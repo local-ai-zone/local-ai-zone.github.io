@@ -1150,6 +1150,8 @@ class ModelDiscoveryApp {
         <span class="text-sm text-gray-600">
           ${model.files ? model.files.length : 0} file${model.files && model.files.length !== 1 ? 's' : ''}
         </span>
+        <!-- COMMENTED OUT: Hugging Face link removed since we no longer use HF URLs -->
+        <!--
         <a 
           href="https://huggingface.co/${model.modelId}" 
           target="_blank" 
@@ -1162,6 +1164,7 @@ class ModelDiscoveryApp {
           </svg>
           View Model
         </a>
+        -->
       </div>
     `;
 

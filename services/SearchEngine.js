@@ -62,10 +62,12 @@ export class SearchEngine {
         metadata: {
           architecture: 'Unknown',
           quantizations: [],
-          organization: this.extractOrganization(model.modelId),
-          modelName: this.extractModelName(model.modelId),
+          // organization: this.extractOrganization(model.huggingFaceLink), // COMMENTED OUT: No longer using HF URLs
+          organization: 'Unknown', // Placeholder value since we don't extract from HF URLs anymore
+          // modelName: this.extractModelName(model.huggingFaceLink), // COMMENTED OUT: No longer using HF URLs
+          modelName: model.modelName || 'Unknown', // Use direct property from workflow data
           fileCount: model.files ? model.files.length : 0,
-          downloads: model.downloads || 0,
+          downloads: model.downloadCount || 0,
           lastModified: model.lastModified || null
         }
       });
@@ -91,11 +93,12 @@ export class SearchEngine {
     parts.push(model.modelType || '');
     parts.push(model.quantFormat || '');
     
-    // Extract organization and model name from huggingFaceLink
-    if (model.huggingFaceLink) {
-      parts.push(this.extractOrganization(model.huggingFaceLink));
-      parts.push(this.extractModelName(model.huggingFaceLink));
-    }
+    // COMMENTED OUT: No longer extracting organization and model name from huggingFaceLink
+    // The workflow data already provides modelName directly, no need to parse URLs
+    // if (model.huggingFaceLink) {
+    //   parts.push(this.extractOrganization(model.huggingFaceLink));
+    //   parts.push(this.extractModelName(model.huggingFaceLink));
+    // }
     
     // Extract filename from directDownloadLink
     if (model.directDownloadLink) {
@@ -239,13 +242,14 @@ export class SearchEngine {
       score += 1.5;
     }
     
-    // Organization match bonus using workflow format
-    if (indexData.model.huggingFaceLink) {
-      const organization = this.extractOrganization(indexData.model.huggingFaceLink).toLowerCase();
-      if (organization.includes(query)) {
-        score += 1.2;
-      }
-    }
+    // COMMENTED OUT: Organization match bonus using Hugging Face URL
+    // No longer extracting organization from huggingFaceLink since we work with workflow data directly
+    // if (indexData.model.huggingFaceLink) {
+    //   const organization = this.extractOrganization(indexData.model.huggingFaceLink).toLowerCase();
+    //   if (organization.includes(query)) {
+    //     score += 1.2;
+    //   }
+    // }
     
     // Model type match bonus using workflow format
     if (indexData.model.modelType && indexData.model.modelType.toLowerCase().includes(query)) {
@@ -296,33 +300,41 @@ export class SearchEngine {
    * Extract organization from Hugging Face URL
    * @param {string} url - Hugging Face URL
    * @returns {string} Organization name
+   * 
+   * COMMENTED OUT: No longer using Hugging Face URLs for data extraction
+   * The application now works entirely with pre-generated workflow data
+   * and doesn't need to parse Hugging Face URLs for organization information.
    */
-  extractOrganization(url) {
-    if (!url) return '';
-    try {
-      const urlObj = new URL(url);
-      const pathParts = urlObj.pathname.split('/').filter(Boolean);
-      return pathParts.length > 0 ? pathParts[0] : '';
-    } catch {
-      return '';
-    }
-  }
+  // extractOrganization(url) {
+  //   if (!url) return '';
+  //   try {
+  //     const urlObj = new URL(url);
+  //     const pathParts = urlObj.pathname.split('/').filter(Boolean);
+  //     return pathParts.length > 0 ? pathParts[0] : '';
+  //   } catch {
+  //     return '';
+  //   }
+  // }
 
   /**
    * Extract model name from Hugging Face URL
    * @param {string} url - Hugging Face URL
    * @returns {string} Model name
+   * 
+   * COMMENTED OUT: No longer using Hugging Face URLs for data extraction
+   * The application now works entirely with pre-generated workflow data
+   * and doesn't need to parse Hugging Face URLs for model name information.
    */
-  extractModelName(url) {
-    if (!url) return '';
-    try {
-      const urlObj = new URL(url);
-      const pathParts = urlObj.pathname.split('/').filter(Boolean);
-      return pathParts.length > 1 ? pathParts[1] : (pathParts.length === 1 ? pathParts[0] : '');
-    } catch {
-      return '';
-    }
-  }
+  // extractModelName(url) {
+  //   if (!url) return '';
+  //   try {
+  //     const urlObj = new URL(url);
+  //     const pathParts = urlObj.pathname.split('/').filter(Boolean);
+  //     return pathParts.length > 1 ? pathParts[1] : (pathParts.length === 1 ? pathParts[0] : '');
+  //   } catch {
+  //     return '';
+  //   }
+  // }
 
   /**
    * Update search performance statistics
