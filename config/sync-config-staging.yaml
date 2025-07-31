@@ -1,0 +1,132 @@
+# Staging Environment Configuration
+# Pre-production testing environment
+
+# Environment and basic settings
+environment: staging
+log_level: INFO
+debug_mode: false
+dry_run: false
+
+# API and external service settings
+api_base_url: "https://huggingface.co"
+user_agent: "GGUF-Models-Sync/1.0-staging"
+
+# Workflow and deployment settings
+workflow_timeout_hours: 4
+enable_github_actions_integration: true
+enable_pages_deployment: true
+
+# Rate limiting configuration
+rate_limiting:
+  requests_per_second: 1.0
+  requests_per_hour: 3000
+  max_concurrent_requests: 30
+  backoff_base: 2.0
+  backoff_jitter: true
+  max_retries: 4
+  timeout_seconds: 45
+
+# Sync behavior configuration
+sync_behavior:
+  mode: auto
+  incremental_window_hours: 36
+  full_sync_threshold_hours: 120  # 5 days
+  significant_change_threshold: 0.08
+  force_full_sync: false
+  enable_multi_strategy_discovery: true
+  enable_deduplication: true
+
+# Data validation configuration
+validation:
+  enable_schema_validation: true
+  enable_file_verification: true
+  enable_completeness_checking: true
+  min_completeness_score: 0.92
+  enable_quality_scoring: true
+  enable_automatic_fixes: true
+  validation_timeout_seconds: 240
+
+# Error handling configuration
+error_handling:
+  enable_error_recovery: true
+  enable_exponential_backoff: true
+  enable_categorized_errors: true
+  enable_notifications: true
+  max_recovery_attempts: 3
+  recovery_delay_seconds: 45
+  preserve_data_on_failure: true
+
+# Monitoring and alerting configuration
+monitoring:
+  enable_detailed_logging: true
+  enable_progress_tracking: true
+  progress_report_interval_seconds: 600  # 10 minutes
+  enable_performance_metrics: true
+  enable_alerts: true
+  alert_channels:
+    - log
+    - github
+  enable_dashboard: true
+
+# Performance optimization configuration
+performance:
+  enable_streaming_processing: true
+  enable_data_compression: true
+  enable_caching: true
+  cache_ttl_hours: 12
+  memory_limit_mb: 1536
+  enable_parallel_processing: true
+  chunk_size: 75
+  enable_adaptive_parameters: true
+
+# Storage configuration
+storage:
+  data_directory: "data"
+  backup_directory: "data/backups"
+  reports_directory: "reports"
+  logs_directory: "logs"
+  enable_backups: true
+  backup_retention_days: 14
+  enable_compression: true
+
+# Notification configuration
+notifications:
+  enable_success_notifications: true
+  enable_failure_notifications: true
+  enable_warning_notifications: true
+  enable_critical_notifications: true
+  notification_channels:
+    - log
+    - github
+  webhook_urls: []
+  email_recipients: []
+
+# Security configuration
+security:
+  enable_token_validation: true
+  enable_rate_limit_protection: true
+  enable_request_signing: false
+  enable_audit_logging: true
+  mask_sensitive_data: true
+  allowed_domains:
+    - "huggingface.co"
+
+# Dynamic retention configuration (staging settings)
+dynamic_retention:
+  retention_days: 21  # Shorter retention for staging
+  top_models_count: 15  # Fewer models for staging
+  update_schedule_cron: "0 3 * * *"  # Daily at 3 AM
+  enable_cleanup: true
+  cleanup_batch_size: 75
+  preserve_download_threshold: 500  # Lower threshold for staging
+  enable_ranking_history: true
+  ranking_history_days: 60
+  enable_retention_mode: true  # Enable for testing
+  recent_models_priority: true
+  top_models_storage_path: "data/top_models_staging.json"
+  retention_metadata_path: "data/retention_metadata_staging.json"
+
+# Custom settings for staging
+custom_settings:
+  enable_performance_testing: true
+  enable_load_testing: false

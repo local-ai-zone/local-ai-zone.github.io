@@ -1,0 +1,132 @@
+# Development Environment Configuration
+# Optimized for local development and testing
+
+# Environment and basic settings
+environment: development
+log_level: DEBUG
+debug_mode: true
+dry_run: false
+
+# API and external service settings
+api_base_url: "https://huggingface.co"
+user_agent: "GGUF-Models-Sync/1.0-dev"
+
+# Workflow and deployment settings
+workflow_timeout_hours: 2
+enable_github_actions_integration: false
+enable_pages_deployment: false
+
+# Rate limiting configuration (more conservative for development)
+rate_limiting:
+  requests_per_second: 0.5  # Slower for development
+  requests_per_hour: 1000
+  max_concurrent_requests: 10
+  backoff_base: 2.0
+  backoff_jitter: true
+  max_retries: 3
+  timeout_seconds: 60
+
+# Sync behavior configuration
+sync_behavior:
+  mode: incremental  # Default to incremental for faster dev cycles
+  incremental_window_hours: 24  # Shorter window for development
+  full_sync_threshold_hours: 72  # More frequent full syncs
+  significant_change_threshold: 0.05  # More sensitive to changes
+  force_full_sync: false
+  enable_multi_strategy_discovery: true
+  enable_deduplication: true
+
+# Data validation configuration
+validation:
+  enable_schema_validation: true
+  enable_file_verification: false  # Skip file verification for speed
+  enable_completeness_checking: true
+  min_completeness_score: 0.8  # Lower threshold for development
+  enable_quality_scoring: true
+  enable_automatic_fixes: true
+  validation_timeout_seconds: 120
+
+# Error handling configuration
+error_handling:
+  enable_error_recovery: true
+  enable_exponential_backoff: true
+  enable_categorized_errors: true
+  enable_notifications: false  # Disable notifications in dev
+  max_recovery_attempts: 2
+  recovery_delay_seconds: 30
+  preserve_data_on_failure: true
+
+# Monitoring and alerting configuration
+monitoring:
+  enable_detailed_logging: true
+  enable_progress_tracking: true
+  progress_report_interval_seconds: 300  # More frequent progress reports
+  enable_performance_metrics: true
+  enable_alerts: false  # Disable alerts in development
+  alert_channels:
+    - log
+  enable_dashboard: true
+
+# Performance optimization configuration
+performance:
+  enable_streaming_processing: false  # Disable for easier debugging
+  enable_data_compression: false
+  enable_caching: true
+  cache_ttl_hours: 1  # Shorter cache for development
+  memory_limit_mb: 1024
+  enable_parallel_processing: false  # Disable for easier debugging
+  chunk_size: 50
+  enable_adaptive_parameters: false
+
+# Storage configuration
+storage:
+  data_directory: "data"
+  backup_directory: "data/backups"
+  reports_directory: "reports"
+  logs_directory: "logs"
+  enable_backups: false  # Disable backups in development
+  backup_retention_days: 7
+  enable_compression: false
+
+# Notification configuration
+notifications:
+  enable_success_notifications: false
+  enable_failure_notifications: false
+  enable_warning_notifications: false
+  enable_critical_notifications: false
+  notification_channels:
+    - log
+  webhook_urls: []
+  email_recipients: []
+
+# Security configuration
+security:
+  enable_token_validation: true
+  enable_rate_limit_protection: false  # Disable for easier testing
+  enable_request_signing: false
+  enable_audit_logging: false
+  mask_sensitive_data: false  # Show full data for debugging
+  allowed_domains:
+    - "huggingface.co"
+    - "localhost"
+
+# Dynamic retention configuration (development settings)
+dynamic_retention:
+  retention_days: 7  # Shorter retention for development
+  top_models_count: 10  # Fewer models for faster testing
+  update_schedule_cron: "0 */6 * * *"  # Every 6 hours for development
+  enable_cleanup: false  # Disable cleanup in development
+  cleanup_batch_size: 50
+  preserve_download_threshold: 100  # Lower threshold for development
+  enable_ranking_history: false  # Disable for simpler development
+  ranking_history_days: 30
+  enable_retention_mode: true  # Enable for testing
+  recent_models_priority: true
+  top_models_storage_path: "data/top_models_dev.json"
+  retention_metadata_path: "data/retention_metadata_dev.json"
+
+# Custom settings for development
+custom_settings:
+  enable_test_mode: true
+  sample_size_limit: 100  # Limit sample size for faster testing
+  enable_mock_responses: false

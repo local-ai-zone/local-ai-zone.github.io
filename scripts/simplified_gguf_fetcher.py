@@ -1,0 +1,951 @@
+#!/usr/bin/env python3
+"""
+Simplified GGUF Fetcher
+
+A two-phase system that downloads model data from Hugging Face API once,
+then processes it locally to extract essential GGUF model information.
+
+Phase 1 (Download): Fetch recent models + top downloaded models, save raw data
+Phase 2 (Process): Extract 8 required fields from saved data, generate output
+"""
+
+import argparse
+import json
+import logging
+import os
+import sys
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Tuple
+
+from huggingface_hub import HfApi
+
+
+class SimplifiedGGUFetcher:
+    """
+    Main class for fetching and processing GGUF model data from Hugging Face.
+    
+    Implements a two-phase approach:
+    1. Download: Fetch model data from API and save locally
+    2. Process: Extract required fields from saved data
+    """
+    
+    def __init__(self, token: Optional[str] = None):
+        """
+        Initialize the fetcher with optional HF token.
+        
+        Args:
+            token: Optional Hugging Face API token for authenticated requests
+        """
+        self.api = HfApi(token=token)
+        self.logger = logging.getLogger(__name__)
+        
+        # File paths
+        self.raw_data_file = "data/raw_models_data.json"
+        self.output_file = "data/gguf_models.json"
+        
+        # Ensure data directory exists
+        os.makedirs("data", exist_ok=True)
+    
+    def download_data(self) -> None:
+        """
+        Phase 1: Download model data from Hugging Face API and save locally.
+        
+        Fetches recent models (last 30 days) and top downloaded models,
+        deduplicates them, and saves raw data for processing.
+        """
+        self.logger.info("=" * 50)
+        self.logger.info("STARTING DOWNLOAD PHASE")
+        self.logger.info("=" * 50)
+        
+        try:
+            # Fetch both datasets with progress logging
+            self.logger.info("Step 1/3: Fetching recent models...")
+            recent_models = self._fetch_recent_models()
+            
+            self.logger.info("Step 2/3: Fetching top downloaded models...")
+            top_models = self._fetch_top_models()
+            
+            self.logger.info("Step 3/3: Combining and deduplicating models...")
+            
+            # Combine both model lists
+            all_models = recent_models + top_models
+            
+            # Deduplicate models by model ID
+            seen_ids = set()
+            deduplicated_models = []
+            
+            for model in all_models:
+                try:
+                    model_id = model.id
+                    if model_id not in seen_ids:
+                        seen_ids.add(model_id)
+                        deduplicated_models.append(model)
+                except Exception as e:
+                    self.logger.warning(f"Error processing model during deduplication: {e}")
+                    continue
+            
+            # Log summary statistics
+            self.logger.info(f"Download Summary:")
+            self.logger.info(f"  - Recent models (30 days): {len(recent_models)}")
+            self.logger.info(f"  - Top downloaded models: {len(top_models)}")
+            self.logger.info(f"  - Total before deduplication: {len(all_models)}")
+            self.logger.info(f"  - Unique models after deduplication: {len(deduplicated_models)}")
+            self.logger.info(f"  - Duplicates removed: {len(all_models) - len(deduplicated_models)}")
+            
+            # Save raw model data to JSON file
+            self._save_raw_data(deduplicated_models)
+            
+            self.logger.info("=" * 50)
+            self.logger.info("DOWNLOAD PHASE COMPLETED SUCCESSFULLY")
+            self.logger.info("=" * 50)
+            
+        except Exception as e:
+            self.logger.error(f"Download phase failed: {e}")
+            raise
+    
+    def _fetch_recent_models(self) -> List[Dict]:
+        """
+        Fetch models uploaded in the last 30 days with GGUF filter.
+        
+        Returns:
+            List of model dictionaries from the last 30 days
+        """
+        # Calculate date 30 days ago
+        thirty_days_ago = datetime.now() - timedelta(days=30)
+        self.logger.info(f"Fetching GGUF models created since {thirty_days_ago.strftime('%Y-%m-%d')}")
+        
+        try:
+            # Get models with GGUF filter, sorted by creation date
+            # Using a larger limit to ensure we get enough recent models
+            self.logger.debug("Querying Hugging Face API for recent models...")
+            models = list(self.api.list_models(
+                filter="gguf",
+                sort="createdAt",
+                direction=-1,  # Newest first
+                limit=500  # Get more models to filter by date
+            ))
+            
+            self.logger.debug(f"Retrieved {len(models)} models from API, filtering by date...")
+            
+            # Filter models by created_at field to get last 30 days only
+            recent_models = []
+            skipped_no_date = 0
+            skipped_too_old = 0
+            
+            for model in models:
+                try:
+                    if hasattr(model, 'created_at') and model.created_at:
+                        # Parse the created_at datetime
+                        created_date = model.created_at
+                        if isinstance(created_date, str):
+                            # If it's a string, parse it
+                            try:
+                                created_date = datetime.fromisoformat(created_date.replace('Z', '+00:00'))
+                            except ValueError:
+                                # Skip if we can't parse the date
+                                skipped_no_date += 1
+                                continue
+                        
+                        # Check if model was created in the last 30 days
+                        if created_date.replace(tzinfo=None) >= thirty_days_ago:
+                            recent_models.append(model)
+                        else:
+                            # Since models are sorted by creation date (newest first),
+                            # we can break once we hit models older than 30 days
+                            skipped_too_old += 1
+                            break
+                    else:
+                        skipped_no_date += 1
+                except Exception as e:
+                    self.logger.debug(f"Error processing model {getattr(model, 'id', 'unknown')}: {e}")
+                    skipped_no_date += 1
+                    continue
+            
+            # Log summary statistics
+            self.logger.info(f"Recent models summary:")
+            self.logger.info(f"  - Models found in last 30 days: {len(recent_models)}")
+            self.logger.info(f"  - Models skipped (no date): {skipped_no_date}")
+            self.logger.info(f"  - Models skipped (too old): {skipped_too_old}")
+            
+            return recent_models
+            
+        except Exception as e:
+            self.logger.error(f"Failed to fetch recent models: {e}")
+            self.logger.warning("Continuing with empty recent models list")
+            return []
+    
+    def _fetch_top_models(self) -> List[Dict]:
+        """
+        Fetch top 20 most downloaded GGUF models of all time.
+        
+        Returns:
+            List of top 20 most downloaded model dictionaries
+        """
+        self.logger.info("Fetching top 20 most downloaded GGUF models of all time...")
+        
+        try:
+            # Get models with GGUF filter, sorted by downloads in descending order
+            self.logger.debug("Querying Hugging Face API for top downloaded models...")
+            models = list(self.api.list_models(
+                filter="gguf",
+                sort="downloads",
+                direction=-1,  # Highest downloads first
+                limit=20  # Top 20 models
+            ))
+            
+            # Log some statistics about the top models
+            if models:
+                top_downloads = getattr(models[0], 'downloads', 0) if models else 0
+                self.logger.info(f"Top downloaded models summary:")
+                self.logger.info(f"  - Models retrieved: {len(models)}")
+                self.logger.info(f"  - Highest download count: {top_downloads:,}")
+            else:
+                self.logger.warning("No top downloaded models found")
+            
+            return models
+            
+        except Exception as e:
+            self.logger.error(f"Failed to fetch top downloaded models: {e}")
+            self.logger.warning("Continuing with empty top models list")
+            return []
+    
+    def _save_raw_data(self, models: List[Dict]) -> None:
+        """
+        Save raw model data to JSON file.
+        
+        Args:
+            models: List of model dictionaries to save
+        """
+        if not models:
+            self.logger.warning("No models to save")
+            return
+            
+        self.logger.info(f"Saving {len(models)} models to {self.raw_data_file}...")
+        
+        try:
+            # Convert model objects to dictionaries for JSON serialization
+            models_data = []
+            failed_models = 0
+            
+            for i, model in enumerate(models, 1):
+                try:
+                    model_id = getattr(model, 'id', 'unknown')
+                    self.logger.debug(f"Processing model {i}/{len(models)}: {model_id}")
+                    
+                    # Get detailed model info including siblings (files)
+                    try:
+                        detailed_model = self.api.model_info(model_id, files_metadata=True)
+                        raw_siblings = getattr(detailed_model, 'siblings', [])
+                        
+                        # Convert RepoSibling objects to dictionaries
+                        siblings = []
+                        for sibling in raw_siblings:
+                            if hasattr(sibling, 'rfilename'):
+                                sibling_dict = {
+                                    'rfilename': getattr(sibling, 'rfilename', ''),
+                                    'size': getattr(sibling, 'size', 0)
+                                }
+                                siblings.append(sibling_dict)
+                            
+                    except Exception as e:
+                        self.logger.debug(f"Could not fetch detailed info for {model_id}: {e}")
+                        siblings = []
+                    
+                    # Convert the model object to a dictionary with the fields we need
+                    model_dict = {
+                        'id': model_id,
+                        'downloads': getattr(model, 'downloads', 0),
+                        'tags': getattr(model, 'tags', []),
+                        'siblings': siblings,
+                        'cardData': getattr(model, 'cardData', {}),
+                        'lastModified': getattr(model, 'lastModified', None),
+                        'created_at': getattr(model, 'created_at', None)
+                    }
+                    
+                    # Convert datetime objects to ISO strings for JSON serialization
+                    if model_dict['lastModified'] and hasattr(model_dict['lastModified'], 'isoformat'):
+                        model_dict['lastModified'] = model_dict['lastModified'].isoformat()
+                    if model_dict['created_at'] and hasattr(model_dict['created_at'], 'isoformat'):
+                        model_dict['created_at'] = model_dict['created_at'].isoformat()
+                    
+                    models_data.append(model_dict)
+                    
+                except Exception as e:
+                    failed_models += 1
+                    model_id = getattr(model, 'id', 'unknown')
+                    self.logger.warning(f"Failed to process model {model_id} during save: {e}")
+                    continue
+            
+            # Save to JSON file
+            with open(self.raw_data_file, 'w', encoding='utf-8') as f:
+                json.dump(models_data, f, indent=2, ensure_ascii=False)
+            
+            # Log save summary statistics
+            self.logger.info(f"Save summary:")
+            self.logger.info(f"  - Successfully saved: {len(models_data)} models")
+            self.logger.info(f"  - Failed to process: {failed_models} models")
+            self.logger.info(f"  - Output file: {self.raw_data_file}")
+            
+        except Exception as e:
+            self.logger.error(f"Critical error saving raw data: {e}")
+            raise
+    
+    def process_data(self) -> None:
+        """
+        Phase 2: Process downloaded data and generate final output.
+        
+        Reads raw model data, extracts required fields for each GGUF file,
+        and generates the final JSON output.
+        """
+        self.logger.info("=" * 50)
+        self.logger.info("STARTING PROCESS PHASE")
+        self.logger.info("=" * 50)
+        
+        try:
+            # Step 1: Load raw data
+            self.logger.info("Step 1/4: Loading raw model data...")
+            raw_models = self._load_raw_data()
+            if not raw_models:
+                self.logger.warning("No raw data found, nothing to process")
+                return
+            
+            # Step 2: Filter models to only process those with GGUF files
+            self.logger.info("Step 2/4: Filtering models with GGUF files...")
+            models_with_gguf = self._filter_gguf_models(raw_models)
+            
+            models_without_gguf = len(raw_models) - len(models_with_gguf)
+            self.logger.info(f"Filtering summary:")
+            self.logger.info(f"  - Total models loaded: {len(raw_models)}")
+            self.logger.info(f"  - Models with GGUF files: {len(models_with_gguf)}")
+            self.logger.info(f"  - Models without GGUF files: {models_without_gguf}")
+            
+            if not models_with_gguf:
+                self.logger.warning("No models with GGUF files found, nothing to process")
+                return
+            
+            # Step 3: Process each model and extract info for each GGUF file
+            self.logger.info("Step 3/4: Processing models and extracting GGUF file information...")
+            processed_models = self._process_models(models_with_gguf)
+            
+            # Step 4: Generate final output with proper sorting and formatting
+            self.logger.info("Step 4/4: Generating final output...")
+            self._generate_output(processed_models)
+            
+            self.logger.info("=" * 50)
+            self.logger.info("PROCESS PHASE COMPLETED SUCCESSFULLY")
+            self.logger.info("=" * 50)
+            
+        except Exception as e:
+            self.logger.error(f"Process phase failed: {e}")
+            raise
+    
+    def _load_raw_data(self) -> List[Dict]:
+        """
+        Load raw model data from JSON file.
+        
+        Returns:
+            List of raw model dictionaries, empty list if file not found or error
+        """
+        try:
+            if not os.path.exists(self.raw_data_file):
+                self.logger.error(f"Raw data file not found: {self.raw_data_file}")
+                self.logger.info("Run the download phase first to generate raw data")
+                return []
+            
+            with open(self.raw_data_file, 'r', encoding='utf-8') as f:
+                raw_models = json.load(f)
+            
+            self.logger.info(f"Loaded {len(raw_models)} models from {self.raw_data_file}")
+            return raw_models
+            
+        except json.JSONDecodeError as e:
+            self.logger.error(f"Invalid JSON in raw data file: {e}")
+            return []
+        except Exception as e:
+            self.logger.error(f"Error loading raw data: {e}")
+            return []
+    
+    def _filter_gguf_models(self, raw_models: List[Dict]) -> List[Dict]:
+        """
+        Filter models to only process those with .gguf files in siblings.
+        
+        Args:
+            raw_models: List of raw model dictionaries
+            
+        Returns:
+            List of models that have GGUF files
+        """
+        models_with_gguf = []
+        skipped_no_siblings = 0
+        skipped_no_gguf = 0
+        
+        for model in raw_models:
+            try:
+                model_id = model.get('id', 'unknown')
+                siblings = model.get('siblings')
+                
+                # Check if siblings data exists and is a list
+                if not siblings or not isinstance(siblings, list):
+                    self.logger.debug(f"Skipping {model_id}: no siblings data")
+                    skipped_no_siblings += 1
+                    continue
+                
+                # Check if any sibling file has .gguf extension
+                has_gguf = False
+                gguf_count = 0
+                for sibling in siblings:
+                    if isinstance(sibling, dict):
+                        filename = sibling.get('rfilename', '')
+                        if filename.lower().endswith('.gguf'):
+                            has_gguf = True
+                            gguf_count += 1
+                
+                if has_gguf:
+                    models_with_gguf.append(model)
+                    self.logger.debug(f"Model {model_id}: found {gguf_count} GGUF files")
+                else:
+                    self.logger.debug(f"Skipping {model_id}: no GGUF files found")
+                    skipped_no_gguf += 1
+                    
+            except Exception as e:
+                model_id = model.get('id', 'unknown')
+                self.logger.warning(f"Error filtering model {model_id}: {e}")
+                skipped_no_siblings += 1
+                continue
+        
+        # Log detailed filtering statistics
+        self.logger.info(f"GGUF filtering results:")
+        self.logger.info(f"  - Models with GGUF files: {len(models_with_gguf)}")
+        self.logger.info(f"  - Models skipped (no siblings): {skipped_no_siblings}")
+        self.logger.info(f"  - Models skipped (no GGUF files): {skipped_no_gguf}")
+        self.logger.info(f"  - Total skipped: {skipped_no_siblings + skipped_no_gguf}")
+        
+        return models_with_gguf
+    
+    def _process_models(self, models: List[Dict]) -> List[Dict]:
+        """
+        Process each model and extract info for each GGUF file.
+        
+        Creates separate entries for each GGUF file in a model and handles
+        processing errors gracefully by skipping failed models.
+        
+        Args:
+            models: List of model dictionaries with GGUF files
+            
+        Returns:
+            List of processed model entries (one per GGUF file)
+        """
+        processed_models = []
+        skipped_count = 0
+        total_gguf_files = 0
+        
+        self.logger.info(f"Processing {len(models)} models...")
+        
+        for i, model in enumerate(models, 1):
+            model_id = model.get('id', 'unknown')
+            
+            try:
+                self.logger.debug(f"Processing model {i}/{len(models)}: {model_id}")
+                
+                # Extract info for each GGUF file in this model
+                model_entries = self._extract_model_info(model)
+                processed_models.extend(model_entries)
+                total_gguf_files += len(model_entries)
+                
+                self.logger.debug(f"  -> Created {len(model_entries)} GGUF file entries")
+                
+                # Log progress every 10 models
+                if i % 10 == 0 or i == len(models):
+                    self.logger.info(f"Progress: {i}/{len(models)} models processed ({(i/len(models)*100):.1f}%)")
+                
+            except Exception as e:
+                # Handle processing errors gracefully by skipping failed models
+                self.logger.warning(f"Skipping model {model_id} due to processing error: {e}")
+                skipped_count += 1
+                continue
+        
+        # Log comprehensive processing statistics
+        self.logger.info(f"Model processing summary:")
+        self.logger.info(f"  - Models processed successfully: {len(models) - skipped_count}")
+        self.logger.info(f"  - Models skipped due to errors: {skipped_count}")
+        self.logger.info(f"  - Total GGUF file entries created: {len(processed_models)}")
+        self.logger.info(f"  - Average GGUF files per model: {total_gguf_files / max(len(models) - skipped_count, 1):.1f}")
+        
+        return processed_models
+    
+    def _extract_model_info(self, model_data: Dict) -> List[Dict]:
+        """
+        Extract info for each GGUF file in a model.
+        
+        Args:
+            model_data: Raw model dictionary from API
+            
+        Returns:
+            List of processed model dictionaries (one per GGUF file)
+        """
+        model_id = model_data.get('id', '')
+        siblings = model_data.get('siblings', [])
+        downloads = model_data.get('downloads', 0)
+        tags = model_data.get('tags', [])
+        card_data = model_data.get('cardData', {})
+        
+        # Extract common fields that are the same for all GGUF files in this model
+        model_name = self._extract_model_name(model_id)
+        model_type = self._infer_model_type(model_id, tags)
+        license_info = self._get_license(card_data)
+        hf_link, _ = self._generate_links(model_id, "")  # Get HF link without filename
+        
+        processed_entries = []
+        
+        # Process each GGUF file in the model
+        for sibling in siblings:
+            if not isinstance(sibling, dict):
+                continue
+                
+            filename = sibling.get('rfilename', '')
+            if not filename.lower().endswith('.gguf'):
+                continue
+            
+            # Extract file-specific fields
+            file_size = sibling.get('size', 0)
+            file_size_formatted = self._format_file_size(file_size)
+            quantization = self._extract_quantization(filename)
+            _, direct_download_link = self._generate_links(model_id, filename)
+            
+            # Create entry for this GGUF file
+            entry = {
+                'modelName': model_name,
+                'quantFormat': quantization,
+                'fileSize': file_size,
+                'fileSizeFormatted': file_size_formatted,
+                'modelType': model_type,
+                'license': license_info,
+                'downloadCount': downloads,
+                'huggingFaceLink': hf_link,
+                'directDownloadLink': direct_download_link,
+                'modelId': model_id,
+                'filename': filename
+            }
+            
+            processed_entries.append(entry)
+        
+        return processed_entries
+    
+    def _generate_output(self, processed_models: List[Dict]) -> None:
+        """
+        Generate JSON array with exactly 8 required fields per model.
+        
+        Sorts models by download count (highest first) and ensures output is valid JSON.
+        
+        Args:
+            processed_models: List of processed model dictionaries
+        """
+        if not processed_models:
+            self.logger.warning("No processed models to output, creating empty output file")
+            # Create empty output file
+            with open(self.output_file, 'w', encoding='utf-8') as f:
+                json.dump([], f, indent=2, ensure_ascii=False)
+            self.logger.info(f"Created empty output file: {self.output_file}")
+            return
+        
+        self.logger.info(f"Generating output from {len(processed_models)} processed entries...")
+        
+        # Sort models by download count (highest first)
+        self.logger.debug("Sorting models by download count...")
+        sorted_models = sorted(processed_models, key=lambda x: x.get('downloadCount', 0), reverse=True)
+        
+        # Create output with exactly 8 required fields per model
+        output_models = []
+        field_errors = 0
+        
+        for i, model in enumerate(sorted_models):
+            try:
+                # Ensure we only include the 8 required fields in the exact order
+                output_entry = {
+                    'modelName': model.get('modelName', ''),
+                    'quantFormat': model.get('quantFormat', 'Unknown'),
+                    'fileSize': model.get('fileSize', 0),
+                    'fileSizeFormatted': model.get('fileSizeFormatted', '0 B'),
+                    'modelType': model.get('modelType', 'Unknown'),
+                    'license': model.get('license', 'Not specified'),
+                    'downloadCount': model.get('downloadCount', 0),
+                    'huggingFaceLink': model.get('huggingFaceLink', ''),
+                    'directDownloadLink': model.get('directDownloadLink', '')
+                }
+                output_models.append(output_entry)
+            except Exception as e:
+                field_errors += 1
+                model_name = model.get('modelName', 'unknown')
+                self.logger.warning(f"Error creating output entry for {model_name}: {e}")
+                continue
+        
+        try:
+            # Generate final JSON output
+            with open(self.output_file, 'w', encoding='utf-8') as f:
+                json.dump(output_models, f, indent=2, ensure_ascii=False)
+            
+            # Copy to root directory for website access (GitHub Actions compatible)
+            import shutil
+            root_output_file = 'gguf_models.json'
+            shutil.copy2(self.output_file, root_output_file)
+            self.logger.info(f"Copied {self.output_file} to {root_output_file} for website access")
+            
+            # Log comprehensive output statistics
+            self.logger.info(f"Output generation summary:")
+            self.logger.info(f"  - Output file: {self.output_file}")
+            self.logger.info(f"  - Root copy: {root_output_file}")
+            self.logger.info(f"  - Total entries written: {len(output_models)}")
+            self.logger.info(f"  - Entries with field errors: {field_errors}")
+            
+            # Log detailed statistics about the output
+            if output_models:
+                top_downloads = output_models[0].get('downloadCount', 0)
+                bottom_downloads = output_models[-1].get('downloadCount', 0)
+                unique_models = len(set(model.get('modelName', '') for model in output_models))
+                unique_types = len(set(model.get('modelType', '') for model in output_models))
+                unique_quants = len(set(model.get('quantFormat', '') for model in output_models))
+                
+                self.logger.info(f"Content statistics:")
+                self.logger.info(f"  - Unique model names: {unique_models}")
+                self.logger.info(f"  - Unique model types: {unique_types}")
+                self.logger.info(f"  - Unique quantization formats: {unique_quants}")
+                self.logger.info(f"  - Download count range: {top_downloads:,} to {bottom_downloads:,}")
+                
+                # Log top 3 models for verification
+                self.logger.info(f"Top 3 models by downloads:")
+                for i, model in enumerate(output_models[:3], 1):
+                    name = model.get('modelName', 'Unknown')
+                    downloads = model.get('downloadCount', 0)
+                    model_type = model.get('modelType', 'Unknown')
+                    self.logger.info(f"  {i}. {name} ({model_type}) - {downloads:,} downloads")
+            
+        except Exception as e:
+            self.logger.error(f"Critical error generating output file: {e}")
+            raise
+    
+    def _extract_model_name(self, model_id: str) -> str:
+        """
+        Extract clean model name from modelId (remove org prefix, format nicely).
+        
+        Args:
+            model_id: The full model ID like "microsoft/DialoGPT-medium"
+            
+        Returns:
+            Clean model name like "DialoGPT Medium"
+        """
+        if not model_id:
+            return "Unknown Model"
+        
+        # Split by '/' and take the last part (model name without org)
+        parts = model_id.split('/')
+        model_name = parts[-1] if parts else model_id
+        
+        # Replace hyphens and underscores with spaces
+        model_name = model_name.replace('-', ' ').replace('_', ' ')
+        
+        # Title case the name (capitalize first letter of each word)
+        model_name = ' '.join(word.capitalize() for word in model_name.split())
+        
+        return model_name
+    
+    def _extract_quantization(self, filename: str) -> str:
+        """
+        Parse quantization patterns (Q4_K_M, Q5_0, etc.) from .gguf filenames.
+        
+        Args:
+            filename: The GGUF filename to parse
+            
+        Returns:
+            Quantization format string, "Unknown" if pattern cannot be matched
+        """
+        if not filename:
+            return "Unknown"
+        
+        # Convert to uppercase for consistent matching
+        filename_upper = filename.upper()
+        
+        # Define quantization patterns in order of specificity (most specific first)
+        quant_patterns = [
+            'Q4_K_M', 'Q4_K_S', 'Q5_K_M', 'Q5_K_S', 'Q3_K_M', 'Q3_K_S', 
+            'Q6_K', 'Q2_K', 'Q8_0', 'Q4_0', 'Q4_1', 'Q5_0', 'Q5_1',
+            'F16', 'F32', 'BF16', 'IQ1_S', 'IQ2_XXS', 'IQ3_S', 'IQ4_XS'
+        ]
+        
+        # Look for quantization patterns in the filename
+        for pattern in quant_patterns:
+            if pattern in filename_upper:
+                return pattern
+        
+        # If no pattern found, return fallback
+        return "Unknown"
+    
+    def _infer_model_type(self, model_id: str, tags: List[str]) -> str:
+        """
+        Check tags and model name for patterns (LLaMA, Mistral, Qwen, etc.).
+        
+        Args:
+            model_id: The model ID to check for patterns
+            tags: List of model tags to check
+            
+        Returns:
+            Model type string, "Unknown" if type cannot be determined
+        """
+        if not model_id:
+            return "Unknown"
+        
+        # Convert model_id and tags to lowercase for case-insensitive matching
+        model_id_lower = model_id.lower()
+        tags_lower = [tag.lower() for tag in (tags or [])]
+        
+        # Define model type patterns
+        model_type_patterns = {
+            'LLaMA': ['llama', 'llama-2', 'llama2', 'llama-3', 'llama3'],
+            'Mistral': ['mistral', 'mixtral'],
+            'Qwen': ['qwen', 'qwen1.5', 'qwen2'],
+            'Gemma': ['gemma'],
+            'Phi': ['phi-3', 'phi3', 'phi-2', 'phi'],
+            'CodeLlama': ['codellama', 'code-llama'],
+            'Yi': ['yi-34b', 'yi-6b', 'yi-'],
+            'DeepSeek': ['deepseek'],
+            'Falcon': ['falcon'],
+            'MPT': ['mpt'],
+            'GPT': ['gpt-', 'gpt2', 'gpt3'],
+            'BERT': ['bert'],
+            'T5': ['t5-'],
+            'Vicuna': ['vicuna'],
+            'Alpaca': ['alpaca'],
+            'ChatGLM': ['chatglm'],
+            'Baichuan': ['baichuan'],
+            'InternLM': ['internlm'],
+            'Zephyr': ['zephyr'],
+            'Orca': ['orca'],
+            'WizardLM': ['wizardlm', 'wizard'],
+            'StableLM': ['stablelm'],
+            'RedPajama': ['redpajama'],
+            'OpenLLaMA': ['openllama'],
+            'Dolly': ['dolly']
+        }
+        
+        # Check model ID for patterns first (more reliable)
+        for model_type, patterns in model_type_patterns.items():
+            for pattern in patterns:
+                if pattern in model_id_lower:
+                    return model_type
+        
+        # Check tags for patterns
+        for model_type, patterns in model_type_patterns.items():
+            for pattern in patterns:
+                for tag in tags_lower:
+                    if pattern in tag:
+                        return model_type
+        
+        # If no pattern found, return fallback
+        return "Unknown"
+    
+    def _get_license(self, card_data: Dict) -> str:
+        """
+        Extract license from cardData metadata.
+        
+        Args:
+            card_data: The cardData dictionary from model metadata
+            
+        Returns:
+            License string, "Not specified" if license is missing
+        """
+        if not card_data or not isinstance(card_data, dict):
+            return "Not specified"
+        
+        # Try to get license from various possible fields
+        license_value = card_data.get('license')
+        
+        if not license_value:
+            # Try alternative field names that might contain license info
+            license_value = card_data.get('license_name')
+        
+        if not license_value:
+            # Try to get from nested metadata
+            metadata = card_data.get('metadata', {})
+            if isinstance(metadata, dict):
+                license_value = metadata.get('license')
+        
+        # If we found a license value, clean it up
+        if license_value:
+            if isinstance(license_value, str):
+                license_value = license_value.strip()
+                if license_value:
+                    return license_value
+            elif isinstance(license_value, list) and license_value:
+                # If it's a list, take the first non-empty item
+                for item in license_value:
+                    if isinstance(item, str) and item.strip():
+                        return item.strip()
+        
+        # If no license found, return fallback
+        return "Not specified"
+    
+    def _format_file_size(self, size_bytes: int) -> str:
+        """
+        Convert bytes to human readable format (GB, MB, etc.).
+        
+        Args:
+            size_bytes: File size in bytes
+            
+        Returns:
+            Human readable size string like "4.2 GB", "0 B" if size is missing
+        """
+        if not size_bytes or size_bytes <= 0:
+            return "0 B"
+        
+        # Define size units
+        units = ['B', 'KB', 'MB', 'GB', 'TB']
+        
+        # Convert to appropriate unit
+        size = float(size_bytes)
+        unit_index = 0
+        
+        while size >= 1024 and unit_index < len(units) - 1:
+            size /= 1024
+            unit_index += 1
+        
+        # Format with appropriate precision
+        if size >= 100:
+            # For sizes >= 100, show no decimal places
+            return f"{size:.0f} {units[unit_index]}"
+        elif size >= 10:
+            # For sizes >= 10, show 1 decimal place
+            return f"{size:.1f} {units[unit_index]}"
+        else:
+            # For sizes < 10, show 2 decimal places
+            return f"{size:.2f} {units[unit_index]}"
+    
+    def _generate_links(self, model_id: str, filename: str) -> Tuple[str, str]:
+        """
+        Generate Hugging Face page and direct download links.
+        
+        Args:
+            model_id: The model ID like "microsoft/DialoGPT-medium"
+            filename: The GGUF filename
+            
+        Returns:
+            Tuple of (hugging_face_link, direct_download_link)
+        """
+        if not model_id:
+            return ("", "")
+        
+        # Generate Hugging Face page link
+        hugging_face_link = f"https://huggingface.co/{model_id}"
+        
+        # Generate direct download link
+        if filename:
+            direct_download_link = f"https://huggingface.co/{model_id}/resolve/main/{filename}"
+        else:
+            direct_download_link = ""
+        
+        return (hugging_face_link, direct_download_link)
+
+
+def setup_logging() -> None:
+    """Configure logging with appropriate format and level."""
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        datefmt='%Y-%m-%d %H:%M:%S'
+    )
+
+
+def main():
+    """Main entry point with command line argument parsing."""
+    parser = argparse.ArgumentParser(
+        description="Simplified GGUF Fetcher - Download and process GGUF model data",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  %(prog)s                    # Run both download and process phases
+  %(prog)s download           # Run only download phase
+  %(prog)s process            # Run only process phase
+        """
+    )
+    
+    parser.add_argument(
+        'command',
+        nargs='?',
+        choices=['download', 'process'],
+        help='Specific phase to run (default: run both phases)'
+    )
+    
+    parser.add_argument(
+        '--token',
+        help='Hugging Face API token for authenticated requests'
+    )
+    
+    parser.add_argument(
+        '--verbose', '-v',
+        action='store_true',
+        help='Enable verbose logging'
+    )
+    
+    args = parser.parse_args()
+    
+    # Setup logging
+    setup_logging()
+    if args.verbose:
+        logging.getLogger().setLevel(logging.DEBUG)
+    
+    logger = logging.getLogger(__name__)
+    
+    # Log execution start
+    start_time = datetime.now()
+    logger.info("=" * 60)
+    logger.info("SIMPLIFIED GGUF FETCHER - EXECUTION START")
+    logger.info("=" * 60)
+    logger.info(f"Start time: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+    logger.info(f"Command: {args.command or 'both phases'}")
+    logger.info(f"Verbose logging: {args.verbose}")
+    logger.info(f"HF Token provided: {'Yes' if args.token else 'No'}")
+    
+    try:
+        # Initialize fetcher
+        logger.info("Initializing GGUF fetcher...")
+        fetcher = SimplifiedGGUFetcher(token=args.token)
+        
+        # Execute requested phase(s)
+        if args.command == 'download':
+            logger.info("Executing download phase only")
+            fetcher.download_data()
+        elif args.command == 'process':
+            logger.info("Executing process phase only")
+            fetcher.process_data()
+        else:
+            logger.info("Executing both download and process phases")
+            fetcher.download_data()
+            fetcher.process_data()
+        
+        # Log successful completion
+        end_time = datetime.now()
+        duration = end_time - start_time
+        logger.info("=" * 60)
+        logger.info("EXECUTION COMPLETED SUCCESSFULLY")
+        logger.info("=" * 60)
+        logger.info(f"End time: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        logger.info(f"Total duration: {duration}")
+        logger.info("All phases completed without critical errors")
+        
+    except KeyboardInterrupt:
+        logger.warning("Execution interrupted by user (Ctrl+C)")
+        sys.exit(130)  # Standard exit code for Ctrl+C
+    except Exception as e:
+        # Log detailed error information
+        end_time = datetime.now()
+        duration = end_time - start_time
+        logger.error("=" * 60)
+        logger.error("EXECUTION FAILED")
+        logger.error("=" * 60)
+        logger.error(f"Error: {e}")
+        logger.error(f"End time: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        logger.error(f"Duration before failure: {duration}")
+        logger.error("Check the logs above for more details")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()

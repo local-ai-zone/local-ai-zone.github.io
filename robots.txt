@@ -1,0 +1,19 @@
+# Robots.txt for GGUF Models Discovery Website
+# Generated automatically by data pipeline
+
+User-agent: *
+Allow: /
+Crawl-delay: 1
+
+# Sitemaps
+Sitemap: https://username.github.io/gguf-models/sitemap.xml
+
+# Disallow crawling of API endpoints
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+
+# Allow crawling of data files
+Allow: /data/
+Allow: /*.json
+Allow: /*.xml
