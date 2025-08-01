@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Engagement Filter</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/engagement-mobile-responsive.css">
+    <style>
+        body {
+            padding: 2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .test-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-results {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Engagement Filter Test</h1>
+        
+        <div id="search-filter-container"></div>
+        
+        <div class="test-results">
+            <h3>Test Results:</h3>
+            <div id="test-output"></div>
+        </div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/state/AppState.js"></script>
+    <script src="js/services/FilterService.js"></script>
+    <script src="js/components/SearchFilter.js"></script>
+
+    <script>
+        // Test data with engagement metrics
+        const testModels = [
+            {
+                modelName: "Test Model 1",
+                quantFormat: "Q4_K_M",
+                modelType: "LLM",
+                license: "MIT",
+                downloadCount: 1000,
+                likeCount: 5,
+                fileSize: 1000000
+            },
+            {
+                modelName: "Test Model 2", 
+                quantFormat: "Q8_0",
+                modelType: "LLM",
+                license: "Apache-2.0",
+                downloadCount: 5000,
+                likeCount: 25,
+                fileSize: 2000000
+            },
+            {
+                modelName: "Test Model 3",
+                quantFormat: "F16",
+                modelType: "Embedding",
+                license: "MIT",
+                downloadCount: 10000,
+                likeCount: 100,
+                fileSize: 500000
+            }
+        ];
+
+        // Initialize components
+        const appState = new AppState();
+        const filterService = new FilterService();
+        
+        // Set test data
+        appState.setModels(testModels);
+        
+        // Initialize SearchFilter component
+        const searchFilter = new SearchFilter('search-filter-container', appState, filterService);
+        
+        // Test engagement filtering
+        function testEngagementFilter() {
+            const output = document.getElementById('test-output');
+            
+            // Test 1: Filter by minimum likes
+            const filtered1 = filterService.filterByEngagement(testModels, 10, Infinity);
+            output.innerHTML += `<p><strong>Test 1 - Min 10 likes:</strong> ${filtered1.length} models (${filtered1.map(m => m.modelName).join(', ')})</p>`;
+            
+            // Test 2: Filter by range
+            const filtered2 = filterService.filterByEngagement(testModels, 5, 50);
+            output.innerHTML += `<p><strong>Test 2 - 5-50 likes:</strong> ${filtered2.length} models (${filtered2.map(m => m.modelName).join(', ')})</p>`;
+            
+            // Test 3: No filter
+            const filtered3 = filterService.filterByEngagement(testModels, 0, Infinity);
+            output.innerHTML += `<p><strong>Test 3 - No filter:</strong> ${filtered3.length} models (all models)</p>`;
+            
+            // Test 4: State integration
+            appState.updateFilters({ likeCountMin: 20, likeCountMax: Infinity });
+            const state = appState.getState();
+            output.innerHTML += `<p><strong>Test 4 - State integration:</strong> likeCountMin=${state.filters.likeCountMin}, likeCountMax=${state.filters.likeCountMax}</p>`;
+        }
+        
+        // Run tests after a short delay to ensure components are initialized
+        setTimeout(testEngagementFilter, 500);
+    </script>
+</body>
+</html>

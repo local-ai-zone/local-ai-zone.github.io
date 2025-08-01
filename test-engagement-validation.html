@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engagement Metrics Validation Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            background: white;
+        }
+        
+        .test-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #111827;
+        }
+        
+        .test-case {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-left: 3px solid #3b82f6;
+            background: #f9fafb;
+        }
+        
+        .test-input {
+            font-family: monospace;
+            background: #f3f4f6;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        
+        .test-result {
+            margin-top: 5px;
+            font-weight: 500;
+        }
+        
+        .test-success {
+            color: #10b981;
+        }
+        
+        .test-warning {
+            color: #f59e0b;
+        }
+        
+        .test-error {
+            color: #ef4444;
+        }
+        
+        .model-card-test {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            background: white;
+        }
+        
+        .console-output {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 0.9em;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Engagement Metrics Validation Test</h1>
+        <p>This page tests error handling and data validation for engagement metrics.</p>
+        
+        <div class="test-section">
+            <div class="test-title">1. Engagement Validation Utility Tests</div>
+            <div id="validation-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">2. Model Card Display Tests</div>
+            <div id="model-card-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">3. Filter Service Validation Tests</div>
+            <div id="filter-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">4. Data Service Processing Tests</div>
+            <div id="data-service-tests"></div>
+        </div>
+        
+        <div class="test-section">
+            <div class="test-title">5. Console Output</div>
+            <div id="console-output" class="console-output"></div>
+        </div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/formatters.js"></script>
+    <script src="js/utils/engagement.js"></script>
+    <script src="js/utils/engagementValidation.js"></script>
+    <script src="js/components/ModelCard.js"></script>
+    <script src="js/services/FilterService.js"></script>
+    <script src="js/services/DataService.js"></script>
+
+    <script>
+        // Capture console output
+        const consoleOutput = document.getElementById('console-output');
+        const originalConsole = {
+            log: console.log,
+            warn: console.warn,
+            error: console.error,
+            info: console.info,
+            debug: console.debug
+        };
+        
+        function captureConsole(level, ...args) {
+            originalConsole[level](...args);
+            const timestamp = new Date().toLocaleTimeString();
+            const message = args.map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            consoleOutput.textContent += `[${timestamp}] ${level.toUpperCase()}: ${message}\n`;
+            consoleOutput.scrollTop = consoleOutput.scrollHeight;
+        }
+        
+        console.log = (...args) => captureConsole('log', ...args);
+        console.warn = (...args) => captureConsole('warn', ...args);
+        console.error = (...args) => captureConsole('error', ...args);
+        console.info = (...args) => captureConsole('info', ...args);
+        console.debug = (...args) => captureConsole('debug', ...args);
+
+        // Test data with various edge cases
+        const testCases = [
+            { name: 'Valid positive integer', value: 42, expected: 42 },
+            { name: 'Valid zero', value: 0, expected: 0 },
+            { name: 'Valid large number', value: 1500000, expected: 1500000 },
+            { name: 'Null value', value: null, expected: 0 },
+            { name: 'Undefined value', value: undefined, expected: 0 },
+            { name: 'Empty string', value: '', expected: 0 },
+            { name: 'String "null"', value: 'null', expected: 0 },
+            { name: 'String "N/A"', value: 'N/A', expected: 0 },
+            { name: 'Valid number string', value: '123', expected: 123 },
+            { name: 'Float number', value: 42.7, expected: 42 },
+            { name: 'Negative number', value: -10, expected: 0 },
+            { name: 'NaN', value: NaN, expected: 0 },
+            { name: 'Infinity', value: Infinity, expected: 0 },
+            { name: 'Boolean true', value: true, expected: 1 },
+            { name: 'Boolean false', value: false, expected: 0 },
+            { name: 'Array', value: [1, 2, 3], expected: 0 },
+            { name: 'Object', value: { likes: 42 }, expected: 0 },
+            { name: 'Extremely large number', value: 50000000, expected: 10000000 },
+            { name: 'Invalid string', value: 'not-a-number', expected: 0 }
+        ];
+
+        // Test models with various engagement data states
+        const testModels = [
+            {
+                modelName: 'Valid Model',
+                likeCount: 42,
+                quantFormat: 'Q4_K_M',
+                modelType: 'LLM',
+                license: 'MIT'
+            },
+            {
+                modelName: 'Zero Likes Model',
+                likeCount: 0,
+                quantFormat: 'Q4_K_M',
+                modelType: 'LLM',
+                license: 'MIT'
+            },
+            {
+                modelName: 'Null Likes Model',
+                likeCount: null,
+                quantFormat: 'Q4_K_M',
+                modelType: 'LLM',
+                license: 'MIT'
+            },
+            {
+                modelName: 'Invalid Likes Model',
+                likeCount: 'invalid',
+                quantFormat: 'Q4_K_M',
+                modelType: 'LLM',
+                license: 'MIT'
+            },
+            {
+                modelName: 'Missing Likes Model',
+                quantFormat: 'Q4_K_M',
+                modelType: 'LLM',
+                license: 'MIT'
+            },
+            {
+                modelName: 'High Engagement Model',
+                likeCount: 15000000,
+                quantFormat: 'Q4_K_M',
+                modelType: 'LLM',
+                license: 'MIT'
+            }
+        ];
+
+        function runValidationTests() {
+            const container = document.getElementById('validation-tests');
+            
+            testCases.forEach(testCase => {
+                const result = EngagementValidation.validateEngagementMetric(
+                    testCase.value, 
+                    'test-model', 
+                    'likeCount'
+                );
+                
+                const div = document.createElement('div');
+                div.className = 'test-case';
+                
+                const isCorrect = result.value === testCase.expected;
+                const statusClass = result.error ? 'test-error' : 
+                                  result.warning ? 'test-warning' : 'test-success';
+                
+                div.innerHTML = `
+                    <strong>${testCase.name}</strong><br>
+                    Input: <span class="test-input">${JSON.stringify(testCase.value)}</span><br>
+                    <div class="test-result ${statusClass}">
+                        Result: ${result.value} (Expected: ${testCase.expected}) 
+                        ${isCorrect ? '✓' : '✗'}<br>
+                        Valid: ${result.isValid}, Modified: ${result.wasModified}<br>
+                        ${result.error ? `Error: ${result.error}` : ''}
+                        ${result.warning ? `Warning: ${result.warning}` : ''}
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+
+        function runModelCardTests() {
+            const container = document.getElementById('model-card-tests');
+            
+            testModels.forEach((model, index) => {
+                const div = document.createElement('div');
+                div.className = 'model-card-test';
+                
+                try {
+                    const modelCard = new ModelCard(model, index + 1);
+                    const cardElement = modelCard.render();
+                    
+                    div.innerHTML = `
+                        <h4>${model.modelName}</h4>
+                        <p>Input likeCount: <span class="test-input">${JSON.stringify(model.likeCount)}</span></p>
+                    `;
+                    div.appendChild(cardElement);
+                    
+                } catch (error) {
+                    div.innerHTML = `
+                        <h4>${model.modelName}</h4>
+                        <p>Input likeCount: <span class="test-input">${JSON.stringify(model.likeCount)}</span></p>
+                        <div class="test-result test-error">Error: ${error.message}</div>
+                    `;
+                }
+                
+                container.appendChild(div);
+            });
+        }
+
+        function runFilterTests() {
+            const container = document.getElementById('filter-tests');
+            const filterService = new FilterService();
+            
+            const filterTestCases = [
+                { name: 'Valid range', min: 0, max: 100 },
+                { name: 'Invalid min (negative)', min: -10, max: 100 },
+                { name: 'Invalid max (string)', min: 0, max: 'invalid' },
+                { name: 'Null values', min: null, max: null },
+                { name: 'Swapped values', min: 100, max: 10 },
+                { name: 'Infinity max', min: 0, max: Infinity }
+            ];
+            
+            filterTestCases.forEach(testCase => {
+                const div = document.createElement('div');
+                div.className = 'test-case';
+                
+                try {
+                    const filtered = filterService.filterByEngagement(testModels, testCase.min, testCase.max);
+                    
+                    div.innerHTML = `
+                        <strong>${testCase.name}</strong><br>
+                        Range: <span class="test-input">[${testCase.min}, ${testCase.max}]</span><br>
+                        <div class="test-result test-success">
+                            Filtered ${testModels.length} models to ${filtered.length} results
+                        </div>
+                    `;
+                    
+                } catch (error) {
+                    div.innerHTML = `
+                        <strong>${testCase.name}</strong><br>
+                        Range: <span class="test-input">[${testCase.min}, ${testCase.max}]</span><br>
+                        <div class="test-result test-error">Error: ${error.message}</div>
+                    `;
+                }
+                
+                container.appendChild(div);
+            });
+        }
+
+        function runDataServiceTests() {
+            const container = document.getElementById('data-service-tests');
+            const dataService = new DataService();
+            
+            // Test batch validation
+            const batchResult = EngagementValidation.batchValidateEngagementMetrics(testModels);
+            
+            const div = document.createElement('div');
+            div.className = 'test-case';
+            div.innerHTML = `
+                <strong>Batch Validation Results</strong><br>
+                <div class="test-result test-info">
+                    Total Models: ${batchResult.totalModels}<br>
+                    Valid Models: ${batchResult.validModels}<br>
+                    Models with Errors: ${batchResult.modelsWithErrors}<br>
+                    Models with Warnings: ${batchResult.modelsWithWarnings}<br>
+                    Models Modified: ${batchResult.modelsModified}
+                </div>
+            `;
+            
+            container.appendChild(div);
+            
+            // Test individual model validation
+            testModels.forEach(model => {
+                const isValid = dataService.validateModelData(model);
+                const processedModel = dataService._processModelData([model]);
+                
+                const modelDiv = document.createElement('div');
+                modelDiv.className = 'test-case';
+                modelDiv.innerHTML = `
+                    <strong>${model.modelName}</strong><br>
+                    Original likeCount: <span class="test-input">${JSON.stringify(model.likeCount)}</span><br>
+                    <div class="test-result ${isValid ? 'test-success' : 'test-error'}">
+                        Validation: ${isValid ? 'PASS' : 'FAIL'}<br>
+                        Processed likeCount: ${processedModel.length > 0 ? processedModel[0].likeCount : 'N/A'}
+                    </div>
+                `;
+                
+                container.appendChild(modelDiv);
+            });
+        }
+
+        // Run all tests when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Starting engagement metrics validation tests...');
+            
+            try {
+                runValidationTests();
+                console.log('✓ Validation tests completed');
+            } catch (error) {
+                console.error('✗ Validation tests failed:', error);
+            }
+            
+            try {
+                runModelCardTests();
+                console.log('✓ Model card tests completed');
+            } catch (error) {
+                console.error('✗ Model card tests failed:', error);
+            }
+            
+            try {
+                runFilterTests();
+                console.log('✓ Filter tests completed');
+            } catch (error) {
+                console.error('✗ Filter tests failed:', error);
+            }
+            
+            try {
+                runDataServiceTests();
+                console.log('✓ Data service tests completed');
+            } catch (error) {
+                console.error('✗ Data service tests failed:', error);
+            }
+            
+            console.log('All tests completed. Check results above.');
+        });
+    </script>
+</body>
+</html>

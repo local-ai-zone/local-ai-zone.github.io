@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium GGUF Test</title>
+    <style>
+        body { font-family: 'Inter', Arial, sans-serif; padding: 20px; background: #f8fafc; }
+        .test-container { max-width: 800px; margin: 0 auto; }
+        .test-item { background: white; padding: 20px; margin: 15px 0; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .pass { border-left: 4px solid #10b981; }
+        .fail { border-left: 4px solid #ef4444; }
+        .info { border-left: 4px solid #3b82f6; }
+        .test-title { font-size: 18px; font-weight: 600; margin-bottom: 10px; }
+        .test-details { color: #6b7280; font-size: 14px; }
+        .loading { opacity: 0.6; }
+        pre { background: #f3f4f6; padding: 10px; border-radius: 6px; overflow-x: auto; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🚀 Premium GGUF Discovery Test Suite</h1>
+        <div id="test-results"></div>
+    </div>
+    
+    <script>
+        const testResults = document.getElementById('test-results');
+        let testCount = 0;
+        let passCount = 0;
+        
+        function addTest(title, status, details = '', data = null) {
+            testCount++;
+            if (status) passCount++;
+            
+            const testItem = document.createElement('div');
+            testItem.className = `test-item ${status ? 'pass' : 'fail'}`;
+            
+            let content = `
+                <div class="test-title">
+                    ${status ? '✅' : '❌'} ${title}
+                </div>
+            `;
+            
+            if (details) {
+                content += `<div class="test-details">${details}</div>`;
+            }
+            
+            if (data) {
+                content += `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+            }
+            
+            testItem.innerHTML = content;
+            testResults.appendChild(testItem);
+        }
+        
+        function addInfo(title, details) {
+            const testItem = document.createElement('div');
+            testItem.className = 'test-item info';
+            testItem.innerHTML = `
+                <div class="test-title">ℹ️ ${title}</div>
+                <div class="test-details">${details}</div>
+            `;
+            testResults.appendChild(testItem);
+        }
+        
+        async function runTests() {
+            addInfo('Starting Premium Tests', 'Testing all premium components and functionality...');
+            
+            // Test 1: Check if premium files exist
+            try {
+                const cssResponse = await fetch('./css/premium-styles.css');
+                addTest('Premium CSS File', cssResponse.ok, `Status: ${cssResponse.status}`);
+            } catch (error) {
+                addTest('Premium CSS File', false, error.message);
+            }
+            
+            try {
+                const jsResponse = await fetch('./js/premium-app.js');
+                addTest('Premium JavaScript File', jsResponse.ok, `Status: ${jsResponse.status}`);
+            } catch (error) {
+                addTest('Premium JavaScript File', false, error.message);
+            }
+            
+            try {
+                const htmlResponse = await fetch('./premium-index.html');
+                addTest('Premium HTML File', htmlResponse.ok, `Status: ${htmlResponse.status}`);
+            } catch (error) {
+                addTest('Premium HTML File', false, error.message);
+            }
+            
+            // Test 2: Check data loading
+            try {
+                const dataResponse = await fetch('./gguf_models.json');
+                const data = await dataResponse.json();
+                addTest('JSON Data Loading', Array.isArray(data) && data.length > 0, 
+                    `Loaded ${data.length} models`);
+                
+                if (data.length > 0) {
+                    const sampleModel = data[0];
+                    const hasRequiredFields = sampleModel.modelName && 
+                                            sampleModel.quantFormat !== undefined && 
+                                            sampleModel.downloadCount !== undefined;
+                    addTest('Model Data Structure', hasRequiredFields, 
+                        'Required fields: modelName, quantFormat, downloadCount', 
+                        {
+                            modelName: sampleModel.modelName,
+                            quantFormat: sampleModel.quantFormat,
+                            downloadCount: sampleModel.downloadCount,
+                            fileSize: sampleModel.fileSize
+                        });
+                }
+            } catch (error) {
+                addTest('JSON Data Loading', false, error.message);
+            }
+            
+            // Test 3: Check utility functions
+            try {
+                const helpersResponse = await fetch('./js/utils/helpers.js');
+                addTest('Helpers Utility', helpersResponse.ok, 'Required for premium app functionality');
+            } catch (error) {
+                addTest('Helpers Utility', false, error.message);
+            }
+            
+            try {
+                const formattersResponse = await fetch('./js/utils/formatters.js');
+                addTest('Formatters Utility', formattersResponse.ok, 'Required for data formatting');
+            } catch (error) {
+                addTest('Formatters Utility', false, error.message);
+            }
+            
+            // Test 4: Browser compatibility
+            const browserFeatures = {
+                'Fetch API': typeof fetch !== 'undefined',
+                'ES6 Classes': typeof class {} === 'function',
+                'Arrow Functions': (() => true)(),
+                'Template Literals': `${true}` === 'true',
+                'Async/Await': typeof (async () => {})().then === 'function',
+                'CSS Grid': CSS.supports('display', 'grid'),
+                'CSS Flexbox': CSS.supports('display', 'flex'),
+                'Local Storage': typeof localStorage !== 'undefined'
+            };
+            
+            const supportedFeatures = Object.values(browserFeatures).filter(Boolean).length;
+            const totalFeatures = Object.keys(browserFeatures).length;
+            
+            addTest('Browser Compatibility', supportedFeatures === totalFeatures, 
+                `${supportedFeatures}/${totalFeatures} features supported`, browserFeatures);
+            
+            // Test 5: Performance check
+            const startTime = performance.now();
+            
+            // Simulate some operations
+            const testArray = Array.from({length: 1000}, (_, i) => ({
+                id: i,
+                name: `Model ${i}`,
+                downloads: Math.floor(Math.random() * 1000000)
+            }));
+            
+            testArray.sort((a, b) => b.downloads - a.downloads);
+            const filtered = testArray.filter(item => item.name.includes('Model'));
+            
+            const endTime = performance.now();
+            const performanceTime = endTime - startTime;
+            
+            addTest('Performance Test', performanceTime < 100, 
+                `Array operations completed in ${performanceTime.toFixed(2)}ms`);
+            
+            // Test 6: Memory usage (basic check)
+            const memoryInfo = performance.memory ? {
+                usedJSHeapSize: Math.round(performance.memory.usedJSHeapSize / 1024 / 1024) + ' MB',
+                totalJSHeapSize: Math.round(performance.memory.totalJSHeapSize / 1024 / 1024) + ' MB'
+            } : 'Not available';
+            
+            addInfo('Memory Usage', typeof memoryInfo === 'object' ? 
+                `Used: ${memoryInfo.usedJSHeapSize}, Total: ${memoryInfo.totalJSHeapSize}` : 
+                memoryInfo);
+            
+            // Final summary
+            const successRate = Math.round((passCount / testCount) * 100);
+            const summaryClass = successRate >= 80 ? 'pass' : successRate >= 60 ? 'info' : 'fail';
+            
+            const summaryItem = document.createElement('div');
+            summaryItem.className = `test-item ${summaryClass}`;
+            summaryItem.innerHTML = `
+                <div class="test-title">
+                    📊 Test Summary
+                </div>
+                <div class="test-details">
+                    Passed: ${passCount}/${testCount} tests (${successRate}%)<br>
+                    ${successRate >= 80 ? 
+                        '🎉 Premium GGUF Discovery is ready to use!' : 
+                        '⚠️ Some issues detected. Check failed tests above.'}
+                </div>
+            `;
+            testResults.appendChild(summaryItem);
+            
+            // Add links
+            const linksItem = document.createElement('div');
+            linksItem.className = 'test-item info';
+            linksItem.innerHTML = `
+                <div class="test-title">🔗 Quick Links</div>
+                <div class="test-details">
+                    <a href="./premium-index.html" target="_blank" style="color: #3b82f6; text-decoration: none; font-weight: 600;">
+                        🚀 Launch Premium GGUF Discovery
+                    </a><br><br>
+                    <a href="./index.html" target="_blank" style="color: #6b7280; text-decoration: none;">
+                        📋 Standard Version
+                    </a><br>
+                    <a href="./minimal-test.html" target="_blank" style="color: #6b7280; text-decoration: none;">
+                        🧪 Minimal Test
+                    </a>
+                </div>
+            `;
+            testResults.appendChild(linksItem);
+        }
+        
+        // Run tests when page loads
+        runTests().catch(error => {
+            addTest('Test Suite', false, `Test suite failed: ${error.message}`);
+        });
+    </script>
+</body>
+</html>

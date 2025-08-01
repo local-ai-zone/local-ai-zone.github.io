@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal GGUF Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/engagement-mobile-responsive.css">
+</head>
+<body>
+    <!-- Loading screen -->
+    <div id="loading-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #f9fafb; z-index: 9999; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+        <div style="width: 2rem; height: 2rem; border: 2px solid #e5e7eb; border-top: 2px solid #3b82f6; border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 1rem;"></div>
+        <div>Loading GGUF models...</div>
+    </div>
+    
+    <!-- Main content -->
+    <div id="main-content" style="display: none;">
+        <header>
+            <h1>GGUF Model Discovery</h1>
+            <div id="model-count-display">Loading...</div>
+        </header>
+        
+        <main>
+            <div id="model-grid" style="display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); padding: 2rem;">
+                <!-- Models will be inserted here -->
+            </div>
+        </main>
+    </div>
+    
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+    
+    <!-- Load dependencies in order -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/formatters.js"></script>
+    <script>
+        console.log('Starting minimal test...');
+        
+        // Test if utilities loaded
+        if (typeof Helpers === 'undefined') {
+            console.error('Helpers not loaded!');
+            alert('Error: Helpers utility not loaded');
+        } else {
+            console.log('✓ Helpers loaded');
+        }
+        
+        if (typeof Formatters === 'undefined') {
+            console.error('Formatters not loaded!');
+            alert('Error: Formatters utility not loaded');
+        } else {
+            console.log('✓ Formatters loaded');
+        }
+        
+        // Simple data loading test
+        async function loadAndDisplayModels() {
+            try {
+                console.log('Loading models...');
+                
+                const response = await fetch('./gguf_models.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const models = await response.json();
+                console.log(`✓ Loaded ${models.length} models`);
+                
+                // Update count display
+                const countDisplay = document.getElementById('model-count-display');
+                if (countDisplay) {
+                    countDisplay.textContent = `${models.length} models`;
+                }
+                
+                // Display first few models
+                const modelGrid = document.getElementById('model-grid');
+                if (modelGrid && models.length > 0) {
+                    const modelsToShow = models.slice(0, 6); // Show first 6 models
+                    
+                    modelGrid.innerHTML = modelsToShow.map((model, index) => `
+                        <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 1.5rem; background: white;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <div style="background: #3b82f6; color: white; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">
+                                    #${index + 1}
+                                </div>
+                                <div style="font-size: 0.75rem; color: #6b7280;">
+                                    ${Formatters.formatDownloadCount(model.downloadCount)} downloads
+                                </div>
+                            </div>
+                            
+                            <h3 style="font-size: 1.125rem; font-weight: 600; margin-bottom: 0.75rem;">
+                                ${Formatters.formatModelName(model.modelName)}
+                            </h3>
+                            
+                            <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.875rem;">
+                                <span style="color: #6b7280;">Quantization:</span>
+                                <span>${model.quantFormat || 'N/A'}</span>
+                                
+                                <span style="color: #6b7280;">File Size:</span>
+                                <span>${model.fileSizeFormatted || 'N/A'}</span>
+                                
+                                <span style="color: #6b7280;">Type:</span>
+                                <span>${model.modelType || 'N/A'}</span>
+                            </div>
+                            
+                            <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                                ${model.directDownloadLink ? `
+                                    <a href="${model.directDownloadLink}" 
+                                       style="background: #3b82f6; color: white; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; text-align: center;"
+                                       target="_blank">
+                                        Direct Download
+                                    </a>
+                                ` : ''}
+                                ${model.huggingFaceLink ? `
+                                    <a href="${model.huggingFaceLink}" 
+                                       style="background: white; color: #374151; border: 1px solid #d1d5db; padding: 0.5rem 1rem; border-radius: 4px; text-decoration: none; text-align: center;"
+                                       target="_blank">
+                                        HuggingFace
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                
+                // Hide loading screen and show content
+                const loadingScreen = document.getElementById('loading-screen');
+                const mainContent = document.getElementById('main-content');
+                
+                if (loadingScreen) loadingScreen.style.display = 'none';
+                if (mainContent) mainContent.style.display = 'block';
+                
+                console.log('✓ Minimal test completed successfully!');
+                
+            } catch (error) {
+                console.error('Error in minimal test:', error);
+                alert(`Error loading models: ${error.message}`);
+                
+                // Hide loading screen even on error
+                const loadingScreen = document.getElementById('loading-screen');
+                if (loadingScreen) {
+                    loadingScreen.innerHTML = `
+                        <div style="text-align: center; color: #dc2626;">
+                            <h2>Error Loading Models</h2>
+                            <p>${error.message}</p>
+                            <button onclick="location.reload()" style="background: #3b82f6; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
+                                Retry
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+        
+        // Start the test when DOM is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadAndDisplayModels);
+        } else {
+            loadAndDisplayModels();
+        }
+    </script>
+</body>
+</html>

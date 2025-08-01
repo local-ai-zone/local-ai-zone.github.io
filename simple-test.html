@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple GGUF Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .pass { background: #d4edda; color: #155724; }
+        .fail { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Simple GGUF Test</h1>
+    <div id="results"></div>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        function test(name, condition, details = '') {
+            const div = document.createElement('div');
+            div.className = `test ${condition ? 'pass' : 'fail'}`;
+            div.innerHTML = `<strong>${condition ? '✓' : '✗'} ${name}</strong>${details ? '<br>' + details : ''}`;
+            results.appendChild(div);
+            return condition;
+        }
+        
+        // Test basic functionality
+        test('DOM Ready', document.readyState === 'complete' || document.readyState === 'interactive');
+        
+        // Test JSON loading
+        fetch('./gguf_models.json')
+            .then(response => response.json())
+            .then(data => {
+                test('JSON Data Loaded', Array.isArray(data) && data.length > 0, `Found ${data.length} models`);
+                
+                if (data.length > 0) {
+                    const sample = data[0];
+                    test('Model Structure', 
+                        sample.modelName && sample.quantFormat && sample.downloadCount !== undefined,
+                        `Sample: ${sample.modelName}`
+                    );
+                }
+            })
+            .catch(error => {
+                test('JSON Data Loaded', false, error.message);
+            });
+        
+        // Test if we can create basic elements
+        try {
+            const testDiv = document.createElement('div');
+            testDiv.className = 'test-element';
+            testDiv.innerHTML = '<span>Test</span>';
+            test('DOM Manipulation', true, 'Can create and modify elements');
+        } catch (error) {
+            test('DOM Manipulation', false, error.message);
+        }
+        
+        // Test CSS loading
+        const styles = window.getComputedStyle(document.body);
+        test('CSS Loading', styles.fontFamily.includes('Arial'), 'Basic styles applied');
+        
+        console.log('Simple test completed');
+    </script>
+</body>
+</html>

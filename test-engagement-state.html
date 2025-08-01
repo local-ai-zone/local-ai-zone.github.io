@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Engagement State Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .state-display {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            margin: 10px 0;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+        .controls button {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background-color: #0056b3;
+        }
+        .controls input {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Engagement State Management Test</h1>
+    
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <div class="controls">
+            <button onclick="runAllTests()">Run All Tests</button>
+            <button onclick="testStateInitialization()">Test State Init</button>
+            <button onclick="testEngagementFilters()">Test Engagement Filters</button>
+            <button onclick="testDataValidation()">Test Data Validation</button>
+            <button onclick="testStateSubscriptions()">Test Subscriptions</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+        
+        <div class="controls">
+            <label>Min Likes: <input type="number" id="minLikes" value="0" min="0"></label>
+            <label>Max Likes: <input type="number" id="maxLikes" value="100" min="0"></label>
+            <button onclick="setEngagementFilter()">Set Engagement Filter</button>
+            <button onclick="clearEngagementFilter()">Clear Engagement Filter</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Current State</h2>
+        <div id="currentState" class="state-display">State not initialized</div>
+        <button onclick="updateStateDisplay()">Refresh State Display</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Subscription Log</h2>
+        <div id="subscriptionLog" class="state-display">No subscriptions yet</div>
+        <button onclick="clearSubscriptionLog()">Clear Log</button>
+    </div>
+
+    <!-- Include required dependencies -->
+    <script src="js/utils/formatters.js"></script>
+    <script src="js/utils/engagement.js"></script>
+    <script src="js/state/AppState.js"></script>
+    <script src="js/services/DataService.js"></script>
+
+    <script>
+        // Test framework
+        let appState;
+        let dataService;
+        let subscriptionLog = [];
+        let subscriptionId;
+
+        // Mock data for testing
+        const mockModels = [
+            {
+                modelName: "Test Model 1",
+                quantFormat: "Q4_K_M",
+                fileSize: 4200000000,
+                fileSizeFormatted: "4.2 GB",
+                modelType: "Chat",
+                license: "Apache-2.0",
+                downloadCount: 1500,
+                likeCount: 25,
+                huggingFaceLink: "https://huggingface.co/test1",
+                directDownloadLink: "https://example.com/test1.gguf"
+            },
+            {
+                modelName: "Test Model 2",
+                quantFormat: "Q8_0",
+                fileSize: 8100000000,
+                fileSizeFormatted: "8.1 GB",
+                modelType: "Code",
+                license: "MIT",
+                downloadCount: 3200,
+                likeCount: 150,
+                huggingFaceLink: "https://huggingface.co/test2",
+                directDownloadLink: "https://example.com/test2.gguf"
+            },
+            {
+                modelName: "Test Model 3",
+                quantFormat: "Q4_K_M",
+                fileSize: 2800000000,
+                fileSizeFormatted: "2.8 GB",
+                modelType: "Chat",
+                license: "Apache-2.0",
+                downloadCount: 800,
+                likeCount: 0,
+                huggingFaceLink: "https://huggingface.co/test3",
+                directDownloadLink: "https://example.com/test3.gguf"
+            },
+            {
+                modelName: "Test Model 4",
+                quantFormat: "Q5_K_M",
+                fileSize: 5500000000,
+                fileSizeFormatted: "5.5 GB",
+                modelType: "Instruct",
+                license: "CC-BY-4.0",
+                downloadCount: 2100,
+                likeCount: 75,
+                huggingFaceLink: "https://huggingface.co/test4",
+                directDownloadLink: "https://example.com/test4.gguf"
+            }
+        ];
+
+        // Initialize test environment
+        function initializeTest() {
+            appState = new AppState();
+            dataService = new DataService();
+            
+            // Set up subscription to log state changes
+            subscriptionId = appState.subscribe((newState, previousState) => {
+                const timestamp = new Date().toLocaleTimeString();
+                subscriptionLog.push({
+                    timestamp,
+                    changes: getStateChanges(previousState, newState)
+                });
+                updateSubscriptionLogDisplay();
+            });
+
+            // Set mock data
+            appState.setModels(mockModels);
+            updateStateDisplay();
+        }
+
+        // Helper function to detect state changes
+        function getStateChanges(oldState, newState) {
+            const changes = [];
+            
+            if (oldState.searchQuery !== newState.searchQuery) {
+                changes.push(`searchQuery: "${oldState.searchQuery}" → "${newState.searchQuery}"`);
+            }
+            
+            if (JSON.stringify(oldState.filters) !== JSON.stringify(newState.filters)) {
+                changes.push('filters changed');
+            }
+            
+            if (JSON.stringify(oldState.sorting) !== JSON.stringify(newState.sorting)) {
+                changes.push(`sorting: ${oldState.sorting.field} → ${newState.sorting.field}`);
+            }
+            
+            if (oldState.filteredModels.length !== newState.filteredModels.length) {
+                changes.push(`filteredModels: ${oldState.filteredModels.length} → ${newState.filteredModels.length}`);
+            }
+            
+            return changes.length > 0 ? changes : ['minor state update'];
+        }
+
+        // Test functions
+        function testStateInitialization() {
+            const results = [];
+            
+            try {
+                // Test 1: AppState initialization
+                const state = appState.getState();
+                results.push({
+                    name: "AppState initialization",
+                    pass: state && typeof state === 'object',
+                    message: state ? "State initialized successfully" : "State initialization failed"
+                });
+
+                // Test 2: Engagement filter defaults
+                results.push({
+                    name: "Engagement filter defaults",
+                    pass: state.filters.likeCountMin === 0 && state.filters.likeCountMax === Infinity,
+                    message: `likeCountMin: ${state.filters.likeCountMin}, likeCountMax: ${state.filters.likeCountMax}`
+                });
+
+                // Test 3: Models loaded
+                results.push({
+                    name: "Models loaded",
+                    pass: state.allModels.length === mockModels.length,
+                    message: `Loaded ${state.allModels.length} models`
+                });
+
+                // Test 4: Engagement metrics present
+                const hasEngagementMetrics = state.allModels.every(model => 
+                    typeof model.likeCount === 'number' && model.likeCount >= 0
+                );
+                results.push({
+                    name: "Engagement metrics present",
+                    pass: hasEngagementMetrics,
+                    message: hasEngagementMetrics ? "All models have valid likeCount" : "Some models missing likeCount"
+                });
+
+            } catch (error) {
+                results.push({
+                    name: "State initialization error",
+                    pass: false,
+                    message: error.message
+                });
+            }
+
+            displayTestResults("State Initialization Tests", results);
+        }
+
+        function testEngagementFilters() {
+            const results = [];
+            
+            try {
+                // Test 1: Set engagement filter
+                appState.setEngagementFilter(10, 100);
+                const state1 = appState.getState();
+                results.push({
+                    name: "Set engagement filter",
+                    pass: state1.filters.likeCountMin === 10 && state1.filters.likeCountMax === 100,
+                    message: `Filter set to ${state1.filters.likeCountMin}-${state1.filters.likeCountMax}`
+                });
+
+                // Test 2: Clear engagement filter
+                appState.clearEngagementFilter();
+                const state2 = appState.getState();
+                results.push({
+                    name: "Clear engagement filter",
+                    pass: state2.filters.likeCountMin === 0 && state2.filters.likeCountMax === Infinity,
+                    message: `Filter cleared to ${state2.filters.likeCountMin}-${state2.filters.likeCountMax}`
+                });
+
+                // Test 3: Get engagement stats
+                const stats = appState.getEngagementFilterStats();
+                results.push({
+                    name: "Engagement filter stats",
+                    pass: typeof stats === 'object' && typeof stats.totalLikes === 'number',
+                    message: `Total likes: ${stats.totalLikes}, Avg: ${stats.avgLikes.toFixed(1)}`
+                });
+
+                // Test 4: Active filters include engagement
+                appState.setEngagementFilter(50, 200);
+                const activeFilters = appState.getActiveFilters();
+                const hasEngagementFilter = activeFilters.some(filter => filter.includes('Likes:'));
+                results.push({
+                    name: "Active filters include engagement",
+                    pass: hasEngagementFilter,
+                    message: `Active filters: ${activeFilters.join(', ')}`
+                });
+
+            } catch (error) {
+                results.push({
+                    name: "Engagement filter error",
+                    pass: false,
+                    message: error.message
+                });
+            }
+
+            displayTestResults("Engagement Filter Tests", results);
+        }
+
+        function testDataValidation() {
+            const results = [];
+            
+            try {
+                // Test 1: Valid model data
+                const validModel = mockModels[0];
+                const isValid = dataService.validateModelData(validModel);
+                results.push({
+                    name: "Valid model validation",
+                    pass: isValid,
+                    message: isValid ? "Valid model passed validation" : "Valid model failed validation"
+                });
+
+                // Test 2: Model with invalid engagement data
+                const invalidModel = {
+                    ...validModel,
+                    likeCount: "invalid"
+                };
+                const isValidInvalid = dataService.validateModelData(invalidModel);
+                results.push({
+                    name: "Invalid engagement data handling",
+                    pass: isValidInvalid, // Should still pass validation but warn
+                    message: "Model with invalid likeCount should pass validation with warning"
+                });
+
+                // Test 3: Data statistics include engagement
+                const stats = dataService.getDataStats(mockModels);
+                results.push({
+                    name: "Data stats include engagement",
+                    pass: typeof stats.totalLikes === 'number' && typeof stats.avgLikes === 'number',
+                    message: `Total likes: ${stats.totalLikes}, Models with likes: ${stats.modelsWithLikes}`
+                });
+
+                // Test 4: Engagement number sanitization
+                const sanitized1 = dataService._sanitizeEngagementNumber(25.7);
+                const sanitized2 = dataService._sanitizeEngagementNumber(-5);
+                const sanitized3 = dataService._sanitizeEngagementNumber("invalid");
+                results.push({
+                    name: "Engagement number sanitization",
+                    pass: sanitized1 === 25 && sanitized2 === 0 && sanitized3 === 0,
+                    message: `25.7→${sanitized1}, -5→${sanitized2}, "invalid"→${sanitized3}`
+                });
+
+            } catch (error) {
+                results.push({
+                    name: "Data validation error",
+                    pass: false,
+                    message: error.message
+                });
+            }
+
+            displayTestResults("Data Validation Tests", results);
+        }
+
+        function testStateSubscriptions() {
+            const results = [];
+            
+            try {
+                const initialLogLength = subscriptionLog.length;
+                
+                // Test 1: Subscription triggers on engagement filter change
+                appState.setEngagementFilter(20, 80);
+                const afterFilterChange = subscriptionLog.length;
+                results.push({
+                    name: "Subscription triggers on filter change",
+                    pass: afterFilterChange > initialLogLength,
+                    message: `Log entries: ${initialLogLength} → ${afterFilterChange}`
+                });
+
+                // Test 2: Subscription triggers on search change
+                const beforeSearch = subscriptionLog.length;
+                appState.setSearchQuery("test");
+                const afterSearch = subscriptionLog.length;
+                results.push({
+                    name: "Subscription triggers on search change",
+                    pass: afterSearch > beforeSearch,
+                    message: `Log entries: ${beforeSearch} → ${afterSearch}`
+                });
+
+                // Test 3: Subscription triggers on sorting change
+                const beforeSort = subscriptionLog.length;
+                appState.setSorting('likeCount', 'desc');
+                const afterSort = subscriptionLog.length;
+                results.push({
+                    name: "Subscription triggers on sort change",
+                    pass: afterSort > beforeSort,
+                    message: `Log entries: ${beforeSort} → ${afterSort}`
+                });
+
+                // Test 4: State persistence across operations
+                const currentState = appState.getState();
+                results.push({
+                    name: "State persistence",
+                    pass: currentState.searchQuery === "test" && 
+                          currentState.sorting.field === "likeCount" &&
+                          currentState.filters.likeCountMin === 20,
+                    message: `Search: "${currentState.searchQuery}", Sort: ${currentState.sorting.field}, Filter: ${currentState.filters.likeCountMin}-${currentState.filters.likeCountMax}`
+                });
+
+            } catch (error) {
+                results.push({
+                    name: "Subscription test error",
+                    pass: false,
+                    message: error.message
+                });
+            }
+
+            displayTestResults("State Subscription Tests", results);
+        }
+
+        // UI helper functions
+        function displayTestResults(sectionName, results) {
+            const resultsDiv = document.getElementById('testResults');
+            const sectionDiv = document.createElement('div');
+            sectionDiv.innerHTML = `
+                <h3>${sectionName}</h3>
+                ${results.map(result => `
+                    <div class="test-result ${result.pass ? 'test-pass' : 'test-fail'}">
+                        <strong>${result.name}:</strong> ${result.pass ? 'PASS' : 'FAIL'}<br>
+                        <small>${result.message}</small>
+                    </div>
+                `).join('')}
+            `;
+            resultsDiv.appendChild(sectionDiv);
+        }
+
+        function updateStateDisplay() {
+            if (!appState) return;
+            
+            const state = appState.getState();
+            const display = document.getElementById('currentState');
+            display.textContent = JSON.stringify({
+                searchQuery: state.searchQuery,
+                filters: state.filters,
+                sorting: state.sorting,
+                modelCounts: {
+                    all: state.allModels.length,
+                    filtered: state.filteredModels.length
+                },
+                pagination: state.pagination,
+                activeFilters: state.activeFilters
+            }, null, 2);
+        }
+
+        function updateSubscriptionLogDisplay() {
+            const display = document.getElementById('subscriptionLog');
+            const recentLogs = subscriptionLog.slice(-10); // Show last 10 entries
+            display.textContent = recentLogs.map(log => 
+                `[${log.timestamp}] ${log.changes.join(', ')}`
+            ).join('\n') || 'No subscription events yet';
+        }
+
+        function setEngagementFilter() {
+            const minLikes = parseInt(document.getElementById('minLikes').value) || 0;
+            const maxLikes = parseInt(document.getElementById('maxLikes').value) || Infinity;
+            appState.setEngagementFilter(minLikes, maxLikes);
+            updateStateDisplay();
+        }
+
+        function clearEngagementFilter() {
+            appState.clearEngagementFilter();
+            updateStateDisplay();
+        }
+
+        function clearResults() {
+            document.getElementById('testResults').innerHTML = '';
+        }
+
+        function clearSubscriptionLog() {
+            subscriptionLog = [];
+            updateSubscriptionLogDisplay();
+        }
+
+        function runAllTests() {
+            clearResults();
+            testStateInitialization();
+            testEngagementFilters();
+            testDataValidation();
+            testStateSubscriptions();
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', initializeTest);
+    </script>
+</body>
+</html>

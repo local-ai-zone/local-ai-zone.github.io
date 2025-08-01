@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Engagement Metrics Mobile Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/filter-responsive-fix.css">
+    <link rel="stylesheet" href="css/engagement-mobile-responsive.css">
+    <style>
+        /* Test-specific styles */
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem;
+        }
+        
+        .test-section {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+        }
+        
+        .test-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .device-simulator {
+            border: 2px solid #ccc;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            background: white;
+        }
+        
+        .device-simulator.mobile {
+            max-width: 375px;
+            margin: 1rem auto;
+        }
+        
+        .device-simulator.tablet {
+            max-width: 768px;
+            margin: 1rem auto;
+        }
+        
+        .device-label {
+            text-align: center;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Engagement Metrics Mobile Responsiveness Test</h1>
+        
+        <!-- Mobile Device Simulation -->
+        <div class="test-section">
+            <h2 class="test-title">Mobile Device (375px)</h2>
+            <div class="device-simulator mobile">
+                <div class="device-label">iPhone SE / Small Mobile</div>
+                
+                <!-- Sample Model Cards -->
+                <div class="model-grid">
+                    <div class="model-card">
+                        <div class="model-card-header">
+                            <div class="model-number">#1</div>
+                            <div class="model-metrics">
+                                <div class="download-count" title="1,234,567 downloads">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                                    </svg>
+                                    1.2M
+                                </div>
+                                <div class="engagement-count engagement-high engagement-highlight" title="High engagement: 156 likes">
+                                    <span class="engagement-icon">❤️</span>
+                                    <span class="engagement-number">156</span>
+                                </div>
+                                <div class="engagement-badge engagement-high">
+                                    HOT
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-name-container">
+                            <h3 class="model-name">llama-2-7b-chat.Q4_K_M.gguf</h3>
+                        </div>
+                        
+                        <div class="model-details">
+                            <span class="detail-label">Quantization:</span>
+                            <span class="detail-value">
+                                <span class="quantization-badge">Q4_K_M</span>
+                            </span>
+                            
+                            <span class="detail-label">File Size:</span>
+                            <span class="detail-value">4.08 GB</span>
+                            
+                            <span class="detail-label">Model Type:</span>
+                            <span class="detail-value">LLaMA</span>
+                            
+                            <span class="detail-label">License:</span>
+                            <span class="detail-value">Apache-2.0</span>
+                        </div>
+                        
+                        <div class="model-actions">
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-primary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                                    </svg>
+                                    Direct Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="model-card">
+                        <div class="model-card-header">
+                            <div class="model-number">#2</div>
+                            <div class="model-metrics">
+                                <div class="download-count" title="567,890 downloads">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                                    </svg>
+                                    568K
+                                </div>
+                                <div class="engagement-count engagement-medium" title="Medium engagement: 42 likes">
+                                    <span class="engagement-icon">❤️</span>
+                                    <span class="engagement-number">42</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-name-container">
+                            <h3 class="model-name">mistral-7b-instruct.Q8_0.gguf</h3>
+                        </div>
+                        
+                        <div class="model-details">
+                            <span class="detail-label">Quantization:</span>
+                            <span class="detail-value">
+                                <span class="quantization-badge">Q8_0</span>
+                            </span>
+                            
+                            <span class="detail-label">File Size:</span>
+                            <span class="detail-value">7.17 GB</span>
+                            
+                            <span class="detail-label">Model Type:</span>
+                            <span class="detail-value">Mistral</span>
+                            
+                            <span class="detail-label">License:</span>
+                            <span class="detail-value">Apache-2.0</span>
+                        </div>
+                        
+                        <div class="model-actions">
+                            <div class="btn-group">
+                                <a href="#" class="btn btn-primary">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                                    </svg>
+                                    Direct Download
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Mobile Filter Test -->
+                <div class="search-filter-section">
+                    <div class="search-container">
+                        <input type="search" class="search-input" placeholder="Search models..." style="font-size: 16px;">
+                    </div>
+                    
+                    <button class="mobile-filter-toggle" aria-expanded="false">
+                        <span class="filter-toggle-text">Show Filters</span>
+                        <svg class="filter-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M6 9l6 6 6-6"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="filters-container mobile-hidden">
+                        <div class="filter-group">
+                            <label class="filter-label">Engagement (Likes)</label>
+                            <div class="range-filter-container">
+                                <div class="range-inputs">
+                                    <input type="number" class="range-input" placeholder="Min" style="font-size: 16px;">
+                                    <span class="range-separator">-</span>
+                                    <input type="number" class="range-input" placeholder="Max" style="font-size: 16px;">
+                                </div>
+                                <div class="range-slider-container">
+                                    <input type="range" class="range-slider range-slider-min" min="0" max="1000" value="0">
+                                    <input type="range" class="range-slider range-slider-max" min="0" max="1000" value="1000">
+                                </div>
+                                <div class="range-display">
+                                    <span>0 - 1000+ likes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tablet Device Simulation -->
+        <div class="test-section">
+            <h2 class="test-title">Tablet Device (768px)</h2>
+            <div class="device-simulator tablet">
+                <div class="device-label">iPad / Tablet</div>
+                
+                <div class="test-grid">
+                    <div class="model-card">
+                        <div class="model-card-header">
+                            <div class="model-number">#1</div>
+                            <div class="model-metrics">
+                                <div class="download-count">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                                    </svg>
+                                    2.1M
+                                </div>
+                                <div class="engagement-count engagement-viral engagement-highlight">
+                                    <span class="engagement-icon">❤️</span>
+                                    <span class="engagement-number">1.2K</span>
+                                </div>
+                                <div class="engagement-badge engagement-viral">
+                                    VIRAL
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-name-container">
+                            <h3 class="model-name">codellama-34b-instruct.Q4_K_M.gguf</h3>
+                        </div>
+                        
+                        <div class="model-details">
+                            <span class="detail-label">Quantization:</span>
+                            <span class="detail-value">
+                                <span class="quantization-badge">Q4_K_M</span>
+                            </span>
+                            
+                            <span class="detail-label">File Size:</span>
+                            <span class="detail-value">20.22 GB</span>
+                        </div>
+                        
+                        <div class="model-actions">
+                            <a href="#" class="btn btn-primary">Direct Download</a>
+                            <a href="#" class="btn btn-secondary">HuggingFace</a>
+                        </div>
+                    </div>
+                    
+                    <div class="model-card">
+                        <div class="model-card-header">
+                            <div class="model-number">#2</div>
+                            <div class="model-metrics">
+                                <div class="download-count">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                        <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                                    </svg>
+                                    890K
+                                </div>
+                                <div class="engagement-count engagement-low">
+                                    <span class="engagement-icon">❤️</span>
+                                    <span class="engagement-number">8</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="model-name-container">
+                            <h3 class="model-name">phi-2.Q5_K_M.gguf</h3>
+                        </div>
+                        
+                        <div class="model-details">
+                            <span class="detail-label">Quantization:</span>
+                            <span class="detail-value">
+                                <span class="quantization-badge">Q5_K_M</span>
+                            </span>
+                            
+                            <span class="detail-label">File Size:</span>
+                            <span class="detail-value">1.96 GB</span>
+                        </div>
+                        
+                        <div class="model-actions">
+                            <a href="#" class="btn btn-primary">Direct Download</a>
+                            <a href="#" class="btn btn-secondary">HuggingFace</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Desktop Comparison -->
+        <div class="test-section">
+            <h2 class="test-title">Desktop View (1200px+)</h2>
+            <div class="test-grid">
+                <div class="model-card">
+                    <div class="model-card-header">
+                        <div class="model-number">#1</div>
+                        <div class="model-metrics">
+                            <div class="download-count">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                                </svg>
+                                3.4M
+                            </div>
+                            <div class="engagement-count engagement-high engagement-highlight">
+                                <span class="engagement-icon">❤️</span>
+                                <span class="engagement-number">2.1K</span>
+                            </div>
+                            <div class="engagement-badge engagement-high">
+                                HOT
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="model-name-container">
+                        <h3 class="model-name">llama-2-70b-chat.Q4_K_M.gguf</h3>
+                    </div>
+                    
+                    <div class="model-details">
+                        <span class="detail-label">Quantization:</span>
+                        <span class="detail-value">
+                            <span class="quantization-badge">Q4_K_M</span>
+                        </span>
+                        
+                        <span class="detail-label">File Size:</span>
+                        <span class="detail-value">40.96 GB</span>
+                        
+                        <span class="detail-label">Model Type:</span>
+                        <span class="detail-value">LLaMA</span>
+                        
+                        <span class="detail-label">License:</span>
+                        <span class="detail-value">Apache-2.0</span>
+                    </div>
+                    
+                    <div class="model-actions">
+                        <a href="#" class="btn btn-primary">Direct Download</a>
+                        <a href="#" class="btn btn-secondary">HuggingFace</a>
+                    </div>
+                </div>
+                
+                <div class="model-card">
+                    <div class="model-card-header">
+                        <div class="model-number">#2</div>
+                        <div class="model-metrics">
+                            <div class="download-count">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                                </svg>
+                                1.8M
+                            </div>
+                            <div class="engagement-count engagement-medium">
+                                <span class="engagement-icon">❤️</span>
+                                <span class="engagement-number">89</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="model-name-container">
+                        <h3 class="model-name">mixtral-8x7b-instruct.Q5_K_M.gguf</h3>
+                    </div>
+                    
+                    <div class="model-details">
+                        <span class="detail-label">Quantization:</span>
+                        <span class="detail-value">
+                            <span class="quantization-badge">Q5_K_M</span>
+                        </span>
+                        
+                        <span class="detail-label">File Size:</span>
+                        <span class="detail-value">30.03 GB</span>
+                        
+                        <span class="detail-label">Model Type:</span>
+                        <span class="detail-value">Mixtral</span>
+                        
+                        <span class="detail-label">License:</span>
+                        <span class="detail-value">Apache-2.0</span>
+                    </div>
+                    
+                    <div class="model-actions">
+                        <a href="#" class="btn btn-primary">Direct Download</a>
+                        <a href="#" class="btn btn-secondary">HuggingFace</a>
+                    </div>
+                </div>
+                
+                <div class="model-card">
+                    <div class="model-card-header">
+                        <div class="model-number">#3</div>
+                        <div class="model-metrics">
+                            <div class="download-count">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M5 20h14v-2H5v2zM19 9h-4V3H9v6H5l7 7 7-7z"/>
+                                </svg>
+                                456K
+                            </div>
+                            <div class="engagement-count engagement-low">
+                                <span class="engagement-icon">❤️</span>
+                                <span class="engagement-number">12</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="model-name-container">
+                        <h3 class="model-name">gemma-7b-it.Q4_K_M.gguf</h3>
+                    </div>
+                    
+                    <div class="model-details">
+                        <span class="detail-label">Quantization:</span>
+                        <span class="detail-value">
+                            <span class="quantization-badge">Q4_K_M</span>
+                        </span>
+                        
+                        <span class="detail-label">File Size:</span>
+                        <span class="detail-value">4.24 GB</span>
+                        
+                        <span class="detail-label">Model Type:</span>
+                        <span class="detail-value">Gemma</span>
+                        
+                        <span class="detail-label">License:</span>
+                        <span class="detail-value">Apache-2.0</span>
+                    </div>
+                    
+                    <div class="model-actions">
+                        <a href="#" class="btn btn-primary">Direct Download</a>
+                        <a href="#" class="btn btn-secondary">HuggingFace</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test mobile filter toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.querySelector('.mobile-filter-toggle');
+            const filtersContainer = document.querySelector('.filters-container');
+            
+            if (toggleBtn && filtersContainer) {
+                toggleBtn.addEventListener('click', function() {
+                    const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+                    const newState = !isExpanded;
+                    
+                    toggleBtn.setAttribute('aria-expanded', newState.toString());
+                    
+                    if (newState) {
+                        filtersContainer.classList.remove('mobile-hidden');
+                        filtersContainer.classList.add('mobile-visible');
+                        toggleBtn.querySelector('.filter-toggle-text').textContent = 'Hide Filters';
+                        toggleBtn.querySelector('.filter-toggle-icon').style.transform = 'rotate(180deg)';
+                    } else {
+                        filtersContainer.classList.remove('mobile-visible');
+                        filtersContainer.classList.add('mobile-hidden');
+                        toggleBtn.querySelector('.filter-toggle-text').textContent = 'Show Filters';
+                        toggleBtn.querySelector('.filter-toggle-icon').style.transform = 'rotate(0deg)';
+                    }
+                });
+            }
+            
+            // Test touch feedback
+            const interactiveElements = document.querySelectorAll('button, .btn, .model-card, input, select');
+            interactiveElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.classList.add('touch-active');
+                }, { passive: true });
+                
+                element.addEventListener('touchend', function() {
+                    setTimeout(() => {
+                        this.classList.remove('touch-active');
+                    }, 150);
+                }, { passive: true });
+            });
+        });
+    </script>
+</body>
+</html>

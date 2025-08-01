@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Pagination Enhancement Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .iframe-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .test-controls {
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Premium Pagination Enhancement Test</h1>
+    <p>This test verifies that the premium-index.html page correctly implements 48 models per page and defaults to most liked sorting.</p>
+
+    <div class="test-section">
+        <h2>Test Controls</h2>
+        <div class="test-controls">
+            <button onclick="runTests()">Run All Tests</button>
+            <button onclick="clearResults()">Clear Results</button>
+        </div>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Premium Index Page</h2>
+        <div class="iframe-container">
+            <iframe id="premium-iframe" src="premium-index.html"></iframe>
+        </div>
+    </div>
+
+    <script>
+        let testResults = [];
+
+        function addTestResult(testName, passed, message) {
+            testResults.push({ testName, passed, message });
+            displayResults();
+        }
+
+        function displayResults() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '';
+            
+            testResults.forEach(result => {
+                const div = document.createElement('div');
+                div.className = `test-result ${result.passed ? 'test-pass' : 'test-fail'}`;
+                div.innerHTML = `
+                    <strong>${result.testName}:</strong> 
+                    ${result.passed ? '✅ PASS' : '❌ FAIL'} - ${result.message}
+                `;
+                resultsDiv.appendChild(div);
+            });
+        }
+
+        function clearResults() {
+            testResults = [];
+            displayResults();
+        }
+
+        async function runTests() {
+            clearResults();
+            
+            const iframe = document.getElementById('premium-iframe');
+            
+            // Wait for iframe to load
+            await new Promise(resolve => {
+                if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+                    resolve();
+                } else {
+                    iframe.onload = resolve;
+                }
+            });
+
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            const iframeWindow = iframe.contentWindow;
+
+            // Test 1: Check if sort dropdown defaults to "Most Liked"
+            try {
+                const sortSelect = iframeDoc.getElementById('sort-select');
+                if (sortSelect) {
+                    const selectedOption = sortSelect.options[sortSelect.selectedIndex];
+                    const isCorrectDefault = selectedOption.value === 'likeCount-desc' && selectedOption.textContent.includes('Most Liked');
+                    addTestResult(
+                        'Default Sort Selection',
+                        isCorrectDefault,
+                        isCorrectDefault ? 
+                            'Sort dropdown correctly defaults to "Most Liked" (likeCount-desc)' :
+                            `Expected "Most Liked" (likeCount-desc), got "${selectedOption.textContent}" (${selectedOption.value})`
+                    );
+                } else {
+                    addTestResult('Default Sort Selection', false, 'Sort select element not found');
+                }
+            } catch (error) {
+                addTestResult('Default Sort Selection', false, `Error: ${error.message}`);
+            }
+
+            // Test 2: Check if PremiumGGUFApp is configured with 48 items per page
+            try {
+                await new Promise(resolve => setTimeout(resolve, 2000)); // Wait for app to initialize
+                
+                const premiumApp = iframeWindow.premiumApp;
+                if (premiumApp) {
+                    const itemsPerPage = premiumApp.itemsPerPage;
+                    const isCorrectItemsPerPage = itemsPerPage === 48;
+                    addTestResult(
+                        'Items Per Page Configuration',
+                        isCorrectItemsPerPage,
+                        isCorrectItemsPerPage ? 
+                            'PremiumGGUFApp correctly configured with 48 items per page' :
+                            `Expected 48 items per page, got ${itemsPerPage}`
+                    );
+                } else {
+                    addTestResult('Items Per Page Configuration', false, 'PremiumGGUFApp instance not found');
+                }
+            } catch (error) {
+                addTestResult('Items Per Page Configuration', false, `Error: ${error.message}`);
+            }
+
+            // Test 3: Check if models are sorted by like count by default
+            try {
+                await new Promise(resolve => setTimeout(resolve, 3000)); // Wait for models to load
+                
+                const premiumApp = iframeWindow.premiumApp;
+                if (premiumApp && premiumApp.filteredModels && premiumApp.filteredModels.length > 1) {
+                    const firstModel = premiumApp.filteredModels[0];
+                    const secondModel = premiumApp.filteredModels[1];
+                    
+                    const firstLikes = firstModel.likeCount || 0;
+                    const secondLikes = secondModel.likeCount || 0;
+                    
+                    const isCorrectlySorted = firstLikes >= secondLikes;
+                    addTestResult(
+                        'Default Sorting by Like Count',
+                        isCorrectlySorted,
+                        isCorrectlySorted ? 
+                            `Models correctly sorted by like count (first: ${firstLikes}, second: ${secondLikes})` :
+                            `Models not sorted correctly by like count (first: ${firstLikes}, second: ${secondLikes})`
+                    );
+                } else {
+                    addTestResult('Default Sorting by Like Count', false, 'Models not loaded or insufficient data');
+                }
+            } catch (error) {
+                addTestResult('Default Sorting by Like Count', false, `Error: ${error.message}`);
+            }
+
+            // Test 4: Check pagination calculations
+            try {
+                await new Promise(resolve => setTimeout(resolve, 4000)); // Wait for pagination to render
+                
+                const premiumApp = iframeWindow.premiumApp;
+                if (premiumApp && premiumApp.models && premiumApp.models.length > 0) {
+                    const totalModels = premiumApp.models.length;
+                    const itemsPerPage = premiumApp.itemsPerPage;
+                    const expectedPages = Math.ceil(totalModels / itemsPerPage);
+                    
+                    // Check if pagination container exists and has content
+                    const paginationContainer = iframeDoc.getElementById('pagination-container');
+                    const hasPagination = paginationContainer && paginationContainer.children.length > 0;
+                    
+                    addTestResult(
+                        'Pagination Calculations',
+                        hasPagination,
+                        hasPagination ? 
+                            `Pagination rendered correctly (${totalModels} models, ${itemsPerPage} per page, ~${expectedPages} pages)` :
+                            'Pagination not rendered or empty'
+                    );
+                } else {
+                    addTestResult('Pagination Calculations', false, 'Models not loaded');
+                }
+            } catch (error) {
+                addTestResult('Pagination Calculations', false, `Error: ${error.message}`);
+            }
+
+            // Test 5: Check results count display
+            try {
+                const resultsCount = iframeDoc.getElementById('results-count');
+                if (resultsCount && resultsCount.textContent.trim()) {
+                    const hasCorrectFormat = resultsCount.textContent.includes('models') || resultsCount.textContent.includes('Showing');
+                    addTestResult(
+                        'Results Count Display',
+                        hasCorrectFormat,
+                        hasCorrectFormat ? 
+                            `Results count displayed correctly: "${resultsCount.textContent.trim()}"` :
+                            `Results count format unexpected: "${resultsCount.textContent.trim()}"`
+                    );
+                } else {
+                    addTestResult('Results Count Display', false, 'Results count element not found or empty');
+                }
+            } catch (error) {
+                addTestResult('Results Count Display', false, `Error: ${error.message}`);
+            }
+        }
+
+        // Auto-run tests after page loads
+        window.addEventListener('load', () => {
+            setTimeout(runTests, 1000);
+        });
+    </script>
+</body>
+</html>

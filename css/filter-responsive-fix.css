@@ -1,0 +1,147 @@
+/* Filter Responsive Layout Fix - Updated v2.0 */
+/* Desktop: Compact horizontal layout, Mobile: Vertical layout */
+/* IMPORTANT: All filters must fit in one line on desktop */
+
+/* Make the entire filter section more compact */
+.search-filter-section {
+    padding: 1rem 1.5rem !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Make search input more compact on desktop */
+@media (min-width: 768px) {
+    .search-container {
+        margin-bottom: 1rem !important;
+    }
+    
+    .search-input {
+        padding: 0.6rem 1rem !important;
+        font-size: 0.95rem !important;
+    }
+    
+    /* Force horizontal layout on desktop - override main CSS */
+    .filters-container,
+    .filters-container.mobile-visible,
+    .filters-container.mobile-hidden {
+        display: flex !important;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
+        grid-template-columns: none !important;
+        gap: 0.3rem !important;
+        max-width: 500px !important;
+    }
+}
+
+/* Desktop: Horizontal layout (default) - filters in one compact line */
+/* Override all conflicting styles from main CSS */
+.filters-container,
+.filters-container.mobile-visible,
+.filters-container.mobile-hidden {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;  /* Never wrap on desktop */
+    gap: 0.3rem !important;
+    align-items: flex-end !important;
+    width: 100% !important;
+    max-width: 500px !important;  /* Much smaller to ensure all fit */
+    overflow: hidden !important;
+    grid-template-columns: none !important;  /* Override grid layout */
+}
+
+.filter-group {
+    flex: 1 !important;
+    min-width: 60px !important;   /* Even smaller to ensure fit */
+    max-width: 90px !important;   /* Much smaller */
+}
+
+.filter-select {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 0.4rem 0.2rem !important;  /* Even smaller padding */
+    font-size: 0.8rem !important;       /* Smaller font */
+}
+
+.filter-label {
+    font-size: 0.75rem !important;   /* Even smaller label */
+    margin-bottom: 0.2rem !important;
+}
+
+/* Large desktop: Slightly more space but still compact */
+@media (min-width: 1024px) {
+    .filters-container {
+        gap: 0.4rem !important;
+        max-width: 600px !important;  /* Much smaller */
+    }
+    
+    .filter-group {
+        min-width: 70px !important;   /* Smaller */
+        max-width: 100px !important;  /* Smaller */
+    }
+}
+
+/* Extra large desktop: Maximum compact size */
+@media (min-width: 1400px) {
+    .filters-container {
+        gap: 0.8rem;
+        max-width: 800px;  /* 20% smaller than 1000px */
+    }
+    
+    .filter-group {
+        max-width: 144px;  /* 20% smaller than 180px */
+    }
+}
+
+/* Mobile: Stack vertically for better touch interaction */
+@media (max-width: 767px) {
+    .filters-container {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .filter-group {
+        flex: none;
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .filter-label {
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .filter-select {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.75rem 0.5rem;
+        width: 100%;
+    }
+}
+
+/* Tablet: Compact horizontal layout */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .filters-container {
+        gap: 0.3rem !important;
+        max-width: 450px !important;  /* Much smaller */
+    }
+    
+    .filter-group {
+        min-width: 55px !important;   /* Much smaller */
+        max-width: 80px !important;   /* Much smaller */
+    }
+    
+    .filter-select {
+        padding: 0.3rem 0.1rem !important;
+        font-size: 0.7rem !important;
+    }
+}
+
+/* Very small mobile: Ensure full width */
+@media (max-width: 479px) {
+    .filters-container {
+        gap: 0.5rem;
+    }
+    
+    .filter-select {
+        padding: 0.875rem 0.75rem;
+    }
+}

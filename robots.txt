@@ -1,19 +1,26 @@
-# Robots.txt for GGUF Models Discovery Website
-# Generated automatically by data pipeline
-
 User-agent: *
 Allow: /
+
+# Sitemap
+Sitemap: https://local-ai-zone.github.io/sitemap.xml
+
+# Crawl-delay for respectful crawling
 Crawl-delay: 1
 
-# Sitemaps
-Sitemap: https://username.github.io/gguf-models/sitemap.xml
+# Disallow crawling of test files
+Disallow: /test-*.html
+Disallow: /debug-*.html
+Disallow: /minimal-test.html
+Disallow: /simple-test.html
 
-# Disallow crawling of API endpoints
-Disallow: /api/
-Disallow: /_next/
-Disallow: /admin/
+# Disallow crawling of development files
+Disallow: /node_modules/
+Disallow: /scripts/
+Disallow: /.git/
+Disallow: /.github/
+Disallow: /venv/
 
-# Allow crawling of data files
-Allow: /data/
-Allow: /*.json
-Allow: /*.xml
+# Allow important resources
+Allow: /css/
+Allow: /js/
+Allow: /data/gguf_models.json

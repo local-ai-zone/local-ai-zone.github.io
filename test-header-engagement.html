@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Header Engagement Statistics Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/engagement-mobile-responsive.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .test-controls {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+        }
+        
+        .test-controls button {
+            margin-right: 10px;
+            padding: 8px 16px;
+            border: 1px solid #007bff;
+            background: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        .test-controls button:hover {
+            background: #0056b3;
+        }
+        
+        .test-info {
+            padding: 20px;
+            background: #e7f3ff;
+            border-bottom: 1px solid #b3d9ff;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <div class="test-info">
+            <h3>Header Engagement Statistics Test</h3>
+            <p>This test verifies that the Header component correctly displays engagement metrics including total likes, average likes, and filtered statistics.</p>
+        </div>
+        
+        <div class="test-controls">
+            <button onclick="loadTestData()">Load Test Data</button>
+            <button onclick="applyFilter()">Apply Filter (>10 likes)</button>
+            <button onclick="clearFilter()">Clear Filter</button>
+            <button onclick="updateTimestamp()">Update Timestamp</button>
+        </div>
+        
+        <!-- Header component will be rendered here -->
+        <div id="header-container"></div>
+        
+        <div style="padding: 20px;">
+            <h4>Test Results:</h4>
+            <div id="test-results"></div>
+        </div>
+    </div>
+
+    <!-- Load dependencies -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/formatters.js"></script>
+    <script src="js/utils/engagement.js"></script>
+    <script src="js/state/AppState.js"></script>
+    <script src="js/components/Header.js"></script>
+
+    <script>
+        // Test data with engagement metrics
+        const testModels = [
+            {
+                modelName: "High Engagement Model",
+                quantFormat: "Q4_K_M",
+                fileSize: 4200000000,
+                fileSizeFormatted: "4.2 GB",
+                modelType: "LLM",
+                license: "Apache-2.0",
+                downloadCount: 150000,
+                likeCount: 1250,
+                huggingFaceLink: "https://huggingface.co/test/model1"
+            },
+            {
+                modelName: "Medium Engagement Model",
+                quantFormat: "Q4_K_M",
+                fileSize: 2100000000,
+                fileSizeFormatted: "2.1 GB",
+                modelType: "LLM",
+                license: "MIT",
+                downloadCount: 75000,
+                likeCount: 45,
+                huggingFaceLink: "https://huggingface.co/test/model2"
+            },
+            {
+                modelName: "Low Engagement Model",
+                quantFormat: "Q8_0",
+                fileSize: 8400000000,
+                fileSizeFormatted: "8.4 GB",
+                modelType: "LLM",
+                license: "Apache-2.0",
+                downloadCount: 25000,
+                likeCount: 3,
+                huggingFaceLink: "https://huggingface.co/test/model3"
+            },
+            {
+                modelName: "No Engagement Model",
+                quantFormat: "F16",
+                fileSize: 1050000000,
+                fileSizeFormatted: "1.05 GB",
+                modelType: "Embedding",
+                license: "MIT",
+                downloadCount: 10000,
+                likeCount: 0,
+                huggingFaceLink: "https://huggingface.co/test/model4"
+            }
+        ];
+
+        let appState;
+        let header;
+
+        function initializeTest() {
+            // Initialize AppState
+            appState = new AppState();
+            
+            // Initialize Header component
+            header = new Header('header-container', appState);
+            
+            logResult('Test initialized successfully');
+        }
+
+        function loadTestData() {
+            const timestamp = new Date().toISOString();
+            
+            appState.updateState({
+                allModels: testModels,
+                filteredModels: testModels,
+                lastUpdateTime: timestamp
+            });
+            
+            logResult(`Loaded ${testModels.length} test models with engagement data`);
+            logEngagementStats();
+        }
+
+        function applyFilter() {
+            // Filter models with more than 10 likes
+            const filtered = testModels.filter(model => model.likeCount > 10);
+            
+            appState.updateState({
+                filteredModels: filtered,
+                activeFilters: ['Likes > 10']
+            });
+            
+            logResult(`Applied filter: ${filtered.length} models with >10 likes`);
+            logEngagementStats();
+        }
+
+        function clearFilter() {
+            appState.updateState({
+                filteredModels: testModels,
+                activeFilters: []
+            });
+            
+            logResult('Filter cleared - showing all models');
+            logEngagementStats();
+        }
+
+        function updateTimestamp() {
+            const timestamp = new Date().toISOString();
+            
+            appState.updateState({
+                lastUpdateTime: timestamp
+            });
+            
+            logResult('Updated timestamp to current time');
+        }
+
+        function logEngagementStats() {
+            const state = appState.getState();
+            const allTotalLikes = state.allModels.reduce((sum, model) => sum + (model.likeCount || 0), 0);
+            const filteredTotalLikes = state.filteredModels.reduce((sum, model) => sum + (model.likeCount || 0), 0);
+            const avgLikes = state.filteredModels.length > 0 ? 
+                (filteredTotalLikes / state.filteredModels.length).toFixed(1) : 0;
+            
+            logResult(`Stats - All: ${allTotalLikes} likes, Filtered: ${filteredTotalLikes} likes, Avg: ${avgLikes} likes`);
+        }
+
+        function logResult(message) {
+            const resultsDiv = document.getElementById('test-results');
+            const timestamp = new Date().toLocaleTimeString();
+            resultsDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+            resultsDiv.scrollTop = resultsDiv.scrollHeight;
+        }
+
+        // Initialize test when page loads
+        document.addEventListener('DOMContentLoaded', initializeTest);
+    </script>
+</body>
+</html>

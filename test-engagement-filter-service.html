@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Engagement Filter Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .test-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .test-pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .test-data {
+            background-color: #e2e3e5;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Engagement Filter Service Tests</h1>
+    
+    <div class="test-container">
+        <h2>Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+
+    <script src="js/services/FilterService.js"></script>
+    <script>
+        // Test data with engagement metrics
+        const testModels = [
+            {
+                modelName: "llama-2-7b-chat.Q4_0.gguf",
+                quantFormat: "Q4_0",
+                modelType: "Chat",
+                license: "Custom",
+                fileSize: 3800000000,
+                downloadCount: 50000,
+                likeCount: 150
+            },
+            {
+                modelName: "mistral-7b-instruct.Q8_0.gguf", 
+                quantFormat: "Q8_0",
+                modelType: "Instruct",
+                license: "Apache-2.0",
+                fileSize: 7200000000,
+                downloadCount: 25000,
+                likeCount: 75
+            },
+            {
+                modelName: "codellama-13b.Q4_K_M.gguf",
+                quantFormat: "Q4_K_M", 
+                modelType: "Code",
+                license: "Custom",
+                fileSize: 7800000000,
+                downloadCount: 15000,
+                likeCount: 200
+            },
+            {
+                modelName: "phi-2.Q5_K_M.gguf",
+                quantFormat: "Q5_K_M",
+                modelType: "General",
+                license: "MIT",
+                fileSize: 1800000000,
+                downloadCount: 8000,
+                likeCount: 45
+            },
+            {
+                modelName: "neural-chat-7b.Q4_0.gguf",
+                quantFormat: "Q4_0",
+                modelType: "Chat", 
+                license: "Apache-2.0",
+                fileSize: 3900000000,
+                downloadCount: 12000,
+                likeCount: 0  // Model with no likes
+            }
+        ];
+
+        const filterService = new FilterService();
+        const results = [];
+
+        function runTest(testName, testFunction) {
+            try {
+                const result = testFunction();
+                if (result.success) {
+                    results.push({
+                        name: testName,
+                        status: 'pass',
+                        message: result.message,
+                        data: result.data
+                    });
+                } else {
+                    results.push({
+                        name: testName,
+                        status: 'fail',
+                        message: result.message,
+                        data: result.data
+                    });
+                }
+            } catch (error) {
+                results.push({
+                    name: testName,
+                    status: 'fail',
+                    message: `Error: ${error.message}`,
+                    data: null
+                });
+            }
+        }
+
+        // Test 1: filterByEngagement method exists and works
+        runTest('filterByEngagement method exists', () => {
+            const filtered = filterService.filterByEngagement(testModels, 50, 150);
+            const expectedCount = 2; // Models with 75 and 150 likes
+            return {
+                success: filtered.length === expectedCount,
+                message: `Expected ${expectedCount} models, got ${filtered.length}`,
+                data: filtered.map(m => ({ name: m.modelName, likes: m.likeCount }))
+            };
+        });
+
+        // Test 2: sortByLikeCount method exists and works
+        runTest('sortByLikeCount method exists', () => {
+            const sorted = filterService.sortByLikeCount(testModels, 'desc');
+            const expectedOrder = [200, 150, 75, 45, 0];
+            const actualOrder = sorted.map(m => m.likeCount);
+            return {
+                success: JSON.stringify(actualOrder) === JSON.stringify(expectedOrder),
+                message: `Expected order: ${expectedOrder.join(', ')}, got: ${actualOrder.join(', ')}`,
+                data: sorted.map(m => ({ name: m.modelName, likes: m.likeCount }))
+            };
+        });
+
+        // Test 3: sortByLikeCount ascending order
+        runTest('sortByLikeCount ascending order', () => {
+            const sorted = filterService.sortByLikeCount(testModels, 'asc');
+            const expectedOrder = [0, 45, 75, 150, 200];
+            const actualOrder = sorted.map(m => m.likeCount);
+            return {
+                success: JSON.stringify(actualOrder) === JSON.stringify(expectedOrder),
+                message: `Expected order: ${expectedOrder.join(', ')}, got: ${actualOrder.join(', ')}`,
+                data: sorted.map(m => ({ name: m.modelName, likes: m.likeCount }))
+            };
+        });
+
+        // Test 4: Engagement filter integration in filterModels
+        runTest('Engagement filter integration', () => {
+            const filters = {
+                quantFormat: 'all',
+                modelType: 'all',
+                license: 'all',
+                likeCountMin: 70,
+                likeCountMax: 160
+            };
+            const filtered = filterService.filterModels(testModels, filters);
+            const expectedCount = 2; // Models with 75 and 150 likes
+            return {
+                success: filtered.length === expectedCount,
+                message: `Expected ${expectedCount} models with likes 70-160, got ${filtered.length}`,
+                data: filtered.map(m => ({ name: m.modelName, likes: m.likeCount }))
+            };
+        });
+
+        // Test 5: Engagement filter validation
+        runTest('Engagement filter validation', () => {
+            const invalidFilters = {
+                likeCountMin: 100,
+                likeCountMax: 50  // Max less than min
+            };
+            const validated = filterService.validateFilters(invalidFilters);
+            return {
+                success: validated.likeCountMax >= validated.likeCountMin,
+                message: `Min: ${validated.likeCountMin}, Max: ${validated.likeCountMax}`,
+                data: validated
+            };
+        });
+
+        // Test 6: Combined filtering and sorting with engagement metrics
+        runTest('Combined filtering and sorting', () => {
+            const options = {
+                filters: {
+                    quantFormat: 'all',
+                    modelType: 'all', 
+                    license: 'all',
+                    likeCountMin: 40
+                },
+                sorting: {
+                    field: 'likeCount',
+                    direction: 'desc'
+                }
+            };
+            const processed = filterService.applyAllFilters(testModels, options);
+            const expectedCount = 4; // All models except the one with 0 likes
+            const firstModelLikes = processed[0].likeCount;
+            return {
+                success: processed.length === expectedCount && firstModelLikes === 200,
+                message: `Expected ${expectedCount} models with highest likes first (200), got ${processed.length} models with ${firstModelLikes} likes first`,
+                data: processed.map(m => ({ name: m.modelName, likes: m.likeCount }))
+            };
+        });
+
+        // Test 7: Edge case - no engagement data
+        runTest('Handle missing engagement data', () => {
+            const modelsWithoutLikes = [
+                { modelName: "test-model.gguf", quantFormat: "Q4_0" }
+            ];
+            const filtered = filterService.filterByEngagement(modelsWithoutLikes, 0, 100);
+            return {
+                success: filtered.length === 1,
+                message: `Expected 1 model (treating undefined as 0), got ${filtered.length}`,
+                data: filtered.map(m => ({ name: m.modelName, likes: m.likeCount || 'undefined' }))
+            };
+        });
+
+        // Test 8: Performance with engagement sorting
+        runTest('Performance test with engagement sorting', () => {
+            const startTime = performance.now();
+            const sorted = filterService.sortByLikeCount(testModels, 'desc');
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            return {
+                success: duration < 10, // Should complete in under 10ms for small dataset
+                message: `Sorting completed in ${duration.toFixed(2)}ms`,
+                data: { duration, modelCount: testModels.length }
+            };
+        });
+
+        // Display results
+        function displayResults() {
+            const container = document.getElementById('test-results');
+            let html = '';
+            
+            const passCount = results.filter(r => r.status === 'pass').length;
+            const totalCount = results.length;
+            
+            html += `<div class="test-result ${passCount === totalCount ? 'test-pass' : 'test-fail'}">
+                <strong>Overall: ${passCount}/${totalCount} tests passed</strong>
+            </div>`;
+            
+            results.forEach(result => {
+                html += `
+                    <div class="test-result ${result.status === 'pass' ? 'test-pass' : 'test-fail'}">
+                        <strong>${result.name}</strong>: ${result.message}
+                        ${result.data ? `<div class="test-data">${JSON.stringify(result.data, null, 2)}</div>` : ''}
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // Run all tests
+        displayResults();
+    </script>
+</body>
+</html>

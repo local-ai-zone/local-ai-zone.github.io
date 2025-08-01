@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Engagement Filter Test</title>
+    <style>
+        body { padding: 2rem; font-family: Arial, sans-serif; }
+        .test-result { margin: 1rem 0; padding: 1rem; background: #f0f0f0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>Simple Engagement Filter Test</h1>
+    <div id="results"></div>
+
+    <script src="js/services/FilterService.js"></script>
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(message, isSuccess = true) {
+            const div = document.createElement('div');
+            div.className = `test-result ${isSuccess ? 'success' : 'error'}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        // Test data
+        const testModels = [
+            { modelName: "Model A", likeCount: 5 },
+            { modelName: "Model B", likeCount: 25 },
+            { modelName: "Model C", likeCount: 100 },
+            { modelName: "Model D", likeCount: 0 }
+        ];
+
+        try {
+            const filterService = new FilterService();
+            
+            // Test 1: Filter by minimum likes
+            const filtered1 = filterService.filterByEngagement(testModels, 10, Infinity);
+            addResult(`Test 1 - Min 10 likes: Found ${filtered1.length} models (${filtered1.map(m => m.modelName).join(', ')})`);
+            
+            // Test 2: Filter by range
+            const filtered2 = filterService.filterByEngagement(testModels, 5, 50);
+            addResult(`Test 2 - 5-50 likes: Found ${filtered2.length} models (${filtered2.map(m => m.modelName).join(', ')})`);
+            
+            // Test 3: No filter (should return all)
+            const filtered3 = filterService.filterByEngagement(testModels, 0, Infinity);
+            addResult(`Test 3 - No filter: Found ${filtered3.length} models (should be 4)`);
+            
+            // Test 4: Validate filters
+            const validatedFilters = filterService.validateFilters({
+                likeCountMin: 10,
+                likeCountMax: 100
+            });
+            addResult(`Test 4 - Validation: likeCountMin=${validatedFilters.likeCountMin}, likeCountMax=${validatedFilters.likeCountMax}`);
+            
+            addResult("All tests completed successfully!");
+            
+        } catch (error) {
+            addResult(`Error: ${error.message}`, false);
+            console.error(error);
+        }
+    </script>
+</body>
+</html>

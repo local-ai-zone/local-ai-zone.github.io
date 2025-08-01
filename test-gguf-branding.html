@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GGUF Loader Branding Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/premium-styles.css">
+    <style>
+        .test-content {
+            height: 200vh;
+            padding: 100px 20px;
+            background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+        }
+        .test-section {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        h1, h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        p {
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 16px;
+        }
+    </style>
+</head>
+<body class="gguf-banner-active">
+    <!-- GGUF Loader Top Banner -->
+    <div id="gguf-banner" class="gguf-banner">
+        <div class="banner-content">
+            <div class="banner-branding">
+                <span class="banner-icon">🔋</span>
+                <span class="banner-text">Powered by GGUF Loader</span>
+            </div>
+            <div class="banner-tagline">Local-first AI. Your models, your machine, your rules.</div>
+            <a href="https://ggufloader.github.io" class="banner-cta" rel="noopener" target="_blank">Visit GGUF Loader</a>
+        </div>
+    </div>
+
+    <!-- Header with GGUF Button -->
+    <header style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px); border-bottom: 1px solid #e5e5e5; position: sticky; top: 60px; z-index: 100; padding: 16px 0;">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="margin: 0; font-size: 24px; color: #333;">Test Header</h1>
+            </div>
+            <div style="display: flex; gap: 16px; align-items: center;">
+                <input type="search" placeholder="Search..." style="padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px;">
+                <!-- GGUF Loader Header Button -->
+                <a href="https://ggufloader.github.io" class="gguf-header-btn" rel="noopener" target="_blank">
+                    <span class="btn-text">GGUF Loader</span>
+                    <span class="btn-icon">🔋</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Test Content -->
+    <div class="test-content">
+        <div class="test-section">
+            <h1>GGUF Loader Branding Test</h1>
+            <p>This page tests the GGUF Loader branding elements:</p>
+            <ul>
+                <li><strong>Top Banner:</strong> Fixed position banner with scroll behavior</li>
+                <li><strong>Header Button:</strong> GGUF Loader button in the header</li>
+                <li><strong>Footer Attribution:</strong> Powered by GGUF Loader footer</li>
+            </ul>
+        </div>
+
+        <div class="test-section">
+            <h2>Scroll Test</h2>
+            <p>Scroll down to test the banner hide/show behavior. The banner should hide when scrolling down and show when scrolling up or when near the top.</p>
+            <p>The banner uses futuristic styling with dark backgrounds and electric blue/neon green accents.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>Responsive Design</h2>
+            <p>Resize the browser window to test responsive behavior on different screen sizes.</p>
+            <p>On mobile devices, the banner layout should stack vertically for better usability.</p>
+        </div>
+
+        <div class="test-section">
+            <h2>Visual Effects</h2>
+            <p>The branding elements feature:</p>
+            <ul>
+                <li>Gradient backgrounds with dark themes</li>
+                <li>Electric blue (#00d4ff) and neon green (#39ff14) accents</li>
+                <li>Glowing text shadows and box shadows</li>
+                <li>Smooth hover animations</li>
+                <li>Neural circuit-inspired styling</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Footer with Attribution -->
+    <footer style="background: #262626; color: #a3a3a3; padding: 40px 0;">
+        <div style="max-width: 1400px; margin: 0 auto; padding: 0 24px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h3 style="color: white; margin-bottom: 8px;">Test Footer</h3>
+                <p style="margin: 0;">This is a test footer section</p>
+            </div>
+            
+            <!-- GGUF Loader Footer Attribution -->
+            <div class="gguf-footer-attribution">
+                <div class="attribution-content">
+                    <span class="attribution-text">Powered by</span>
+                    <a href="https://ggufloader.github.io" class="attribution-link" rel="noopener" target="_blank">GGUF Loader</a>
+                </div>
+                <div class="attribution-tagline">Local-first AI. Your models, your machine, your rules.</div>
+            </div>
+            
+            <div style="text-align: center; padding-top: 20px; border-top: 1px solid #404040; margin-top: 20px;">
+                <p style="margin: 0; font-size: 14px;">&copy; 2024 Test Page. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // GGUF Loader Banner Scroll Behavior
+        const banner = document.getElementById('gguf-banner');
+        if (banner) {
+            let lastScrollY = window.scrollY;
+            let isScrollingDown = false;
+            let scrollTimeout;
+            
+            const handleScroll = () => {
+                const currentScrollY = window.scrollY;
+                
+                // Determine scroll direction
+                if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                    // Scrolling down and past threshold
+                    if (!isScrollingDown) {
+                        isScrollingDown = true;
+                        banner.classList.add('hidden');
+                    }
+                } else if (currentScrollY < lastScrollY || currentScrollY <= 50) {
+                    // Scrolling up or near top
+                    if (isScrollingDown) {
+                        isScrollingDown = false;
+                        banner.classList.remove('hidden');
+                    }
+                }
+                
+                lastScrollY = currentScrollY;
+                
+                // Clear any existing timeout
+                clearTimeout(scrollTimeout);
+                
+                // Show banner after scroll stops for better UX
+                scrollTimeout = setTimeout(() => {
+                    if (currentScrollY <= 50) {
+                        banner.classList.remove('hidden');
+                    }
+                }, 150);
+            };
+            
+            // Throttle scroll events for better performance
+            let ticking = false;
+            const throttledScroll = () => {
+                if (!ticking) {
+                    requestAnimationFrame(() => {
+                        handleScroll();
+                        ticking = false;
+                    });
+                    ticking = true;
+                }
+            };
+            
+            window.addEventListener('scroll', throttledScroll, { passive: true });
+            
+            console.log('✅ GGUF Loader banner scroll behavior initialized');
+        }
+    </script>
+</body>
+</html>

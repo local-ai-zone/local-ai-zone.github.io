@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium GGUF Debug</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/premium-styles.css">
+    <style>
+        .debug-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            width: 300px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 10000;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .debug-log {
+            margin-bottom: 5px;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .debug-success { color: #10b981; }
+        .debug-error { color: #ef4444; }
+        .debug-warning { color: #f59e0b; }
+        .debug-info { color: #3b82f6; }
+    </style>
+</head>
+<body>
+    <!-- Debug Panel -->
+    <div class="debug-panel">
+        <div style="font-weight: bold; margin-bottom: 10px;">🐛 Premium Debug Console</div>
+        <div id="debug-logs"></div>
+        <button onclick="clearDebugLogs()" style="background: #374151; color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 11px; margin-top: 10px;">Clear</button>
+    </div>
+
+    <!-- Premium Loading Screen -->
+    <div id="loading-screen" class="premium-loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="logo-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                    </svg>
+                </div>
+                <h1 class="logo-text">GGUF Discovery</h1>
+            </div>
+            <div class="loading-spinner-container">
+                <div class="premium-spinner"></div>
+                <p class="loading-message">Loading AI Models...</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <main class="premium-main">
+        <div class="container">
+            <div class="results-summary">
+                <div class="results-header">
+                    <div id="results-count" class="results-count">Loading models...</div>
+                </div>
+            </div>
+            
+            <section class="premium-model-section">
+                <div id="model-grid" class="premium-model-grid">
+                    <div class="premium-loading-container">
+                        <div class="premium-spinner"></div>
+                        <div class="loading-message">Initializing...</div>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="premium-pagination-section">
+                <div id="pagination-container" class="premium-pagination-container">
+                    <!-- Pagination will be rendered here -->
+                </div>
+            </section>
+        </div>
+    </main>
+    
+    <!-- JavaScript -->
+    <script>
+        // Debug logging system
+        const debugLogs = document.getElementById('debug-logs');
+        let logCount = 0;
+        
+        function debugLog(message, type = 'info') {
+            logCount++;
+            const logElement = document.createElement('div');
+            logElement.className = `debug-log debug-${type}`;
+            logElement.innerHTML = `${logCount}. ${message}`;
+            debugLogs.appendChild(logElement);
+            debugLogs.scrollTop = debugLogs.scrollHeight;
+            
+            // Also log to console
+            console.log(`[DEBUG ${type.toUpperCase()}] ${message}`);
+        }
+        
+        function clearDebugLogs() {
+            debugLogs.innerHTML = '';
+            logCount = 0;
+        }
+        
+        // Override console methods to capture logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            debugLog(args.join(' '), 'info');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            debugLog(args.join(' '), 'error');
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            debugLog(args.join(' '), 'warning');
+        };
+        
+        debugLog('🚀 Debug system initialized', 'success');
+        debugLog('📋 Starting file loading checks...', 'info');
+    </script>
+    
+    <!-- Load utilities -->
+    <script src="js/utils/helpers.js" onload="debugLog('✅ Helpers loaded', 'success')" onerror="debugLog('❌ Helpers failed to load', 'error')"></script>
+    <script src="js/utils/formatters.js" onload="debugLog('✅ Formatters loaded', 'success')" onerror="debugLog('❌ Formatters failed to load', 'error')"></script>
+    <script src="js/utils/notifications.js" onload="debugLog('✅ Notifications loaded', 'success')" onerror="debugLog('❌ Notifications failed to load', 'error')"></script>
+    
+    <!-- Load premium app -->
+    <script src="js/premium-app.js" onload="debugLog('✅ Premium app loaded', 'success')" onerror="debugLog('❌ Premium app failed to load', 'error')"></script>
+    
+    <!-- Initialize -->
+    <script>
+        debugLog('🔧 Starting initialization...', 'info');
+        
+        // Test data loading first
+        fetch('./gguf_models.json')
+            .then(response => {
+                debugLog(`📡 Data fetch: ${response.status} ${response.statusText}`, response.ok ? 'success' : 'error');
+                return response.json();
+            })
+            .then(data => {
+                debugLog(`📊 Data loaded: ${data.length} models`, 'success');
+                
+                // Now try to initialize the app
+                setTimeout(() => {
+                    try {
+                        debugLog('🎯 Creating PremiumGGUFApp instance...', 'info');
+                        
+                        if (typeof PremiumGGUFApp === 'undefined') {
+                            debugLog('❌ PremiumGGUFApp class not found', 'error');
+                            return;
+                        }
+                        
+                        window.premiumApp = new PremiumGGUFApp();
+                        debugLog('✅ Premium app instance created', 'success');
+                        
+                    } catch (error) {
+                        debugLog(`❌ App initialization failed: ${error.message}`, 'error');
+                        debugLog(`Stack: ${error.stack}`, 'error');
+                    }
+                }, 1000);
+            })
+            .catch(error => {
+                debugLog(`❌ Data loading failed: ${error.message}`, 'error');
+            });
+    </script>
+</body>
+</html>

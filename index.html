@@ -1,677 +1,425 @@
 <!DOCTYPE html>
-<html lang="en" itemscope itemtype="https://schema.org/WebApplication">
+<html lang="en">
 
 <head>
-    <!-- Basic Meta Tags -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-
-    <!-- SEO Meta Tags -->
-    <title>GGUF Model Discovery - Browse & Download AI Models | GGUF Index</title>
-    <meta name="description"
-        content="Discover and download GGUF AI models from Hugging Face. Search through thousands of quantized models with real-time filtering by size, architecture, and quantization. Updated daily.">
-    <meta name="keywords" content="GGUF models, AI models, machine learning, quantization, Hugging Face, download, LLM, neural networks, model discovery">
+    <meta name="description" content="Discover and download GGUF format machine learning models. Browse thousands of quantized AI models with detailed information, download counts, and direct links.">
+    <meta name="keywords" content="GGUF models, machine learning, AI models, quantized models, model download, Hugging Face, LLaMA, neural networks, deep learning, BERT models, Qwen models, LLaMA models, Gemma models, Mistral models, Phi models, DeepSeek models, MPT models, Alpaca models, Yi models, Falcon models, Q4_0 quantization, Q4_K_M quantization, Q5_K_M quantization, Q8_0 quantization, F16 quantization">
     <meta name="author" content="GGUF Model Discovery">
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
-    <link rel="canonical" href="https://ggufloader.github.io/">
 
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="GGUF Model Discovery - Browse & Download AI Models">
-    <meta property="og:description" content="Discover and download GGUF AI models from Hugging Face. Search through thousands of quantized models with real-time filtering. Updated daily.">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ggufloader.github.io/">
-    <meta property="og:site_name" content="GGUF Model Discovery">
-    <meta property="og:locale" content="en_US">
-    <meta property="og:image" content="https://ggufloader.github.io/og-image.png">
-    <meta property="og:image:width" content="1200">
-    <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="GGUF Model Discovery - AI Model Search Interface">
+    <title>GGUF Model Discovery - Browse & Download AI Models</title>
 
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="GGUF Model Discovery - Browse & Download AI Models">
-    <meta name="twitter:description" content="Discover and download GGUF AI models from Hugging Face. Search through thousands of quantized models with real-time filtering. Updated daily.">
-    <meta name="twitter:image" content="https://ggufloader.github.io/og-image.png">
-    <meta name="twitter:image:alt" content="GGUF Model Discovery - AI Model Search Interface">
-    <meta name="twitter:creator" content="@ggufmodels">
-    <meta name="twitter:site" content="@ggufmodels">
-
-    <!-- Structured Data (JSON-LD) -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "GGUF Model Discovery",
-        "description": "Discover and download GGUF AI models from Hugging Face. Search through thousands of quantized models with real-time filtering by size, architecture, and quantization.",
-        "url": "https://ggufloader.github.io/",
-        "applicationCategory": "DeveloperApplication",
-        "operatingSystem": "Web Browser",
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "author": {
-            "@type": "Organization",
-            "name": "GGUF Model Discovery Team"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": "GGUF Model Discovery Team"
-        },
-        "datePublished": "2025-01-01",
-        "dateModified": "2025-07-29",
-        "inLanguage": "en-US",
-        "isAccessibleForFree": true,
-        "keywords": ["GGUF", "AI models", "machine learning", "quantization", "Hugging Face", "model discovery"],
-        "mainEntity": {
-            "@type": "Dataset",
-            "name": "GGUF Models Collection",
-            "description": "Comprehensive collection of GGUF quantized AI models from Hugging Face",
-            "keywords": ["GGUF", "quantized models", "AI", "machine learning"],
-            "license": "https://creativecommons.org/licenses/by/4.0/",
-            "creator": {
-                "@type": "Organization",
-                "name": "Hugging Face"
-            }
-        }
-    }
-    </script>
-
-    <!-- Web App Manifest -->
-    <link rel="manifest" href="./manifest.json">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml"
-        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
-    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
-    <link rel="icon" type="image/png" sizes="32x32" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
-    <link rel="icon" type="image/png" sizes="16x16" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
-
-    <!-- Preconnect for Performance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://huggingface.co">
-    
     <!-- Preload critical resources -->
-    <link rel="preload" href="./gguf_models.json" as="fetch" type="application/json" crossorigin>
-    <link rel="preload" href="./main.js" as="script">
-    <link rel="preload" href="./styles/main.css" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        as="style">
+    <link rel="preload" href="css/premium-styles.css" as="style">
+
+    <!-- Stylesheets -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/premium-styles.css">
+
+    <!-- Favicon and app icons -->
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="GGUF Model Discovery - Browse & Download AI Models">
+    <meta property="og:description" content="Discover and download GGUF format machine learning models. Browse thousands of quantized AI models with detailed information, download counts, and direct links.">
+    <meta property="og:type" content="website">
+    <link rel="canonical" href="https://local-ai-zone.github.io/">
+
     
-    <!-- DNS prefetch for external resources -->
-    <link rel="dns-prefetch" href="//cdn.tailwindcss.com">
-    <link rel="dns-prefetch" href="//fonts.googleapis.com">
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    <meta property="og:url" content="https://local-ai-zone.github.io">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
 
-    <!-- Content Security Policy for font loading -->
-    <meta http-equiv="Content-Security-Policy"
-        content="font-src 'self' https://fonts.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.tailwindcss.com;">
-
-    <!-- Fonts will be loaded by CSPPolicyManager for better security compliance -->
-    <!-- Fallback fonts defined in CSS -->
-
-    <!-- Critical CSS (inlined for performance) -->
-    <style>
-        /* Critical above-the-fold styles */
-        *,*::before,*::after{box-sizing:border-box}html{scroll-behavior:smooth;font-size:16px;line-height:1.5}body{-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','Roboto','Oxygen','Ubuntu','Cantarell','Fira Sans','Droid Sans','Helvetica Neue',sans-serif;background-color:#f9fafb;color:#111827;margin:0;padding:0}.loading-spinner{border:2px solid #f3f4f6;border-top:2px solid #3b82f6;border-radius:50%;width:20px;height:20px;animation:spin 1s linear infinite}@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.skip-link{position:absolute;top:-40px;left:6px;background:#3b82f6;color:white;padding:8px;text-decoration:none;border-radius:4px;z-index:1000}.skip-link:focus{top:6px}header{background-color:white;box-shadow:0 1px 3px 0 rgba(0,0,0,0.1);border-bottom:1px solid #e5e7eb}#loading-screen{position:fixed;inset:0;background:white;z-index:50;display:flex;align-items:center;justify-content:center}.fixed{position:fixed}.absolute{position:absolute}.relative{position:relative}.inset-0{top:0;right:0;bottom:0;left:0}.z-50{z-index:50}.flex{display:flex}.items-center{align-items:center}.justify-center{justify-content:center}.text-center{text-align:center}.bg-white{background-color:white}.text-gray-600{color:#4b5563}.mb-4{margin-bottom:1rem}.mx-auto{margin-left:auto;margin-right:auto}@media (prefers-reduced-motion:reduce){*{animation-duration:0.01ms!important;animation-iteration-count:1!important;transition-duration:0.01ms!important}}@media (prefers-contrast:high){.loading-spinner{border:2px solid #000;border-top:2px solid #3b82f6}}
-    </style>
-
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Main CSS (loaded asynchronously for performance) -->
-    <link rel="preload" href="./styles/main.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="./styles/main.css"></noscript>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        'sans': ['Inter', 'system-ui', 'sans-serif'],
-                    },
-                    animation: {
-                        'fade-in': 'fadeIn 0.5s ease-in-out',
-                        'slide-up': 'slideUp 0.3s ease-out',
-                        'pulse-slow': 'pulse 3s infinite',
-                    },
-                    keyframes: {
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' },
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(10px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' },
-                        }
-                    }
-                }
-            }
-        }
+
+    
+
+    
+    
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "GGUF Model Discovery",
+      "description": "Browse and download GGUF format machine learning models",
+      "url": "https://local-ai-zone.github.io",
+      "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "https://local-ai-zone.github.io/#search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+      },
+      "mainEntity": {
+            "@type": "DataCatalog",
+            "name": "GGUF Model Catalog",
+            "description": "Comprehensive catalog of GGUF format machine learning models",
+            "numberOfItems": 3147,
+            "keywords": "BERT, Qwen, LLaMA, Gemma, Mistral, Phi, DeepSeek, MPT, Alpaca, Yi, Falcon"
+      }
+}
     </script>
-
-    <!-- Custom Styles -->
-    <style>
-        /* Loading animation */
-        .loading-spinner {
-            border: 2px solid #f3f4f6;
-            border-top: 2px solid #3b82f6;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
-        }
-
-        /* Focus styles for accessibility */
-        .focus-visible:focus-visible {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
-        }
-
-        /* Skip link for accessibility */
-        .skip-link {
-            position: absolute;
-            top: -40px;
-            left: 6px;
-            background: #3b82f6;
-            color: white;
-            padding: 8px;
-            text-decoration: none;
-            border-radius: 4px;
-            z-index: 1000;
-        }
-
-        .skip-link:focus {
-            top: 6px;
-        }
-
-        /* High contrast mode support */
-        @media (prefers-contrast: high) {
-            .shadow-sm {
-                box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-            }
-
-            .shadow-md {
-                box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-            }
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-            * {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-        }
-
-        /* Fallback font stack for when external fonts fail to load */
-        body,
-        * {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-        }
-
-        /* Visually hidden utility class for accessibility */
-        .visually-hidden {
-            position: absolute !important;
-            width: 1px !important;
-            height: 1px !important;
-            padding: 0 !important;
-            margin: -1px !important;
-            overflow: hidden !important;
-            clip: rect(0, 0, 0, 0) !important;
-            white-space: nowrap !important;
-            border: 0 !important;
-        }
-
-        /* Mobile-first responsive design improvements */
-        @media (max-width: 640px) {
-            .mobile-stack {
-                flex-direction: column;
-            }
-            
-            .mobile-full {
-                width: 100%;
-            }
-            
-            .mobile-text-center {
-                text-align: center;
-            }
-            
-            .mobile-hidden {
-                display: none;
-            }
-        }
-
-        /* Touch-friendly interactive elements */
-        @media (hover: none) and (pointer: coarse) {
-            button, 
-            .btn,
-            input[type="button"],
-            input[type="submit"] {
-                min-height: 44px;
-                min-width: 44px;
-            }
-        }
-
-        /* Enhanced focus indicators for keyboard navigation */
-        .focus-ring:focus-visible {
-            outline: 2px solid #3b82f6;
-            outline-offset: 2px;
-            border-radius: 4px;
-        }
-
-        /* Loading states */
-        .loading-skeleton {
-            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-        }
-
-        @keyframes loading {
-            0% {
-                background-position: 200% 0;
-            }
-            100% {
-                background-position: -200% 0;
-            }
-        }
-
-        /* Print styles */
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            
-            body {
-                font-size: 12pt;
-                line-height: 1.4;
-            }
-            
-            h1, h2, h3 {
-                page-break-after: avoid;
-            }
-        }
-    </style>
 </head>
 
-<body class="bg-gray-50 font-sans antialiased">
-    <!-- Skip Links for Accessibility -->
+<body class="gguf-banner-active">
+    <!-- Skip link for accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
-    <a href="#filter-panel" class="skip-link">Skip to filters</a>
 
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="fixed inset-0 bg-white z-50 flex items-center justify-center" aria-hidden="true">
-        <div class="text-center">
-            <div class="loading-spinner mx-auto mb-4"></div>
-            <p class="text-gray-600">Loading GGUF Model Index...</p>
+    <!-- GGUF Loader Top Banner -->
+    <div id="gguf-banner" class="gguf-banner">
+        <div class="banner-content">
+            <div class="banner-branding">
+                <span class="banner-icon">🔋</span>
+                <span class="banner-text">Powered by GGUF Loader</span>
+            </div>
+            <div class="banner-tagline">Local-first AI. Your models, your machine, your rules.</div>
+            <a href="https://ggufloader.github.io" class="banner-cta" rel="noopener" target="_blank">Visit GGUF Loader</a>
         </div>
     </div>
 
-    <!-- Main Application Container -->
-    <div id="app" class="min-h-screen">
-        <!-- GGUF Loader Banner -->
-        <div id="gguf-loader-banner" class="relative overflow-hidden">
-            <!-- Background Pattern -->
-            <div class="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-700"></div>
-            <div class="absolute inset-0 bg-black bg-opacity-10"></div>
-            
-            <!-- Animated Background Elements -->
-            <div class="absolute inset-0 overflow-hidden">
-                <div class="banner-particle banner-particle-1"></div>
-                <div class="banner-particle banner-particle-2"></div>
-                <div class="banner-particle banner-particle-3"></div>
-                <div class="banner-particle banner-particle-4"></div>
+    <!-- Premium Loading Screen -->
+    <div id="loading-screen" class="premium-loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="logo-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                </div>
+                <h1 class="logo-text">GGUF Discovery</h1>
             </div>
-            
-            <!-- Content -->
-            <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
-                <div class="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-8">
-                    <!-- Left Content -->
-                    <div class="flex-1 text-center lg:text-left">
-                        <div class="flex items-center justify-center lg:justify-start mb-4">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-12 h-12 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                                    <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                    </svg>
-                                </div>
-                                <div class="text-white">
-                                    <div class="text-sm font-medium opacity-90">Powered by</div>
-                                    <div class="text-xl font-bold">GGUF Loader Team</div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <h2 class="text-2xl lg:text-3xl font-bold text-white mb-4 leading-tight">
-                            Experience the <span class="text-yellow-300">Fastest</span> Way to Run Local AI Models
-                        </h2>
-                        
-                        <p class="text-lg text-blue-100 mb-6 max-w-2xl leading-relaxed">
-                            GGUF Loader delivers unmatched <strong class="text-white">performance</strong>, 
-                            <strong class="text-white">simplicity</strong>, and <strong class="text-white">full offline access</strong> 
-                            for your AI workflow. Built for developers who demand excellence.
-                        </p>
-                        
-                        <!-- Feature Pills -->
-                        <div class="flex flex-wrap justify-center lg:justify-start gap-2 mb-6">
-                            <span class="px-3 py-1 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full backdrop-blur-sm">
-                                ⚡ Lightning Fast
-                            </span>
-                            <span class="px-3 py-1 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full backdrop-blur-sm">
-                                🔒 100% Offline
-                            </span>
-                            <span class="px-3 py-1 bg-white bg-opacity-20 text-white text-sm font-medium rounded-full backdrop-blur-sm">
-                                🎯 Developer-First
-                            </span>
-                        </div>
-                    </div>
-                    
-                    <!-- Right Content - CTA -->
-                    <div class="flex-shrink-0">
-                        <div class="text-center">
-                            <a href="https://ggufloader.github.io" 
-                               target="_blank" 
-                               rel="noopener noreferrer"
-                               class="group inline-flex items-center px-8 py-4 bg-white hover:bg-gray-50 text-gray-900 text-lg font-bold rounded-xl shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-white focus:ring-opacity-50">
-                                <span class="mr-3">Visit GGUF Loader</span>
-                                <div class="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center group-hover:rotate-12 transition-transform duration-300">
-                                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-                                    </svg>
-                                </div>
-                            </a>
-                            <p class="text-blue-100 text-sm mt-3 opacity-90">
-                                Join thousands of developers already using GGUF Loader
-                            </p>
-                        </div>
-                    </div>
+            <div class="loading-spinner-container">
+                <div class="premium-spinner"></div>
+                <p class="loading-message">Loading AI Models...</p>
+            </div>
+            <div class="loading-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="loading-model-count">40,000+</span>
+                    <span class="stat-label">Models</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">15+</span>
+                    <span class="stat-label">Formats</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100+</span>
+                    <span class="stat-label">Publishers</span>
                 </div>
             </div>
-            
-            <!-- Bottom Accent -->
-            <div class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-yellow-400 via-pink-500 to-red-500"></div>
         </div>
+    </div>
 
-        <!-- Header Section -->
-        <header role="banner" class="bg-white shadow-sm border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col gap-4 py-4">
-                    <!-- Main header row -->
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center">
-                            <h1 class="text-xl font-bold text-gray-900">
-                                <span class="sr-only">GGUF Model Discovery - </span>
-                                🧠 GGUF Models
-                            </h1>
-                            <div class="ml-4 text-sm text-gray-600" id="model-count-display">
-                                <!-- Model count will be inserted here -->
-                            </div>
-                        </div>
-                        <nav role="navigation" aria-label="Main navigation">
-                            <div class="flex items-center space-x-4">
-                                <a href="#about" class="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium">About</a>
-                                <a href="https://github.com/ggufloader" class="text-gray-600 hover:text-gray-900 px-3 py-2 text-sm font-medium" target="_blank" rel="noopener noreferrer">GitHub</a>
-                            </div>
-                        </nav>
-                    </div>
-                    
-                    <!-- Freshness indicator row -->
-                    <div id="freshness-indicator-container" class="freshness-indicator-container">
-                        <!-- Freshness indicator will be inserted here by JavaScript -->
-                    </div>
-                </div>
-            </div>
-        </header>
-
-        <!-- Breadcrumb Navigation -->
-        <nav aria-label="Breadcrumb" class="bg-gray-50 border-b border-gray-200">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <ol class="flex items-center space-x-2 py-3 text-sm" itemscope itemtype="https://schema.org/BreadcrumbList">
-                    <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                        <a href="/" class="text-gray-500 hover:text-gray-700" itemprop="item">
-                            <span itemprop="name">Home</span>
-                        </a>
-                        <meta itemprop="position" content="1" />
-                    </li>
-                    <li class="flex items-center">
-                        <svg class="h-4 w-4 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                    </li>
-                    <li itemprop="itemListElement" itemscope itemtype="https://schema.org/ListItem">
-                        <span class="text-gray-900 font-medium" itemprop="name">GGUF Models</span>
-                        <meta itemprop="position" content="2" />
-                    </li>
-                </ol>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main id="main-content" role="main" class="flex-1">
-            <!-- Search and Filter Section -->
-            <section class="bg-gray-50 py-8">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div class="text-center mb-8">
-                        <h2 class="text-3xl font-bold text-gray-900 mb-4">Discover GGUF AI Models</h2>
-                        <p class="text-lg text-gray-600 max-w-3xl mx-auto">
-                            Search through thousands of quantized AI models from Hugging Face. 
-                            Find the perfect model for your project with real-time filtering and instant downloads.
-                        </p>
-                    </div>
-                    
-                    <!-- Search Bar -->
-                    <div class="max-w-2xl mx-auto mb-6">
-                        <div class="flex items-center gap-3">
-                            <div class="flex-shrink-0">
-                                <svg class="h-6 w-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                                </svg>
-                            </div>
-                            <input 
-                                type="search" 
-                                id="model-search" 
-                                name="search"
-                                placeholder="Search models by name, architecture, or description..."
-                                class="search-input focus-visible flex-1"
-                                aria-label="Search GGUF models"
-                                autocomplete="off"
-                            >
-                        </div>
-                    </div>
-
-                    <!-- Filter Panel -->
-                    <aside id="filter-panel" role="complementary" aria-label="Model filters">
-                        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">Filter Models</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" id="filter-controls">
-                                <!-- Filter controls will be populated by JavaScript -->
-                            </div>
-                        </div>
-                    </aside>
-                </div>
-            </section>
-
-            <!-- Results Section -->
-            <section class="py-8">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <!-- Results Header -->
-                    <div class="flex items-center justify-between mb-6">
-                        <div>
-                            <h3 class="text-xl font-semibold text-gray-900">Available Models</h3>
-                            <p class="text-gray-600 mt-1" id="results-count">Loading models...</p>
-                            <div id="active-filters" class="mt-2 flex flex-wrap gap-2"></div>
-                        </div>
-                        <div class="flex items-center space-x-4">
-                            <label for="sort-select" class="text-sm font-medium text-gray-700">Sort by:</label>
-                            <select id="sort-select" class="filter-select focus-visible">
-                                <option value="name">Name</option>
-                                <option value="downloads">Downloads</option>
-                                <option value="popularity">Popularity</option>
-                                <option value="size">Size (File Count)</option>
-                                <option value="updated">Last Updated</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Model Grid -->
-                    <div id="model-grid" class="grid-responsive" role="region" aria-label="Model results">
-                        <!-- Model cards will be populated by JavaScript -->
-                        <div class="text-center py-12 col-span-full">
-                            <div class="loading-spinner mx-auto mb-4"></div>
-                            <p class="text-gray-600">Loading GGUF models...</p>
-                        </div>
-                    </div>
-
-                    <!-- Load More Button -->
-                    <div class="text-center mt-8">
-                        <button id="load-more" class="hidden btn-primary focus-visible disabled:opacity-50 disabled:cursor-not-allowed">
-                            Load More Models
-                        </button>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- Footer -->
-        <footer role="contentinfo" class="bg-gray-900 text-white">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div>
-                        <h4 class="text-lg font-semibold mb-4">GGUF Model Discovery</h4>
-                        <p class="text-gray-300 text-sm">
-                            Discover and download GGUF AI models from Hugging Face. 
-                            Updated daily with the latest quantized models.
-                        </p>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-semibold mb-4">Resources</h4>
-                        <ul class="space-y-2 text-sm">
-                            <li><a href="#about" class="text-gray-300 hover:text-white">About GGUF</a></li>
-                            <li><a href="https://huggingface.co" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">Hugging Face</a></li>
-                            <li><a href="https://github.com/ggerganov/llama.cpp" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">llama.cpp</a></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h4 class="text-lg font-semibold mb-4">Connect</h4>
-                        <ul class="space-y-2 text-sm">
-                            <li><a href="https://github.com/ggufloader" class="text-gray-300 hover:text-white" target="_blank" rel="noopener noreferrer">GitHub</a></li>
-                            <li><a href="mailto:contact@ggufmodels.com" class="text-gray-300 hover:text-white">Contact</a></li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="border-t border-gray-800 mt-8 pt-8 text-center text-sm text-gray-400">
-                    <p>&copy; 2025 GGUF Model Discovery. Data sourced from Hugging Face. Updated daily at 23:59 UTC.</p>
-                </div>
-            </div>
-        </footer>
-
-        <!-- No JavaScript Fallback -->
-        <noscript>
-            <div class="fixed inset-0 bg-white z-50 flex items-center justify-center">
-                <div class="text-center max-w-md mx-auto p-6">
-                    <div class="text-red-600 mb-4">
-                        <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z">
-                            </path>
+    <!-- Premium Header -->
+    <header class="premium-header">
+        <div class="container">
+            <!-- Mobile Header Bar -->
+            <div class="mobile-header-bar">
+                <div class="header-brand">
+                    <div class="brand-logo">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
                         </svg>
                     </div>
-                    <h1 class="text-2xl font-bold text-gray-900 mb-2">JavaScript Required</h1>
-                    <p class="text-gray-600 mb-4">This application requires JavaScript to function properly.</p>
-                    <p class="text-sm text-gray-500">Please enable JavaScript in your browser and refresh the page.</p>
-                    <div class="mt-6">
-                        <a href="https://huggingface.co/models?library=gguf" class="inline-block px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" target="_blank" rel="noopener noreferrer">
-                            Browse Models on Hugging Face
-                        </a>
+                    <div class="brand-text">
+                        <h1 class="brand-title">GGUF Discovery</h1>
+                        <p class="brand-subtitle">Professional AI Model Repository</p>
                     </div>
                 </div>
+
+                <button class="mobile-toggle-btn" id="mobile-header-toggle" aria-label="Toggle search and filters">
+                    <svg class="toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <path d="M3 12h18M3 6h18M3 18h18" />
+                    </svg>
+                </button>
             </div>
-        </noscript>
-    </div>
 
-    <!-- Global Loading State -->
-    <div id="global-loading" class="fixed top-4 right-4 z-40 hidden">
-        <div class="bg-white rounded-lg shadow-lg p-4 flex items-center space-x-3">
-            <div class="loading-spinner"></div>
-            <span class="text-sm text-gray-600" id="loading-message">Loading...</span>
-        </div>
-    </div>
+            <!-- Collapsible Header Content -->
+            <div class="header-content" id="header-content">
+                <div class="header-stats">
+                    <div class="stat-card">
+                        <div class="stat-value" id="model-count-display">Loading...</div>
+                        <div class="stat-label">Total Models</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="data-timestamp">Loading...</div>
+                        <div class="stat-label">Last Updated</div>
+                    </div>
+                </div>
 
-    <!-- Error Toast Container -->
-    <div id="error-toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite"></div>
-
-    <!-- Success Toast Container -->
-    <div id="success-toast-container" class="fixed top-4 right-4 z-50 space-y-2" aria-live="polite"></div>
-
-    <!-- Analytics and Performance Monitoring -->
-    <script>
-        // Configure analytics
-        window.GOOGLE_ANALYTICS_ID = 'G-XXXXXXXXXX'; // Replace with your GA4 ID
-    </script>
-    <script src="analytics-setup.js"></script>
-
-    <!-- Application Scripts -->
-    <script type="module" src="./main.js" defer></script>
-    
-    <!-- Preload modules for better performance -->
-    <link rel="modulepreload" href="./services/SearchEngine.js">
-    <link rel="modulepreload" href="./utils/debounce.js">
-    <link rel="modulepreload" href="./components/ModelCard.js">
-    <link rel="modulepreload" href="./utils/performanceOptimizer.js">
-
-    <!-- Hide loading screen once DOM is ready -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Hide loading screen after a short delay to ensure smooth transition
-            setTimeout(function () {
-                const loadingScreen = document.getElementById('loading-screen');
-                if (loadingScreen) {
-                    loadingScreen.style.opacity = '0';
-                    loadingScreen.style.transition = 'opacity 0.3s ease-out';
-                    setTimeout(function () {
-                        loadingScreen.style.display = 'none';
-                    }, 300);
-                }
-            }, 500);
-        });
-
-        // Handle errors gracefully
-        window.addEventListener('error', function (event) {
-            console.error('Global error:', event.error);
-            const loadingScreen = document.getElementById('loading-screen');
-            if (loadingScreen && loadingScreen.style.display !== 'none') {
-                loadingScreen.innerHTML = `
-                    <div class="text-center">
-                        <div class="text-red-600 mb-4">
-                            <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                <div class="header-actions">
+                    <div class="search-container">
+                        <div class="search-input-wrapper">
+                            <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                stroke="currentColor" stroke-width="2">
+                                <circle cx="11" cy="11" r="8" />
+                                <path d="m21 21-4.35-4.35" />
                             </svg>
+                            <input type="search" id="model-search" class="premium-search-input"
+                                placeholder="Search models, formats, types..." aria-label="Search models"
+                                autocomplete="off">
+                            <kbd class="search-shortcut">⌘K</kbd>
                         </div>
-                        <h1 class="text-2xl font-bold text-gray-900 mb-2">Application Error</h1>
-                        <p class="text-gray-600 mb-4">Failed to load the GGUF Model Index.</p>
-                        <button onclick="window.location.reload()" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                            Reload Application
+                    </div>
+
+                    <div class="sort-container">
+                        <select id="sort-select" class="premium-select" aria-label="Sort models">
+                            <option value="likeCount-desc" selected>❤️ Most Liked</option>
+                            <option value="downloadCount-desc">🔥 Most Popular</option>
+                            <option value="downloadCount-asc">📈 Trending Up</option>
+                            <option value="likeCount-asc">💔 Least Liked</option>
+                            <option value="modelName-asc">🔤 A to Z</option>
+                            <option value="modelName-desc">🔤 Z to A</option>
+                            <option value="fileSize-desc">📦 Largest First</option>
+                            <option value="fileSize-asc">📦 Smallest First</option>
+                        </select>
+                    </div>
+
+                    <!-- GGUF Loader Header Button -->
+                    <a href="https://ggufloader.github.io" class="gguf-header-btn" rel="noopener" target="_blank">
+                        <span class="btn-text">GGUF Loader</span>
+                        <span class="btn-icon">🔋</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main id="main-content" class="premium-main">
+        <div class="container">
+
+            <!-- Premium Filter Section -->
+            <section class="premium-filter-section" aria-label="Search and filter controls">
+                <div class="filter-header">
+                    <h2 class="filter-title">Refine Your Search</h2>
+                    <button id="clear-filters-btn" class="clear-filters-btn" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                        </svg>
+                        Clear All
+                    </button>
+                </div>
+
+                <div id="filter-controls" class="premium-filters">
+                    <div class="filter-group">
+                        <label for="quantization-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            Quantization
+                        </label>
+                        <select id="quantization-filter" class="premium-select">
+                            <option value="all">All Quantizations</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="model-type-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                            Model Type
+                        </label>
+                        <select id="model-type-filter" class="premium-select">
+                            <option value="all">All Types</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="license-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <circle cx="12" cy="16" r="1" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                            License
+                        </label>
+                        <select id="license-filter" class="premium-select">
+                            <option value="all">All Licenses</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Active filters display -->
+                <div id="active-filters" class="active-filters-container" aria-live="polite">
+                    <!-- Active filter tags will be displayed here -->
+                </div>
+            </section>
+
+            <!-- Results summary -->
+            <section class="results-summary" aria-live="polite">
+                <div class="results-header">
+                    <div id="results-count" class="results-count">Loading models...</div>
+                    <div class="view-options">
+                        <button class="view-btn active" data-view="grid" title="Grid View">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                            </svg>
+                        </button>
+                        <button class="view-btn" data-view="list" title="List View">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="8" y1="6" x2="21" y2="6" />
+                                <line x1="8" y1="12" x2="21" y2="12" />
+                                <line x1="8" y1="18" x2="21" y2="18" />
+                                <line x1="3" y1="6" x2="3.01" y2="6" />
+                                <line x1="3" y1="12" x2="3.01" y2="12" />
+                                <line x1="3" y1="18" x2="3.01" y2="18" />
+                            </svg>
                         </button>
                     </div>
-                `;
-            }
-        });
+                </div>
+            </section>
+
+            <!-- Premium Model Grid -->
+            <section class="premium-model-section" aria-label="Model results">
+                <div id="model-grid" class="premium-model-grid" role="grid" aria-label="GGUF Models">
+                    <!-- Model cards will be dynamically populated -->
+                    <div class="premium-loading-container">
+                        <div class="premium-spinner"></div>
+                        <div class="loading-message">Loading premium models...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Pagination -->
+            <section class="premium-pagination-section" aria-label="Pagination controls">
+                <div id="pagination-container" class="premium-pagination-container">
+                    <!-- Pagination will be dynamically populated -->
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Premium Footer -->
+    <footer class="premium-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>GGUF Discovery</h3>
+                        <p>Professional AI Model Repository</p>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Platform</h4>
+                        <a href="#" class="footer-link">Browse Models</a>
+                        <a href="#" class="footer-link">API Access</a>
+                        <a href="#" class="footer-link">Documentation</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Support</h4>
+                        <a href="#" class="footer-link">Help Center</a>
+                        <a href="#" class="footer-link">Contact Us</a>
+                        <a href="#" class="footer-link">Status</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Legal</h4>
+                        <a href="#" class="footer-link">Privacy Policy</a>
+                        <a href="#" class="footer-link">Terms of Service</a>
+                        <a href="#" class="footer-link">Licenses</a>
+                    </div>
+                </div>
+
+                <div class="footer-stats">
+                    <div class="footer-stat">
+                        <span class="stat-number">40K+</span>
+                        <span class="stat-label">Models</span>
+                    </div>
+                    <div class="footer-stat">
+                        <span class="stat-number">1M+</span>
+                        <span class="stat-label">Downloads</span>
+                    </div>
+                    <div class="footer-stat">
+                        <span class="stat-number">99.9%</span>
+                        <span class="stat-label">Uptime</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GGUF Loader Footer Attribution -->
+            <div class="gguf-footer-attribution">
+                <div class="attribution-content">
+                    <span class="attribution-text">Powered by</span>
+                    <a href="https://ggufloader.github.io" class="attribution-link" rel="noopener" target="_blank">GGUF Loader</a>
+                </div>
+                <div class="attribution-tagline">Local-first AI. Your models, your machine, your rules.</div>
+            </div>
+
+            <div class="footer-disclaimer">
+                <p class="disclaimer-text">
+                    <strong>Disclaimer:</strong> GGUF Loader is not affiliated with Hugging Face. All links point to publicly available models hosted by their respective creators. We do not store or redistribute any model files directly.
+                </p>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 GGUF Model Discovery. All rights reserved.</p>
+                <div class="footer-social">
+                    <a href="#" class="social-link" aria-label="GitHub">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link" aria-label="Twitter">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification container -->
+    <div id="notification-container" class="premium-notification-container" aria-live="polite" aria-atomic="true">
+        <!-- Notifications will be dynamically added here -->
+    </div>
+
+    <!-- JavaScript Dependencies -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/formatters.js"></script>
+    <script src="js/utils/notifications.js"></script>
+
+    <!-- Premium JavaScript -->
+    <script src="js/premium-app.js"></script>
+
+    <!-- Initialize application -->
+    <script>
+        // Initialize the premium application
+        let premiumApp;
+        try {
+            premiumApp = new PremiumGGUFApp();
+            window.premiumApp = premiumApp;
+        } catch (error) {
+            console.error('Failed to initialize Premium GGUF App:', error);
+        }
     </script>
 </body>
 

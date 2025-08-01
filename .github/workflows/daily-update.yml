@@ -1,0 +1,153 @@
+name: Daily GGUF Model Data Update
+
+on:
+  schedule:
+    # Run every day at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  update-model-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r scripts/requirements.txt
+        
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+    - name: Run GGUF fetcher with retry logic
+      id: fetch_data
+      run: |
+        max_attempts=3
+        delay=300  # 5 minutes in seconds
+        attempt=1
+        
+        while [ $attempt -le $max_attempts ]; do
+          echo "Attempt $attempt of $max_attempts"
+          
+          if python scripts/simplified_gguf_fetcher.py; then
+            echo "GGUF data fetch successful on attempt $attempt"
+            echo "success=true" >> $GITHUB_OUTPUT
+            break
+          else
+            echo "GGUF data fetch failed on attempt $attempt"
+            if [ $attempt -eq $max_attempts ]; then
+              echo "All retry attempts failed"
+              echo "success=false" >> $GITHUB_OUTPUT
+              exit 1
+            else
+              echo "Waiting $delay seconds before retry..."
+              sleep $delay
+              # Exponential backoff - double the delay for next attempt
+              delay=$((delay * 2))
+            fi
+          fi
+          
+          attempt=$((attempt + 1))
+        done
+        
+    - name: Check for data changes
+      id: check_changes
+      run: |
+        if git diff --quiet data/gguf_models.json data/raw_models_data.json; then
+          echo "No changes detected in data files"
+          echo "changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "Changes detected in data files"
+          echo "changes=true" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Commit and push changes
+      if: steps.check_changes.outputs.changes == 'true'
+      run: |
+        git add data/gguf_models.json data/raw_models_data.json
+        git commit -m "Automated daily update: GGUF model data $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
+        git push
+        
+    - name: Trigger GitHub Pages deployment
+      if: steps.check_changes.outputs.changes == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.repos.createPagesSite({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            source: {
+              branch: 'main',
+              path: '/'
+            }
+          }).catch(err => {
+            // Pages site might already exist, try to update instead
+            if (err.status === 409) {
+              console.log('GitHub Pages already configured, triggering rebuild...');
+              return github.rest.repos.requestPagesBuild({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+            }
+            throw err;
+          });
+          
+    - name: Create issue on failure
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const title = `Daily GGUF Data Update Failed - ${new Date().toISOString().split('T')[0]}`;
+          const body = `## Automation Failure: Daily Data Update
+          
+          **Failure Type**: Data Update
+          **Timestamp**: ${new Date().toISOString()}
+          **Workflow Run**: [${context.runId}](${context.payload.repository.html_url}/actions/runs/${context.runId})
+          
+          ### Error Details
+          The daily GGUF model data update workflow failed. Please check the workflow logs for detailed error information.
+          
+          ### Affected Components
+          - [x] Data files (data/gguf_models.json, data/raw_models_data.json)
+          - [ ] Dependencies  
+          - [ ] Deployment
+          - [ ] Tests
+          
+          ### Recommended Actions
+          1. Check the workflow logs for specific error messages
+          2. Verify the simplified_gguf_fetcher.py script is working correctly
+          3. Ensure Hugging Face API is accessible
+          4. Check if data file formats are valid
+          
+          ### Next Steps
+          - Review and fix any issues with the data fetching script
+          - Re-run the workflow manually once issues are resolved
+          - Consider updating retry logic if needed
+          `;
+          
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: title,
+            body: body,
+            labels: ['automation', 'bug', 'data-update']
+          });
+          
+    - name: Notify on success
+      if: success() && steps.check_changes.outputs.changes == 'true'
+      run: |
+        echo "✅ Daily GGUF model data update completed successfully"
+        echo "📊 Data files updated and committed"
+        echo "🚀 GitHub Pages deployment triggered"

@@ -14,6 +14,7 @@ import json
 import logging
 import os
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Tuple
 
@@ -50,7 +51,7 @@ class SimplifiedGGUFetcher:
         """
         Phase 1: Download model data from Hugging Face API and save locally.
         
-        Fetches recent models (last 30 days) and top downloaded models,
+        Fetches recent models (last 30 days) and top liked models,
         deduplicates them, and saves raw data for processing.
         """
         self.logger.info("=" * 50)
@@ -62,7 +63,7 @@ class SimplifiedGGUFetcher:
             self.logger.info("Step 1/3: Fetching recent models...")
             recent_models = self._fetch_recent_models()
             
-            self.logger.info("Step 2/3: Fetching top downloaded models...")
+            self.logger.info("Step 2/3: Fetching top liked models...")
             top_models = self._fetch_top_models()
             
             self.logger.info("Step 3/3: Combining and deduplicating models...")
@@ -87,7 +88,7 @@ class SimplifiedGGUFetcher:
             # Log summary statistics
             self.logger.info(f"Download Summary:")
             self.logger.info(f"  - Recent models (30 days): {len(recent_models)}")
-            self.logger.info(f"  - Top downloaded models: {len(top_models)}")
+            self.logger.info(f"  - Top liked models: {len(top_models)}")
             self.logger.info(f"  - Total before deduplication: {len(all_models)}")
             self.logger.info(f"  - Unique models after deduplication: {len(deduplicated_models)}")
             self.logger.info(f"  - Duplicates removed: {len(all_models) - len(deduplicated_models)}")
@@ -176,36 +177,36 @@ class SimplifiedGGUFetcher:
     
     def _fetch_top_models(self) -> List[Dict]:
         """
-        Fetch top 20 most downloaded GGUF models of all time.
+        Fetch top 50 most liked GGUF models of all time.
         
         Returns:
-            List of top 20 most downloaded model dictionaries
+            List of top 50 most liked model dictionaries
         """
-        self.logger.info("Fetching top 20 most downloaded GGUF models of all time...")
+        self.logger.info("Fetching top 50 most liked GGUF models of all time...")
         
         try:
-            # Get models with GGUF filter, sorted by downloads in descending order
-            self.logger.debug("Querying Hugging Face API for top downloaded models...")
+            # Get models with GGUF filter, sorted by likes in descending order
+            self.logger.debug("Querying Hugging Face API for top liked models...")
             models = list(self.api.list_models(
                 filter="gguf",
-                sort="downloads",
-                direction=-1,  # Highest downloads first
-                limit=20  # Top 20 models
+                sort="likes",
+                direction=-1,  # Highest likes first
+                limit=50  # Top 50 models
             ))
             
             # Log some statistics about the top models
             if models:
-                top_downloads = getattr(models[0], 'downloads', 0) if models else 0
-                self.logger.info(f"Top downloaded models summary:")
+                top_likes = getattr(models[0], 'likes', 0) if models else 0
+                self.logger.info(f"Top liked models summary:")
                 self.logger.info(f"  - Models retrieved: {len(models)}")
-                self.logger.info(f"  - Highest download count: {top_downloads:,}")
+                self.logger.info(f"  - Highest like count: {top_likes:,}")
             else:
-                self.logger.warning("No top downloaded models found")
+                self.logger.warning("No top liked models found")
             
             return models
             
         except Exception as e:
-            self.logger.error(f"Failed to fetch top downloaded models: {e}")
+            self.logger.error(f"Failed to fetch top liked models: {e}")
             self.logger.warning("Continuing with empty top models list")
             return []
     
@@ -226,69 +227,216 @@ class SimplifiedGGUFetcher:
             # Convert model objects to dictionaries for JSON serialization
             models_data = []
             failed_models = 0
+            engagement_stats = {
+                'models_with_likes': 0,
+                'models_missing_likes': 0,
+                'total_likes': 0,
+                'max_likes': 0,
+                'min_likes': float('inf')
+            }
             
-            for i, model in enumerate(models, 1):
-                try:
-                    model_id = getattr(model, 'id', 'unknown')
-                    self.logger.debug(f"Processing model {i}/{len(models)}: {model_id}")
-                    
-                    # Get detailed model info including siblings (files)
-                    try:
-                        detailed_model = self.api.model_info(model_id, files_metadata=True)
-                        raw_siblings = getattr(detailed_model, 'siblings', [])
-                        
-                        # Convert RepoSibling objects to dictionaries
-                        siblings = []
-                        for sibling in raw_siblings:
-                            if hasattr(sibling, 'rfilename'):
-                                sibling_dict = {
-                                    'rfilename': getattr(sibling, 'rfilename', ''),
-                                    'size': getattr(sibling, 'size', 0)
-                                }
-                                siblings.append(sibling_dict)
-                            
-                    except Exception as e:
-                        self.logger.debug(f"Could not fetch detailed info for {model_id}: {e}")
-                        siblings = []
-                    
-                    # Convert the model object to a dictionary with the fields we need
-                    model_dict = {
-                        'id': model_id,
-                        'downloads': getattr(model, 'downloads', 0),
-                        'tags': getattr(model, 'tags', []),
-                        'siblings': siblings,
-                        'cardData': getattr(model, 'cardData', {}),
-                        'lastModified': getattr(model, 'lastModified', None),
-                        'created_at': getattr(model, 'created_at', None)
-                    }
-                    
-                    # Convert datetime objects to ISO strings for JSON serialization
-                    if model_dict['lastModified'] and hasattr(model_dict['lastModified'], 'isoformat'):
-                        model_dict['lastModified'] = model_dict['lastModified'].isoformat()
-                    if model_dict['created_at'] and hasattr(model_dict['created_at'], 'isoformat'):
-                        model_dict['created_at'] = model_dict['created_at'].isoformat()
-                    
-                    models_data.append(model_dict)
-                    
-                except Exception as e:
-                    failed_models += 1
-                    model_id = getattr(model, 'id', 'unknown')
-                    self.logger.warning(f"Failed to process model {model_id} during save: {e}")
-                    continue
+            # Use batch processing with threading for efficiency
+            self.logger.info(f"Fetching detailed info for {len(models)} models using batch processing...")
+            models_data = self._batch_fetch_model_details(models, engagement_stats)
+            failed_models = len(models) - len(models_data)
             
             # Save to JSON file
             with open(self.raw_data_file, 'w', encoding='utf-8') as f:
                 json.dump(models_data, f, indent=2, ensure_ascii=False)
             
-            # Log save summary statistics
+            # Calculate engagement statistics
+            avg_likes = engagement_stats['total_likes'] / max(engagement_stats['models_with_likes'], 1)
+            if engagement_stats['min_likes'] == float('inf'):
+                engagement_stats['min_likes'] = 0
+            
+            # Log save summary statistics including engagement data
             self.logger.info(f"Save summary:")
             self.logger.info(f"  - Successfully saved: {len(models_data)} models")
             self.logger.info(f"  - Failed to process: {failed_models} models")
             self.logger.info(f"  - Output file: {self.raw_data_file}")
             
+            # Log engagement data extraction statistics
+            self.logger.info(f"Engagement metrics extraction:")
+            self.logger.info(f"  - Models with like data: {engagement_stats['models_with_likes']}")
+            self.logger.info(f"  - Models missing like data: {engagement_stats['models_missing_likes']}")
+            self.logger.info(f"  - Total likes across all models: {engagement_stats['total_likes']:,}")
+            if engagement_stats['models_with_likes'] > 0:
+                self.logger.info(f"  - Average likes per model: {avg_likes:.1f}")
+                self.logger.info(f"  - Like count range: {engagement_stats['min_likes']} to {engagement_stats['max_likes']:,}")
+            
         except Exception as e:
             self.logger.error(f"Critical error saving raw data: {e}")
             raise
+    
+    def _batch_fetch_model_details(self, models: List[Dict], engagement_stats: Dict) -> List[Dict]:
+        """
+        Efficiently fetch detailed model information using batch processing with threading.
+        
+        Args:
+            models: List of basic model objects from list_models
+            engagement_stats: Dictionary to track engagement statistics
+            
+        Returns:
+            List of processed model dictionaries with detailed info
+        """
+        models_data = []
+        failed_models = 0
+        
+        def fetch_single_model(model):
+            """Fetch detailed info for a single model"""
+            try:
+                model_id = getattr(model, 'id', 'unknown')
+                
+                # Try to get detailed model info with files and engagement metrics
+                try:
+                    detailed_model = self.api.model_info(model_id, files_metadata=True)
+                    raw_siblings = getattr(detailed_model, 'siblings', [])
+                    likes = getattr(detailed_model, 'likes', 0)
+                except Exception as e:
+                    # Fallback to basic model data if detailed fetch fails
+                    self.logger.debug(f"Detailed fetch failed for {model_id}, using basic data: {e}")
+                    detailed_model = model
+                    raw_siblings = getattr(model, 'siblings', [])
+                    likes = getattr(model, 'likes', 0)
+                
+                # Convert RepoSibling objects to dictionaries
+                siblings = []
+                for sibling in raw_siblings:
+                    if hasattr(sibling, 'rfilename'):
+                        sibling_dict = {
+                            'rfilename': getattr(sibling, 'rfilename', ''),
+                            'size': getattr(sibling, 'size', 0)
+                        }
+                        siblings.append(sibling_dict)
+                
+                # Validate and sanitize engagement metrics
+                likes = self._validate_engagement_metric(likes, model_id, 'likes')
+                
+                # Convert the model object to a dictionary with the fields we need
+                model_dict = {
+                    'id': model_id,
+                    'downloads': getattr(model, 'downloads', 0),
+                    'likes': likes,
+                    'tags': getattr(model, 'tags', []),
+                    'siblings': siblings,
+                    'cardData': getattr(model, 'cardData', {}),
+                    'lastModified': getattr(model, 'lastModified', None),
+                    'created_at': getattr(model, 'created_at', None)
+                }
+                
+                # Convert datetime objects to ISO strings for JSON serialization
+                if model_dict['lastModified'] and hasattr(model_dict['lastModified'], 'isoformat'):
+                    model_dict['lastModified'] = model_dict['lastModified'].isoformat()
+                if model_dict['created_at'] and hasattr(model_dict['created_at'], 'isoformat'):
+                    model_dict['created_at'] = model_dict['created_at'].isoformat()
+                
+                return model_dict, likes
+                
+            except Exception as e:
+                model_id = getattr(model, 'id', 'unknown')
+                self.logger.error(f"Critical error processing model {model_id}: {e}")
+                return None, 0
+        
+        # Use ThreadPoolExecutor for parallel processing
+        max_workers = min(10, len(models))  # Limit concurrent requests to avoid rate limiting
+        self.logger.info(f"Using {max_workers} parallel workers for batch processing")
+        
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all tasks
+            future_to_model = {executor.submit(fetch_single_model, model): model for model in models}
+            
+            # Process completed tasks
+            for i, future in enumerate(as_completed(future_to_model), 1):
+                try:
+                    model_dict, likes = future.result()
+                    if model_dict:
+                        models_data.append(model_dict)
+                        
+                        # Update engagement statistics
+                        if likes > 0:
+                            engagement_stats['models_with_likes'] += 1
+                            engagement_stats['total_likes'] += likes
+                            engagement_stats['max_likes'] = max(engagement_stats['max_likes'], likes)
+                            engagement_stats['min_likes'] = min(engagement_stats['min_likes'], likes)
+                        else:
+                            engagement_stats['models_missing_likes'] += 1
+                    else:
+                        failed_models += 1
+                        
+                    # Log progress every 10 models
+                    if i % 10 == 0 or i == len(models):
+                        self.logger.info(f"Batch progress: {i}/{len(models)} models processed ({(i/len(models)*100):.1f}%)")
+                        
+                except Exception as e:
+                    failed_models += 1
+                    self.logger.warning(f"Error processing batch result: {e}")
+        
+        self.logger.info(f"Batch processing completed: {len(models_data)} successful, {failed_models} failed")
+        return models_data
+    
+    def _validate_engagement_metric(self, value: any, model_id: str, metric_name: str) -> int:
+        """
+        Validate and sanitize engagement metric values with comprehensive error handling.
+        
+        Args:
+            value: Raw engagement metric value from API
+            model_id: Model ID for error logging
+            metric_name: Name of the metric for error logging
+            
+        Returns:
+            Validated integer engagement metric (0 if invalid)
+        """
+        try:
+            # Handle None/null values
+            if value is None:
+                self.logger.debug(f"Model {model_id}: {metric_name} is None, defaulting to 0")
+                return 0
+            
+            # Handle string values that might be numeric
+            if isinstance(value, str):
+                if value.strip() == '' or value.lower() in ['null', 'none', 'n/a']:
+                    self.logger.debug(f"Model {model_id}: {metric_name} is empty/null string, defaulting to 0")
+                    return 0
+                try:
+                    value = float(value)
+                except ValueError:
+                    self.logger.warning(f"Model {model_id}: Invalid {metric_name} string '{value}', defaulting to 0")
+                    return 0
+            
+            # Convert to number and validate
+            if isinstance(value, (int, float)):
+                # Check for NaN or infinity
+                if not isinstance(value, int) and (value != value or value == float('inf') or value == float('-inf')):
+                    self.logger.warning(f"Model {model_id}: {metric_name} is NaN/infinity ({value}), defaulting to 0")
+                    return 0
+                
+                # Ensure non-negative
+                if value < 0:
+                    self.logger.warning(f"Model {model_id}: Negative {metric_name} ({value}), defaulting to 0")
+                    return 0
+                
+                # Convert to integer and validate range
+                int_value = int(value)
+                
+                # Sanity check for extremely large values (likely data errors)
+                if int_value > 10_000_000:  # 10 million likes seems unreasonable
+                    self.logger.warning(f"Model {model_id}: Suspiciously high {metric_name} ({int_value}), capping at 10M")
+                    return 10_000_000
+                
+                # Log if value was modified during conversion
+                if int_value != value:
+                    self.logger.debug(f"Model {model_id}: {metric_name} converted from {value} to {int_value}")
+                
+                return int_value
+            
+            # Handle unexpected data types
+            else:
+                self.logger.warning(f"Model {model_id}: Unexpected {metric_name} type {type(value)} ({value}), defaulting to 0")
+                return 0
+                
+        except Exception as e:
+            self.logger.error(f"Model {model_id}: Error validating {metric_name} ({value}): {e}, defaulting to 0")
+            return 0
     
     def process_data(self) -> None:
         """
@@ -486,6 +634,10 @@ class SimplifiedGGUFetcher:
         model_id = model_data.get('id', '')
         siblings = model_data.get('siblings', [])
         downloads = model_data.get('downloads', 0)
+        
+        # Extract and validate engagement metrics with comprehensive error handling
+        likes = self._validate_engagement_metric(model_data.get('likes', 0), model_id, 'likes')
+        
         tags = model_data.get('tags', [])
         card_data = model_data.get('cardData', {})
         
@@ -521,6 +673,7 @@ class SimplifiedGGUFetcher:
                 'modelType': model_type,
                 'license': license_info,
                 'downloadCount': downloads,
+                'likeCount': likes,  # Add engagement metrics
                 'huggingFaceLink': hf_link,
                 'directDownloadLink': direct_download_link,
                 'modelId': model_id,
@@ -533,9 +686,9 @@ class SimplifiedGGUFetcher:
     
     def _generate_output(self, processed_models: List[Dict]) -> None:
         """
-        Generate JSON array with exactly 8 required fields per model.
+        Generate JSON array with exactly 10 required fields per model.
         
-        Sorts models by download count (highest first) and ensures output is valid JSON.
+        Sorts models by download count (highest first) and ensures engagement metrics are properly validated.
         
         Args:
             processed_models: List of processed model dictionaries
@@ -550,17 +703,44 @@ class SimplifiedGGUFetcher:
         
         self.logger.info(f"Generating output from {len(processed_models)} processed entries...")
         
-        # Sort models by download count (highest first)
-        self.logger.debug("Sorting models by download count...")
-        sorted_models = sorted(processed_models, key=lambda x: x.get('downloadCount', 0), reverse=True)
+        # Validate and clean engagement metrics before sorting with comprehensive error handling
+        validation_errors = 0
+        for i, model in enumerate(processed_models):
+            try:
+                like_count = model.get('likeCount', 0)
+                validated_likes = self._validate_engagement_metric(like_count, model.get('modelId', f'model_{i}'), 'likeCount')
+                model['likeCount'] = validated_likes
+                
+                if validated_likes != like_count:
+                    validation_errors += 1
+                    
+            except Exception as e:
+                self.logger.error(f"Error validating engagement metrics for model {i}: {e}")
+                model['likeCount'] = 0
+                validation_errors += 1
         
-        # Create output with exactly 8 required fields per model
+        if validation_errors > 0:
+            self.logger.warning(f"Fixed engagement metric validation errors in {validation_errors} models")
+        
+        # Sort models by download count (highest first), with engagement metrics as secondary sort
+        self.logger.debug("Sorting models by download count (primary) and like count (secondary)...")
+        sorted_models = sorted(processed_models, 
+                             key=lambda x: (x.get('downloadCount', 0), x.get('likeCount', 0)), 
+                             reverse=True)
+        
+        # Create output with exactly 9 required fields per model
         output_models = []
         field_errors = 0
         
         for i, model in enumerate(sorted_models):
             try:
-                # Ensure we only include the 8 required fields in the exact order
+                # Validate and ensure we only include the 10 required fields in the exact order
+                like_count = model.get('likeCount', 0)
+                if like_count is None or not isinstance(like_count, (int, float)) or like_count < 0:
+                    like_count = 0
+                else:
+                    like_count = int(like_count)
+                
                 output_entry = {
                     'modelName': model.get('modelName', ''),
                     'quantFormat': model.get('quantFormat', 'Unknown'),
@@ -569,6 +749,7 @@ class SimplifiedGGUFetcher:
                     'modelType': model.get('modelType', 'Unknown'),
                     'license': model.get('license', 'Not specified'),
                     'downloadCount': model.get('downloadCount', 0),
+                    'likeCount': like_count,  # Validated engagement metrics
                     'huggingFaceLink': model.get('huggingFaceLink', ''),
                     'directDownloadLink': model.get('directDownloadLink', '')
                 }
@@ -605,19 +786,35 @@ class SimplifiedGGUFetcher:
                 unique_types = len(set(model.get('modelType', '') for model in output_models))
                 unique_quants = len(set(model.get('quantFormat', '') for model in output_models))
                 
+                # Calculate engagement metrics statistics
+                like_counts = [model.get('likeCount', 0) for model in output_models]
+                total_likes = sum(like_counts)
+                models_with_likes = sum(1 for likes in like_counts if likes > 0)
+                max_likes = max(like_counts) if like_counts else 0
+                avg_likes = total_likes / len(output_models) if output_models else 0
+                
                 self.logger.info(f"Content statistics:")
                 self.logger.info(f"  - Unique model names: {unique_models}")
                 self.logger.info(f"  - Unique model types: {unique_types}")
                 self.logger.info(f"  - Unique quantization formats: {unique_quants}")
                 self.logger.info(f"  - Download count range: {top_downloads:,} to {bottom_downloads:,}")
                 
+                # Log engagement metrics statistics
+                self.logger.info(f"Engagement metrics statistics:")
+                self.logger.info(f"  - Total likes across all entries: {total_likes:,}")
+                self.logger.info(f"  - Entries with likes > 0: {models_with_likes}")
+                self.logger.info(f"  - Entries with no likes: {len(output_models) - models_with_likes}")
+                self.logger.info(f"  - Average likes per entry: {avg_likes:.1f}")
+                self.logger.info(f"  - Maximum likes: {max_likes:,}")
+                
                 # Log top 3 models for verification
                 self.logger.info(f"Top 3 models by downloads:")
                 for i, model in enumerate(output_models[:3], 1):
                     name = model.get('modelName', 'Unknown')
                     downloads = model.get('downloadCount', 0)
+                    likes = model.get('likeCount', 0)
                     model_type = model.get('modelType', 'Unknown')
-                    self.logger.info(f"  {i}. {name} ({model_type}) - {downloads:,} downloads")
+                    self.logger.info(f"  {i}. {name} ({model_type}) - {downloads:,} downloads, {likes:,} likes")
             
         except Exception as e:
             self.logger.error(f"Critical error generating output file: {e}")
