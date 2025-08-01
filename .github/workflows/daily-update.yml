@@ -70,7 +70,7 @@ jobs:
     - name: Check for data changes
       id: check_changes
       run: |
-        if git diff --quiet data/gguf_models.json data/raw_models_data.json; then
+        if git diff --quiet data/gguf_models.json data/raw_models_data.json gguf_models.json; then
           echo "No changes detected in data files"
           echo "changes=false" >> $GITHUB_OUTPUT
         else
@@ -81,7 +81,7 @@ jobs:
     - name: Commit and push changes
       if: steps.check_changes.outputs.changes == 'true'
       run: |
-        git add data/gguf_models.json data/raw_models_data.json
+        git add data/gguf_models.json data/raw_models_data.json gguf_models.json
         git commit -m "Automated daily update: GGUF model data $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
         git push
         
@@ -118,7 +118,7 @@ jobs:
           The daily GGUF model data update workflow failed. Please check the workflow logs for detailed error information.
           
           ### Affected Components
-          - [x] Data files (data/gguf_models.json, data/raw_models_data.json)
+          - [x] Data files (data/gguf_models.json, data/raw_models_data.json, gguf_models.json)
           - [ ] Dependencies  
           - [ ] Deployment
           - [ ] Tests
@@ -147,5 +147,5 @@ jobs:
       if: success() && steps.check_changes.outputs.changes == 'true'
       run: |
         echo "✅ Daily GGUF model data update completed successfully"
-        echo "📊 Data files updated and committed"
+        echo "📊 Data files updated and committed (data/gguf_models.json, data/raw_models_data.json, gguf_models.json)"
         echo "🚀 GitHub Pages deployment triggered"
