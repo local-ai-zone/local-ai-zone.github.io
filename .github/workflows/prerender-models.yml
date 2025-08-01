@@ -100,12 +100,12 @@ jobs:
         // Create new URLs for pre-rendered pages
         const newUrls = files.map(file => {
           const modelSlug = file.replace('.html', '');
-          return \`  <url>
-    <loc>https://local-ai-zone.github.io/models/\${file}</loc>
-    <lastmod>\${new Date().toISOString().split('T')[0]}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>\`;
+          return '  <url>' +
+            '\n    <loc>https://local-ai-zone.github.io/models/' + file + '</loc>' +
+            '\n    <lastmod>' + new Date().toISOString().split('T')[0] + '</lastmod>' +
+            '\n    <changefreq>weekly</changefreq>' +
+            '\n    <priority>0.8</priority>' +
+            '\n  </url>';
         }).join('\n');
         
         // Insert new URLs before closing urlset tag
@@ -113,7 +113,7 @@ jobs:
         
         // Write updated sitemap
         fs.writeFileSync('sitemap.xml', sitemap);
-        console.log(\`Added \${files.length} pre-rendered pages to sitemap\`);
+        console.log('Added ' + files.length + ' pre-rendered pages to sitemap');
         "
         
     - name: Commit sitemap updates

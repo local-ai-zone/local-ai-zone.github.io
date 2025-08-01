@@ -2,8 +2,8 @@ name: SEO Optimization
 
 on:
   schedule:
-    # Run daily at 3 AM UTC (1 hour after data update)
-    - cron: '0 3 * * *'
+    # Run daily at 5:00 AM UTC - optimized timing after prerender-models workflow
+    - cron: '0 5 * * *'
   workflow_dispatch: # Allow manual triggering
   workflow_run:
     workflows: ["Daily GGUF Model Data Update"]

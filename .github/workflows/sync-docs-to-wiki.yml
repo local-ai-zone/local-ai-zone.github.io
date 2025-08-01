@@ -1,0 +1,111 @@
+name: Sync Documentation to Wiki
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'README.md'
+      - 'docs/**/*.md'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check workflow rate limit
+      id: rate-limit
+      run: |
+        # Get the timestamp of the last successful run
+        LAST_RUN=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}/actions/workflows/sync-docs-to-wiki.yml/runs?status=success&per_page=1" \
+          | jq -r '.workflow_runs[0].created_at // empty')
+        
+        if [ -n "$LAST_RUN" ]; then
+          LAST_RUN_TIMESTAMP=$(date -d "$LAST_RUN" +%s)
+          CURRENT_TIMESTAMP=$(date +%s)
+          TIME_DIFF=$((CURRENT_TIMESTAMP - LAST_RUN_TIMESTAMP))
+          HOUR_IN_SECONDS=3600
+          
+          if [ $TIME_DIFF -lt $HOUR_IN_SECONDS ]; then
+            REMAINING_TIME=$((HOUR_IN_SECONDS - TIME_DIFF))
+            REMAINING_MINUTES=$((REMAINING_TIME / 60))
+            echo "⏳ Rate limit: Last run was $((TIME_DIFF / 60)) minutes ago"
+            echo "⏳ Please wait $REMAINING_MINUTES more minutes before next sync"
+            echo "should_skip=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+        fi
+        
+        echo "✅ Rate limit check passed"
+        echo "should_skip=false" >> $GITHUB_OUTPUT
+    - name: Checkout repository
+      if: steps.rate-limit.outputs.should_skip != 'true'
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup Node.js
+      if: steps.rate-limit.outputs.should_skip != 'true'
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        
+    - name: Install dependencies
+      if: steps.rate-limit.outputs.should_skip != 'true'
+      run: |
+        npm init -y
+        npm install @octokit/rest
+        
+    - name: Get changed files
+      if: steps.rate-limit.outputs.should_skip != 'true'
+      id: changed-files
+      uses: tj-actions/changed-files@v40
+      with:
+        files: |
+          README.md
+          docs/**/*.md
+          
+    - name: Sync documentation to wiki
+      if: steps.rate-limit.outputs.should_skip != 'true' && steps.changed-files.outputs.any_changed == 'true'
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPOSITORY: ${{ github.repository }}
+        CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+      run: node scripts/sync-docs-to-wiki.js
+      
+    - name: Rate limit summary
+      if: steps.rate-limit.outputs.should_skip == 'true'
+      run: |
+        echo "## Wiki Sync Skipped ⏳" >> $GITHUB_STEP_SUMMARY
+        echo "Workflow was skipped due to rate limiting (1 hour minimum between runs)." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "This prevents excessive API usage and ensures stable operation." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "💡 **Tip**: You can manually trigger the workflow after the cooldown period if needed." >> $GITHUB_STEP_SUMMARY
+      
+    - name: Success summary
+      if: steps.rate-limit.outputs.should_skip != 'true' && steps.changed-files.outputs.any_changed == 'true'
+      run: |
+        echo "## Wiki Sync Complete 📚" >> $GITHUB_STEP_SUMMARY
+        echo "Successfully synchronized documentation files to GitHub Wiki." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Files Processed:" >> $GITHUB_STEP_SUMMARY
+        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+          echo "- $file" >> $GITHUB_STEP_SUMMARY
+        done
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "View the updated wiki: [GitHub Wiki](https://github.com/${{ github.repository }}/wiki)" >> $GITHUB_STEP_SUMMARY
+        
+    - name: No changes summary
+      if: steps.rate-limit.outputs.should_skip != 'true' && steps.changed-files.outputs.any_changed != 'true'
+      run: |
+        echo "## No Documentation Changes 📄" >> $GITHUB_STEP_SUMMARY
+        echo "No documentation files were changed in this push." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "Wiki sync was skipped as no updates are needed." >> $GITHUB_STEP_SUMMARY

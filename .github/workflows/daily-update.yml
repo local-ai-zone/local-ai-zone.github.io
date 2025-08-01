@@ -2,8 +2,8 @@ name: Daily GGUF Model Data Update
 
 on:
   schedule:
-    # Run every day at 2 AM UTC
-    - cron: '0 2 * * *'
+    # Run every day at 23:59 UTC (11:59 PM) - optimized timing to collect fresh data before other workflows
+    - cron: '59 23 * * *'
   workflow_dispatch: # Allow manual triggering
 
 jobs:
