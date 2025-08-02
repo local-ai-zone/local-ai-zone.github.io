@@ -29,7 +29,7 @@ class SEOGenerator {
      */
     loadModelsData() {
         try {
-            const dataPath = path.join(__dirname, '../data/gguf_models.json');
+            const dataPath = path.join(__dirname, '../gguf_models.json');
             console.log('Loading models data...');
             
             const rawData = fs.readFileSync(dataPath, 'utf8');
@@ -176,7 +176,7 @@ class SEOGenerator {
             '# Allow important resources',
             'Allow: /css/',
             'Allow: /js/',
-            'Allow: /data/gguf_models.json'
+            'Allow: /gguf_models.json'
         ];
         
         fs.writeFileSync('robots.txt', robots.join('\n'));

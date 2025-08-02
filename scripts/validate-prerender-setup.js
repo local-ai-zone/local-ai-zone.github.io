@@ -15,7 +15,7 @@ async function validateSetup() {
     
     try {
         // Check if data file exists
-        const dataPath = path.join(__dirname, '../data/gguf_models.json');
+        const dataPath = path.join(__dirname, '../gguf_models.json');
         try {
             const stats = await fs.stat(dataPath);
             checks.push({

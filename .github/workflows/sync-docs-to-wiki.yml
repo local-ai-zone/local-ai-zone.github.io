@@ -7,9 +7,15 @@ on:
       - 'README.md'
       - 'docs/**/*.md'
   workflow_dispatch: # Allow manual trigger
+    inputs:
+      force_sync:
+        description: 'Force sync all documentation files'
+        required: false
+        default: 'false'
+        type: boolean
 
 permissions:
-  contents: read
+  contents: write  # Need write access for wiki repository
   pages: write
   id-token: write
 
@@ -71,12 +77,37 @@ jobs:
           README.md
           docs/**/*.md
           
-    - name: Sync documentation to wiki
+    - name: Set files for manual trigger
+      if: steps.rate-limit.outputs.should_skip != 'true' && github.event_name == 'workflow_dispatch' && inputs.force_sync == 'true'
+      run: |
+        echo "all_changed_files=README.md docs/API.md docs/DEPLOYMENT.md docs/CONTRIBUTING.md docs/ARCHITECTURE.md docs/wiki-sync.md" >> $GITHUB_ENV
+        echo "any_changed=true" >> $GITHUB_ENV
+          
+    - name: Check wiki initialization
       if: steps.rate-limit.outputs.should_skip != 'true' && steps.changed-files.outputs.any_changed == 'true'
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Check if wiki exists by trying to access it
+        WIKI_CHECK=$(curl -s -o /dev/null -w "%{http_code}" \
+          -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+          "https://api.github.com/repos/${{ github.repository }}.wiki/contents")
+        
+        if [ "$WIKI_CHECK" = "404" ]; then
+          echo "⚠️  Wiki not initialized. Please visit https://github.com/${{ github.repository }}/wiki and create the first page."
+          echo "   After creating the first page manually, this workflow will be able to sync documentation automatically."
+          echo "wiki_exists=false" >> $GITHUB_ENV
+        else
+          echo "✅ Wiki repository is accessible"
+          echo "wiki_exists=true" >> $GITHUB_ENV
+        fi
+        
+    - name: Sync documentation to wiki
+      if: steps.rate-limit.outputs.should_skip != 'true' && (steps.changed-files.outputs.any_changed == 'true' || env.any_changed == 'true')
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         REPOSITORY: ${{ github.repository }}
-        CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+        CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files || env.all_changed_files }}
       run: node scripts/sync-docs-to-wiki.js
       
     - name: Rate limit summary
@@ -90,22 +121,43 @@ jobs:
         echo "💡 **Tip**: You can manually trigger the workflow after the cooldown period if needed." >> $GITHUB_STEP_SUMMARY
       
     - name: Success summary
-      if: steps.rate-limit.outputs.should_skip != 'true' && steps.changed-files.outputs.any_changed == 'true'
+      if: steps.rate-limit.outputs.should_skip != 'true' && (steps.changed-files.outputs.any_changed == 'true' || env.any_changed == 'true') && success()
       run: |
+        FILES="${{ steps.changed-files.outputs.all_changed_files || env.all_changed_files }}"
         echo "## Wiki Sync Complete 📚" >> $GITHUB_STEP_SUMMARY
         echo "Successfully synchronized documentation files to GitHub Wiki." >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "### Files Processed:" >> $GITHUB_STEP_SUMMARY
-        for file in ${{ steps.changed-files.outputs.all_changed_files }}; do
+        for file in $FILES; do
           echo "- $file" >> $GITHUB_STEP_SUMMARY
         done
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "View the updated wiki: [GitHub Wiki](https://github.com/${{ github.repository }}/wiki)" >> $GITHUB_STEP_SUMMARY
         
+    - name: Wiki initialization needed
+      if: steps.rate-limit.outputs.should_skip != 'true' && (steps.changed-files.outputs.any_changed == 'true' || env.any_changed == 'true') && failure()
+      run: |
+        FILES="${{ steps.changed-files.outputs.all_changed_files || env.all_changed_files }}"
+        echo "## Wiki Initialization Required 📝" >> $GITHUB_STEP_SUMMARY
+        echo "The wiki sync failed because the GitHub Wiki hasn't been initialized yet." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### To fix this:" >> $GITHUB_STEP_SUMMARY
+        echo "1. Visit [GitHub Wiki](https://github.com/${{ github.repository }}/wiki)" >> $GITHUB_STEP_SUMMARY
+        echo "2. Click **\"Create the first page\"** to initialize the wiki" >> $GITHUB_STEP_SUMMARY
+        echo "3. Add any content (it will be overwritten by the sync)" >> $GITHUB_STEP_SUMMARY
+        echo "4. Re-run this workflow or push changes to trigger automatic sync" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### Files waiting to be synced:" >> $GITHUB_STEP_SUMMARY
+        for file in $FILES; do
+          echo "- $file" >> $GITHUB_STEP_SUMMARY
+        done
+        
     - name: No changes summary
-      if: steps.rate-limit.outputs.should_skip != 'true' && steps.changed-files.outputs.any_changed != 'true'
+      if: steps.rate-limit.outputs.should_skip != 'true' && steps.changed-files.outputs.any_changed != 'true' && env.any_changed != 'true'
       run: |
         echo "## No Documentation Changes 📄" >> $GITHUB_STEP_SUMMARY
         echo "No documentation files were changed in this push." >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "Wiki sync was skipped as no updates are needed." >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "💡 **Tip**: Use the 'Force sync all documentation files' option when manually triggering this workflow to sync all files regardless of changes." >> $GITHUB_STEP_SUMMARY

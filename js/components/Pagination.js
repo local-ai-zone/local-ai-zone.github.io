@@ -38,7 +38,7 @@ class Pagination {
         this.currentPage = 1;
         this.totalPages = 1;
         this.totalItems = 0;
-        this.itemsPerPage = 50;
+        this.itemsPerPage = 60;
         this.isRendering = false;
 
         // Bind methods

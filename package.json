@@ -257,7 +257,13 @@
     "zod": "^3.25.76"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "generate-banner": "node scripts/generate-banner.js",
+    "test-banner": "node scripts/test-banner-generation.js",
+    "create-fallback-banner": "node scripts/create-fallback-banner.js",
+    "validate-banner-setup": "node scripts/validate-banner-setup.js",
+    "update-banner": "npm run generate-banner && npm run create-fallback-banner && npm run validate-banner-setup",
+    "update-banner-local": "node scripts/update-banner-local.js"
   },
   "repository": {
     "type": "git",

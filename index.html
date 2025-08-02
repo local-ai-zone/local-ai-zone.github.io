@@ -5,8 +5,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Discover and download GGUF format machine learning models. Browse thousands of quantized AI models with detailed information, download counts, and direct links.">
-    <meta name="keywords" content="GGUF models, machine learning, AI models, quantized models, model download, Hugging Face, LLaMA, neural networks, deep learning, BERT models, Qwen models, LLaMA models, Gemma models, Mistral models, Phi models, DeepSeek models, MPT models, Alpaca models, Yi models, Falcon models, Q4_0 quantization, Q4_K_M quantization, Q5_K_M quantization, Q8_0 quantization, F16 quantization">
-    <meta name="author" content="GGUF Model Discovery">
+    <meta name="keywords" content="GGUF models, machine learning, AI models, quantized models, model download, Hugging Face, LLaMA, neural networks, deep learning, BERT models, Qwen models, LLaMA models, Gemma models, Phi models, DeepSeek models, Mistral models, T5 models, StableLM models, Falcon models, Zephyr models, WizardLM models, Yi models, Alpaca models, Q4_0 quantization, Q4_K_M quantization, Q5_K_M quantization, Q8_0 quantization, F16 quantization">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Hussain Nazary">
+    <meta name="publisher" content="Local AI Zone">
 
     <title>GGUF Model Discovery - Browse & Download AI Models</title>
 
@@ -20,6 +22,8 @@
     <link rel="stylesheet" href="css/premium-styles.css">
 
     <!-- Favicon and app icons -->
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <link rel="icon" type="image/png" href="logo.png">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 
@@ -27,16 +31,40 @@
     <meta property="og:title" content="GGUF Model Discovery - Browse & Download AI Models">
     <meta property="og:description" content="Discover and download GGUF format machine learning models. Browse thousands of quantized AI models with detailed information, download counts, and direct links.">
     <meta property="og:type" content="website">
-    <link rel="canonical" href="https://local-ai-zone.github.io/">
-
-    
     <meta property="og:url" content="https://local-ai-zone.github.io">
     <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:logo" content="https://local-ai-zone.github.io/logo.svg">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="article:author" content="Hussain Nazary">
+    <link rel="canonical" href="https://local-ai-zone.github.io/">
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Local AI Zone - Direct Access to GGUF Models for Local LLMs">
+    <meta name="twitter:description" content="40,000+ GGUF models updated daily. Compatible with llama.cpp, LM Studio, Ollama, KoboldCpp. No registration required.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta name="twitter:image:alt" content="Local AI Zone - Direct Access to GGUF Models for Local LLMs">
+    <meta name="twitter:creator" content="Hussain Nazary">
+
+    <!-- Additional social media meta tags -->
+    <meta property="og:locale" content="en_US">
+    <meta name="theme-color" content="#3b82f6">
 
     
 
     
 
+    
+    
+    
+
+    <!-- Author/Organization Structured Data for SEO -->
+    
+
+    <!-- FAQ Structured Data for SEO -->
     
     
     <script type="application/ld+json">
@@ -58,8 +86,8 @@
             "@type": "DataCatalog",
             "name": "GGUF Model Catalog",
             "description": "Comprehensive catalog of GGUF format machine learning models",
-            "numberOfItems": 3147,
-            "keywords": "BERT, Qwen, LLaMA, Gemma, Mistral, Phi, DeepSeek, MPT, Alpaca, Yi, Falcon"
+            "numberOfItems": 3782,
+            "keywords": "BERT, Qwen, LLaMA, Gemma, Phi, DeepSeek, Mistral, T5, StableLM, Falcon, Zephyr, WizardLM, Yi, Alpaca"
       }
 }
     </script>
@@ -119,15 +147,19 @@
             <!-- Mobile Header Bar -->
             <div class="mobile-header-bar">
                 <div class="header-brand">
-                    <div class="brand-logo">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
-                        </svg>
-                    </div>
-                    <div class="brand-text">
-                        <h1 class="brand-title">GGUF Discovery</h1>
-                        <p class="brand-subtitle">Professional AI Model Repository</p>
+                    <div class="header-logo-section">
+                        <div class="header-logo" onclick="window.location.href='/'">
+                            <img src="logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="logo-fallback" style="display: none;">
+                                <svg class="logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <h1 class="brand-title">GGUF Discovery</h1>
+                            <p class="brand-subtitle">Professional AI Model Repository</p>
+                        </div>
                     </div>
                 </div>
 
@@ -193,6 +225,14 @@
     <!-- Main content -->
     <main id="main-content" class="premium-main">
         <div class="container">
+            
+            <!-- Local AI Zone Title Section -->
+            <section class="local-ai-zone-title" aria-label="Local AI Zone introduction">
+                <div class="title-content">
+                    <h1 class="main-title">Local AI Zone</h1>
+                    <p class="main-description">Direct access to AI models for running large language models locally. Updated daily with direct download links, no registration required. Compatible with llama.cpp, GGUF Loader, LM Studio, Ollama, KoboldCpp, and other local LLM tools.</p>
+                </div>
+            </section>
 
             <!-- Premium Filter Section -->
             <section class="premium-filter-section" aria-label="Search and filter controls">

@@ -14,6 +14,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  issues: write
 
 jobs:
   generate-seo:
@@ -51,30 +52,53 @@ jobs:
     - name: Check for SEO changes
       id: check_seo_changes
       run: |
-        if git diff --quiet sitemap.xml robots.txt seo-metadata.json index.html premium-index.html; then
-          echo "No changes detected in SEO files"
+        # Build list of files that actually exist
+        SEO_FILES=""
+        for file in sitemap.xml robots.txt seo-metadata.json index.html; do
+          if [ -f "$file" ]; then
+            SEO_FILES="$SEO_FILES $file"
+          fi
+        done
+        
+        if [ -z "$SEO_FILES" ]; then
+          echo "No SEO files found to check"
+          echo "changes=false" >> $GITHUB_OUTPUT
+        elif git diff --quiet $SEO_FILES; then
+          echo "No changes detected in SEO files: $SEO_FILES"
           echo "changes=false" >> $GITHUB_OUTPUT
         else
-          echo "Changes detected in SEO files"
+          echo "Changes detected in SEO files: $SEO_FILES"
           echo "changes=true" >> $GITHUB_OUTPUT
+          echo "seo_files=$SEO_FILES" >> $GITHUB_OUTPUT
           
           # Show what changed
           echo "Changed files:"
-          git diff --name-only sitemap.xml robots.txt seo-metadata.json index.html premium-index.html || true
+          git diff --name-only $SEO_FILES || true
         fi
         
     - name: Commit and push SEO changes
       if: steps.check_seo_changes.outputs.changes == 'true'
       run: |
-        git add sitemap.xml robots.txt seo-metadata.json index.html premium-index.html
-        git commit -m "Automated SEO optimization update $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+        # Use the files that were actually found and changed
+        SEO_FILES="${{ steps.check_seo_changes.outputs.seo_files }}"
+        if [ -n "$SEO_FILES" ]; then
+          git add $SEO_FILES
+          # Check if there are actually changes to commit
+          if git diff --cached --quiet; then
+            echo "No changes to commit - SEO files are already up to date"
+          else
+            git commit -m "Automated SEO optimization update $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
-        - Updated sitemap.xml with latest models
-        - Refreshed robots.txt crawling directives  
-        - Generated meta descriptions and structured data
-        - Updated Open Graph tags for social sharing
-        - Added canonical URLs for duplicate content prevention"
-        git push
+            - Updated sitemap.xml with latest models
+            - Refreshed robots.txt crawling directives  
+            - Generated meta descriptions and structured data
+            - Updated Open Graph tags for social sharing
+            - Added canonical URLs for duplicate content prevention"
+            git push
+          fi
+        else
+          echo "No SEO files to commit"
+        fi
         
     - name: Trigger GitHub Pages deployment
       if: steps.check_seo_changes.outputs.changes == 'true'
@@ -145,7 +169,7 @@ jobs:
           ### Recommended Actions
           1. Check the workflow logs for specific error messages
           2. Verify the generate-seo.js script is working correctly
-          3. Ensure data/gguf_models.json file is accessible and valid
+          3. Ensure gguf_models.json file is accessible and valid
           4. Check if HTML files can be modified
           
           ### SEO Files Affected

@@ -36,7 +36,7 @@ class AppState {
             // Pagination state
             pagination: {
                 currentPage: 1,
-                itemsPerPage: 50,
+                itemsPerPage: 60,
                 totalItems: 0,
                 totalPages: 0
             },

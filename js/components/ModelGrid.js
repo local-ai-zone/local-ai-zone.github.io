@@ -1,7 +1,7 @@
 /**
  * ModelGrid Component for GGUF Model Discovery
  * Manages the grid container and rendering of model cards with responsive layout
- * Handles 50 cards per page with responsive breakpoints (5/3/1-2 cards per row)
+ * Handles 60 cards per page with responsive breakpoints (5/3/1-2 cards per row)
  */
 
 class ModelGrid {
@@ -20,7 +20,7 @@ class ModelGrid {
 
         // Configuration options
         this.options = {
-            cardsPerPage: 50,
+            cardsPerPage: 60,
             enableVirtualization: true,
             enableLazyLoading: false,
             animateCards: true,
@@ -236,7 +236,7 @@ class ModelGrid {
                 throw new Error('Models must be an array');
             }
 
-            // Limit to 50 cards per page as per requirements
+            // Limit to 60 cards per page as per requirements
             const cardsToRender = models.slice(0, this.options.cardsPerPage);
             
             // Clear existing cards if not appending

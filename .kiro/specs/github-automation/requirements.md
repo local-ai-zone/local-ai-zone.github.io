@@ -13,7 +13,7 @@ This feature will implement automated GitHub workflows to keep the GGUF model lo
 #### Acceptance Criteria
 
 1. WHEN 24 hours have passed since the last update THEN the system SHALL run the simplified_gguf_fetcher.py script to fetch latest model data
-2. WHEN the script completes successfully THEN the system SHALL update data/gguf_models.json and data/raw_models_data.json files
+2. WHEN the script completes successfully THEN the system SHALL update data/raw_models_data.json and gguf_models.json files
 3. WHEN data files are updated THEN the system SHALL commit and push the changes to the main branch
 4. IF the data fetch fails THEN the system SHALL log the error and retry up to 3 times with exponential backoff
 5. WHEN data updates are successful THEN the system SHALL update the GitHub Pages deployment

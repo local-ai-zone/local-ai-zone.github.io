@@ -14,6 +14,7 @@ permissions:
   contents: write
   pages: write
   id-token: write
+  issues: write
 
 jobs:
   prerender:
@@ -39,13 +40,18 @@ jobs:
     - name: Install dependencies
       run: |
         npm ci
-        # Install Puppeteer with Chromium
-        npm install puppeteer
+        # Install Puppeteer with Chromium (without saving to package.json)
+        npm install puppeteer --no-save
         
     - name: Configure Git
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
+        
+    - name: Clean up any package-lock.json changes
+      run: |
+        # Reset any changes to package-lock.json that might have occurred during npm install
+        git checkout -- package-lock.json 2>/dev/null || true
         
     - name: Generate minimal model pages
       id: prerender
@@ -70,15 +76,30 @@ jobs:
         
     - name: Commit and push pre-rendered files
       if: steps.check_files.outputs.files_generated == 'true'
+      id: commit_files
       run: |
-        git add models/
-        git commit -m "Automated pre-rendering: Generated ${{ steps.check_files.outputs.file_count }} model pages $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+        # Check if models directory exists and has files
+        if [ -d "models" ] && [ "$(ls -A models 2>/dev/null)" ]; then
+          git add models/
+          # Check if there are actually changes to commit
+          if git diff --cached --quiet; then
+            echo "No changes to commit - models files are already up to date"
+            echo "committed=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "Automated pre-rendering: Generated ${{ steps.check_files.outputs.file_count }} model pages $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
-        - Pre-rendered top 100 models by likes
-        - Generated static HTML files for better SEO
-        - Files saved in models/ directory
-        - Each model now has its own addressable URL"
-        git push        
+            - Pre-rendered top 100 models by likes
+            - Generated static HTML files for better SEO
+            - Files saved in models/ directory
+            - Each model now has its own addressable URL"
+            git push
+            echo "committed=true" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "No models directory or files found - this should not happen if files_generated is true"
+          echo "This indicates an issue with the file generation step"
+          echo "committed=false" >> $GITHUB_OUTPUT
+        fi        
 
     - name: Update sitemap with pre-rendered pages
       if: steps.check_files.outputs.files_generated == 'true'
@@ -89,51 +110,70 @@ jobs:
         const fs = require('fs');
         const path = require('path');
         
-        // Read existing sitemap
-        let sitemap = fs.readFileSync('sitemap.xml', 'utf8');
-        
-        // Get list of pre-rendered files
-        const prerenderDir = 'models';
-        
-        if (!fs.existsSync(prerenderDir)) {
-          console.log('No prerendered files found');
-          return;
+        try {
+          // Check if sitemap exists
+          if (!fs.existsSync('sitemap.xml')) {
+            console.log('sitemap.xml not found, skipping update');
+            process.exit(0);
+          }
+          
+          // Read existing sitemap
+          let sitemap = fs.readFileSync('sitemap.xml', 'utf8');
+          
+          // Get list of pre-rendered files
+          const prerenderDir = 'models';
+          
+          if (!fs.existsSync(prerenderDir)) {
+            console.log('No prerendered files found');
+            process.exit(0);
+          }
+          
+          const files = fs.readdirSync(prerenderDir).filter(f => f.endsWith('.html'));
+          
+          if (files.length === 0) {
+            console.log('No HTML files found in models directory');
+            process.exit(0);
+          }
+          
+          // Create new URLs for pre-rendered pages
+          const newUrls = files.map(file => {
+            const modelSlug = file.replace('.html', '');
+            return '  <url>' +
+              '\n    <loc>https://local-ai-zone.github.io/models/' + file + '</loc>' +
+              '\n    <lastmod>' + new Date().toISOString().split('T')[0] + '</lastmod>' +
+              '\n    <changefreq>weekly</changefreq>' +
+              '\n    <priority>0.8</priority>' +
+              '\n  </url>';
+          }).join('\n');
+          
+          // Insert new URLs before closing urlset tag
+          sitemap = sitemap.replace('</urlset>', newUrls + '\n</urlset>');
+          
+          // Write updated sitemap
+          fs.writeFileSync('sitemap.xml', sitemap);
+          console.log('Added ' + files.length + ' pre-rendered pages to sitemap');
+        } catch (error) {
+          console.error('Error updating sitemap:', error.message);
+          process.exit(1);
         }
-        
-        const files = fs.readdirSync(prerenderDir).filter(f => f.endsWith('.html'));
-        
-        // Create new URLs for pre-rendered pages
-        const newUrls = files.map(file => {
-          const modelSlug = file.replace('.html', '');
-          return '  <url>' +
-            '\n    <loc>https://local-ai-zone.github.io/models/' + file + '</loc>' +
-            '\n    <lastmod>' + new Date().toISOString().split('T')[0] + '</lastmod>' +
-            '\n    <changefreq>weekly</changefreq>' +
-            '\n    <priority>0.8</priority>' +
-            '\n  </url>';
-        }).join('\n');
-        
-        // Insert new URLs before closing urlset tag
-        sitemap = sitemap.replace('</urlset>', newUrls + '\n</urlset>');
-        
-        // Write updated sitemap
-        fs.writeFileSync('sitemap.xml', sitemap);
-        console.log('Added ' + files.length + ' pre-rendered pages to sitemap');
         "
         
     - name: Commit sitemap updates
       if: steps.check_files.outputs.files_generated == 'true'
+      id: commit_sitemap
       run: |
         if git diff --quiet sitemap.xml; then
           echo "No sitemap changes to commit"
+          echo "sitemap_updated=false" >> $GITHUB_OUTPUT
         else
           git add sitemap.xml
           git commit -m "Updated sitemap with pre-rendered model pages"
           git push
+          echo "sitemap_updated=true" >> $GITHUB_OUTPUT
         fi
         
     - name: Trigger GitHub Pages deployment
-      if: steps.check_files.outputs.files_generated == 'true'
+      if: steps.check_files.outputs.files_generated == 'true' && (steps.commit_files.outputs.committed == 'true' || steps.commit_sitemap.outputs.sitemap_updated == 'true')
       uses: actions/github-script@v7
       with:
         script: |
@@ -189,7 +229,7 @@ jobs:
           2. Verify Puppeteer is working correctly
           3. Ensure the main site is accessible
           4. Check if there are memory or timeout issues
-          5. Verify data/gguf_models.json file is accessible
+          5. Verify gguf_models.json file is accessible
           
           ### Pre-rendering Process
           - **Target**: Top 500 models by likes
@@ -211,12 +251,19 @@ jobs:
             labels: ['automation', 'bug', 'prerendering']
           });
           
-    - name: Notify on success
-      if: success() && steps.check_files.outputs.files_generated == 'true'
+    - name: Notify on success with changes
+      if: success() && steps.check_files.outputs.files_generated == 'true' && (steps.commit_files.outputs.committed == 'true' || steps.commit_sitemap.outputs.sitemap_updated == 'true')
       run: |
         echo "✅ Model pre-rendering completed successfully"
         echo "📊 Generated ${{ steps.check_files.outputs.file_count }} HTML files"
         echo "🚀 GitHub Pages deployment triggered"
+        
+    - name: Notify on success without changes
+      if: success() && steps.check_files.outputs.files_generated == 'true' && steps.commit_files.outputs.committed == 'false' && steps.commit_sitemap.outputs.sitemap_updated == 'false'
+      run: |
+        echo "✅ Model pre-rendering completed successfully"
+        echo "📊 Generated ${{ steps.check_files.outputs.file_count }} HTML files"
+        echo "ℹ️ No changes to commit - files are already up to date"
         
     - name: Notify on no changes
       if: success() && steps.check_files.outputs.files_generated == 'false'

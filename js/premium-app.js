@@ -8,7 +8,7 @@ class PremiumGGUFApp {
         this.models = [];
         this.filteredModels = [];
         this.currentPage = 1;
-        this.itemsPerPage = 48; // More items per page with smaller cards
+        this.itemsPerPage = 60; // More items per page with smaller cards
         this.isLoading = false;
         
         // Bind methods

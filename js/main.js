@@ -196,7 +196,7 @@ class GGUFModelApp {
             // Initialize ModelGrid component with performance settings
             console.log('📋 Initializing ModelGrid...');
             const gridOptions = {
-                cardsPerPage: 50,
+                cardsPerPage: 60,
                 animateCards: true,
                 enableBatching: true,
                 batchSize: 10,

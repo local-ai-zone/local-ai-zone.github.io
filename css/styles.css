@@ -70,6 +70,7 @@ body {
     font-size: 1.5rem;
     font-weight: 700;
     color: var(--text-primary);
+    margin: 0;
 }
 
 .header-stats {
@@ -79,6 +80,57 @@ body {
     font-size: 0.875rem;
     color: var(--text-secondary);
     flex-wrap: wrap;
+}
+
+/* Logo integration styles */
+.header-logo-section {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.header-logo {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: var(--transition);
+    border-radius: var(--border-radius);
+    padding: 0.25rem;
+    text-decoration: none;
+}
+
+.header-logo:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.logo-image {
+    height: 40px;
+    width: auto;
+    max-width: 200px;
+    display: block;
+}
+
+.logo-fallback {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background: var(--primary-color);
+    border-radius: var(--border-radius);
+    color: white;
+}
+
+.logo-icon {
+    width: 24px;
+    height: 24px;
+}
+
+.header-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
 }
 
 .stat-item {

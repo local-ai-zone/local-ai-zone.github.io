@@ -1,0 +1,278 @@
+name: Update Social Media Banner
+
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC (after the daily model update)
+    - cron: '0 6 * * *'
+  workflow_dispatch: # Allow manual triggering
+  push:
+    paths:
+      - 'gguf_models.json'
+      - 'scripts/generate-banner.js'
+      - 'social-banner.html'
+      - 'css/social-banner.css'
+
+jobs:
+  update-banner:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          # Install additional system dependencies for Puppeteer
+          sudo apt-get update
+          sudo apt-get install -y \
+            gconf-service \
+            libasound2 \
+            libatk1.0-0 \
+            libc6 \
+            libcairo2 \
+            libcups2 \
+            libdbus-1-3 \
+            libexpat1 \
+            libfontconfig1 \
+            libgcc1 \
+            libgconf-2-4 \
+            libgdk-pixbuf2.0-0 \
+            libglib2.0-0 \
+            libgtk-3-0 \
+            libnspr4 \
+            libpango-1.0-0 \
+            libpangocairo-1.0-0 \
+            libstdc++6 \
+            libx11-6 \
+            libx11-xcb1 \
+            libxcb1 \
+            libxcomposite1 \
+            libxcursor1 \
+            libxdamage1 \
+            libxext6 \
+            libxfixes3 \
+            libxi6 \
+            libxrandr2 \
+            libxrender1 \
+            libxss1 \
+            libxtst6 \
+            ca-certificates \
+            fonts-liberation \
+            libappindicator1 \
+            libnss3 \
+            lsb-release \
+            xdg-utils \
+            wget
+
+      - name: Generate new banner
+        run: |
+          echo "🚀 Generating new social media banner..."
+          node scripts/generate-banner.js
+          
+          # Verify banner was created
+          if [ -f "og-image.png" ]; then
+            echo "✅ Banner generated successfully"
+            ls -la og-image.png
+          else
+            echo "❌ Banner generation failed"
+            exit 1
+          fi
+
+      - name: Create fallback banner
+        run: |
+          echo "🎨 Creating fallback banner..."
+          node scripts/create-fallback-banner.js
+          
+          # Verify fallback banner was created
+          if [ -f "og-image-fallback.png" ]; then
+            echo "✅ Fallback banner created successfully"
+            ls -la og-image-fallback.png
+          else
+            echo "❌ Fallback banner creation failed"
+            exit 1
+          fi
+
+      - name: Validate banner setup
+        run: |
+          echo "🔍 Validating banner setup..."
+          node scripts/validate-banner-setup.js
+
+      - name: Check for changes
+        id: changes
+        run: |
+          # Check if banner files have changed
+          if git diff --quiet og-image.png og-image-fallback.png; then
+            echo "No changes detected in banner files"
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected in banner files"
+            echo "changed=true" >> $GITHUB_OUTPUT
+            
+            # Show file sizes for logging
+            echo "📊 Banner file sizes:"
+            ls -lh og-image*.png
+          fi
+
+      - name: Get current statistics
+        id: stats
+        run: |
+          # Extract statistics from the models file
+          MODEL_COUNT=$(node -e "
+            const fs = require('fs');
+            try {
+              const data = JSON.parse(fs.readFileSync('gguf_models.json', 'utf8'));
+              const count = data.length;
+              const formatted = count >= 1000 ? Math.floor(count / 1000) + 'K+' : count + '+';
+              console.log(formatted);
+            } catch (error) {
+              console.log('40K+');
+            }
+          ")
+          
+          CURRENT_DATE=$(date +'%b %d, %Y')
+          
+          echo "model_count=$MODEL_COUNT" >> $GITHUB_OUTPUT
+          echo "current_date=$CURRENT_DATE" >> $GITHUB_OUTPUT
+          
+          echo "📊 Current Statistics:"
+          echo "   Models: $MODEL_COUNT"
+          echo "   Date: $CURRENT_DATE"
+
+      - name: Commit and push changes
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          # Configure git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Add banner files
+          git add og-image.png og-image-fallback.png
+          
+          # Create commit message with statistics
+          COMMIT_MSG="🎨 Update social media banner - ${{ steps.stats.outputs.model_count }} models (${{ steps.stats.outputs.current_date }})"
+          
+          # Commit changes
+          git commit -m "$COMMIT_MSG" || {
+            echo "No changes to commit"
+            exit 0
+          }
+          
+          # Push changes
+          git push origin main
+          
+          echo "✅ Banner updated and pushed to repository"
+
+      - name: Create deployment comment
+        if: steps.changes.outputs.changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const stats = {
+              modelCount: '${{ steps.stats.outputs.model_count }}',
+              currentDate: '${{ steps.stats.outputs.current_date }}'
+            };
+            
+            const comment = `🎨 **Social Media Banner Updated**
+            
+            The social media banner has been automatically updated with current statistics:
+            
+            - **Models**: ${stats.modelCount}
+            - **Last Updated**: ${stats.currentDate}
+            - **Banner Size**: Updated og-image.png (1200x630px)
+            - **Fallback**: Updated og-image-fallback.png
+            
+            The banner will now display current information when shared on social media platforms.
+            
+            _This update was performed automatically by the daily banner update workflow._`;
+            
+            // Only create comment if this was triggered by schedule or manual dispatch
+            if (context.eventName === 'schedule' || context.eventName === 'workflow_dispatch') {
+              github.rest.repos.createCommitComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                commit_sha: context.sha,
+                body: comment
+              });
+            }
+
+      - name: Upload banner artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: social-media-banners-${{ github.run_number }}
+          path: |
+            og-image.png
+            og-image-fallback.png
+          retention-days: 30
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## 🎨 Social Media Banner Update Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Statistics:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Models: ${{ steps.stats.outputs.model_count }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Date: ${{ steps.stats.outputs.current_date }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.changes.outputs.changed }}" == "true" ]; then
+            echo "**Status:** ✅ Banner updated successfully" >> $GITHUB_STEP_SUMMARY
+            echo "**Files Updated:**" >> $GITHUB_STEP_SUMMARY
+            echo "- og-image.png (main banner)" >> $GITHUB_STEP_SUMMARY
+            echo "- og-image-fallback.png (fallback banner)" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "**Status:** ℹ️ No changes needed (banner is up to date)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next Update:** Tomorrow at 6:00 AM UTC" >> $GITHUB_STEP_SUMMARY
+
+  # Optional: Test banner generation without committing
+  test-banner:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: |
+          npm ci
+          sudo apt-get update
+          sudo apt-get install -y gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
+
+      - name: Test banner generation
+        run: |
+          echo "🧪 Testing banner generation..."
+          node scripts/test-banner-generation.js
+          
+          echo "🔍 Testing banner validation..."
+          node scripts/validate-banner-setup.js
+          
+          echo "✅ All banner tests passed"
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-banners-${{ github.run_number }}
+          path: |
+            og-image.png
+            og-image-fallback.png
+          retention-days: 7

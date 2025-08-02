@@ -47,7 +47,7 @@ class LocalTestPrerenderer extends ModelPrerenderer {
     async loadModelsData() {
         try {
             console.log('📊 Loading sample models data for local testing...');
-            const dataPath = path.join(__dirname, '../data/gguf_models.json');
+            const dataPath = path.join(__dirname, '../gguf_models.json');
             const rawData = await fs.readFile(dataPath, 'utf8');
             const modelsData = JSON.parse(rawData);
             

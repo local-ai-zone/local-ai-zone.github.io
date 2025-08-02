@@ -5,7 +5,7 @@ Simplified GGUF Fetcher
 A two-phase system that downloads model data from Hugging Face API once,
 then processes it locally to extract essential GGUF model information.
 
-Phase 1 (Download): Fetch recent models + top downloaded models, save raw data
+Phase 1 (Download): Fetch recent models + top liked models, save raw data
 Phase 2 (Process): Extract 8 required fields from saved data, generate output
 """
 
@@ -30,6 +30,11 @@ class SimplifiedGGUFetcher:
     2. Process: Extract required fields from saved data
     """
     
+    # Configuration constants for data collection limits
+    RECENT_DAYS_LIMIT = 90  # Days to look back for recent models
+    TOP_MODELS_LIMIT = 200  # Number of top liked models to fetch
+    RECENT_MODELS_API_LIMIT = 1000  # API limit for recent models query
+    
     def __init__(self, token: Optional[str] = None):
         """
         Initialize the fetcher with optional HF token.
@@ -42,7 +47,7 @@ class SimplifiedGGUFetcher:
         
         # File paths
         self.raw_data_file = "data/raw_models_data.json"
-        self.output_file = "data/gguf_models.json"
+        self.output_file = "gguf_models.json"  # Save directly to root directory
         
         # Ensure data directory exists
         os.makedirs("data", exist_ok=True)
@@ -51,7 +56,7 @@ class SimplifiedGGUFetcher:
         """
         Phase 1: Download model data from Hugging Face API and save locally.
         
-        Fetches recent models (last 30 days) and top liked models,
+        Fetches recent models (last 90 days) and top liked models,
         deduplicates them, and saves raw data for processing.
         """
         self.logger.info("=" * 50)
@@ -87,7 +92,7 @@ class SimplifiedGGUFetcher:
             
             # Log summary statistics
             self.logger.info(f"Download Summary:")
-            self.logger.info(f"  - Recent models (30 days): {len(recent_models)}")
+            self.logger.info(f"  - Recent models (90 days): {len(recent_models)}")
             self.logger.info(f"  - Top liked models: {len(top_models)}")
             self.logger.info(f"  - Total before deduplication: {len(all_models)}")
             self.logger.info(f"  - Unique models after deduplication: {len(deduplicated_models)}")
@@ -106,14 +111,14 @@ class SimplifiedGGUFetcher:
     
     def _fetch_recent_models(self) -> List[Dict]:
         """
-        Fetch models uploaded in the last 30 days with GGUF filter.
+        Fetch models uploaded in the last 90 days with GGUF filter.
         
         Returns:
-            List of model dictionaries from the last 30 days
+            List of model dictionaries from the last 90 days
         """
-        # Calculate date 30 days ago
-        thirty_days_ago = datetime.now() - timedelta(days=30)
-        self.logger.info(f"Fetching GGUF models created since {thirty_days_ago.strftime('%Y-%m-%d')}")
+        # Calculate date using RECENT_DAYS_LIMIT
+        cutoff_date = datetime.now() - timedelta(days=self.RECENT_DAYS_LIMIT)
+        self.logger.info(f"Fetching GGUF models created since {cutoff_date.strftime('%Y-%m-%d')}")
         
         try:
             # Get models with GGUF filter, sorted by creation date
@@ -123,12 +128,12 @@ class SimplifiedGGUFetcher:
                 filter="gguf",
                 sort="createdAt",
                 direction=-1,  # Newest first
-                limit=500  # Get more models to filter by date
+                limit=self.RECENT_MODELS_API_LIMIT  # Get more models to filter by date
             ))
             
             self.logger.debug(f"Retrieved {len(models)} models from API, filtering by date...")
             
-            # Filter models by created_at field to get last 30 days only
+            # Filter models by created_at field to get last 90 days only
             recent_models = []
             skipped_no_date = 0
             skipped_too_old = 0
@@ -147,12 +152,12 @@ class SimplifiedGGUFetcher:
                                 skipped_no_date += 1
                                 continue
                         
-                        # Check if model was created in the last 30 days
-                        if created_date.replace(tzinfo=None) >= thirty_days_ago:
+                        # Check if model was created in the last 90 days
+                        if created_date.replace(tzinfo=None) >= cutoff_date:
                             recent_models.append(model)
                         else:
                             # Since models are sorted by creation date (newest first),
-                            # we can break once we hit models older than 30 days
+                            # we can break once we hit models older than 90 days
                             skipped_too_old += 1
                             break
                     else:
@@ -164,7 +169,7 @@ class SimplifiedGGUFetcher:
             
             # Log summary statistics
             self.logger.info(f"Recent models summary:")
-            self.logger.info(f"  - Models found in last 30 days: {len(recent_models)}")
+            self.logger.info(f"  - Models found in last 90 days: {len(recent_models)}")
             self.logger.info(f"  - Models skipped (no date): {skipped_no_date}")
             self.logger.info(f"  - Models skipped (too old): {skipped_too_old}")
             
@@ -177,12 +182,12 @@ class SimplifiedGGUFetcher:
     
     def _fetch_top_models(self) -> List[Dict]:
         """
-        Fetch top 50 most liked GGUF models of all time.
+        Fetch top 200 most liked GGUF models of all time.
         
         Returns:
-            List of top 50 most liked model dictionaries
+            List of top 200 most liked model dictionaries
         """
-        self.logger.info("Fetching top 50 most liked GGUF models of all time...")
+        self.logger.info("Fetching top 200 most liked GGUF models of all time...")
         
         try:
             # Get models with GGUF filter, sorted by likes in descending order
@@ -191,7 +196,7 @@ class SimplifiedGGUFetcher:
                 filter="gguf",
                 sort="likes",
                 direction=-1,  # Highest likes first
-                limit=50  # Top 50 models
+                limit=self.TOP_MODELS_LIMIT  # Top 200 models
             ))
             
             # Log some statistics about the top models
@@ -765,16 +770,12 @@ class SimplifiedGGUFetcher:
             with open(self.output_file, 'w', encoding='utf-8') as f:
                 json.dump(output_models, f, indent=2, ensure_ascii=False)
             
-            # Copy to root directory for website access (GitHub Actions compatible)
-            import shutil
-            root_output_file = 'gguf_models.json'
-            shutil.copy2(self.output_file, root_output_file)
-            self.logger.info(f"Copied {self.output_file} to {root_output_file} for website access")
+            # File saved directly to root directory for website access
+            self.logger.info(f"Saved directly to root directory: {self.output_file}")
             
             # Log comprehensive output statistics
             self.logger.info(f"Output generation summary:")
             self.logger.info(f"  - Output file: {self.output_file}")
-            self.logger.info(f"  - Root copy: {root_output_file}")
             self.logger.info(f"  - Total entries written: {len(output_models)}")
             self.logger.info(f"  - Entries with field errors: {field_errors}")
             

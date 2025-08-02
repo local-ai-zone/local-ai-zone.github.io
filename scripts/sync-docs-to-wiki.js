@@ -2,7 +2,6 @@
 
 const { Octokit } = require('@octokit/rest');
 const fs = require('fs');
-const path = require('path');
 
 // Configuration
 const FILE_MAPPINGS = {
@@ -10,7 +9,8 @@ const FILE_MAPPINGS = {
   'docs/API.md': 'API-Documentation',
   'docs/DEPLOYMENT.md': 'Deployment-Guide',
   'docs/CONTRIBUTING.md': 'Contributing-Guide',
-  'docs/ARCHITECTURE.md': 'Architecture-Documentation'
+  'docs/ARCHITECTURE.md': 'Architecture-Documentation',
+  'docs/wiki-sync.md': 'Wiki-Synchronization'
 };
 
 const RETRY_CONFIG = {
@@ -88,7 +88,7 @@ class WikiSyncer {
     // Transform relative links to other documentation files
     processed = processed.replace(
       /\[([^\]]+)\]\(docs\/([^)]+\.md)\)/g,
-      (match, text, docFile) => {
+      (_, text, docFile) => {
         const targetPage = FILE_MAPPINGS[`docs/${docFile}`];
         if (targetPage) {
           return `[${text}](${targetPage})`;
@@ -134,19 +134,7 @@ class WikiSyncer {
     };
 
     try {
-      // Check if page exists
-      let existingPage = null;
-      try {
-        const response = await retryOperation(() => 
-          this.octokit.rest.gists.get({
-            gist_id: `${this.owner}.github.io.wiki.git`
-          })
-        );
-        // This is a workaround - GitHub doesn't provide direct wiki API
-        // We'll use the simpler approach of always creating/updating
-      } catch (error) {
-        // Page doesn't exist or API limitation
-      }
+      // Use GitHub's wiki git repository approach directly
 
       // Use GitHub's wiki git repository approach
       await retryOperation(() => this.updateViaGitAPI(pageName, content));
@@ -166,11 +154,14 @@ class WikiSyncer {
 
   async updateViaGitAPI(pageName, content) {
     // GitHub Wiki pages are stored in a separate git repository
-    // We'll create a commit to the wiki repository
+    // We need to clone, update, and push to the wiki repository
     const wikiRepo = `${this.repo}.wiki`;
     const fileName = `${pageName}.md`;
     
     try {
+      // First, try to ensure the wiki exists by creating a dummy page if needed
+      await this.ensureWikiExists();
+      
       // Get current file SHA if it exists
       let currentSha = null;
       try {
@@ -182,6 +173,9 @@ class WikiSyncer {
         currentSha = currentFile.sha;
       } catch (error) {
         // File doesn't exist, that's okay
+        if (error.status !== 404) {
+          throw error;
+        }
       }
 
       // Create or update the file
@@ -199,13 +193,50 @@ class WikiSyncer {
       });
 
     } catch (error) {
-      // If wiki repo doesn't exist or isn't accessible, try alternative approach
+      // If wiki repo doesn't exist or isn't accessible, provide helpful guidance
       if (error.status === 404) {
-        console.log(`⚠️  Wiki repository not found. Please ensure the wiki is initialized.`);
-        console.log(`   Visit: https://github.com/${this.owner}/${this.repo}/wiki`);
-        throw new Error(`Wiki repository ${wikiRepo} not accessible. Please initialize the wiki first.`);
+        console.log(`⚠️  Wiki repository not found or not accessible.`);
+        console.log(`   This usually means the wiki hasn't been initialized yet.`);
+        console.log(`   To fix this:`);
+        console.log(`   1. Visit: https://github.com/${this.owner}/${this.repo}/wiki`);
+        console.log(`   2. Click "Create the first page" to initialize the wiki`);
+        console.log(`   3. Re-run this workflow`);
+        throw new Error(`Wiki repository ${wikiRepo} not accessible. Please initialize the wiki first by creating a page manually.`);
       }
       throw error;
+    }
+  }
+
+  async ensureWikiExists() {
+    // Try to check if wiki repository exists by attempting to get its contents
+    try {
+      await this.octokit.rest.repos.getContent({
+        owner: this.owner,
+        repo: `${this.repo}.wiki`,
+        path: ''
+      });
+    } catch (error) {
+      if (error.status === 404) {
+        // Wiki doesn't exist, we need to initialize it
+        console.log(`📝 Wiki repository doesn't exist. Attempting to initialize...`);
+        
+        // Try to create a basic Home page to initialize the wiki
+        try {
+          await this.octokit.rest.repos.createOrUpdateFileContents({
+            owner: this.owner,
+            repo: `${this.repo}.wiki`,
+            path: 'Home.md',
+            message: 'Initialize wiki',
+            content: Buffer.from('# Welcome to the Wiki\n\nThis wiki was automatically initialized.').toString('base64')
+          });
+          console.log(`✅ Wiki repository initialized successfully`);
+        } catch (initError) {
+          console.log(`❌ Could not initialize wiki repository: ${initError.message}`);
+          throw initError;
+        }
+      } else {
+        throw error;
+      }
     }
   }
 

@@ -22,7 +22,7 @@ class TestPrerenderer extends ModelPrerenderer {
     async loadModelsData() {
         try {
             console.log('📊 Loading sample models data for testing...');
-            const dataPath = require('path').join(__dirname, '../data/gguf_models.json');
+            const dataPath = require('path').join(__dirname, '../gguf_models.json');
             const rawData = await fs.readFile(dataPath, 'utf8');
             const modelsData = JSON.parse(rawData);
             

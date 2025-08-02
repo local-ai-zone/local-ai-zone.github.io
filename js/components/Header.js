@@ -59,11 +59,23 @@ class Header {
                 <div class="container">
                     <div class="header-content">
                         <div class="header-left">
-                            <h1 class="header-title">
-                                🧠 GGUF Model Discovery
-                            </h1>
-                            <div class="header-subtitle">
-                                Enhanced AI Model Browser
+                            <div class="header-logo-section">
+                                <div class="header-logo" onclick="window.location.href='/'">
+                                    <img src="logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                    <div class="logo-fallback" style="display: none;">
+                                        <svg class="logo-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="header-text">
+                                    <h1 class="header-title">
+                                        🧠 GGUF Model Discovery
+                                    </h1>
+                                    <div class="header-subtitle">
+                                        Enhanced AI Model Browser
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         
@@ -378,6 +390,55 @@ class Header {
                     gap: 0.25rem;
                 }
 
+                .header-logo-section {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                }
+
+                .header-logo {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    transition: var(--transition);
+                    border-radius: var(--border-radius);
+                    padding: 0.25rem;
+                }
+
+                .header-logo:hover {
+                    transform: scale(1.05);
+                    opacity: 0.9;
+                }
+
+                .logo-image {
+                    height: 40px;
+                    width: auto;
+                    max-width: 200px;
+                    display: block;
+                }
+
+                .logo-fallback {
+                    display: none;
+                    align-items: center;
+                    justify-content: center;
+                    width: 40px;
+                    height: 40px;
+                    background: var(--primary-color);
+                    border-radius: var(--border-radius);
+                    color: white;
+                }
+
+                .logo-icon {
+                    width: 24px;
+                    height: 24px;
+                }
+
+                .header-text {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.25rem;
+                }
+
                 .header-subtitle {
                     font-size: 0.875rem;
                     color: var(--text-secondary);
@@ -528,6 +589,25 @@ class Header {
                         align-items: flex-start;
                     }
 
+                    .header-logo-section {
+                        gap: 0.5rem;
+                    }
+
+                    .logo-image {
+                        height: 36px;
+                        max-width: 150px;
+                    }
+
+                    .logo-fallback {
+                        width: 36px;
+                        height: 36px;
+                    }
+
+                    .logo-icon {
+                        width: 20px;
+                        height: 20px;
+                    }
+
                     .header-stats {
                         flex-wrap: wrap;
                         gap: 1rem;
@@ -550,6 +630,27 @@ class Header {
                 }
 
                 @media (max-width: 480px) {
+                    .header-logo-section {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 0.5rem;
+                    }
+
+                    .logo-image {
+                        height: 32px;
+                        max-width: 100px;
+                    }
+
+                    .logo-fallback {
+                        width: 32px;
+                        height: 32px;
+                    }
+
+                    .logo-icon {
+                        width: 18px;
+                        height: 18px;
+                    }
+
                     .header-stats {
                         gap: 0.75rem;
                         font-size: 0.8rem;
@@ -563,6 +664,23 @@ class Header {
 
                     .stat-label {
                         font-size: 0.75rem;
+                    }
+                }
+
+                @media (max-width: 320px) {
+                    .logo-image {
+                        height: 28px;
+                        max-width: 80px;
+                    }
+
+                    .logo-fallback {
+                        width: 28px;
+                        height: 28px;
+                    }
+
+                    .logo-icon {
+                        width: 16px;
+                        height: 16px;
                     }
                 }
             `;

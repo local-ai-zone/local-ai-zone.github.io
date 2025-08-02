@@ -7,7 +7,7 @@ The model pre-rendering system creates static HTML files for individual model pa
 ## How It Works
 
 ### 1. Data Processing
-- Loads model data from `data/gguf_models.json`
+- Loads model data from `gguf_models.json`
 - Creates unique models map (avoiding duplicates)
 - Sorts models by likes in descending order
 - Selects top 500 models for pre-rendering

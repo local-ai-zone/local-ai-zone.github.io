@@ -56,7 +56,7 @@ graph TD
 - Retry configuration
 
 **Outputs**:
-- Updated data/gguf_models.json
+- Updated gguf_models.json
 - Updated data/raw_models_data.json
 - Commit with timestamp and change summary
 
