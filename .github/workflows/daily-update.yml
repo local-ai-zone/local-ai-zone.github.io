@@ -1,0 +1,391 @@
+name: Daily GGUF Model Data Update
+
+on:
+  schedule:
+    # Run every day at 23:59 UTC (11:59 PM) - optimized timing to collect fresh data before other workflows
+    - cron: '59 23 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  issues: write
+
+jobs:
+  update-model-data:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r scripts/requirements.txt
+        
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+    - name: Run GGUF fetcher with retry logic
+      id: fetch_data
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+      run: |
+        max_attempts=3
+        delay=300  # 5 minutes in seconds
+        attempt=1
+        
+        # Prepare enhanced command with optimal configuration
+        FETCH_CMD="python scripts/simplified_gguf_fetcher.py --verbose"
+        if [ -n "$HF_TOKEN" ]; then
+          FETCH_CMD="$FETCH_CMD --token $HF_TOKEN"
+          echo "Using authenticated Hugging Face API requests"
+        else
+          echo "Warning: No HF_TOKEN provided, using unauthenticated requests (may hit rate limits)"
+        fi
+        
+        echo "Command: $FETCH_CMD"
+        
+        while [ $attempt -le $max_attempts ]; do
+          echo "Attempt $attempt of $max_attempts"
+          
+          if eval $FETCH_CMD; then
+            echo "GGUF data fetch successful on attempt $attempt"
+            echo "success=true" >> $GITHUB_OUTPUT
+            break
+          else
+            echo "GGUF data fetch failed on attempt $attempt"
+            if [ $attempt -eq $max_attempts ]; then
+              echo "All retry attempts failed"
+              echo "success=false" >> $GITHUB_OUTPUT
+              exit 1
+            else
+              echo "Waiting $delay seconds before retry..."
+              sleep $delay
+              # Exponential backoff - double the delay for next attempt
+              delay=$((delay * 2))
+            fi
+          fi
+          
+          attempt=$((attempt + 1))
+        done
+        
+    - name: Verify backup creation and data integrity
+      id: verify_backup
+      run: |
+        echo "Verifying backup creation and data integrity..."
+        
+        # Check if backups were created
+        if [ -d "data/backups" ] && [ "$(ls -A data/backups 2>/dev/null)" ]; then
+          BACKUP_COUNT=$(ls -1 data/backups/*.json 2>/dev/null | wc -l)
+          echo "✅ Backup verification: $BACKUP_COUNT backup files found"
+          echo "backup_created=true" >> $GITHUB_OUTPUT
+          echo "backup_count=$BACKUP_COUNT" >> $GITHUB_OUTPUT
+          
+          # Show latest backup info
+          LATEST_BACKUP=$(ls -t data/backups/*.json 2>/dev/null | head -1)
+          if [ -n "$LATEST_BACKUP" ]; then
+            BACKUP_SIZE=$(stat -f%z "$LATEST_BACKUP" 2>/dev/null || stat -c%s "$LATEST_BACKUP" 2>/dev/null || echo "unknown")
+            echo "Latest backup: $(basename "$LATEST_BACKUP") (${BACKUP_SIZE} bytes)"
+          fi
+        else
+          echo "⚠️ No backups found in data/backups directory"
+          echo "backup_created=false" >> $GITHUB_OUTPUT
+          echo "backup_count=0" >> $GITHUB_OUTPUT
+        fi
+        
+        # Verify output files exist and are valid JSON
+        echo "Verifying output file integrity..."
+        
+        if [ -f "gguf_models.json" ]; then
+          if python -m json.tool gguf_models.json > /dev/null 2>&1; then
+            MODEL_COUNT=$(python -c "import json; data=json.load(open('gguf_models.json')); print(len(data))" 2>/dev/null || echo "0")
+            FILE_SIZE=$(stat -f%z "gguf_models.json" 2>/dev/null || stat -c%s "gguf_models.json" 2>/dev/null || echo "unknown")
+            echo "✅ Output file verification: gguf_models.json is valid JSON"
+            echo "✅ Model count: $MODEL_COUNT models"
+            echo "✅ File size: $FILE_SIZE bytes"
+            echo "output_valid=true" >> $GITHUB_OUTPUT
+            echo "model_count=$MODEL_COUNT" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Output file verification failed: gguf_models.json is invalid JSON"
+            echo "output_valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+        else
+          echo "❌ Output file missing: gguf_models.json not found"
+          echo "output_valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+        if [ -f "data/raw_models_data.json" ]; then
+          if python -m json.tool data/raw_models_data.json > /dev/null 2>&1; then
+            RAW_COUNT=$(python -c "import json; data=json.load(open('data/raw_models_data.json')); print(len(data))" 2>/dev/null || echo "0")
+            echo "✅ Raw data verification: data/raw_models_data.json is valid JSON"
+            echo "✅ Raw model count: $RAW_COUNT models"
+            echo "raw_data_valid=true" >> $GITHUB_OUTPUT
+            echo "raw_model_count=$RAW_COUNT" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Raw data verification failed: data/raw_models_data.json is invalid JSON"
+            echo "raw_data_valid=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+        else
+          echo "❌ Raw data file missing: data/raw_models_data.json not found"
+          echo "raw_data_valid=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+        
+    - name: Clean up old backups
+      id: cleanup_backups
+      run: |
+        echo "Cleaning up old backup files..."
+        
+        if [ -d "data/backups" ]; then
+          # Keep only the 5 most recent backups to prevent disk space issues
+          BACKUP_COUNT=$(ls -1 data/backups/*.json 2>/dev/null | wc -l)
+          
+          if [ "$BACKUP_COUNT" -gt 5 ]; then
+            echo "Found $BACKUP_COUNT backups, keeping only the 5 most recent"
+            
+            # Remove old backups (keep 5 most recent)
+            ls -t data/backups/*.json 2>/dev/null | tail -n +6 | xargs rm -f
+            
+            REMAINING_COUNT=$(ls -1 data/backups/*.json 2>/dev/null | wc -l)
+            REMOVED_COUNT=$((BACKUP_COUNT - REMAINING_COUNT))
+            
+            echo "✅ Cleanup completed: removed $REMOVED_COUNT old backups, $REMAINING_COUNT remaining"
+            echo "backups_cleaned=true" >> $GITHUB_OUTPUT
+            echo "backups_removed=$REMOVED_COUNT" >> $GITHUB_OUTPUT
+            echo "backups_remaining=$REMAINING_COUNT" >> $GITHUB_OUTPUT
+          else
+            echo "✅ Backup cleanup not needed: only $BACKUP_COUNT backups found (≤5)"
+            echo "backups_cleaned=false" >> $GITHUB_OUTPUT
+            echo "backups_removed=0" >> $GITHUB_OUTPUT
+            echo "backups_remaining=$BACKUP_COUNT" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "No backup directory found, skipping cleanup"
+          echo "backups_cleaned=false" >> $GITHUB_OUTPUT
+          echo "backups_removed=0" >> $GITHUB_OUTPUT
+          echo "backups_remaining=0" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Check for data changes
+      id: check_changes
+      run: |
+        if git diff --quiet data/raw_models_data.json gguf_models.json; then
+          echo "No changes detected in data files"
+          echo "changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "Changes detected in data files"
+          echo "changes=true" >> $GITHUB_OUTPUT
+          
+          # Show what changed for better visibility
+          echo "Files with changes:"
+          git diff --name-only data/raw_models_data.json gguf_models.json || true
+          
+          # Show diff stats
+          echo "Change statistics:"
+          git diff --stat data/raw_models_data.json gguf_models.json || true
+        fi
+        
+    - name: Commit and push changes
+      if: steps.check_changes.outputs.changes == 'true'
+      run: |
+        git add data/raw_models_data.json gguf_models.json
+        
+        # Create enhanced commit message with verification data
+        COMMIT_MSG="Automated daily update: GGUF model data $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+        📊 Update Summary:
+        - Processed models: ${{ steps.verify_backup.outputs.model_count }} GGUF models
+        - Raw data models: ${{ steps.verify_backup.outputs.raw_model_count }} total models
+        - Backup created: ${{ steps.verify_backup.outputs.backup_created == 'true' && '✅ Yes' || '❌ No' }}
+        - Backups managed: ${{ steps.cleanup_backups.outputs.backups_remaining }} files retained
+        
+        🔧 Processing Details:
+        - Spam filtering: Enabled with integrated processing
+        - Authentication: ${{ env.HF_TOKEN && 'Authenticated API requests' || 'Unauthenticated requests' }}
+        - Verbose logging: Enabled for detailed diagnostics
+        - Data integrity: Verified (valid JSON output)
+        
+        🗂️ Files Updated:
+        - data/raw_models_data.json (raw API data)
+        - gguf_models.json (processed model data)"
+        
+        git commit -m "$COMMIT_MSG"
+        git push
+        
+    - name: Trigger GitHub Pages deployment
+      if: steps.check_changes.outputs.changes == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          console.log('Triggering GitHub Pages rebuild for data updates...');
+          try {
+            await github.rest.repos.requestPagesBuild({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            console.log('GitHub Pages rebuild triggered successfully');
+          } catch (error) {
+            console.log('Error triggering Pages rebuild:', error.message);
+            // Don't fail the workflow if Pages rebuild fails
+          }
+          
+    - name: Create issue on failure
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const title = `Daily GGUF Data Update Failed - ${new Date().toISOString().split('T')[0]}`;
+          
+          // Gather failure context from step outputs
+          const fetchSuccess = '${{ steps.fetch_data.outputs.success }}';
+          const backupCreated = '${{ steps.verify_backup.outputs.backup_created }}';
+          const outputValid = '${{ steps.verify_backup.outputs.output_valid }}';
+          const rawDataValid = '${{ steps.verify_backup.outputs.raw_data_valid }}';
+          const modelCount = '${{ steps.verify_backup.outputs.model_count }}';
+          const rawModelCount = '${{ steps.verify_backup.outputs.raw_model_count }}';
+          const hasToken = '${{ env.HF_TOKEN }}' ? 'Yes' : 'No';
+          
+          const body = `## Automation Failure: Daily Data Update
+          
+          **Failure Type**: Enhanced Data Update Process
+          **Timestamp**: ${new Date().toISOString()}
+          **Workflow Run**: [${context.runId}](${context.payload.repository.html_url}/actions/runs/${context.runId})
+          
+          ### Failure Context
+          - **Data Fetch Success**: ${fetchSuccess || 'Unknown'}
+          - **Authentication Used**: ${hasToken}
+          - **Backup Created**: ${backupCreated || 'Unknown'}
+          - **Output File Valid**: ${outputValid || 'Unknown'}
+          - **Raw Data Valid**: ${rawDataValid || 'Unknown'}
+          - **Models Processed**: ${modelCount || 'Unknown'}
+          - **Raw Models Found**: ${rawModelCount || 'Unknown'}
+          
+          ### Error Details
+          The enhanced daily GGUF model data update workflow failed. This workflow includes:
+          - Authenticated Hugging Face API requests
+          - Verbose logging for detailed diagnostics
+          - Comprehensive data verification
+          - Automatic backup management
+          - Enhanced error reporting
+          
+          ### Affected Components
+          - [x] Data files (data/raw_models_data.json, gguf_models.json)
+          - [x] Backup management (data/backups/)
+          - [x] Data verification and integrity checks
+          - [ ] Dependencies  
+          - [ ] Deployment
+          - [ ] Tests
+          
+          ### Enhanced Diagnostics Available
+          1. **Verbose Logging**: Check workflow logs for detailed execution information
+          2. **Data Verification**: Review backup creation and file integrity checks
+          3. **Authentication Status**: Verify HF_TOKEN secret configuration
+          4. **Backup Management**: Check backup directory and cleanup operations
+          
+          ### Recommended Actions
+          1. **Check Enhanced Logs**: Review verbose output from simplified_gguf_fetcher.py
+          2. **Verify Authentication**: Ensure HF_TOKEN secret is properly configured
+          3. **Check Data Integrity**: Review backup and verification step outputs
+          4. **API Status**: Verify Hugging Face API accessibility and rate limits
+          5. **Disk Space**: Ensure sufficient space for data and backup files
+          6. **Backup Recovery**: Use latest backup if data corruption occurred
+          
+          ### Configuration Details
+          - **Script Command**: \`python scripts/simplified_gguf_fetcher.py --verbose --token [REDACTED]\`
+          - **Spam Filtering**: Enabled with integrated processing
+          - **Backup Management**: Enabled with automatic cleanup (keep 5 most recent)
+          - **Data Verification**: JSON validation and model count verification
+          - **Retry Logic**: 3 attempts with exponential backoff (5min, 10min, 20min)
+          
+          ### Next Steps
+          - Review enhanced workflow logs for specific error messages
+          - Check backup files in data/backups/ for recovery options
+          - Verify HF_TOKEN secret is valid and has appropriate permissions
+          - Re-run the workflow manually once issues are resolved
+          - Consider temporary --disable-spam-filter flag if spam filtering is causing issues
+          `;
+          
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: title,
+            body: body,
+            labels: ['automation', 'bug', 'data-update', 'enhanced-workflow']
+          });
+          
+    - name: Generate execution summary
+      if: success()
+      run: |
+        echo "## Daily GGUF Update Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **Execution completed successfully**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Data processing summary
+        echo "### 📊 Data Processing Results" >> $GITHUB_STEP_SUMMARY
+        echo "- **Processed Models**: ${{ steps.verify_backup.outputs.model_count }} GGUF models" >> $GITHUB_STEP_SUMMARY
+        echo "- **Raw Data Models**: ${{ steps.verify_backup.outputs.raw_model_count }} total models" >> $GITHUB_STEP_SUMMARY
+        echo "- **Data Changes**: ${{ steps.check_changes.outputs.changes == 'true' && '✅ Changes detected and committed' || 'ℹ️ No changes detected' }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Backup management summary
+        echo "### 🗂️ Backup Management" >> $GITHUB_STEP_SUMMARY
+        echo "- **Backup Created**: ${{ steps.verify_backup.outputs.backup_created == 'true' && '✅ Yes' || '❌ No' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Backup Count**: ${{ steps.verify_backup.outputs.backup_count }} files" >> $GITHUB_STEP_SUMMARY
+        echo "- **Cleanup Performed**: ${{ steps.cleanup_backups.outputs.backups_cleaned == 'true' && '✅ Yes' || 'ℹ️ Not needed' }}" >> $GITHUB_STEP_SUMMARY
+        if [ "${{ steps.cleanup_backups.outputs.backups_removed }}" -gt 0 ]; then
+          echo "- **Old Backups Removed**: ${{ steps.cleanup_backups.outputs.backups_removed }} files" >> $GITHUB_STEP_SUMMARY
+        fi
+        echo "- **Backups Retained**: ${{ steps.cleanup_backups.outputs.backups_remaining }} files" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Configuration summary
+        echo "### ⚙️ Configuration Used" >> $GITHUB_STEP_SUMMARY
+        echo "- **Authentication**: ${{ env.HF_TOKEN && '✅ Authenticated API requests' || '⚠️ Unauthenticated requests' }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Verbose Logging**: ✅ Enabled" >> $GITHUB_STEP_SUMMARY
+        echo "- **Spam Filtering**: ✅ Enabled with integrated processing" >> $GITHUB_STEP_SUMMARY
+        echo "- **Backup Management**: ✅ Enabled with automatic cleanup" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Deployment status
+        if [ "${{ steps.check_changes.outputs.changes }}" == "true" ]; then
+          echo "### 🚀 Deployment Status" >> $GITHUB_STEP_SUMMARY
+          echo "- **GitHub Pages**: ✅ Deployment triggered" >> $GITHUB_STEP_SUMMARY
+          echo "- **Files Updated**: data/raw_models_data.json, gguf_models.json" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "### ℹ️ No Deployment Needed" >> $GITHUB_STEP_SUMMARY
+          echo "- **Reason**: No changes detected in data files" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+    - name: Notify on success
+      if: success() && steps.check_changes.outputs.changes == 'true'
+      run: |
+        echo "✅ Daily GGUF model data update completed successfully"
+        echo "📊 Processed ${{ steps.verify_backup.outputs.model_count }} GGUF models from ${{ steps.verify_backup.outputs.raw_model_count }} total models"
+        echo "🗂️ Backup management: ${{ steps.verify_backup.outputs.backup_count }} backups created, ${{ steps.cleanup_backups.outputs.backups_remaining }} retained"
+        echo "🔧 Enhanced execution: authenticated API, verbose logging, spam filtering, data verification"
+        echo "📁 Data files updated and committed (data/raw_models_data.json, gguf_models.json)"
+        echo "🚀 GitHub Pages deployment triggered"
+        
+    - name: Notify on no changes
+      if: success() && steps.check_changes.outputs.changes == 'false'
+      run: |
+        echo "ℹ️ Daily GGUF model data update completed - no changes detected"
+        echo "📊 Processed ${{ steps.verify_backup.outputs.model_count }} GGUF models (same as previous run)"
+        echo "🗂️ Backup management: ${{ steps.verify_backup.outputs.backup_count }} backups maintained"
+        echo "✅ All data verification checks passed"

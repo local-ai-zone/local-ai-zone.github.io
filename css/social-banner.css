@@ -1,0 +1,565 @@
+/* Social Media Banner Styles - Local AI Zone */
+
+/* Import premium color variables from existing styles */
+:root {
+    /* Premium Color Palette - Matching website design */
+    --primary-50: #eff6ff;
+    --primary-100: #dbeafe;
+    --primary-200: #bfdbfe;
+    --primary-300: #93c5fd;
+    --primary-400: #60a5fa;
+    --primary-500: #3b82f6;
+    --primary-600: #2563eb;
+    --primary-700: #1d4ed8;
+    --primary-800: #1e40af;
+    --primary-900: #1e3a8a;
+    
+    /* Neutral Palette */
+    --neutral-50: #fafafa;
+    --neutral-100: #f5f5f5;
+    --neutral-200: #e5e5e5;
+    --neutral-300: #d4d4d4;
+    --neutral-400: #a3a3a3;
+    --neutral-500: #737373;
+    --neutral-600: #525252;
+    --neutral-700: #404040;
+    --neutral-800: #262626;
+    --neutral-900: #171717;
+    
+    /* Typography */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+    
+    /* Spacing Scale */
+    --space-1: 0.25rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-5: 1.25rem;
+    --space-6: 1.5rem;
+    --space-8: 2rem;
+    --space-10: 2.5rem;
+    --space-12: 3rem;
+    --space-16: 4rem;
+    
+    /* Border Radius */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Reset and Base Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html, body {
+    width: 1200px;
+    height: 630px;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-family: var(--font-family);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Banner Container */
+.banner-container {
+    position: relative;
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--neutral-50) 100%);
+}
+
+/* Background Elements */
+.background-gradient {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, 
+        var(--primary-50) 0%, 
+        var(--primary-100) 25%, 
+        var(--neutral-50) 75%, 
+        var(--neutral-100) 100%);
+    z-index: 1;
+}
+
+.background-pattern {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+    z-index: 2;
+}
+
+/* Main Content - Optimized for perfect centering and safe areas */
+.banner-content {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    /* Safe area padding to prevent cutoff on any platform */
+    padding: 60px 80px;
+    /* Ensure content stays within safe bounds */
+    max-width: 1040px; /* 1200 - 160px padding */
+    max-height: 510px; /* 630 - 120px padding */
+    margin: 0 auto;
+}
+
+/* Header Section - Centered */
+.banner-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-8);
+    width: 100%;
+}
+
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logo-icon {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+    border-radius: var(--radius-2xl);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    color: white;
+    box-shadow: var(--shadow-xl);
+    position: relative;
+}
+
+.logo-icon::after {
+    content: '';
+    position: absolute;
+    top: -4px;
+    left: -4px;
+    right: -4px;
+    bottom: -4px;
+    background: linear-gradient(135deg, var(--primary-400), var(--primary-600));
+    border-radius: var(--radius-2xl);
+    z-index: -1;
+    opacity: 0.3;
+}
+
+.brand-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.main-title {
+    font-size: 3.2rem;
+    font-weight: 800;
+    color: var(--primary-700);
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+    margin: 0;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.subtitle {
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--neutral-600);
+    line-height: 1.3;
+    margin: 0;
+    max-width: 700px;
+    text-align: center;
+}
+
+/* Statistics Section - Perfectly centered */
+.stats-section {
+    display: flex;
+    gap: var(--space-6);
+    margin: var(--space-8) 0;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    flex-wrap: wrap;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--radius-xl);
+    padding: var(--space-5) var(--space-6);
+    text-align: center;
+    box-shadow: var(--shadow-lg);
+    min-width: 130px;
+    max-width: 160px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-500), var(--primary-700));
+    border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.stat-number {
+    font-size: 2.25rem;
+    font-weight: 700;
+    color: var(--primary-700);
+    line-height: 1;
+    margin-bottom: var(--space-2);
+}
+
+.stat-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--neutral-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Compatibility Section - Centered */
+.compatibility-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    margin: var(--space-6) 0;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.compatibility-label {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--neutral-700);
+}
+
+.compatibility-tools {
+    display: flex;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.tool-badge {
+    background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+    color: var(--primary-800);
+    padding: var(--space-2) var(--space-4);
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid var(--primary-300);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Footer Attribution - Centered */
+.banner-footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-6);
+    margin-top: var(--space-8);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--primary-200);
+    width: 100%;
+    text-align: center;
+}
+
+.attribution {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.powered-by {
+    font-size: 0.875rem;
+    color: var(--neutral-500);
+    font-weight: 500;
+}
+
+.gguf-loader {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--neutral-900);
+    background: linear-gradient(135deg, var(--neutral-100), var(--neutral-200));
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--neutral-300);
+}
+
+.update-info {
+    font-size: 0.875rem;
+    color: var(--neutral-500);
+    font-weight: 500;
+}
+
+#update-timestamp {
+    font-weight: 600;
+    color: var(--neutral-700);
+}
+
+/* Decorative Elements */
+.decorative-elements {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.floating-icon {
+    position: absolute;
+    font-size: 2rem;
+    opacity: 0.1;
+    color: var(--primary-600);
+    animation: float 6s ease-in-out infinite;
+}
+
+.icon-1 {
+    top: 15%;
+    right: 15%;
+    animation-delay: 0s;
+}
+
+.icon-2 {
+    top: 60%;
+    right: 8%;
+    animation-delay: 2s;
+}
+
+.icon-3 {
+    bottom: 20%;
+    right: 25%;
+    animation-delay: 4s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0.1;
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+        opacity: 0.2;
+    }
+}
+
+/* Responsive adjustments for different banner sizes */
+@media (max-width: 1200px) {
+    .banner-container,
+    html, body {
+        width: 100%;
+        max-width: 1200px;
+    }
+    
+    .banner-content {
+        padding: var(--space-6) var(--space-8);
+    }
+    
+    .main-title {
+        font-size: 3rem;
+    }
+    
+    .subtitle {
+        font-size: 1.25rem;
+    }
+    
+    .stats-section {
+        gap: var(--space-4);
+    }
+    
+    .stat-card {
+        padding: var(--space-4) var(--space-6);
+        min-width: 120px;
+    }
+    
+    .stat-number {
+        font-size: 1.875rem;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .banner-container {
+        background: white;
+    }
+    
+    .background-gradient {
+        background: linear-gradient(135deg, #f0f9ff 0%, #ffffff 100%);
+    }
+    
+    .stat-card {
+        border-width: 2px;
+        border-color: var(--primary-600);
+    }
+    
+    .tool-badge {
+        border-width: 2px;
+    }
+}
+
+/* Print styles */
+@media print {
+    .banner-container {
+        background: white !important;
+        box-shadow: none !important;
+    }
+    
+    .decorative-elements {
+        display: none;
+    }
+    
+    .floating-icon {
+        display: none;
+    }
+}
+
+/* Accessibility improvements */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* Focus styles for interactive elements (if any) */
+*:focus {
+    outline: 2px solid var(--primary-600);
+    outline-offset: 2px;
+}
+
+/* Ensure text remains readable on all backgrounds */
+.main-title,
+.subtitle,
+.stat-number,
+.stat-label,
+.compatibility-label,
+.tool-badge,
+.powered-by,
+.gguf-loader,
+.update-info {
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+}
+
+/* Perfect centering and safe area constraints */
+.banner-content > * {
+    flex-shrink: 0;
+}
+
+/* Ensure no content overflow */
+.banner-container {
+    position: relative;
+    width: 1200px;
+    height: 630px;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary-50) 0%, var(--neutral-50) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Safe area for social media platforms */
+.safe-area {
+    position: absolute;
+    top: 40px;
+    left: 40px;
+    right: 40px;
+    bottom: 40px;
+    border: 2px dashed rgba(59, 130, 246, 0.2);
+    pointer-events: none;
+    z-index: 1000;
+    display: none; /* Hidden by default, can be shown for debugging */
+}
+
+/* Responsive text sizing for perfect fit */
+@media (max-width: 1200px) {
+    .main-title {
+        font-size: 2.8rem;
+    }
+    
+    .subtitle {
+        font-size: 1.2rem;
+    }
+    
+    .stat-number {
+        font-size: 1.75rem;
+    }
+    
+    .banner-content {
+        padding: 50px 60px;
+        max-width: 1080px;
+        max-height: 530px;
+    }
+}
+
+/* Additional visual enhancements */
+.logo-icon {
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 50%, var(--primary-700) 100%);
+    box-shadow: 
+        var(--shadow-xl),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    box-shadow: 
+        var(--shadow-lg),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.tool-badge {
+    background: linear-gradient(135deg, 
+        rgba(59, 130, 246, 0.1) 0%, 
+        rgba(59, 130, 246, 0.15) 100%);
+    backdrop-filter: blur(10px);
+    box-shadow: 
+        var(--shadow-sm),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}

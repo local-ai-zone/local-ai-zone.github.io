@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Discover and download GGUF format machine learning models. Browse thousands of quantized AI models with detailed information, download counts, and direct links.">
+    <meta name="keywords"
+        content="GGUF models, machine learning, AI models, quantized models, model download, Hugging Face, LLaMA, neural networks, deep learning, BERT models, Qwen models, LLaMA models, Gemma models, Phi models, DeepSeek models, Mistral models, T5 models, StableLM models, Falcon models, Zephyr models, WizardLM models, Yi models, Alpaca models, Q4_0 quantization, Q4_K_M quantization, Q5_K_M quantization, Q8_0 quantization, F16 quantization">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Hussain Nazary">
+    <meta name="publisher" content="Local AI Zone">
+
+    <title>GGUF Model Discovery - Browse & Download AI Models</title>
+
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+        as="style">
+    <link rel="preload" href="css/premium-styles.css" as="style">
+
+    <!-- Stylesheets -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/premium-styles.css">
+
+    <!-- Favicon and app icons -->
+    <link rel="icon" type="image/svg+xml" href="logo.svg">
+    <link rel="icon" type="image/png" href="logo.png">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+
+    <!-- Open Graph meta tags -->
+    <meta property="og:title" content="GGUF Model Discovery - Browse & Download AI Models">
+    <meta property="og:description"
+        content="5,000+ GGUF models updated daily. Compatible with llama.cpp, LM Studio, Ollama, KoboldCpp. No registration required.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://local-ai-zone.github.io">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:secure_url" content="https://local-ai-zone.github.io/og-image.png?v=2025">
+    <meta property="og:logo" content="https://local-ai-zone.github.io/logo.svg">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="article:author" content="Hussain Nazary">
+    <link rel="canonical" href="https://local-ai-zone.github.io/">
+
+    <!-- Twitter Card meta tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Local AI Zone - Direct Access to GGUF Models for Local LLMs">
+    <meta name="twitter:description"
+        content="5,000+ GGUF models updated daily. Compatible with llama.cpp, LM Studio, Ollama, KoboldCpp. No registration required.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png?v=2025">
+    <meta name="twitter:image:alt" content="Local AI Zone - Direct Access to GGUF Models for Local LLMs">
+    <meta name="twitter:creator" content="Hussain Nazary">
+
+    <!-- Prevent social crawlers from selecting other images -->
+    <meta name="robots" content="index, follow, max-image-preview:large">
+
+    <!-- Additional social media meta tags -->
+    <meta property="og:locale" content="en_US">
+    <meta name="theme-color" content="#3b82f6">
+        <!-- Author/Organization Structured Data for SEO -->
+    
+
+    <!-- FAQ Structured Data for SEO -->
+    
+
+    <!-- Enhanced Website Structured Data -->
+    
+
+    <!-- Software Application Structured Data -->
+    
+
+    <!-- BreadcrumbList for better navigation -->
+    
+
+
+
+
+
+
+
+
+    <!-- Author/Organization Structured Data for SEO -->
+    
+
+    <!-- FAQ Structured Data for SEO -->
+    
+
+    <!-- Enhanced Website Structured Data -->
+    
+
+    <!-- Software Application Structured Data -->
+    
+
+    <!-- BreadcrumbList for better navigation -->
+    
+    
+    <meta property="og:description" content="Discover and download GGUF format machine learning models. Browse thousands of quantized AI models with detailed information, download counts, and direct links.">
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    <script type="application/ld+json">
+{
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "GGUF Model Discovery",
+      "description": "Browse and download GGUF format machine learning models",
+      "url": "https://local-ai-zone.github.io",
+      "potentialAction": {
+            "@type": "SearchAction",
+            "target": {
+                  "@type": "EntryPoint",
+                  "urlTemplate": "https://local-ai-zone.github.io/#search={search_term_string}"
+            },
+            "query-input": "required name=search_term_string"
+      },
+      "mainEntity": {
+            "@type": "DataCatalog",
+            "name": "GGUF Model Catalog",
+            "description": "Comprehensive catalog of GGUF format machine learning models",
+            "numberOfItems": 2066,
+            "keywords": "Qwen, Gemma, Llama, Mistral, DeepSeek, BERT, Phi"
+      }
+}
+    </script>
+</head>
+
+<body class="gguf-banner-active">
+    <!-- Skip link for accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- GGUF Loader Top Banner -->
+    <div id="gguf-banner" class="gguf-banner">
+        <div class="banner-content">
+            <div class="banner-branding">
+                <span class="banner-icon">🔋</span>
+                <span class="banner-text">Powered by GGUF Loader</span>
+            </div>
+            <div class="banner-tagline">Local-first AI. Your models, your machine, your rules.</div>
+            <a href="https://ggufloader.github.io" class="banner-cta" rel="noopener" target="_blank">Visit GGUF
+                Loader</a>
+        </div>
+    </div>
+
+    <!-- Premium Loading Screen -->
+    <div id="loading-screen" class="premium-loading-screen">
+        <div class="loading-content">
+            <div class="loading-logo">
+                <div class="logo-icon">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                    </svg>
+                </div>
+                <h1 class="logo-text">GGUF Discovery</h1>
+            </div>
+            <div class="loading-spinner-container">
+                <div class="premium-spinner"></div>
+                <p class="loading-message">Loading AI Models...</p>
+            </div>
+            <div class="loading-stats">
+                <div class="stat-item">
+                    <span class="stat-number" id="loading-model-count">5,000+</span>
+                    <span class="stat-label">Models</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">15+</span>
+                    <span class="stat-label">Formats</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number">100+</span>
+                    <span class="stat-label">Publishers</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Premium Header -->
+    <header class="premium-header">
+        <div class="container">
+            <!-- Mobile Header Bar -->
+            <div class="mobile-header-bar">
+                <div class="header-brand">
+                    <div class="header-logo-section">
+                        <div class="header-logo" onclick="window.location.href='/'">
+                            <img src="logo.svg" alt="Local AI Zone Logo" class="logo-image"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="logo-fallback" style="display: none;">
+                                <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <h1 class="brand-title">GGUF Discovery</h1>
+                            <p class="brand-subtitle">Professional AI Model Repository</p>
+                        </div>
+                    </div>
+                </div>
+                <button id="mobile-header-toggle" class="mobile-toggle-btn" type="button" aria-expanded="false"
+                    aria-controls="header-content" aria-label="Toggle navigation menu">
+                    <svg class="toggle-icon" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                        stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6" />
+                        <line x1="3" y1="12" x2="21" y2="12" />
+                        <line x1="3" y1="18" x2="21" y2="18" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Collapsible Header Content -->
+            <div class="header-content" id="header-content">
+                <!-- Left: Logo -->
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='/'">
+                                <img src="logo.svg" alt="Local AI Zone Logo" class="logo-image"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <h1 class="brand-title">GGUF Discovery</h1>
+                                <p class="brand-subtitle">Professional AI Model Repository</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center: Stats -->
+                <div class="header-center">
+                    <div class="header-stats">
+                        <div class="stat-card">
+                            <div class="stat-value" id="model-count-display">Loading...</div>
+                            <div class="stat-label">Total Models</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="data-timestamp">Loading...</div>
+                            <div class="stat-label">Last Updated</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Actions -->
+                <div class="header-right">
+                    <div class="header-actions">
+                        <div class="search-container">
+                            <div class="search-input-wrapper">
+                                <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <circle cx="11" cy="11" r="8" />
+                                    <path d="m21 21-4.35-4.35" />
+                                </svg>
+                                <input type="search" id="model-search" class="premium-search-input"
+                                    placeholder="Search models, formats, types..." aria-label="Search models"
+                                    autocomplete="off">
+                                <kbd class="search-shortcut">⌘K</kbd>
+                            </div>
+                        </div>
+
+                        <div class="sort-container">
+                            <select id="sort-select" class="premium-select" aria-label="Sort models">
+                                <option value="likeCount-desc" selected>❤️ Most Liked</option>
+                                <option value="downloadCount-desc">🔥 Most Popular</option>
+                                <option value="downloadCount-asc">📈 Trending Up</option>
+                                <option value="likeCount-asc">💔 Least Liked</option>
+                                <option value="modelName-asc">🔤 A to Z</option>
+                                <option value="modelName-desc">🔤 Z to A</option>
+                                <option value="fileSize-desc">📦 Largest First</option>
+                                <option value="fileSize-asc">📦 Smallest First</option>
+                            </select>
+                        </div>
+
+                        <!-- GGUF Loader Header Button -->
+                        <a href="https://ggufloader.github.io" class="gguf-header-btn" rel="noopener" target="_blank">
+                            <span class="btn-text">GGUF Loader</span>
+                            <span class="btn-icon">🔋</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main content -->
+    <main id="main-content" class="premium-main">
+        <div class="container">
+
+            <!-- Local AI Zone Title Section -->
+            <section class="local-ai-zone-title" aria-label="Local AI Zone introduction">
+                <div class="title-content">
+                    <h1 class="main-title">Local AI Zone</h1>
+                    <p class="main-description">Direct access to AI models for running large language models locally.
+                        Updated daily with direct download links, no registration required. Compatible with llama.cpp,
+                        GGUF Loader, LM Studio, Ollama, KoboldCpp, and other local LLM tools.</p>
+                </div>
+            </section>
+
+            <!-- AI Platform Navigation Section -->
+            <section class="ai-tools-navigation" aria-label="AI Platform Navigation">
+                <div class="tools-header">
+                    <h2 class="tools-title">Get Started with Local AI</h2>
+                    <p class="tools-subtitle">Choose your preferred platform to run GGUF models locally</p>
+                </div>
+                <div class="tools-buttons">
+                    <a href="https://ollama.com" class="tool-button ollama" target="_blank" rel="noopener">
+                        <div class="tool-icon">⚡</div>
+                        <div class="tool-content">
+                            <h3 class="tool-name">Ollama</h3>
+                            <p class="tool-description">Fastest</p>
+                        </div>
+                    </a>
+                    <a href="https://ggufloader.github.io" class="tool-button gguf-loader" target="_blank"
+                        rel="noopener">
+                        <div class="tool-icon">🔋</div>
+                        <div class="tool-content">
+                            <h3 class="tool-name">GGUF Loader</h3>
+                            <p class="tool-description">Lightest</p>
+                        </div>
+                    </a>
+                    <a href="https://lmstudio.ai" class="tool-button lm-studio" target="_blank" rel="noopener">
+                        <div class="tool-icon">🖥️</div>
+                        <div class="tool-content">
+                            <h3 class="tool-name">LM Studio</h3>
+                            <p class="tool-description">Easiest</p>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Premium Filter Section -->
+            <section class="premium-filter-section" aria-label="Search and filter controls">
+                <div class="filter-header">
+                    <h2 class="filter-title">Refine Your Search</h2>
+                    <button id="clear-filters-btn" class="clear-filters-btn" type="button">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                        </svg>
+                        Clear All
+                    </button>
+                </div>
+
+                <div id="filter-controls" class="premium-filters">
+                    <div class="filter-group">
+                        <label for="quantization-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                            </svg>
+                            Quantization
+                        </label>
+                        <select id="quantization-filter" class="premium-select">
+                            <option value="all">All Quantizations</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="model-type-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+                                <polyline points="22,6 12,13 2,6" />
+                            </svg>
+                            Model Type
+                        </label>
+                        <select id="model-type-filter" class="premium-select">
+                            <option value="all">All Types</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="license-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                                <circle cx="12" cy="16" r="1" />
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            </svg>
+                            License
+                        </label>
+                        <select id="license-filter" class="premium-select">
+                            <option value="all">All Licenses</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="cpu-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+                                <rect x="9" y="9" width="6" height="6" />
+                                <line x1="9" y1="1" x2="9" y2="4" />
+                                <line x1="15" y1="1" x2="15" y2="4" />
+                                <line x1="9" y1="20" x2="9" y2="23" />
+                                <line x1="15" y1="20" x2="15" y2="23" />
+                                <line x1="20" y1="9" x2="23" y2="9" />
+                                <line x1="20" y1="14" x2="23" y2="14" />
+                                <line x1="1" y1="9" x2="4" y2="9" />
+                                <line x1="1" y1="14" x2="4" y2="14" />
+                            </svg>
+                            CPU Cores
+                        </label>
+                        <select id="cpu-filter" class="premium-select">
+                            <option value="all">Any CPU</option>
+                            <option value="2">2+ cores</option>
+                            <option value="4">4+ cores</option>
+                            <option value="6">6+ cores</option>
+                            <option value="8">8+ cores</option>
+                            <option value="12">12+ cores</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="ram-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path
+                                    d="M9 5H7a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2m0-14h6m-6 0V3m6 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-2m0-14v2M9 19v2m6-2v2" />
+                            </svg>
+                            RAM
+                        </label>
+                        <select id="ram-filter" class="premium-select">
+                            <option value="all">Any RAM</option>
+                            <option value="4">4+ GB</option>
+                            <option value="8">8+ GB</option>
+                            <option value="16">16+ GB</option>
+                            <option value="32">32+ GB</option>
+                            <option value="64">64+ GB</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="gpu-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="2" y="6" width="20" height="12" rx="2" ry="2" />
+                                <circle cx="12" cy="12" r="2" />
+                                <path d="M12 6v2m0 8v2" />
+                            </svg>
+                            GPU
+                        </label>
+                        <select id="gpu-filter" class="premium-select">
+                            <option value="all">Any GPU</option>
+                            <option value="required">GPU Required</option>
+                            <option value="not-required">No GPU Needed</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label for="recent-filter" class="filter-label">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+                                <line x1="16" y1="2" x2="16" y2="6" />
+                                <line x1="8" y1="2" x2="8" y2="6" />
+                                <line x1="3" y1="10" x2="21" y2="10" />
+                            </svg>
+                            Recent Uploaded
+                        </label>
+                        <select id="recent-filter" class="premium-select">
+                            <option value="all">All Time</option>
+                            <option value="7">Last 7 days</option>
+                            <option value="30">Last 30 days</option>
+                            <option value="90">Last 90 days</option>
+                            <option value="180">Last 6 months</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Active filters display -->
+                <div id="active-filters" class="active-filters-container" aria-live="polite">
+                    <!-- Active filter tags will be displayed here -->
+                </div>
+            </section>
+
+            <!-- Results summary -->
+            <section class="results-summary" aria-live="polite">
+                <div class="results-header">
+                    <div id="results-count" class="results-count">Loading models...</div>
+                    <div class="view-options">
+                        <button class="view-btn active" data-view="grid" title="Grid View">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <rect x="3" y="3" width="7" height="7" />
+                                <rect x="14" y="3" width="7" height="7" />
+                                <rect x="14" y="14" width="7" height="7" />
+                                <rect x="3" y="14" width="7" height="7" />
+                            </svg>
+                        </button>
+                        <button class="view-btn" data-view="list" title="List View">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="8" y1="6" x2="21" y2="6" />
+                                <line x1="8" y1="12" x2="21" y2="12" />
+                                <line x1="8" y1="18" x2="21" y2="18" />
+                                <line x1="3" y1="6" x2="3.01" y2="6" />
+                                <line x1="3" y1="12" x2="3.01" y2="12" />
+                                <line x1="3" y1="18" x2="3.01" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Model Grid -->
+            <section class="premium-model-section" aria-label="Model results">
+                <div id="model-grid" class="premium-model-grid" role="grid" aria-label="GGUF Models">
+                    <!-- Model cards will be dynamically populated -->
+                    <div class="premium-loading-container">
+                        <div class="premium-spinner"></div>
+                        <div class="loading-message">Loading premium models...</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Premium Pagination -->
+            <section class="premium-pagination-section" aria-label="Pagination controls">
+                <div id="pagination-container" class="premium-pagination-container">
+                    <!-- Pagination will be dynamically populated -->
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Premium Footer -->
+    <footer class="premium-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="brand-logo">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h3>GGUF Discovery</h3>
+                        <p>Professional AI Model Repository</p>
+                    </div>
+                </div>
+
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Platform</h4>
+                        <a href="#" class="footer-link">Browse Models</a>
+                        <a href="#" class="footer-link">API Access</a>
+                        <a href="#" class="footer-link">Documentation</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Support</h4>
+                        <a href="#" class="footer-link">Help Center</a>
+                        <a href="#" class="footer-link">Contact Us</a>
+                        <a href="#" class="footer-link">Status</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Legal</h4>
+                        <a href="#" class="footer-link">Privacy Policy</a>
+                        <a href="#" class="footer-link">Terms of Service</a>
+                        <a href="#" class="footer-link">Licenses</a>
+                    </div>
+                </div>
+
+                <div class="footer-stats">
+                    <div class="footer-stat">
+                        <span class="stat-number">5K+</span>
+                        <span class="stat-label">Models</span>
+                    </div>
+                    <div class="footer-stat">
+                        <span class="stat-number">1M+</span>
+                        <span class="stat-label">Downloads</span>
+                    </div>
+                    <div class="footer-stat">
+                        <span class="stat-number">99.9%</span>
+                        <span class="stat-label">Uptime</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GGUF Loader Footer Attribution -->
+            <div class="gguf-footer-attribution">
+                <div class="attribution-content">
+                    <span class="attribution-text">Powered by</span>
+                    <a href="https://ggufloader.github.io" class="attribution-link" rel="noopener" target="_blank">GGUF
+                        Loader</a>
+                </div>
+                <div class="attribution-tagline">Local-first AI. Your models, your machine, your rules.</div>
+            </div>
+
+            <div class="footer-disclaimer">
+                <p class="disclaimer-text">
+                    <strong>Disclaimer:</strong> GGUF Loader is not affiliated with Hugging Face. All links point to
+                    publicly available models hosted by their respective creators. We do not store or redistribute any
+                    model files directly.
+                </p>
+            </div>
+
+            <div class="footer-bottom">
+                <p>&copy; 2025 GGUF Model Discovery. All rights reserved.</p>
+                <div class="footer-social">
+                    <a href="#" class="social-link" aria-label="GitHub">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                        </svg>
+                    </a>
+                    <a href="#" class="social-link" aria-label="Twitter">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <path
+                                d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification container -->
+    <div id="notification-container" class="premium-notification-container" aria-live="polite" aria-atomic="true">
+        <!-- Notifications will be dynamically added here -->
+    </div>
+
+    <!-- JavaScript Dependencies -->
+    <script src="js/utils/helpers.js"></script>
+    <script src="js/utils/formatters.js"></script>
+    <script src="js/utils/notifications.js"></script>
+
+    <!-- Premium JavaScript -->
+    <script src="js/premium-app.js"></script>
+
+    <!-- Initialize application -->
+    <script>
+        // Initialize the premium application
+        let premiumApp;
+        try {
+            premiumApp = new PremiumGGUFApp();
+            window.premiumApp = premiumApp;
+        } catch (error) {
+            console.error('Failed to initialize Premium GGUF App:', error);
+        }
+    </script>
+</body>
+
+</html>

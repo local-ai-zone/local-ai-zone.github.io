@@ -1,0 +1,112 @@
+{
+  "timestamp": "2025-08-06T13:50:08.743Z",
+  "checks": [
+    {
+      "name": "Sitemap Accessibility",
+      "status": "pass",
+      "responseTime": 0,
+      "fileSize": 91243,
+      "lastModified": "2025-08-06T13:25:20.519Z",
+      "details": "Sitemap file accessible locally"
+    },
+    {
+      "name": "Sitemap Structure",
+      "status": "warning",
+      "score": "85.7%",
+      "details": {
+        "hasXMLDeclaration": true,
+        "hasUrlset": true,
+        "hasNamespace": true,
+        "hasValidClosing": true,
+        "noHashFragments": true,
+        "httpsOnly": true,
+        "validXML": false
+      },
+      "passedChecks": 6,
+      "totalChecks": 7
+    },
+    {
+      "name": "URL Health",
+      "status": "pass",
+      "statistics": {
+        "totalURLs": 453,
+        "uniqueURLs": 453,
+        "duplicates": 0,
+        "httpsURLs": 453,
+        "httpURLs": 0,
+        "invalidURLs": 0,
+        "urlTypes": {
+          "other": 1,
+          "models": 377,
+          "guides": 12,
+          "brands": 34,
+          "cpu": 29
+        }
+      },
+      "healthScore": "100.0%",
+      "details": "453 URLs analyzed, 0 invalid, 0 duplicates"
+    },
+    {
+      "name": "File Size",
+      "status": "pass",
+      "fileSizeMB": "0.09",
+      "maxSizeMB": 45,
+      "utilizationPercent": "0.2",
+      "details": "File size: 0.09 MB (limit: 50 MB)"
+    },
+    {
+      "name": "Content Freshness",
+      "status": "pass",
+      "freshnessScore": "100.0%",
+      "recentUpdates": 453,
+      "totalDates": 453,
+      "details": "453 of 453 URLs updated in last 30 days"
+    },
+    {
+      "name": "Search Engine Compatibility",
+      "status": "pass",
+      "compatibilityScore": "100.0%",
+      "checks": {
+        "validXMLDeclaration": true,
+        "correctNamespace": true,
+        "noHashFragments": true,
+        "httpsOnly": true,
+        "validDateFormat": true,
+        "validPriorityValues": true,
+        "validChangefreqValues": true,
+        "properEncoding": true
+      },
+      "passedChecks": 8,
+      "totalChecks": 8,
+      "details": "8/8 compatibility checks passed"
+    }
+  ],
+  "alerts": [],
+  "statistics": {
+    "overallHealthScore": "83.3",
+    "totalChecks": 6,
+    "passedChecks": 5,
+    "failedChecks": 0,
+    "warningChecks": 1,
+    "alertCount": 0,
+    "criticalAlerts": 0,
+    "errorAlerts": 0,
+    "warningAlerts": 0
+  },
+  "trends": {},
+  "config": {
+    "baseURL": "https://local-ai-zone.github.io",
+    "sitemapURL": "https://local-ai-zone.github.io/sitemap.xml",
+    "monitoringInterval": 86400000,
+    "alertThresholds": {
+      "maxResponseTime": 5000,
+      "minURLCount": 100,
+      "maxErrorRate": 0.05,
+      "maxFileSizeMB": 45
+    },
+    "reportRetentionDays": 30,
+    "reportsDir": "monitoring-reports"
+  },
+  "reportVersion": "1.0",
+  "generatedBy": "Sitemap Monitor"
+}
