@@ -152,7 +152,7 @@ jobs:
     - name: Commit and push changes
       if: steps.check_changes.outputs.changes == 'true'
       run: |
-        git add data/raw_models_data.json gguf_models.json
+        git add gguf_models.json data/raw_models_data.json
         
         # Create enhanced commit message with verification data
         COMMIT_MSG="Automated daily update: GGUF model data $(date -u '+%Y-%m-%d %H:%M:%S UTC')
