@@ -152,6 +152,9 @@ jobs:
     - name: Commit and push changes
       if: steps.check_changes.outputs.changes == 'true'
       run: |
+        # Pull latest changes first to avoid conflicts
+        git pull --rebase origin main || git pull origin main
+        
         git add gguf_models.json data/raw_models_data.json
         
         # Create enhanced commit message with verification data
@@ -171,8 +174,8 @@ jobs:
         - data/raw_models_data.json (raw API data)
         - gguf_models.json (processed model data)"
         
-        git commit -m "$COMMIT_MSG"
-        git push
+        git commit -m "$COMMIT_MSG" || echo "Nothing to commit"
+        git push || git push --force-with-lease
         
     - name: Trigger GitHub Pages deployment
       if: steps.check_changes.outputs.changes == 'true'
