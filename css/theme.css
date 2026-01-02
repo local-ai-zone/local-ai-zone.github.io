@@ -1,0 +1,183 @@
+/* css/theme.css */
+
+/* ------------------------- */
+/*  1. Light Mode Variables  */
+/* ------------------------- */
+:root {
+  --background-primary: #ffffff; /* White */
+  --background-secondary: #f8f9fa; /* Off-white */
+  --text-primary: #212529; /* Dark Gray */
+  --text-secondary: #6c757d; /* Medium Gray */
+  --accent-primary: #007bff; /* Blue */
+  --accent-hover: #0056b3; /* Darker Blue */
+  --border-color: #dee2e6; /* Light Gray */
+  --card-background: #ffffff;
+  --card-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  --link-color: #007bff;
+  --link-hover-color: #0056b3;
+}
+
+/* ------------------------ */
+/*  2. Dark Mode Variables  */
+/* ------------------------ */
+html[data-theme='dark'] {
+  --background-primary: #121212; /* Almost Black */
+  --background-secondary: #1e1e1e; /* Dark Gray */
+  --text-primary: #e0e0e0; /* Light Gray */
+  --text-secondary: #a0a0a0; /* Medium Gray */
+  --accent-primary: #0d6efd; /* Brighter Blue */
+  --accent-hover: #3d8bfd; /* Lighter Blue */
+  --border-color: #343a40; /* Dark Gray */
+  --card-background: #1e1e1e;
+  --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  --link-color: #3d8bfd;
+  --link-hover-color: #6caeff;
+}
+
+/* --------------------------- */
+/*  3. Auto-detection (Media Query)  */
+/* --------------------------- */
+/* Automatically set dark mode if the user's OS is in dark mode */
+/* This runs if no preference is saved in localStorage */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --background-primary: #121212;
+    --background-secondary: #1e1e1e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #a0a0a0;
+    --accent-primary: #0d6efd;
+    --accent-hover: #3d8bfd;
+    --border-color: #343a40;
+    --card-background: #1e1e1e;
+    --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    --link-color: #3d8bfd;
+    --link-hover-color: #6caeff;
+  }
+}
+
+/* ------------------------- */
+/*  4. General Styles       */
+/* ------------------------- */
+body {
+  background-color: var(--background-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Update other elements to use the new variables */
+/* Example for a generic container */
+.container {
+    background-color: var(--background-secondary);
+    border: 1px solid var(--border-color);
+}
+
+a {
+    color: var(--link-color);
+}
+
+a:hover {
+    color: var(--link-hover-color);
+}
+
+/* -------------------------------- */
+/*  5. Theme Switcher Button Styles */
+/* -------------------------------- */
+/* Theme switcher in header - improved design with label */
+.theme-switcher,
+.theme-switcher-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: var(--background-secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 14px;
+    font-weight: 500;
+    margin-left: 12px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.theme-switcher-btn .theme-icon {
+    font-size: 16px;
+    line-height: 1;
+}
+
+.theme-switcher-btn .theme-label {
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.theme-switcher:hover,
+.theme-switcher-btn:hover {
+    background: var(--accent-primary);
+    color: white;
+    border-color: var(--accent-primary);
+    transform: scale(1.02);
+}
+
+.theme-switcher:focus,
+.theme-switcher-btn:focus {
+    outline: 2px solid var(--accent-primary);
+    outline-offset: 2px;
+}
+
+/* Show appropriate icon and label based on current theme */
+/* In dark mode: show sun icon + "Light" label (to switch to light) */
+html[data-theme='dark'] .theme-switcher-btn .sun-icon,
+html[data-theme='dark'] .theme-switcher-btn .light-label {
+    display: inline;
+}
+html[data-theme='dark'] .theme-switcher-btn .moon-icon,
+html[data-theme='dark'] .theme-switcher-btn .dark-label {
+    display: none;
+}
+
+/* In light mode: show moon icon + "Dark" label (to switch to dark) */
+html:not([data-theme='dark']) .theme-switcher-btn .sun-icon,
+html:not([data-theme='dark']) .theme-switcher-btn .light-label {
+    display: none;
+}
+html:not([data-theme='dark']) .theme-switcher-btn .moon-icon,
+html:not([data-theme='dark']) .theme-switcher-btn .dark-label {
+    display: inline;
+}
+
+/* Legacy theme-switcher icon support */
+.theme-switcher .icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+}
+
+/* Show appropriate icon based on current theme (to indicate next state) */
+/* When in dark mode, show sun icon to indicate switching to light mode */
+/* When in light mode, show moon icon to indicate switching to dark mode */
+html[data-theme='dark'] .theme-switcher .sun-icon {
+    display: flex;
+}
+html[data-theme='dark'] .theme-switcher .moon-icon {
+    display: none;
+}
+
+html:not([data-theme='dark']) .theme-switcher .sun-icon {
+    display: none;
+}
+html:not([data-theme='dark']) .theme-switcher .moon-icon {
+    display: flex;
+}
+
+/* Floating button fallback for pages that don't have it in header */
+body:not(.header-theme-switcher) .theme-switcher.floating {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

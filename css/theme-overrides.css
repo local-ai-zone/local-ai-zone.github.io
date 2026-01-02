@@ -1,0 +1,650 @@
+/* Theme Overrides - Fixes hardcoded colors that don't respect dark mode */
+/* This file should be loaded after premium-styles.css */
+
+/* Filter Section */
+.premium-filter-section {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Results Header */
+.results-header {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.results-count {
+    color: var(--text-primary) !important;
+}
+
+/* Model Card */
+.premium-model-card {
+    background: linear-gradient(135deg, var(--card-background) 0%, var(--background-secondary) 100%) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.model-name {
+    color: var(--text-primary) !important;
+}
+
+.model-description {
+    color: var(--text-secondary) !important;
+}
+
+.repository-name {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+.model-metadata {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.metadata-label {
+    color: var(--text-secondary) !important;
+}
+
+.metadata-value {
+    color: var(--text-primary) !important;
+}
+
+.quantization-badge {
+    background: linear-gradient(135deg, var(--background-secondary), var(--border-color)) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Buttons */
+.btn-secondary {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.copy-btn {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.copy-btn:hover {
+    background: var(--background-primary) !important;
+    border-color: var(--accent-primary) !important;
+    color: var(--accent-primary) !important;
+}
+
+/* Pagination */
+.premium-pagination-container {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.pagination-btn {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Header */
+.premium-header {
+    background: color-mix(in srgb, var(--background-primary) 95%, transparent) !important;
+}
+
+.header-stats .stat-card {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.stat-value {
+    color: var(--accent-primary) !important;
+}
+
+.stat-card .stat-label {
+    color: var(--text-secondary) !important;
+}
+
+/* Search and Select Inputs */
+.premium-search-input {
+    width: 300px !important; /* Increased width */
+    padding: var(--space-2) var(--space-6) var(--space-2) var(--space-5) !important; /* Increased padding */
+    border: 1px solid var(--border-color) !important;
+    border-radius: var(--radius-md) !important;
+    font-size: 0.9rem !important; /* Increased font size */
+    background: var(--card-background) !important;
+    color: var(--text-primary) !important;
+    transition: var(--transition-fast) !important;
+    font-family: var(--font-family) !important;
+    height: auto !important; /* Ensure it's not constrained */
+}
+
+.premium-search-input:focus {
+    outline: none !important;
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-primary) 25%, transparent) !important;
+}
+
+.premium-select {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+    padding: var(--space-2) var(--space-2) !important; /* Increased padding */
+    font-size: 0.9rem !important; /* Increased font size */
+}
+
+/* AI Tools Navigation */
+.ai-tools-navigation {
+    background: linear-gradient(135deg, var(--background-secondary) 0%, var(--border-color) 100%) !important;
+    border-color: var(--border-color) !important;
+}
+
+.tool-button {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.tool-name {
+    color: var(--text-primary) !important;
+}
+
+.tool-description {
+    color: var(--text-secondary) !important;
+}
+
+.tool-icon {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* System Requirements Section */
+.system-requirements {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.requirement-item {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+}
+
+.requirement-label {
+    color: var(--text-secondary) !important;
+}
+
+.requirement-value {
+    color: var(--text-primary) !important;
+}
+
+/* Filter Controls Container */
+.filter-controls {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Active Filters Container */
+.active-filters-container {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+    display: none; /* Only show when active filters exist */
+}
+
+.active-filters-label {
+    color: var(--text-primary) !important;
+}
+
+/* Active Filter Tags */
+.active-filter-tag {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Body background fix */
+body {
+    background: var(--background-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Footer fixes */
+.premium-footer {
+    background: var(--background-secondary) !important;
+    color: var(--text-primary) !important;
+}
+
+.footer-disclaimer {
+    background: color-mix(in srgb, var(--background-primary) 5%, transparent) !important;
+    border-left-color: var(--accent-primary) !important;
+}
+
+.footer-disclaimer .disclaimer-text {
+    color: var(--text-secondary) !important;
+}
+
+.footer-disclaimer .disclaimer-text strong {
+    color: var(--accent-primary) !important;
+}
+
+/* GGUF Banner */
+.gguf-banner {
+    background: linear-gradient(135deg, var(--background-secondary) 0%, var(--card-background) 100%) !important;
+    border-bottom-color: var(--accent-primary) !important;
+}
+
+.banner-text {
+    color: var(--text-primary) !important;
+    text-shadow: 0 0 10px var(--accent-primary) !important;
+}
+
+.banner-tagline {
+    color: var(--text-secondary) !important;
+}
+
+/* GGUF Header Button */
+.gguf-header-btn {
+    background: linear-gradient(135deg, var(--background-secondary), var(--card-background)) !important;
+    border-color: var(--accent-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+.gguf-header-btn:hover {
+    border-color: var(--accent-hover) !important;
+}
+
+.btn-text {
+    color: var(--text-primary) !important;
+}
+
+/* GGUF Footer Attribution */
+.gguf-footer-attribution {
+    background: var(--background-secondary) !important;
+    border-top-color: var(--accent-primary) !important;
+}
+
+.attribution-text {
+    color: var(--text-secondary) !important;
+}
+
+.attribution-link {
+    color: var(--accent-primary) !important;
+}
+
+.attribution-link:hover {
+    color: var(--text-primary) !important;
+    text-shadow: 0 0 8px var(--accent-primary) !important;
+}
+
+.attribution-tagline {
+    color: var(--text-secondary) !important;
+}
+
+/* Footer Links */
+.link-group h4 {
+    color: var(--text-primary) !important;
+}
+
+.footer-link {
+    color: var(--text-secondary) !important;
+}
+
+.footer-link:hover {
+    color: var(--accent-primary) !important;
+}
+
+/* Footer Stats */
+.footer-stat {
+    background: color-mix(in srgb, var(--text-primary) 5%, transparent) !important;
+}
+
+.footer-stat .stat-number {
+    color: var(--text-primary) !important;
+}
+
+.footer-stat .stat-label {
+    color: var(--text-secondary) !important;
+}
+
+/* Footer Bottom */
+.footer-bottom {
+    border-top-color: var(--background-secondary) !important;
+    color: var(--text-secondary) !important;
+}
+
+.social-link {
+    color: var(--text-secondary) !important;
+}
+
+.social-link:hover {
+    color: var(--accent-primary) !important;
+}
+
+/* Clear Filters Button */
+.clear-filters-btn {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-secondary) !important;
+}
+
+.clear-filters-btn:hover {
+    background: var(--background-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* View Options */
+.view-options {
+    background: var(--background-secondary) !important;
+}
+
+.view-btn {
+    color: var(--text-secondary) !important;
+}
+
+.view-btn.active,
+.view-btn:hover {
+    background: var(--card-background) !important;
+    color: var(--accent-primary) !important;
+}
+
+/* Tool Button Specifics */
+.tool-button.lm-studio:hover {
+    border-color: var(--accent-primary) !important;
+}
+
+.tool-button.lm-studio:hover .tool-icon {
+    background: var(--background-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+.tool-button.ollama:hover {
+    border-color: var(--accent-primary) !important;
+}
+
+.tool-button.ollama:hover .tool-icon {
+    background: var(--background-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+.tool-button.gguf-loader:hover {
+    border-color: var(--accent-primary) !important;
+}
+
+.tool-button.gguf-loader:hover .tool-icon {
+    background: var(--background-primary) !important;
+    border-color: var(--accent-primary) !important;
+}
+
+/* Requirement Items */
+.requirement-item {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+}
+
+.requirement-item:hover {
+    border-color: var(--accent-primary) !important;
+}
+
+.requirement-label {
+    color: var(--text-secondary) !important;
+}
+
+.requirement-value {
+    color: var(--text-primary) !important;
+}
+
+.gpu-required .requirement-value {
+    color: var(--error-600) !important;
+}
+
+/* Active Filter Clear Button */
+.clear-all-active-filters {
+    background: color-mix(in srgb, var(--error-600) 10%, transparent) !important;
+    border-color: color-mix(in srgb, var(--error-600) 20%, transparent) !important;
+    color: var(--error-600) !important;
+}
+
+.clear-all-active-filters:hover {
+    background: color-mix(in srgb, var(--error-600) 20%, transparent) !important;
+    border-color: color-mix(in srgb, var(--error-600) 30%, transparent) !important;
+}
+
+/* Remove Filter Button */
+.remove-filter-btn {
+    background: color-mix(in srgb, var(--primary-600) 20%, transparent) !important;
+    color: var(--primary-600) !important;
+}
+
+.remove-filter-btn:hover {
+    background: color-mix(in srgb, var(--primary-600) 30%, transparent) !important;
+    color: var(--primary-700) !important;
+}
+
+/* Loading Screen */
+.premium-loading-screen {
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-hover) 100%) !important;
+}
+
+/* Local AI Zone Title Section */
+.local-ai-zone-title {
+    background: var(--background-secondary) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.local-ai-zone-title .main-title {
+    color: var(--text-primary) !important;
+}
+
+.local-ai-zone-title .main-description {
+    color: var(--text-secondary) !important;
+}
+
+/* Theme Switcher in About Page Header */
+.header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+}
+
+.header .theme-switcher {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: var(--background-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 18px !important;
+    margin-left: 10px !important;
+}
+
+.header .theme-switcher:hover {
+    background: var(--accent-primary) !important;
+    color: white !important;
+    border-color: var(--accent-primary) !important;
+    transform: scale(1.05) !important;
+}
+
+.header .theme-switcher:focus {
+    outline: 2px solid var(--accent-primary) !important;
+    outline-offset: 2px !important;
+}
+
+/* Theme Switcher in Navigation */
+.main-nav, .nav {
+    display: flex !important;
+    align-items: center !important;
+    gap: 15px !important;
+}
+
+.main-nav .theme-switcher, .nav .theme-switcher {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 50% !important;
+    background: var(--background-secondary) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    font-size: 18px !important;
+    margin-left: 10px !important;
+    flex-shrink: 0 !important;
+}
+
+.main-nav .theme-switcher:hover, .nav .theme-switcher:hover {
+    background: var(--accent-primary) !important;
+    color: white !important;
+    border-color: var(--accent-primary) !important;
+    transform: scale(1.05) !important;
+}
+
+.main-nav .theme-switcher:focus, .nav .theme-switcher:focus {
+    outline: 2px solid var(--accent-primary) !important;
+    outline-offset: 2px !important;
+}
+
+/* Blog Article Card and Page Styles */
+.article-card {
+    background-color: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.article-card:hover {
+    box-shadow: 0 8px 20px color-mix(in srgb, var(--accent-primary) 10%, transparent) !important;
+}
+
+.article-card-title {
+    color: var(--accent-primary) !important;
+}
+
+.article-card-excerpt {
+    color: var(--text-secondary) !important;
+}
+
+.read-more-link {
+    color: var(--accent-primary) !important;
+}
+
+.read-more-link:hover {
+    color: var(--accent-hover) !important;
+}
+
+/* Single Blog Article Page Styles */
+.blog-article {
+    background: var(--card-background) !important;
+    color: var(--text-primary) !important;
+}
+
+.article-header {
+    border-bottom-color: var(--border-color) !important;
+}
+
+.article-title {
+    color: var(--text-primary) !important;
+}
+
+.article-content {
+    color: var(--text-primary) !important;
+}
+
+.article-content h2,
+.article-content h3,
+.article-content h4 {
+    color: var(--text-primary) !important;
+}
+
+.article-content p {
+    color: var(--text-primary) !important;
+}
+
+.article-content a {
+    color: var(--accent-primary) !important;
+}
+
+.article-content a:hover {
+    color: var(--accent-hover) !important;
+}
+
+.article-content strong {
+    color: var(--text-primary) !important;
+}
+
+.article-content pre {
+    background: var(--background-secondary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.article-content code {
+    background: var(--background-secondary) !important;
+    color: var(--accent-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.article-content blockquote {
+    background: var(--background-secondary) !important;
+    color: var(--text-secondary) !important;
+    border-left-color: var(--accent-primary) !important;
+}
+
+.article-content table th {
+    background: var(--background-secondary) !important;
+    color: var(--text-primary) !important;
+    border-color: var(--border-color) !important;
+}
+
+.article-content table tr:nth-child(2n) {
+    background: var(--background-secondary) !important;
+}
+
+.article-content table td,
+.article-content table th {
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.article-meta,
+.article-author,
+.article-date,
+.article-updated {
+    color: var(--text-secondary) !important;
+}
+
+.article-category {
+    background: color-mix(in srgb, var(--accent-primary) 10%, transparent) !important;
+    color: var(--accent-primary) !important;
+}
+
+.related-articles-section .article-card {
+    background: var(--card-background) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.related-articles-section .article-card-title {
+    color: var(--text-primary) !important;
+}
+
+.related-articles-section .article-card-excerpt {
+    color: var(--text-secondary) !important;
+}
+
+.related-articles-section .read-more-link {
+    color: var(--accent-primary) !important;
+}
+
+.related-articles-section .article-card:hover .read-more-link {
+    color: var(--accent-hover) !important;
+}

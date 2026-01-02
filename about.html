@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - Local AI Zone</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/contact-form.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/theme-overrides.css">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+    
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header a {
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .header img {
+            width: 80px;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .content h2 {
+            color: var(--accent-primary); /* Green accent */
+            border-bottom: 2px solid var(--accent-primary);
+            padding-bottom: 10px;
+        }
+        .content p {
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+        .profile-link {
+            display: inline-block;
+            background-color: var(--accent-primary);
+            color: var(--card-background);
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+        .profile-link:hover {
+            background-color: var(--accent-hover);
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.1em;
+        }
+        .nav a:hover {
+            color: var(--accent-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="index.html">
+                <img src="logo.svg" alt="Local AI Zone Logo">
+                <h1>Local AI Zone</h1>
+            </a>
+            <!-- Theme Switcher -->
+            <button id="theme-toggle-button" class="theme-switcher" aria-label="Toggle dark mode">
+                <span class="icon sun-icon">☀️</span>
+                <span class="icon moon-icon">🌙</span>
+            </button>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="services.html">Services</a>
+            <a href="blog.html">Blog</a>
+        </nav>
+
+        <div class="content">
+            <h2>About the Project</h2>
+            <p>
+                <strong>Local AI Zone</strong> was created to demystify the world of local artificial intelligence. Our goal is to provide a curated, easy-to-navigate resource for discovering and running powerful AI models on your own personal computer. We believe in the power of private, offline, and accessible AI for everyone.
+            </p>
+            
+            <h2>About the Creator</h2>
+            <p>
+                My name is <strong>Hussain Nazary</strong>, and I am a passionate software developer and the founder of this project. I specialize in creating user-friendly desktop applications that leverage the power of local AI.
+            </p>
+            <p>
+                My flagship project is the <a href="https://github.com/GGUFloader/gguf-loader" target="_blank" style="color: var(--accent-primary);">GGUF Loader</a>, a popular open-source tool that makes it simple for anyone to run GGUF models on their computer. My work is driven by a commitment to open-source principles and the belief that powerful technology should be in the hands of the user.
+            </p>
+            <p>
+                I created Local AI Zone to be the central hub for my work and a resource for the entire community.
+            </p>
+            <a href="https://github.com/hussainnazary2" class="profile-link" target="_blank">View My GitHub Profile</a>
+        </div>
+    </div>
+
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit-btn" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+        
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+    <!-- Theme Switcher Button -->
+    <button id="theme-toggle-button" class="theme-switcher" aria-label="Toggle theme">
+        <svg class="icon sun-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 9c-1.657 0-3 1.343-3 3s1.343 3 3 3 3-1.343 3-3-1.343-3-3-3zm0 4c-.552 0-1-.448-1-1s.448-1 1-1 1 .448 1 1-.448 1-1 1zM12 2c.552 0 1 .448 1 1v2c0 .552-.448 1-1 1s-1-.448-1-1V3c0-.552.448-1 1-1zm0 18c.552 0 1 .448 1 1v2c0 .552-.448 1-1 1s-1-.448-1-1v-2c0-.552.448-1 1-1zM4.929 4.929c.391-.391 1.024-.391 1.414 0l1.414 1.414c.391.391.391 1.024 0 1.414-.195.195-.451.293-.707.293s-.512-.098-.707-.293L4.929 6.343c-.391-.391-.391-1.024 0-1.414zm12.728 12.728c.391-.391 1.024-.391 1.414 0l1.414 1.414c.391.391.391 1.024 0 1.414-.195.195-.451.293-.707.293s-.512-.098-.707-.293l-1.414-1.414c-.391-.391-.391-1.024 0-1.414zM2 12c0-.552.448-1 1-1h2c.552 0 1 .448 1 1s-.448 1-1 1H3c-.552 0-1-.448-1-1zm18 0c0-.552.448-1 1-1h2c.552 0 1 .448 1 1s-.448 1-1 1h-2c-.552 0-1-.448-1-1zM6.343 17.657c.391-.391 1.024-.391 1.414 0l1.414 1.414c.391.391.391 1.024 0 1.414-.195.195-.451.293-.707.293s-.512-.098-.707-.293l-1.414-1.414c-.391-.391-.391-1.024 0-1.414zm12.728-12.728c.391-.391 1.024-.391 1.414 0l1.414 1.414c.391.391.391 1.024 0 1.414-.195.195-.451.293-.707.293s-.512-.098-.707-.293l-1.414-1.414c-.391-.391-.391-1.024 0-1.414z"></path>
+        </svg>
+        <svg class="icon moon-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 11.5c-3.032 0-5.5 2.467-5.5 5.5s2.468 5.5 5.5 5.5 5.5-2.467 5.5-5.5-2.468-5.5-5.5-5.5zm0 9c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5zM12.5 0c.276 0 .5.224.5.5v3c0 .276-.224.5-.5.5s-.5-.224-.5-.5v-3c0-.276.224-.5.5-.5zM6.018 3.873c.195.195.451.293.707.293s.512-.098.707-.293l2.121-2.121c.391-.391.391-1.024 0-1.414s-1.024-.391-1.414 0L6.018 2.459c-.391.391-.391-1.024 0 1.414zM18.982 3.873c.195.195.451.293.707.293s.512-.098.707-.293l2.121-2.121c.391-.391.391-1.024 0-1.414s-1.024-.391-1.414 0l-2.121 2.121c-.391.391-.391-1.024 0 1.414z"></path>
+        </svg>
+    </button>
+
+    <script src="js/components/contact-form.js"></script>
+    <script src="js/theme-switcher.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+/* Custom Styles for Local AI Zone */
+
+/* Navigation Bar */
+.main-nav {
+    background-color: #1a1a1a;
+    padding: 15px 0;
+    border-bottom: 1px solid #333;
+    text-align: center;
+}
+
+.main-nav a {
+    color: #e0e0e0;
+    text-decoration: none;
+    margin: 0 20px;
+    font-size: 1.1em;
+    font-weight: 500;
+    transition: color 0.3s;
+    display: inline-block;
+    padding: 10px 15px;
+    min-height: 44px; /* Ensure adequate touch target */
+    line-height: 24px;
+}
+
+.main-nav a:hover, .main-nav a.active {
+    color: #4CAF50; /* Green accent */
+}
+
+/* Responsive navigation for mobile */
+@media (max-width: 768px) {
+    .main-nav {
+        padding: 12px 0;
+    }
+    
+    .main-nav a {
+        margin: 0 10px;
+        font-size: 1em;
+        padding: 12px 12px;
+        min-height: 48px; /* Larger touch target on mobile */
+    }
+}
+
+@media (max-width: 480px) {
+    .main-nav {
+        padding: 10px 0;
+    }
+    
+    .main-nav a {
+        margin: 0 5px;
+        font-size: 0.9em;
+        padding: 12px 10px;
+        min-height: 48px;
+    }
+}
+
+@media (max-width: 375px) {
+    .main-nav a {
+        margin: 0 3px;
+        font-size: 0.85em;
+        padding: 12px 8px;
+    }
+}
+
+@media (max-width: 320px) {
+    .main-nav {
+        padding: 8px 0;
+    }
+    
+    .main-nav a {
+        margin: 0 2px;
+        font-size: 0.8em;
+        padding: 12px 6px;
+        min-height: 48px;
+    }
+}
+
+/* Hire Me Button */
+.hire-me-btn {
+    display: inline-block;
+    background-color: #4CAF50;
+    color: #ffffff;
+    padding: 12px 25px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1em;
+    transition: background-color 0.3s, transform 0.3s;
+    margin-top: 20px;
+    border: none;
+    cursor: pointer;
+}
+
+.hire-me-btn:hover {
+    background-color: #45a049;
+    transform: translateY(-2px);
+}
+
+/* GGUF Loader Button on Model Cards */
+.gguf-loader-run-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, var(--gguf-dark), var(--gguf-neural-gray));
+    color: var(--gguf-text-light);
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: 600;
+    transition: all 300ms ease;
+    border: 1px solid var(--gguf-electric-blue);
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 0 8px var(--gguf-electric-blue);
+    z-index: 1; /* Ensure button appears above any background effects */
+}
+
+.gguf-loader-run-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.2), transparent);
+    transition: left 0.5s;
+    z-index: -1; /* Ensure animation is behind the button text */
+}
+
+.gguf-loader-run-btn:hover::before {
+    left: 100%;
+}
+
+.gguf-loader-run-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0, 212, 255, 0.5);
+    border-color: var(--gguf-neon-green);
+    color: var(--gguf-text-light);
+}
+
+.gguf-loader-run-btn .btn-icon {
+    font-size: 1.2em;
+    filter: drop-shadow(0 0 6px var(--gguf-electric-blue));
+}
+
+/* Enhanced styling for GGUF Loader button to make it stand out */
+.gguf-loader-run-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, var(--gguf-dark), var(--gguf-neural-gray));
+    color: var(--gguf-text-light);
+    text-decoration: none;
+    border-radius: 8px; /* Increased border radius for better visibility */
+    font-weight: 600;
+    transition: all 300ms ease;
+    border: 2px solid var(--gguf-electric-blue); /* Increased border width */
+    box-shadow: 0 0 15px rgba(0, 212, 255, 0.4); /* Increased glow */
+    position: relative;
+    overflow: hidden;
+    text-shadow: 0 0 10px var(--gguf-electric-blue);
+    z-index: 1;
+}
+
+.gguf-loader-run-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3), transparent);
+    transition: left 0.5s;
+    z-index: -1;
+}
+
+.gguf-loader-run-btn:hover::before {
+    left: 100%;
+}
+
+.gguf-loader-run-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(0, 212, 255, 0.7); /* Enhanced glow on hover */
+    border-color: var(--gguf-neon-green);
+    color: var(--gguf-text-light);
+    text-shadow: 0 0 15px var(--gguf-electric-blue);
+}
+
+.gguf-loader-run-btn .btn-icon {
+    font-size: 1.3em;
+    filter: drop-shadow(0 0 8px var(--gguf-electric-blue));
+}
+
+/* Ensure button is visually distinct in dark mode too */
+@media (prefers-color-scheme: dark) {
+    .gguf-loader-run-btn {
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        border: 2px solid var(--gguf-electric-blue);
+    }
+    
+    .gguf-loader-run-btn:hover {
+        box-shadow: 0 6px 30px rgba(0, 212, 255, 0.8);
+    }
+}
+
+/* Featured Articles Section */
+.featured-articles {
+    padding: 50px 0;
+    border-top: 1px solid #333;
+}
+
+.articles-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.articles-title {
+    font-size: 2.5em;
+    color: #ffffff;
+    margin: 0;
+}
+
+.articles-subtitle {
+    font-size: 1.2em;
+    color: #a0a0a0;
+    margin-top: 10px;
+}
+
+/* Horizontally Scrolling Grid */
+.articles-grid {
+    display: flex;
+    overflow-x: auto;
+    padding: 20px;
+    gap: 20px;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on mobile */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: #4CAF50 #1e1e1e; /* Firefox */
+}
+
+/* Scrollbar styling for Webkit browsers (Chrome, Safari) */
+.articles-grid::-webkit-scrollbar {
+    height: 8px;
+}
+
+.articles-grid::-webkit-scrollbar-track {
+    background: #1e1e1e;
+    border-radius: 10px;
+}
+
+.articles-grid::-webkit-scrollbar-thumb {
+    background-color: #4CAF50;
+    border-radius: 10px;
+    border: 2px solid #1e1e1e;
+}
+
+.article-card {
+    flex: 0 0 320px; /* Set a fixed width for each card */
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+    color: #e0e0e0;
+    transition: transform 0.3s, box-shadow 0.3s;
+    display: flex;
+    flex-direction: column;
+}
+
+.article-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 255, 80, 0.1);
+}
+
+.article-card-content {
+    padding: 25px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.article-card-title {
+    font-size: 1.4em;
+    color: #4CAF50;
+    margin: 0 0 15px 0;
+    height: 3em; /* Limit to 2 lines */
+    overflow: hidden;
+}
+
+.article-card-excerpt {
+    font-size: 1em;
+    line-height: 1.6;
+    margin: 0 0 20px 0;
+    flex-grow: 1;
+}
+
+.article-card-footer {
+    margin-top: auto;
+}
+
+.read-more-link {
+    color: #ffffff;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.read-more-link:hover {
+    text-decoration: underline;
+}

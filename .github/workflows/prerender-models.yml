@@ -1,0 +1,212 @@
+name: Pre-render Model Pages
+
+on:
+  schedule:
+    # Run daily at 2:00 AM UTC (after daily data update)
+    - cron: '0 2 * * *'
+  workflow_dispatch: # Allow manual triggering
+  workflow_run:
+    workflows: ["Daily GGUF Model Data Update"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  issues: write
+
+jobs:
+  prerender:
+    runs-on: ubuntu-latest
+    # Only run if data update was successful or if manually triggered
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
+    
+    # Set timeout to 45 minutes (within GitHub Actions limits)
+    timeout-minutes: 45
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: |
+        npm ci
+        # Install Puppeteer with Chromium (without saving to package.json)
+        npm install puppeteer --no-save
+        
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+    - name: Clean up any package-lock.json changes
+      run: |
+        # Reset any changes to package-lock.json that might have occurred during npm install
+        git checkout -- package-lock.json 2>/dev/null || true
+        
+    - name: Generate minimal model pages
+      id: prerender
+      run: |
+        echo "Starting minimal page generation with enhanced features..."
+        echo "Features included:"
+        echo "- Hardware requirements calculation"
+        echo "- Enhanced engagement metrics"
+        echo "- System requirements display"
+        echo "- Hardware compatibility indicators"
+        node scripts/generate-minimal-pages.js
+        echo "Minimal page generation completed with all features"
+        
+    - name: Check for generated files
+      id: check_files
+      run: |
+        if [ -d "models" ] && [ "$(ls -A models)" ]; then
+          FILE_COUNT=$(ls -1 models/*.html 2>/dev/null | wc -l)
+          echo "Generated $FILE_COUNT HTML files in models/"
+          echo "files_generated=true" >> $GITHUB_OUTPUT
+          echo "file_count=$FILE_COUNT" >> $GITHUB_OUTPUT
+        else
+          echo "No files were generated in models/"
+          echo "files_generated=false" >> $GITHUB_OUTPUT
+          echo "file_count=0" >> $GITHUB_OUTPUT
+        fi
+        
+    - name: Commit and push pre-rendered files
+      if: steps.check_files.outputs.files_generated == 'true'
+      id: commit_files
+      run: |
+        # Check if models directory exists and has files
+        if [ -d "models" ] && [ "$(ls -A models 2>/dev/null)" ]; then
+          git add models/
+          # Check if there are actually changes to commit
+          if git diff --cached --quiet; then
+            echo "No changes to commit - models files are already up to date"
+            echo "committed=false" >> $GITHUB_OUTPUT
+          else
+            git commit -m "Automated pre-rendering: Generated ${{ steps.check_files.outputs.file_count }} model pages $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+            - Pre-rendered top 1000 models by likes
+            - Generated static HTML files for better SEO
+            - Files saved in models/ directory
+            - Each model now has its own addressable URL
+            - Added hardware requirements calculation
+            - Enhanced engagement metrics display
+            - System requirements visualization
+            - Hardware compatibility indicators"
+            git push
+            echo "committed=true" >> $GITHUB_OUTPUT
+          fi
+        else
+          echo "No models directory or files found - this should not happen if files_generated is true"
+          echo "This indicates an issue with the file generation step"
+          echo "committed=false" >> $GITHUB_OUTPUT
+        fi        
+
+
+        
+    - name: Trigger GitHub Pages deployment
+      if: steps.check_files.outputs.files_generated == 'true' && steps.commit_files.outputs.committed == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          console.log('Triggering GitHub Pages rebuild for pre-rendered pages...');
+          try {
+            await github.rest.repos.requestPagesBuild({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            console.log('GitHub Pages rebuild triggered successfully');
+          } catch (error) {
+            console.log('Error triggering Pages rebuild:', error.message);
+          }
+          
+    - name: Generate pre-rendering summary
+      if: steps.check_files.outputs.files_generated == 'true'
+      run: |
+        echo "## Pre-rendering Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **Pre-rendering completed successfully**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "📊 **Generated Files**: ${{ steps.check_files.outputs.file_count }} HTML pages" >> $GITHUB_STEP_SUMMARY
+        echo "🎯 **Target**: Top 1000 models by likes" >> $GITHUB_STEP_SUMMARY
+        echo "📁 **Location**: \`models/\` directory" >> $GITHUB_STEP_SUMMARY
+        echo "🔗 **URLs**: Each model now accessible at \`/models/{model-slug}.html\`" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 **GitHub Pages deployment triggered**" >> $GITHUB_STEP_SUMMARY
+        echo "🗺️ **Sitemap**: Will be updated by SEO workflow" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Create issue on failure
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const title = `Model Pre-rendering Failed - ${new Date().toISOString().split('T')[0]}`;
+          const body = `## Automation Failure: Model Pre-rendering
+          
+          **Failure Type**: Pre-rendering Process
+          **Timestamp**: ${new Date().toISOString()}
+          **Workflow Run**: [${context.runId}](${context.payload.repository.html_url}/actions/runs/${context.runId})
+          
+          ### Error Details
+          The model pre-rendering workflow failed. Please check the workflow logs for detailed error information.
+          
+          ### Affected Components
+          - [x] Pre-rendered HTML files
+          - [ ] Dependencies  
+          - [ ] Deployment
+          - [ ] Sitemap updates
+          
+          ### Recommended Actions
+          1. Check the workflow logs for specific error messages
+          2. Verify Puppeteer is working correctly
+          3. Ensure the main site is accessible
+          4. Check if there are memory or timeout issues
+          5. Verify gguf_models.json file is accessible
+          
+          ### Pre-rendering Process
+          - **Target**: Top 1000 models by likes
+          - **Features**: Hardware requirements, engagement metrics, system requirements
+          - **Output**: models/ directory
+          - **Enhanced**: Hardware compatibility indicators
+          
+          ### Next Steps
+          - Review and fix any issues with the pre-rendering script
+          - Re-run the workflow manually once issues are resolved
+          - Consider adjusting concurrency or timeout settings if needed
+          `;
+          
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: title,
+            body: body,
+            labels: ['automation', 'bug', 'prerendering']
+          });
+          
+    - name: Notify on success with changes
+      if: success() && steps.check_files.outputs.files_generated == 'true' && steps.commit_files.outputs.committed == 'true'
+      run: |
+        echo "✅ Model pre-rendering completed successfully"
+        echo "📊 Generated ${{ steps.check_files.outputs.file_count }} HTML files"
+        echo "🚀 GitHub Pages deployment triggered"
+        
+    - name: Notify on success without changes
+      if: success() && steps.check_files.outputs.files_generated == 'true' && steps.commit_files.outputs.committed == 'false'
+      run: |
+        echo "✅ Model pre-rendering completed successfully"
+        echo "📊 Generated ${{ steps.check_files.outputs.file_count }} HTML files"
+        echo "ℹ️ No changes to commit - files are already up to date"
+        
+    - name: Notify on no changes
+      if: success() && steps.check_files.outputs.files_generated == 'false'
+      run: |
+        echo "ℹ️ Pre-rendering completed - no files generated"
+        echo "📊 Check if models data is available"

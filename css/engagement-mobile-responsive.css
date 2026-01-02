@@ -1,0 +1,518 @@
+/* Engagement Metrics Mobile Responsive Design */
+/* Optimized for touch interaction and mobile viewing */
+
+/* Base engagement metrics styles for mobile optimization */
+.engagement-count {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    transition: var(--transition);
+    min-height: 24px; /* Ensure minimum touch target */
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+}
+
+.engagement-icon {
+    font-size: 0.875rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.engagement-number {
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+/* Engagement badges mobile optimization */
+.engagement-badge {
+    font-size: 0.625rem;
+    font-weight: 600;
+    padding: 0.125rem 0.375rem;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    margin-left: 0.5rem;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+/* Mobile-first responsive breakpoints for engagement metrics */
+
+/* Extra small mobile devices (320px - 374px) */
+@media (max-width: 374px) {
+    .model-metrics {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.375rem;
+    }
+    
+    .engagement-count {
+        font-size: 0.7rem;
+        gap: 0.2rem;
+        min-height: 28px; /* Larger touch target for small screens */
+        padding: 0.25rem 0.375rem;
+    }
+    
+    .engagement-icon {
+        font-size: 0.8rem;
+    }
+    
+    .engagement-badge {
+        font-size: 0.55rem;
+        padding: 0.1rem 0.3rem;
+        margin-left: 0.25rem;
+    }
+    
+    /* Stack metrics vertically on very small screens */
+    .download-count,
+    .engagement-count {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}
+
+/* Small mobile devices (375px - 479px) */
+@media (min-width: 375px) and (max-width: 479px) {
+    .model-metrics {
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+    
+    .engagement-count {
+        font-size: 0.7rem;
+        min-height: 32px; /* Touch-friendly size */
+        padding: 0.2rem 0.3rem;
+    }
+    
+    .engagement-icon {
+        font-size: 0.85rem;
+    }
+    
+    .engagement-badge {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.3rem;
+        margin-left: 0.25rem;
+    }
+    
+    /* Ensure metrics don't overflow */
+    .download-count,
+    .engagement-count {
+        max-width: calc(50% - 0.25rem);
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
+
+/* Standard mobile devices (480px - 767px) */
+@media (min-width: 480px) and (max-width: 767px) {
+    .model-metrics {
+        gap: 0.75rem;
+    }
+    
+    .engagement-count {
+        font-size: 0.75rem;
+        min-height: 36px; /* Comfortable touch target */
+        padding: 0.25rem 0.375rem;
+    }
+    
+    .engagement-icon {
+        font-size: 0.875rem;
+    }
+    
+    .engagement-badge {
+        font-size: 0.625rem;
+        padding: 0.125rem 0.375rem;
+        margin-left: 0.375rem;
+    }
+}
+
+/* Tablet portrait (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .model-metrics {
+        gap: 0.75rem;
+    }
+    
+    .engagement-count {
+        font-size: 0.8rem;
+        min-height: 32px;
+        padding: 0.2rem 0.3rem;
+    }
+    
+    .engagement-icon {
+        font-size: 0.9rem;
+    }
+    
+    .engagement-badge {
+        font-size: 0.65rem;
+        padding: 0.15rem 0.4rem;
+        margin-left: 0.4rem;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Ensure all engagement elements meet minimum touch target size */
+    .engagement-count {
+        min-height: 44px;
+        min-width: 44px;
+        padding: 0.5rem;
+        touch-action: manipulation;
+        border-radius: 8px;
+    }
+    
+    .engagement-badge {
+        min-height: 32px;
+        min-width: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.25rem 0.5rem;
+        touch-action: manipulation;
+    }
+    
+    /* Enhanced touch feedback */
+    .engagement-count:active {
+        transform: scale(0.95);
+        background-color: rgba(0, 0, 0, 0.05);
+        transition: transform 0.1s ease, background-color 0.1s ease;
+    }
+    
+    .engagement-badge:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+}
+
+/* Engagement filter controls mobile optimization */
+.range-filter-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.range-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.range-input {
+    flex: 1;
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    min-height: 44px; /* Touch-friendly */
+    box-sizing: border-box;
+}
+
+.range-separator {
+    color: var(--text-secondary);
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.range-slider-container {
+    position: relative;
+    height: 44px; /* Touch-friendly height */
+    display: flex;
+    align-items: center;
+}
+
+.range-slider {
+    position: absolute;
+    width: 100%;
+    height: 44px; /* Touch-friendly */
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+    pointer-events: none;
+    outline: none;
+}
+
+.range-slider::-webkit-slider-track {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+}
+
+.range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 24px; /* Touch-friendly */
+    width: 24px; /* Touch-friendly */
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    pointer-events: all;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.range-slider::-moz-range-track {
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    border: none;
+}
+
+.range-slider::-moz-range-thumb {
+    height: 24px; /* Touch-friendly */
+    width: 24px; /* Touch-friendly */
+    border-radius: 50%;
+    background: var(--primary-color);
+    cursor: pointer;
+    pointer-events: all;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.range-display {
+    text-align: center;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    padding: 0.25rem;
+    background: var(--background-color);
+    border-radius: var(--border-radius);
+}
+
+/* Mobile filter controls optimization */
+@media (max-width: 767px) {
+    .range-filter-container {
+        gap: 0.75rem;
+    }
+    
+    .range-inputs {
+        gap: 0.75rem;
+    }
+    
+    .range-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.75rem;
+        min-height: 48px; /* Larger touch target */
+    }
+    
+    .range-separator {
+        font-size: 1rem;
+        padding: 0 0.25rem;
+    }
+    
+    .range-slider-container {
+        height: 48px; /* Larger touch area */
+        margin: 0.5rem 0;
+    }
+    
+    .range-slider {
+        height: 48px;
+    }
+    
+    .range-slider::-webkit-slider-thumb {
+        height: 28px; /* Larger for mobile */
+        width: 28px;
+    }
+    
+    .range-slider::-moz-range-thumb {
+        height: 28px;
+        width: 28px;
+    }
+    
+    .range-display {
+        font-size: 0.875rem;
+        padding: 0.5rem;
+    }
+}
+
+/* Mobile filter toggle button */
+.mobile-filter-toggle {
+    display: none;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 1rem;
+    min-height: 48px; /* Touch-friendly */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.mobile-filter-toggle:hover {
+    background: var(--background-color);
+    border-color: var(--primary-color);
+}
+
+.mobile-filter-toggle:active {
+    transform: scale(0.98);
+}
+
+.filter-toggle-icon {
+    transition: transform 0.2s ease;
+}
+
+.mobile-swipe-indicator {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    padding: 0.5rem;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+@media (max-width: 767px) {
+    .mobile-filter-toggle {
+        display: flex;
+    }
+    
+    .filters-container.mobile-hidden {
+        display: none;
+    }
+    
+    .filters-container.mobile-visible {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        animation: slideDown 0.3s ease-out;
+    }
+    
+    .mobile-swipe-indicator {
+        display: flex;
+    }
+}
+
+/* Touch feedback styles */
+.touch-active {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+    transform: scale(0.98) !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .engagement-count {
+        border: 2px solid var(--text-secondary);
+    }
+    
+    .engagement-badge {
+        border: 2px solid currentColor;
+    }
+    
+    .range-slider::-webkit-slider-thumb {
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px var(--primary-color);
+    }
+    
+    .range-slider::-moz-range-thumb {
+        border: 3px solid white;
+        box-shadow: 0 0 0 2px var(--primary-color);
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    .engagement-count,
+    .engagement-badge,
+    .mobile-filter-toggle,
+    .range-slider {
+        transition: none !important;
+        animation: none !important;
+    }
+    
+    .touch-active {
+        transform: none !important;
+    }
+}
+
+/* Dark mode support for engagement metrics */
+@media (prefers-color-scheme: dark) {
+    .engagement-count {
+        color: #D1D5DB;
+    }
+    
+    .engagement-highlight {
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(220, 38, 38, 0.1));
+        border-color: rgba(239, 68, 68, 0.3);
+    }
+    
+    .range-input {
+        background: #374151;
+        border-color: #4B5563;
+        color: #F9FAFB;
+    }
+    
+    .range-display {
+        background: #374151;
+        color: #D1D5DB;
+    }
+    
+    .mobile-filter-toggle {
+        background: #374151;
+        border-color: #4B5563;
+        color: #F9FAFB;
+    }
+}
+
+/* Landscape orientation optimizations for mobile */
+@media (max-width: 767px) and (orientation: landscape) {
+    .model-metrics {
+        flex-direction: row;
+        gap: 0.5rem;
+    }
+    
+    .engagement-count {
+        font-size: 0.7rem;
+        min-height: 36px;
+        padding: 0.25rem 0.375rem;
+    }
+    
+    .engagement-badge {
+        font-size: 0.6rem;
+        padding: 0.125rem 0.3rem;
+        margin-left: 0.25rem;
+    }
+    
+    .range-slider-container {
+        height: 40px;
+    }
+    
+    .range-slider {
+        height: 40px;
+    }
+    
+    .range-slider::-webkit-slider-thumb {
+        height: 24px;
+        width: 24px;
+    }
+    
+    .range-slider::-moz-range-thumb {
+        height: 24px;
+        width: 24px;
+    }
+}
+
+/* Print styles for engagement metrics */
+@media print {
+    .engagement-count,
+    .engagement-badge {
+        color: black !important;
+        background: white !important;
+        border: 1px solid black !important;
+    }
+    
+    .mobile-filter-toggle,
+    .mobile-swipe-indicator,
+    .range-slider-container {
+        display: none !important;
+    }
+}

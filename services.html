@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stuck with GGUF or Local Inference? - Local AI Zone</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/contact-form.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/theme-overrides.css">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+    
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .container {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .header a {
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .header img {
+            width: 80px;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.1em;
+        }
+        .nav a:hover {
+            color: var(--accent-primary);
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .hero-section h2 {
+            font-size: 2.2em;
+            color: var(--accent-primary);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+        .hero-section .subheadline {
+            font-size: 1.3em;
+            color: var(--text-secondary);
+            margin-bottom: 0;
+        }
+        
+        /* Intro Section */
+        .intro-section {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+        .intro-section p {
+            font-size: 1.15em;
+            margin: 0;
+            line-height: 1.7;
+        }
+        
+        /* Help Section */
+        .help-section {
+            margin-bottom: 40px;
+        }
+        .help-section h3 {
+            font-size: 1.5em;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+        .help-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .help-list li {
+            font-size: 1.1em;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .help-list li:last-child {
+            border-bottom: none;
+        }
+        .help-list .check {
+            color: #22c55e;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+        
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 40px 30px;
+            margin-bottom: 40px;
+        }
+        .cta-section p {
+            font-size: 1.2em;
+            margin-bottom: 25px;
+            color: var(--text-primary);
+        }
+        .cta-button {
+            display: inline-block;
+            background-color: var(--accent-primary);
+            color: var(--card-background);
+            padding: 15px 30px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.15em;
+            transition: background-color 0.3s, transform 0.2s;
+        }
+        .cta-button:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+        
+        /* Credibility Section */
+        .credibility-section {
+            text-align: center;
+            padding: 30px 20px;
+            border-top: 1px solid var(--border-color);
+        }
+        .credibility-section p {
+            font-size: 1em;
+            color: var(--text-secondary);
+            margin: 8px 0;
+            line-height: 1.6;
+        }
+        .credibility-section p:first-child {
+            font-size: 1.05em;
+        }
+        .credibility-section .no-hype {
+            font-style: italic;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="index.html">
+                <img src="logo.svg" alt="Local AI Zone Logo">
+                <h1>Local AI Zone</h1>
+            </a>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="services.html">Services</a>
+            <a href="blog.html">Blog</a>
+            <!-- Theme Switcher -->
+            <button id="theme-toggle-button" class="theme-switcher" aria-label="Toggle dark mode">
+                <span class="icon sun-icon">☀️</span>
+                <span class="icon moon-icon">🌙</span>
+            </button>
+        </nav>
+
+        <!-- 1. Headline -->
+        <div class="hero-section">
+            <h2>Stuck with GGUF or local inference?</h2>
+            <p class="subheadline">Slow models, crashes, or memory issues? You're not alone.</p>
+        </div>
+
+        <!-- 2. Intro Paragraph -->
+        <div class="intro-section">
+            <p>Running AI locally should be empowering, not frustrating. But VRAM limits, cryptic errors, and random crashes can make it feel impossible. I've been there — and I've helped tons of people in the community get past these exact issues. If you're stuck, just reach out. No strings attached.</p>
+        </div>
+
+        <!-- 3. What I Can Help With -->
+        <div class="help-section">
+            <h3>Here's what I help with</h3>
+            <ul class="help-list">
+                <li><span class="check">✅</span> Fix model loading issues, out-of-memory errors, and crashes</li>
+                <li><span class="check">✅</span> Speed up slow inference on your CPU or GPU</li>
+                <li><span class="check">✅</span> Set up local AI pipelines that actually work</li>
+                <li><span class="check">✅</span> Build multi-user setups — share AI with your family, team, or classroom using private APIs</li>
+                <li><span class="check">✅</span> Get your local environment running stable, no cloud costs</li>
+            </ul>
+        </div>
+
+        <!-- 4. Call to Action -->
+        <div class="cta-section">
+            <p>Drop me a message with your setup — I'll do my best to point you in the right direction.</p>
+            <button type="button" class="cta-button" id="open-contact-btn">Ask for Help</button>
+        </div>
+
+        <!-- 5. Credibility -->
+        <div class="credibility-section">
+            <p>I'm just a local AI enthusiast who runs hundreds of models and loves helping others do the same.</p>
+            <p class="no-hype">No fees, no upsells, no catch — just one community member helping another.</p>
+        </div>
+    </div>
+
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Let's Figure This Out</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Hey! Just tell me what's going on:
+
+• What model are you trying to run?
+• Your OS (Windows/Mac/Linux)
+• GPU or CPU you're using
+• What's happening? (error message, crash, slow, etc.)
+
+Don't worry about formatting — just describe the problem and I'll see what I can do. Talk soon! 🙂"
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit-btn" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+        
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+    <script src="js/components/contact-form.js"></script>
+    <script src="js/theme-switcher.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+            
+            // Open contact form when CTA button is clicked
+            const openContactBtn = document.getElementById('open-contact-btn');
+            const contactPanel = document.getElementById('contact-form-panel');
+            
+            if (openContactBtn && contactPanel) {
+                openContactBtn.addEventListener('click', () => {
+                    contactPanel.classList.add('open');
+                    contactPanel.setAttribute('aria-hidden', 'false');
+                    document.getElementById('contact-name').focus();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
