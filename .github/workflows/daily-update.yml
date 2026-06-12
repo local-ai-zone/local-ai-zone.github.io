@@ -47,10 +47,10 @@ jobs:
         attempt=1
         
         # Prepare enhanced command with optimal configuration
-        FETCH_CMD="python scripts/simplified_gguf_fetcher.py download --verbose"
+        FETCH_CMD="python scripts/simplified_gguf_fetcher.py download --verbose --incremental"
         if [ -n "$HF_TOKEN" ]; then
           FETCH_CMD="$FETCH_CMD --token $HF_TOKEN"
-          echo "Using authenticated Hugging Face API requests"
+          echo "Using authenticated Hugging Face API requests in INCREMENTAL mode (last 7 days only)"
         else
           echo "Warning: No HF_TOKEN provided, using unauthenticated requests (may hit rate limits)"
         fi
