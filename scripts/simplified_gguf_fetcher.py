@@ -2,15 +2,18 @@
 """
 Simplified GGUF Fetcher
 
-A two-phase system that downloads model data from Hugging Face API once,
+A two-phase system that downloads ALL model data in ONE API call,
 then processes it locally to extract essential GGUF model information with
 integrated spam filtering.
 
-Phase 1 (Download): Fetch recent models sorted by createdAt, save raw data
+Phase 1 (Download): Fetch recent models with full=True (single API call), save raw data
 Phase 2 (Process): Extract required fields from saved data, apply spam filtering, 
                    filter by 10+ likes, generate output
 
+No per-model API calls needed - all data (siblings, cardData, etc.) comes from the listing call.
+
 Enhanced with:
+- Single API call for all data (full=True parameter)
 - Rate limiting for API calls
 - Retry logic with exponential backoff
 - Better memory management for large datasets
@@ -25,8 +28,10 @@ import argparse
 import json
 import logging
 import os
+import re
 import sys
 import time
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timedelta
 from functools import wraps
@@ -120,7 +125,7 @@ class SimplifiedGGUFetcher:
     Main class for fetching and processing GGUF model data from Hugging Face.
     
     Implements a two-phase approach:
-    1. Download: Fetch recent models sorted by createdAt (SINGLE API REQUEST)
+    1. Download: Fetch models with full=True (SINGLE API REQUEST with all data)
     2. Process: Extract required fields, filter by 10+ likes, generate output
     """
     
@@ -129,7 +134,7 @@ class SimplifiedGGUFetcher:
         'recent_days_limit': 90,
         'api_limit': 1000,
         'incremental_days_limit': 7,
-        'incremental_api_limit': 100,
+        'incremental_api_limit': 1000,
         'min_likes_threshold': 10,
         'max_workers': 10,
         'output_dir': '.',
@@ -268,11 +273,117 @@ class SimplifiedGGUFetcher:
         
         return siblings
     
+    def _normalize_base_model_name(self, model_id: str, model_name: str = '') -> str:
+        """
+        Normalize model name to a canonical form for cross-repo deduplication.
+        
+        Strips repo-specific prefixes/suffixes, uploader names, and quantization
+        markers to identify the same base model across different HuggingFace repos.
+        
+        Args:
+            model_id: Full HuggingFace model ID (e.g., 'unsloth/Qwen3-Coder-Next-GGUF')
+            model_name: Optional display name
+            
+        Returns:
+            Normalized canonical name for grouping
+        """
+        # Use model_id for normalization (more reliable than display name)
+        text = model_id.lower()
+        
+        # Remove uploader prefix (everything before the first '/')
+        if '/' in text:
+            text = text.split('/', 1)[1]
+        
+        # Remove common repo suffixes that don't change the base model
+        # Applied multiple times for compound suffixes
+        repo_suffixes = [
+            '-gguf', '-ggml', '-quantized', '-awq', '-gptq', '-exl2',
+            '-unsloth', '-exl3', '-mlx', '-kquant', '-imatrix',
+            '-fp16', '-bf16', '-q4_k_m', '-q5_k_m', '-q8_0', '-q6_k',
+            '-iq4_xs', '-iq3_xxs', '-iq2_xxs', '-iq1_s',
+        ]
+        for _ in range(3):  # Multiple passes for compound suffixes
+            for suffix in repo_suffixes:
+                if text.endswith(suffix):
+                    text = text[:-len(suffix)]
+        
+        # Remove version suffixes like -v1, -v2, -chat, -instruct, -hf, etc.
+        version_patterns = [
+            r'-v\d+(\.\d+)?$', r'-chat(-hf)?$', r'-instruct(-v\d+(\.\d+)?)?$',
+            r'-base$', r'-raw$', r'-pretrained$', r'-finetuned$',
+            r'-distilled$', r'-merged$', r'-dpo$', r'-rlhf$', r'-sft$',
+            r'-(chat|instruct|base|raw|pretrained|finetuned)(-\w+)*$',
+        ]
+        for pattern in version_patterns:
+            text = re.sub(pattern, '', text)
+        
+        # Note: We intentionally keep size indicators (7B, 13B, 70B) as they
+        # differentiate model variants. Only remove if the name ends with size
+        # AND there's already a version number present (e.g., "llama-2-7b" → "llama 2")
+        # This is handled by the version_patterns above for common cases.
+        
+        # Normalize separators
+        text = re.sub(r'[-_]+', ' ', text).strip()
+        text = re.sub(r'\s+', ' ', text)
+        
+        return text
+
+    def _deduplicate_across_repos(self, models: List[Dict]) -> List[Dict]:
+        """
+        Deduplicate models across different HuggingFace repos.
+        
+        When the same base model (e.g., Qwen3-Coder-Next) is uploaded to multiple
+        repos, keep only the entry from the repo with the highest engagement
+        (likes + downloads). This prevents showing duplicate model info.
+        
+        Args:
+            models: List of processed model entries (after _extract_model_info)
+            
+        Returns:
+            Deduplicated list with one entry per unique base model
+        """
+        if not models:
+            return models
+        
+        # Group models by normalized base name
+        groups = defaultdict(list)
+        for model in models:
+            model_id = model.get('modelId', '')
+            model_name = model.get('modelName', '')
+            canonical = self._normalize_base_model_name(model_id, model_name)
+            groups[canonical].append(model)
+        
+        deduplicated = []
+        duplicates_removed = 0
+        
+        for canonical_name, group in groups.items():
+            if len(group) == 1:
+                deduplicated.append(group[0])
+                continue
+            
+            # Multiple repos have this model - pick the best one
+            # Score = likes * 10 + downloads (likes weighted higher)
+            best = max(group, key=lambda m: (
+                (m.get('likeCount', 0) or 0) * 10 + 
+                (m.get('downloadCount', 0) or 0)
+            ))
+            deduplicated.append(best)
+            duplicates_removed += len(group) - 1
+        
+        if duplicates_removed > 0:
+            self.logger.info(
+                f"Cross-repo deduplication: removed {duplicates_removed} duplicate "
+                f"entries from {len(groups)} unique base models"
+            )
+        
+        return deduplicated
+
     def download_data(self) -> None:
         """
         Phase 1: Download model data from Hugging Face API and save locally.
         
-        Makes a SINGLE API REQUEST to fetch recent GGUF models sorted by createdAt.
+        Makes a SINGLE API REQUEST with full=True to fetch all data including
+        siblings (file info) and cardData. No per-model API calls needed.
         """
         self.logger.info("=" * 50)
         self.logger.info("STARTING DOWNLOAD PHASE")
@@ -315,97 +426,70 @@ class SimplifiedGGUFetcher:
     
     def _fetch_recent_models(self) -> List:
         """
-        Fetch models uploaded recently with GGUF filter.
-        Makes a SINGLE API REQUEST sorted by createdAt.
+        Fetch ALL GGUF models from the last 3 months.
+        Uses full pagination to get every model, filtering by date locally.
         
         Returns:
-            List of model objects from recent period
+            List of all model objects from the last 3 months
         """
-        # Calculate date based on mode
+        cutoff_date = datetime.now() - timedelta(days=self.RECENT_DAYS_LIMIT)
         if self.incremental:
             cutoff_date = datetime.now() - timedelta(days=self.INCREMENTAL_DAYS_LIMIT)
-            api_limit = self.INCREMENTAL_API_LIMIT
-            mode_text = "INCREMENTAL"
-        else:
-            cutoff_date = datetime.now() - timedelta(days=self.RECENT_DAYS_LIMIT)
-            api_limit = self.API_LIMIT
-            mode_text = "FULL"
         
         self.logger.info(
-            f"{mode_text} MODE: Fetching GGUF models created since {cutoff_date.strftime('%Y-%m-%d')}"
+            f"Fetching ALL GGUF models since {cutoff_date.strftime('%Y-%m-%d')} (full pagination)"
         )
         
         try:
-            # Get models with GGUF filter, sorted by creation date (newest first)
-            self.logger.info("Making single API request to Hugging Face...")
             self.stats['api_calls'] += 1
+            self.logger.info("Fetching models from Hugging Face API (paginating through all)...")
             
-            models = list(self.api.list_models(
+            models = []
+            for model in self.api.list_models(
                 filter="gguf",
                 sort="createdAt",
-                direction=-1,  # Newest first
-                limit=api_limit
-            ))
+                direction=-1,
+                full=True,
+            ):
+                created_at = safe_getattr(model, 'created_at', None)
+                last_modified = safe_getattr(model, 'lastModified', None)
+                
+                # Use created_at if available, fallback to lastModified
+                model_date = created_at or last_modified
+                
+                # Stop if model is older than cutoff (sorted by lastModified desc)
+                if model_date and hasattr(model_date, 'timestamp'):
+                    if model_date.timestamp() < cutoff_date.timestamp():
+                        self.logger.info(f"Reached models older than cutoff, stopping at {len(models)} models")
+                        break
+                elif isinstance(model_date, str):
+                    try:
+                        from dateutil.parser import parse as parse_date
+                        parsed = parse_date(model_date)
+                        if parsed.timestamp() < cutoff_date.timestamp():
+                            self.logger.info(f"Reached models older than cutoff, stopping at {len(models)} models")
+                            break
+                    except Exception:
+                        pass  # Can't parse date, include the model
+                
+                models.append(model)
+                if len(models) % 500 == 0 and len(models) > 0:
+                    self.logger.info(f"  Fetched {len(models)} models so far...")
             
             self.logger.info(f"Retrieved {len(models)} models from API")
+            self.logger.info(f"  - Date range: {cutoff_date.strftime('%Y-%m-%d')} to now")
             
-            # Filter models by created_at field with safety buffer
-            recent_models = []
-            skipped_no_date = 0
-            skipped_too_old = 0
-            consecutive_old = 0
-            SAFETY_BUFFER = 10  # Number of consecutive old models before breaking
-            
-            for model in models:
-                try:
-                    if hasattr(model, 'created_at') and model.created_at:
-                        created_date = model.created_at
-                        if isinstance(created_date, str):
-                            try:
-                                created_date = datetime.fromisoformat(created_date.replace('Z', '+00:00'))
-                            except (ValueError, AttributeError):
-                                skipped_no_date += 1
-                                continue
-                        
-                        if isinstance(created_date, datetime):
-                            created_date = created_date.replace(tzinfo=None)
-                            
-                            if created_date >= cutoff_date:
-                                recent_models.append(model)
-                                consecutive_old = 0  # Reset counter
-                            else:
-                                skipped_too_old += 1
-                                consecutive_old += 1
-                                # Only break after seeing multiple consecutive old models
-                                if consecutive_old >= SAFETY_BUFFER:
-                                    self.logger.debug(f"Breaking after {SAFETY_BUFFER} consecutive old models")
-                                    break
-                        else:
-                            skipped_no_date += 1
-                    else:
-                        skipped_no_date += 1
-                except Exception as e:
-                    self.logger.debug(f"Error processing model {safe_getattr(model, 'id', 'unknown')}: {e}")
-                    skipped_no_date += 1
-                    continue
-            
-            days_text = f"last {self.INCREMENTAL_DAYS_LIMIT} days" if self.incremental else f"last {self.RECENT_DAYS_LIMIT} days"
-            self.logger.info(f"Recent models summary:")
-            self.logger.info(f"  - Models found in {days_text}: {len(recent_models)}")
-            self.logger.info(f"  - Models skipped (no date): {skipped_no_date}")
-            self.logger.info(f"  - Models skipped (too old): {skipped_too_old}")
-            
-            return recent_models
+            return models
             
         except Exception as e:
-            self.logger.error(f"Failed to fetch recent models: {e}")
-            self.logger.warning("Continuing with empty recent models list")
+            self.logger.error(f"Failed to fetch models: {e}")
+            self.logger.warning("Continuing with empty models list")
             return []
     
     def _save_raw_data(self, models: List) -> None:
         """
         Save raw model data to JSON file.
-        Fetches detailed file info for each model using parallel API requests.
+        Extracts data directly from the full model objects (no per-model API calls).
         
         Args:
             models: List of model objects to save
@@ -414,7 +498,7 @@ class SimplifiedGGUFetcher:
             self.logger.warning("No models to save")
             return
         
-        self.logger.info(f"Fetching detailed info for {len(models)} models using parallel requests...")
+        self.logger.info(f"Processing {len(models)} models from full API data (no extra API calls)...")
         
         try:
             models_data = []
@@ -429,124 +513,64 @@ class SimplifiedGGUFetcher:
             success_count = 0
             failed_count = 0
             
-            def fetch_model_details(model):
-                """Fetch detailed info for a single model with retry logic."""
+            for model in tqdm(models, desc="Processing models", unit="model"):
                 model_id = safe_getattr(model, 'id', 'unknown')
                 
-                # Initialize with defaults
-                siblings = []
-                likes = 0
-                downloads = 0
-                tags = []
-                card_data = {}
-                last_modified = None
-                created_at = None
-                
                 try:
-                    # Fetch detailed model info with retry and rate limiting
-                    detailed_info = self._fetch_model_info_with_retry(model_id)
-                    
-                    # Safely extract siblings - this is the main fix for the KeyError issue
-                    siblings = self._safe_extract_siblings(detailed_info)
-                    
-                    # Safely extract other fields
-                    likes = safe_getattr(detailed_info, 'likes', 0) or 0
-                    downloads = safe_getattr(detailed_info, 'downloads', 0) or 0
-                    tags = safe_getattr(detailed_info, 'tags', []) or []
-                    card_data = safe_getattr(detailed_info, 'cardData', {}) or {}
-                    last_modified = safe_getattr(detailed_info, 'lastModified', None)
-                    created_at = safe_getattr(detailed_info, 'created_at', None)
-                                
-                except Exception as e:
-                    # API call failed - fall back to basic model data
-                    self.logger.debug(f"API call failed for {model_id}, using basic data: {e}")
-                    
-                    # Try to extract siblings from the original model object
                     siblings = self._safe_extract_siblings(model)
-                    
-                    # Extract other fields from original model
                     likes = safe_getattr(model, 'likes', 0) or 0
                     downloads = safe_getattr(model, 'downloads', 0) or 0
                     tags = safe_getattr(model, 'tags', []) or []
                     card_data = safe_getattr(model, 'cardData', {}) or {}
                     last_modified = safe_getattr(model, 'lastModified', None)
                     created_at = safe_getattr(model, 'created_at', None)
-                
-                # Validate engagement metrics
-                likes = self._validate_engagement_metric(likes, model_id, 'likes')
-                downloads = self._validate_engagement_metric(downloads, model_id, 'downloads')
-                
-                # Build model dictionary
-                model_dict = {
-                    'id': model_id,
-                    'downloads': downloads,
-                    'likes': likes,
-                    'tags': list(tags) if tags else [],
-                    'siblings': siblings,
-                    'cardData': dict(card_data) if card_data else {},
-                    'lastModified': last_modified,
-                    'created_at': created_at
-                }
-                
-                # Convert datetime objects to ISO strings
-                if model_dict['lastModified'] and hasattr(model_dict['lastModified'], 'isoformat'):
-                    model_dict['lastModified'] = model_dict['lastModified'].isoformat()
-                elif isinstance(model_dict['lastModified'], str):
-                    pass  # Already a string
-                else:
-                    model_dict['lastModified'] = None
                     
-                if model_dict['created_at'] and hasattr(model_dict['created_at'], 'isoformat'):
-                    model_dict['created_at'] = model_dict['created_at'].isoformat()
-                elif isinstance(model_dict['created_at'], str):
-                    pass  # Already a string
-                else:
-                    model_dict['created_at'] = None
-                
-                return model_dict, likes
-            
-            # Use ThreadPoolExecutor for parallel processing
-            self.logger.info(f"Using {self.MAX_WORKERS} parallel workers")
-            
-            with ThreadPoolExecutor(max_workers=self.MAX_WORKERS) as executor:
-                future_to_model = {executor.submit(fetch_model_details, model): model for model in models}
-                
-                with tqdm(total=len(models), desc="Fetching model details", unit="model") as pbar:
-                    for future in as_completed(future_to_model):
-                        model_for_error = future_to_model[future]
-                        model_id_for_error = safe_getattr(model_for_error, 'id', 'unknown')
-                        try:
-                            result = future.result()
-                            
-                            if not isinstance(result, tuple) or len(result) != 2:
-                                self.logger.error(f"Invalid result from {model_id_for_error}: {type(result)}")
-                                failed_count += 1
-                                pbar.update(1)
-                                continue
-                                
-                            model_dict, likes = result
-                            
-                            # Always save model data
-                            models_data.append(model_dict)
-                            success_count += 1
-                            
-                            # Update engagement statistics
-                            if likes > 0:
-                                engagement_stats['models_with_likes'] += 1
-                                engagement_stats['total_likes'] += likes
-                                engagement_stats['max_likes'] = max(engagement_stats['max_likes'], likes)
-                                engagement_stats['min_likes'] = min(engagement_stats['min_likes'], likes)
-                            else:
-                                engagement_stats['models_missing_likes'] += 1
-                                
-                        except Exception as e:
-                            failed_count += 1
-                            self.logger.error(f"Critical error processing {model_id_for_error}: {type(e).__name__}: {e}")
-                            if self.logger.isEnabledFor(logging.DEBUG):
-                                import traceback
-                                self.logger.debug(traceback.format_exc())
+                    likes = self._validate_engagement_metric(likes, model_id, 'likes')
+                    downloads = self._validate_engagement_metric(downloads, model_id, 'downloads')
+                    
+                    model_dict = {
+                        'id': model_id,
+                        'downloads': downloads,
+                        'likes': likes,
+                        'tags': list(tags) if tags else [],
+                        'siblings': siblings,
+                        'cardData': {
+                            'license': str(safe_getattr(card_data, 'license', '')) or '',
+                            'license_name': str(safe_getattr(card_data, 'license_name', '')) or '',
+                            'tags': list(safe_getattr(card_data, 'tags', []) or []),
+                            'metadata': {k: str(v) for k, v in (safe_getattr(card_data, 'metadata', {}) or {}).items() if isinstance(k, str)},
+                        } if card_data else {},
+                        'lastModified': last_modified,
+                        'created_at': created_at
+                    }
+                    
+                    if model_dict['lastModified'] and hasattr(model_dict['lastModified'], 'isoformat'):
+                        model_dict['lastModified'] = model_dict['lastModified'].isoformat()
+                    elif not isinstance(model_dict['lastModified'], str):
+                        model_dict['lastModified'] = None
                         
-                        pbar.update(1)
+                    if model_dict['created_at'] and hasattr(model_dict['created_at'], 'isoformat'):
+                        model_dict['created_at'] = model_dict['created_at'].isoformat()
+                    elif not isinstance(model_dict['created_at'], str):
+                        model_dict['created_at'] = None
+                    
+                    models_data.append(model_dict)
+                    success_count += 1
+                    
+                    if likes > 0:
+                        engagement_stats['models_with_likes'] += 1
+                        engagement_stats['total_likes'] += likes
+                        engagement_stats['max_likes'] = max(engagement_stats['max_likes'], likes)
+                        engagement_stats['min_likes'] = min(engagement_stats['min_likes'], likes)
+                    else:
+                        engagement_stats['models_missing_likes'] += 1
+                        
+                except Exception as e:
+                    failed_count += 1
+                    self.logger.error(f"Error processing {model_id}: {type(e).__name__}: {e}")
+                    if self.logger.isEnabledFor(logging.DEBUG):
+                        import traceback
+                        self.logger.debug(traceback.format_exc())
             
             # In incremental mode, merge with existing raw data
             if self.incremental and self.raw_data_file.exists():
@@ -575,6 +599,7 @@ class SimplifiedGGUFetcher:
             self.logger.info(f"Save summary:")
             self.logger.info(f"  - Successfully saved: {success_count} models")
             self.logger.info(f"  - Failed: {failed_count} models")
+            self.logger.info(f"  - API calls: {self.stats['api_calls']} (single listing call only)")
             self.logger.info(f"  - Output file: {self.raw_data_file} ({file_size_mb:.1f}MB)")
             self.logger.info(f"Engagement metrics:")
             self.logger.info(f"  - Models with likes: {engagement_stats['models_with_likes']}")
@@ -658,6 +683,11 @@ class SimplifiedGGUFetcher:
                 
                 self.logger.info("Step 5/6: Using spam-filtered models")
                 final_models = filter_result.filtered_models
+            
+            # Step 5.5: Deduplicate across repos
+            self.logger.info("Step 5.5/6: Deduplicating models across repos...")
+            final_models = self._deduplicate_across_repos(final_models)
+            self.logger.info(f"After deduplication: {len(final_models)} models")
             
             self.stats['models_processed'] = len(final_models)
             
