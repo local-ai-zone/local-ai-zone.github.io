@@ -142,9 +142,16 @@ ehthumbs.db
 Thumbs.db
 
 # Project specific
-# Keep data directory structure but ignore most data files
+# Raw data cache files (too large for Git, >20MB)
+data/raw_models_data.json
+scripts/data/raw_models_data.json
+scripts/data/*.json
+
+# Keep only the processed output
+!gguf_models.json
+
+# Data directory structure
 data/*.json
-!data/raw_models_data.json
 !data/.gitkeep
 data/backups/*
 !data/backups/.gitkeep

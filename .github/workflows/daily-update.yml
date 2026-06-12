@@ -145,34 +145,30 @@ jobs:
     - name: Check for data changes
       id: check_changes
       run: |
-        if git diff --quiet data/raw_models_data.json gguf_models.json; then
-          echo "No changes detected in data files"
+        if git diff --quiet gguf_models.json; then
+          echo "No changes detected in gguf_models.json"
           echo "changes=false" >> $GITHUB_OUTPUT
         else
-          echo "Changes detected in data files"
+          echo "Changes detected in gguf_models.json"
           echo "changes=true" >> $GITHUB_OUTPUT
           
           # Show what changed for better visibility
-          echo "Files with changes:"
-          git diff --name-only data/raw_models_data.json gguf_models.json || true
-          
-          # Show diff stats
           echo "Change statistics:"
-          git diff --stat data/raw_models_data.json gguf_models.json || true
+          git diff --stat gguf_models.json || true
         fi
         
     - name: Commit and push changes
       if: steps.check_changes.outputs.changes == 'true'
       run: |
-        # Add the modified files first
-        git add gguf_models.json data/raw_models_data.json
+        # Add only the processed output file (raw data is too large for Git)
+        git add gguf_models.json
         
         # Create enhanced commit message with verification data
         COMMIT_MSG="Automated daily update: GGUF model data $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
         📊 Update Summary:
         - Processed models: ${{ steps.verify_backup.outputs.model_count }} GGUF models
-        - Raw data models: ${{ steps.verify_backup.outputs.raw_model_count }} total models
+        - Raw data models: ${{ steps.verify_backup.outputs.raw_model_count }} total models (cached locally, not committed)
         
         🔧 Processing Details:
         - Spam filtering: Enabled with integrated processing
@@ -181,8 +177,8 @@ jobs:
         - Data integrity: Verified (valid JSON output)
         
         🗂️ Files Updated:
-        - data/raw_models_data.json (raw API data)
-        - gguf_models.json (processed model data)"
+        - gguf_models.json (processed model data - committed)
+        - data/raw_models_data.json (raw API cache - local only, not committed due to size)"
         
         # Commit changes
         git commit -m "$COMMIT_MSG" || {
