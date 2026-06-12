@@ -152,10 +152,10 @@ class SimplifiedGGUFetcher:
     
     # Default configuration constants
     DEFAULT_CONFIG = {
-        'recent_days_limit': 90,   # 90 days (3 months) for full mode
+        'recent_days_limit': None,  # No date limit - fetch ALL GGUF models
         'api_limit': 10000,         # Fetch up to 10,000 models
-        'incremental_days_limit': 90,  # Changed from 7 to 90 days for incremental too
-        'incremental_api_limit': 10000,  # Changed from 200 to 10000 to match full mode
+        'incremental_days_limit': None,  # No date limit for incremental either
+        'incremental_api_limit': 10000,  # Fetch up to 10,000 models in incremental mode
         'min_likes_threshold': 1,   # Changed from 10 to 1 - get more models!
         'max_workers': 10,
         'output_dir': '.',
@@ -416,7 +416,8 @@ class SimplifiedGGUFetcher:
         self.logger.info("DIRECT MODE: IN-MEMORY PROCESSING (NO RAW DATA FILE)")
         self.logger.info("=" * 70)
         self.logger.info(f"Mode: {'INCREMENTAL' if self.incremental else 'FULL'}")
-        self.logger.info(f"Looking back: {self.INCREMENTAL_DAYS_LIMIT if self.incremental else self.RECENT_DAYS_LIMIT} days")
+        self.logger.info(f"Scope: ALL GGUF MODELS (no date limit)")
+        self.logger.info(f"Sorting: By popularity (likes)")
         self.logger.info(f"Dry run: {self.dry_run}")
         self.logger.info("=" * 70)
         
@@ -609,65 +610,40 @@ class SimplifiedGGUFetcher:
     
     def _fetch_recent_models(self) -> List:
         """
-        Fetch RECENTLY ADDED GGUF models with ONE API call.
+        Fetch ALL GGUF models with ONE API call (no date filters!).
         Uses full=True to get ALL data (siblings, cardData) in single request.
         
         Returns:
-            List of recently added model objects sorted by creation date
+            List of all GGUF model objects sorted by likes (most popular first)
         """
-        cutoff_date = datetime.now() - timedelta(days=self.RECENT_DAYS_LIMIT)
-        if self.incremental:
-            cutoff_date = datetime.now() - timedelta(days=self.INCREMENTAL_DAYS_LIMIT)
-        
         max_models = self.API_LIMIT
         if self.incremental:
             max_models = self.INCREMENTAL_API_LIMIT
         
         self.logger.info("=" * 50)
-        self.logger.info("FETCHING RECENTLY ADDED GGUF MODELS")
+        self.logger.info("FETCHING ALL GGUF MODELS (NO DATE LIMIT)")
         self.logger.info(f"Single API call with full=True (includes all file data)")
-        self.logger.info(f"Date cutoff: {cutoff_date.strftime('%Y-%m-%d')}")
+        self.logger.info(f"Sorting by: LIKES (most popular first)")
         self.logger.info(f"Model limit: {max_models} models")
-        if self.incremental:
-            self.logger.info(f"Size limit: {self.config['max_raw_data_size_mb']}MB (incremental mode)")
-        else:
-            self.logger.info(f"Full mode: No size limit (processes in memory)")
+        self.logger.info(f"Mode: {'INCREMENTAL (merges with existing)' if self.incremental else 'FULL (replaces existing)'}")
         self.logger.info("=" * 50)
         
         try:
             self.stats['api_calls'] += 1
             
             models = []
-            self.logger.info("Starting API pagination (sorted by createdAt, newest first)...")
+            self.logger.info("Starting API pagination (sorted by likes, most popular first)...")
             
             for model in self.api.list_models(
                 filter="gguf",
-                sort="createdAt",  # Sort by creation date for most recently added
-                direction=-1,      # Descending (newest first)
+                sort="likes",      # Sort by likes for most popular models
+                direction=-1,      # Descending (most likes first)
                 full=True,         # CRITICAL: Gets all data in ONE call (siblings, cardData, etc.)
             ):
                 # Check model limit
                 if len(models) >= max_models:
                     self.logger.info(f"Reached model limit ({max_models}), stopping...")
                     break
-                
-                # Extract date information
-                created_at = safe_getattr(model, 'created_at', None)
-                
-                # Check if model is within date range
-                if created_at and hasattr(created_at, 'timestamp'):
-                    if created_at.timestamp() < cutoff_date.timestamp():
-                        self.logger.info(f"Reached models older than cutoff date")
-                        break
-                elif isinstance(created_at, str):
-                    try:
-                        from dateutil.parser import parse as parse_date
-                        parsed = parse_date(created_at)
-                        if parsed.timestamp() < cutoff_date.timestamp():
-                            self.logger.info(f"Reached models older than cutoff date")
-                            break
-                    except Exception:
-                        pass  # Can't parse date, include the model anyway
                 
                 models.append(model)
                 
@@ -685,7 +661,8 @@ class SimplifiedGGUFetcher:
             self.logger.info("=" * 50)
             self.logger.info(f"API FETCH COMPLETED")
             self.logger.info(f"  - Total models fetched: {len(models)}")
-            self.logger.info(f"  - Date range: {cutoff_date.strftime('%Y-%m-%d')} to now")
+            self.logger.info(f"  - All GGUF models (no date filter)")
+            self.logger.info(f"  - Sorted by: LIKES (most popular first)")
             self.logger.info(f"  - API calls: 1 (with full=True)")
             self.logger.info("=" * 50)
             

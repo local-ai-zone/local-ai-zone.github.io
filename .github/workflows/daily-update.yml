@@ -44,7 +44,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         
-    - name: Run GGUF fetcher in direct mode (in-memory processing)
+    - name: Run new daily GGUF fetcher
       id: fetch_data
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -56,17 +56,17 @@ jobs:
         # Change to repository root to ensure correct paths
         cd $GITHUB_WORKSPACE
         
-        # Use DIRECT mode: processes everything in memory without saving raw data
-        # This keeps the repo clean - only gguf_models.json is committed
-        # --incremental: Merges new models with existing ones (doesn't overwrite!)
-        # Fetches last 90 days (3 months) of GGUF models
-        # min-likes 1 to get maximum models (not just popular ones)
-        FETCH_CMD="python scripts/simplified_gguf_fetcher.py direct --incremental --verbose --output-dir . --disable-spam-filter --min-likes 1"
+        # Use NEW daily fetcher: clean, simple, focused
+        # Fetches ALL GGUF models, filters, deduplicates, outputs
+        # --incremental: Merges with existing data (safe!)
+        # --min-likes 1: Get all models with at least 1 like
+        FETCH_CMD="python scripts/daily_gguf_fetcher.py --incremental --min-likes 1 --output gguf_models.json"
         if [ -n "$HF_TOKEN" ]; then
           FETCH_CMD="$FETCH_CMD --token $HF_TOKEN"
-          echo "Using authenticated Hugging Face API requests in DIRECT mode"
-          echo "Mode: INCREMENTAL (last 90 days / 3 months, merges with existing models)"
-          echo "Processing: In-memory (no raw data file created)"
+          echo "Using authenticated Hugging Face API requests"
+          echo "Mode: INCREMENTAL (merges with existing models)"
+          echo "Scope: ALL GGUF models (sorted by popularity)"
+          echo "Output: gguf_models.json"
         else
           echo "Warning: No HF_TOKEN provided, using unauthenticated requests (may hit rate limits)"
         fi
@@ -101,8 +101,6 @@ jobs:
         # Show what was created
         echo "✅ Output file created:"
         ls -lh gguf_models.json 2>/dev/null || echo "⚠️ Warning: gguf_models.json not found"
-        
-        echo "✓ No raw data file created (direct mode - all processing in memory)"
     - name: Verify data integrity
       id: verify_backup
       run: |
