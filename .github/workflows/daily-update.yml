@@ -58,12 +58,14 @@ jobs:
         
         # Use DIRECT mode: processes everything in memory without saving raw data
         # This keeps the repo clean - only gguf_models.json is committed
+        # --incremental: Merges new models with existing ones (doesn't overwrite!)
+        # Fetches last 90 days (3 months) of GGUF models
         # min-likes 1 to get maximum models (not just popular ones)
-        FETCH_CMD="python scripts/simplified_gguf_fetcher.py direct --verbose --output-dir . --disable-spam-filter --min-likes 1"
+        FETCH_CMD="python scripts/simplified_gguf_fetcher.py direct --incremental --verbose --output-dir . --disable-spam-filter --min-likes 1"
         if [ -n "$HF_TOKEN" ]; then
           FETCH_CMD="$FETCH_CMD --token $HF_TOKEN"
           echo "Using authenticated Hugging Face API requests in DIRECT mode"
-          echo "Mode: INCREMENTAL (last 7 days only)"
+          echo "Mode: INCREMENTAL (last 90 days / 3 months, merges with existing models)"
           echo "Processing: In-memory (no raw data file created)"
         else
           echo "Warning: No HF_TOKEN provided, using unauthenticated requests (may hit rate limits)"

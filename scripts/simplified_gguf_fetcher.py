@@ -152,10 +152,10 @@ class SimplifiedGGUFetcher:
     
     # Default configuration constants
     DEFAULT_CONFIG = {
-        'recent_days_limit': 90,   # Back to 90 days for more models
+        'recent_days_limit': 90,   # 90 days (3 months) for full mode
         'api_limit': 10000,         # Fetch up to 10,000 models
-        'incremental_days_limit': 7,
-        'incremental_api_limit': 200,
+        'incremental_days_limit': 90,  # Changed from 7 to 90 days for incremental too
+        'incremental_api_limit': 10000,  # Changed from 200 to 10000 to match full mode
         'min_likes_threshold': 1,   # Changed from 10 to 1 - get more models!
         'max_workers': 10,
         'output_dir': '.',
