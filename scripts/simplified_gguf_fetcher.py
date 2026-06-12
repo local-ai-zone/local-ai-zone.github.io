@@ -152,11 +152,11 @@ class SimplifiedGGUFetcher:
     
     # Default configuration constants
     DEFAULT_CONFIG = {
-        'recent_days_limit': 30,  # Reduced from 90 to keep file size small
-        'api_limit': 500,          # Limit to 500 models max
+        'recent_days_limit': 90,   # Back to 90 days for more models
+        'api_limit': 10000,         # Fetch up to 10,000 models
         'incremental_days_limit': 7,
         'incremental_api_limit': 200,
-        'min_likes_threshold': 10,
+        'min_likes_threshold': 1,   # Changed from 10 to 1 - get more models!
         'max_workers': 10,
         'output_dir': '.',
         'data_dir': 'data',
@@ -612,8 +612,6 @@ class SimplifiedGGUFetcher:
         Fetch RECENTLY ADDED GGUF models with ONE API call.
         Uses full=True to get ALL data (siblings, cardData) in single request.
         
-        GITHUB SIZE LIMIT: Stops downloading before reaching 20MB to avoid GitHub rejection.
-        
         Returns:
             List of recently added model objects sorted by creation date
         """
@@ -630,7 +628,10 @@ class SimplifiedGGUFetcher:
         self.logger.info(f"Single API call with full=True (includes all file data)")
         self.logger.info(f"Date cutoff: {cutoff_date.strftime('%Y-%m-%d')}")
         self.logger.info(f"Model limit: {max_models} models")
-        self.logger.info(f"Size limit: {self.config['max_raw_data_size_mb']}MB (GitHub safe)")
+        if self.incremental:
+            self.logger.info(f"Size limit: {self.config['max_raw_data_size_mb']}MB (incremental mode)")
+        else:
+            self.logger.info(f"Full mode: No size limit (processes in memory)")
         self.logger.info("=" * 50)
         
         try:
@@ -670,16 +671,16 @@ class SimplifiedGGUFetcher:
                 
                 models.append(model)
                 
-                # Progress logging with size estimation
-                if len(models) % 50 == 0 and len(models) > 0:
-                    # Rough size estimation (each model ~30-50KB in JSON)
-                    estimated_size_mb = (len(models) * 35) / 1024
-                    self.logger.info(f"  Progress: {len(models)} models (~{estimated_size_mb:.1f}MB estimated)")
+                # Progress logging
+                if len(models) % 100 == 0 and len(models) > 0:
+                    self.logger.info(f"  Progress: {len(models)} models fetched...")
                     
-                    # Stop if approaching size limit
-                    if estimated_size_mb >= self.config['max_raw_data_size_mb']:
-                        self.logger.warning(f"Approaching size limit ({self.config['max_raw_data_size_mb']}MB), stopping to keep under GitHub 20MB limit")
-                        break
+                    # Only check size limit in incremental mode
+                    if self.incremental:
+                        estimated_size_mb = (len(models) * 35) / 1024
+                        if estimated_size_mb >= self.config['max_raw_data_size_mb']:
+                            self.logger.warning(f"Approaching size limit ({self.config['max_raw_data_size_mb']}MB), stopping")
+                            break
             
             self.logger.info("=" * 50)
             self.logger.info(f"API FETCH COMPLETED")

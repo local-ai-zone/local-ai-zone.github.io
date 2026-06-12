@@ -58,7 +58,8 @@ jobs:
         
         # Use DIRECT mode: processes everything in memory without saving raw data
         # This keeps the repo clean - only gguf_models.json is committed
-        FETCH_CMD="python scripts/simplified_gguf_fetcher.py direct --verbose --incremental --output-dir ."
+        # min-likes 1 to get maximum models (not just popular ones)
+        FETCH_CMD="python scripts/simplified_gguf_fetcher.py direct --verbose --output-dir . --disable-spam-filter --min-likes 1"
         if [ -n "$HF_TOKEN" ]; then
           FETCH_CMD="$FETCH_CMD --token $HF_TOKEN"
           echo "Using authenticated Hugging Face API requests in DIRECT mode"
