@@ -1372,6 +1372,18 @@ Examples:
     )
     
     parser.add_argument(
+        '--output-dir',
+        default='.',
+        help='Output directory for gguf_models.json (default: current directory)'
+    )
+    
+    parser.add_argument(
+        '--data-dir',
+        default='data',
+        help='Data directory for raw_models_data.json (default: ./data)'
+    )
+    
+    parser.add_argument(
         '--config-file',
         help='JSON configuration file path'
     )
@@ -1396,6 +1408,10 @@ Examples:
     # Override config with command line arguments
     if args.max_workers:
         config['max_workers'] = min(args.max_workers, 20)
+    if args.output_dir:
+        config['output_dir'] = args.output_dir
+    if args.data_dir:
+        config['data_dir'] = args.data_dir
     
     # Configure spam filter
     filter_config = None

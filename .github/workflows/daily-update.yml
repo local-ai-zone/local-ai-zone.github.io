@@ -53,8 +53,12 @@ jobs:
         delay=300  # 5 minutes in seconds
         attempt=1
         
+        # Change to repository root to ensure correct paths
+        cd $GITHUB_WORKSPACE
+        
         # Prepare enhanced command with optimal configuration
-        FETCH_CMD="python scripts/simplified_gguf_fetcher.py download --verbose --incremental"
+        # Output to repo root, data to ./data directory
+        FETCH_CMD="python scripts/simplified_gguf_fetcher.py --verbose --incremental --output-dir . --data-dir data"
         if [ -n "$HF_TOKEN" ]; then
           FETCH_CMD="$FETCH_CMD --token $HF_TOKEN"
           echo "Using authenticated Hugging Face API requests in INCREMENTAL mode (last 7 days only)"
@@ -62,17 +66,18 @@ jobs:
           echo "Warning: No HF_TOKEN provided, using unauthenticated requests (may hit rate limits)"
         fi
         
+        echo "Working directory: $(pwd)"
         echo "Command: $FETCH_CMD"
         
         while [ $attempt -le $max_attempts ]; do
           echo "Attempt $attempt of $max_attempts"
           
           if eval $FETCH_CMD; then
-            echo "GGUF data download successful on attempt $attempt"
+            echo "GGUF data fetch successful on attempt $attempt"
             echo "success=true" >> $GITHUB_OUTPUT
             break
           else
-            echo "GGUF data download failed on attempt $attempt"
+            echo "GGUF data fetch failed on attempt $attempt"
             if [ $attempt -eq $max_attempts ]; then
               echo "All retry attempts failed"
               echo "success=false" >> $GITHUB_OUTPUT
@@ -88,9 +93,9 @@ jobs:
           attempt=$((attempt + 1))
         done
         
-        # Now run the process phase
-        echo "Running process phase..."
-        python scripts/simplified_gguf_fetcher.py process --verbose
+        # Show what was created
+        echo "Files created:"
+        ls -lh gguf_models.json data/raw_models_data.json 2>/dev/null || echo "Warning: Expected files not found"
     - name: Verify backup creation and data integrity
       id: verify_backup
       run: |
