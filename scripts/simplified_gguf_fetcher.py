@@ -1,19 +1,40 @@
 #!/usr/bin/env python3
 """
-Simplified GGUF Fetcher
+Simplified GGUF Fetcher - Optimized for Recently Added Models
 
-A two-phase system that downloads ALL model data in ONE API call,
-then processes it locally to extract essential GGUF model information with
-integrated spam filtering.
+OPTIMIZATION STRATEGY:
+=====================
+1. DOWNLOAD PHASE: Single API call with full=True
+   - Fetches recently added models sorted by creation date (newest first)
+   - Gets ALL data in one request: metadata, files (siblings), cardData
+   - No per-model API calls needed
+   - Saves raw data to data/raw_models_data.json
 
-Phase 1 (Download): Fetch recent models with full=True (single API call), save raw data
-Phase 2 (Process): Extract required fields from saved data, apply spam filtering, 
-                   filter by 10+ likes, generate output
+2. PROCESS PHASE: Local filtering from raw data
+   - Loads raw data from local file (no API calls)
+   - Filters by likes threshold (10+)
+   - Extracts GGUF files and metadata
+   - Applies spam filtering
+   - Calculates hardware requirements
+   - Outputs to gguf_models.json
 
-No per-model API calls needed - all data (siblings, cardData, etc.) comes from the listing call.
+USAGE:
+======
+# Full workflow (download + process):
+python simplified_gguf_fetcher.py
+
+# Download only (fetch recently added models):
+python simplified_gguf_fetcher.py download
+
+# Process only (filter local data to gguf_models.json):
+python simplified_gguf_fetcher.py process
+
+# Incremental mode (last 7 days only, merge with existing):
+python simplified_gguf_fetcher.py --incremental
 
 Enhanced with:
 - Single API call for all data (full=True parameter)
+- Focuses on recently added models (sorted by createdAt)
 - Rate limiting for API calls
 - Retry logic with exponential backoff
 - Better memory management for large datasets
@@ -380,44 +401,52 @@ class SimplifiedGGUFetcher:
 
     def download_data(self) -> None:
         """
-        Phase 1: Download model data from Hugging Face API and save locally.
+        Phase 1: Download RECENTLY ADDED model data from Hugging Face API.
         
-        Makes a SINGLE API REQUEST with full=True to fetch all data including
-        siblings (file info) and cardData. No per-model API calls needed.
+        OPTIMIZATION: ONE API CALL with full=True gets ALL data for recently added models:
+        - Model metadata (likes, downloads, tags)
+        - File list (siblings) with sizes
+        - Card data (license, description)
+        
+        No per-model API calls needed. Everything comes from the listing endpoint.
         """
-        self.logger.info("=" * 50)
-        self.logger.info("STARTING DOWNLOAD PHASE")
+        self.logger.info("=" * 70)
+        self.logger.info("PHASE 1: DOWNLOAD RECENTLY ADDED MODELS (SINGLE API CALL)")
+        self.logger.info("=" * 70)
         self.logger.info(f"Mode: {'INCREMENTAL' if self.incremental else 'FULL'}")
+        self.logger.info(f"Looking back: {self.INCREMENTAL_DAYS_LIMIT if self.incremental else self.RECENT_DAYS_LIMIT} days")
         self.logger.info(f"Dry run: {self.dry_run}")
-        self.logger.info("=" * 50)
+        self.logger.info("=" * 70)
         
         self.stats['start_time'] = datetime.now()
         
         try:
-            # Fetch recent models - SINGLE REQUEST, sorted by createdAt
-            self.logger.info("Fetching recent GGUF models sorted by creation date...")
+            # SINGLE API CALL - Gets all recently added models sorted by creation date
+            # with full=True to include all file and metadata information
             recent_models = self._fetch_recent_models()
             self.stats['models_fetched'] = len(recent_models)
             
             if recent_models:
-                self.logger.info(f"Saving {len(recent_models)} raw model records...")
+                self.logger.info(f"\nSaving {len(recent_models)} raw model records to local storage...")
                 if not self.dry_run:
                     self._save_raw_data(recent_models)
                 else:
                     self.logger.info(f"DRY RUN: Would save raw data to {self.raw_data_file}")
             else:
-                self.logger.warning("No models found to download")
+                self.logger.warning("No recently added models found")
             
-            self._save_metadata()
+            if not self.dry_run:
+                self._save_metadata()
             
             self.stats['end_time'] = datetime.now()
             duration = (self.stats['end_time'] - self.stats['start_time']).total_seconds()
             
-            self.logger.info("=" * 50)
-            self.logger.info("DOWNLOAD PHASE COMPLETED SUCCESSFULLY")
-            self.logger.info(f"Duration: {duration:.1f}s")
-            self.logger.info(f"API calls made: {self.stats['api_calls']}")
-            self.logger.info("=" * 50)
+            self.logger.info("=" * 70)
+            self.logger.info("DOWNLOAD PHASE COMPLETED")
+            self.logger.info(f"  Duration: {duration:.1f}s")
+            self.logger.info(f"  API calls: {self.stats['api_calls']} (single paginated request)")
+            self.logger.info(f"  Models downloaded: {len(recent_models)}")
+            self.logger.info("=" * 70)
             
         except Exception as e:
             self.logger.error(f"Download phase failed: {e}")
@@ -426,79 +455,89 @@ class SimplifiedGGUFetcher:
     
     def _fetch_recent_models(self) -> List:
         """
-        Fetch ALL GGUF models from the last 3 months.
-        Uses full pagination to get every model, filtering by date locally.
+        Fetch RECENTLY ADDED GGUF models with ONE API call.
+        Uses full=True to get ALL data (siblings, cardData) in single request.
         
         Returns:
-            List of all model objects from the last 3 months
+            List of recently added model objects sorted by creation date
         """
         cutoff_date = datetime.now() - timedelta(days=self.RECENT_DAYS_LIMIT)
         if self.incremental:
             cutoff_date = datetime.now() - timedelta(days=self.INCREMENTAL_DAYS_LIMIT)
         
-        self.logger.info(
-            f"Fetching ALL GGUF models since {cutoff_date.strftime('%Y-%m-%d')} (full pagination)"
-        )
+        self.logger.info("=" * 50)
+        self.logger.info("FETCHING RECENTLY ADDED GGUF MODELS")
+        self.logger.info(f"Single API call with full=True (includes all file data)")
+        self.logger.info(f"Date cutoff: {cutoff_date.strftime('%Y-%m-%d')}")
+        self.logger.info("=" * 50)
         
         try:
             self.stats['api_calls'] += 1
-            self.logger.info("Fetching models from Hugging Face API (paginating through all)...")
             
             models = []
+            self.logger.info("Starting API pagination (sorted by createdAt, newest first)...")
+            
             for model in self.api.list_models(
                 filter="gguf",
-                sort="createdAt",
-                direction=-1,
-                full=True,
+                sort="createdAt",  # Sort by creation date for most recently added
+                direction=-1,      # Descending (newest first)
+                full=True,         # CRITICAL: Gets all data in ONE call (siblings, cardData, etc.)
             ):
+                # Extract date information
                 created_at = safe_getattr(model, 'created_at', None)
-                last_modified = safe_getattr(model, 'lastModified', None)
                 
-                # Use created_at if available, fallback to lastModified
-                model_date = created_at or last_modified
-                
-                # Stop if model is older than cutoff (sorted by lastModified desc)
-                if model_date and hasattr(model_date, 'timestamp'):
-                    if model_date.timestamp() < cutoff_date.timestamp():
-                        self.logger.info(f"Reached models older than cutoff, stopping at {len(models)} models")
+                # Check if model is within date range
+                if created_at and hasattr(created_at, 'timestamp'):
+                    if created_at.timestamp() < cutoff_date.timestamp():
+                        self.logger.info(f"Reached models older than cutoff date")
                         break
-                elif isinstance(model_date, str):
+                elif isinstance(created_at, str):
                     try:
                         from dateutil.parser import parse as parse_date
-                        parsed = parse_date(model_date)
+                        parsed = parse_date(created_at)
                         if parsed.timestamp() < cutoff_date.timestamp():
-                            self.logger.info(f"Reached models older than cutoff, stopping at {len(models)} models")
+                            self.logger.info(f"Reached models older than cutoff date")
                             break
                     except Exception:
-                        pass  # Can't parse date, include the model
+                        pass  # Can't parse date, include the model anyway
                 
                 models.append(model)
-                if len(models) % 500 == 0 and len(models) > 0:
-                    self.logger.info(f"  Fetched {len(models)} models so far...")
+                
+                # Progress logging
+                if len(models) % 100 == 0 and len(models) > 0:
+                    self.logger.info(f"  Progress: {len(models)} models fetched...")
             
-            self.logger.info(f"Retrieved {len(models)} models from API")
+            self.logger.info("=" * 50)
+            self.logger.info(f"API FETCH COMPLETED")
+            self.logger.info(f"  - Total models fetched: {len(models)}")
             self.logger.info(f"  - Date range: {cutoff_date.strftime('%Y-%m-%d')} to now")
+            self.logger.info(f"  - API calls: 1 (with full=True)")
+            self.logger.info("=" * 50)
             
             return models
             
         except Exception as e:
             self.logger.error(f"Failed to fetch models: {e}")
-            self.logger.warning("Continuing with empty models list")
+            import traceback
+            self.logger.error(traceback.format_exc())
             return []
     
     def _save_raw_data(self, models: List) -> None:
         """
         Save raw model data to JSON file.
-        Extracts data directly from the full model objects (no per-model API calls).
+        
+        OPTIMIZATION: No per-model API calls needed - all data (siblings, cardData, etc.)
+        comes directly from the full=True listing call.
         
         Args:
-            models: List of model objects to save
+            models: List of model objects with full data already loaded
         """
         if not models:
             self.logger.warning("No models to save")
             return
         
-        self.logger.info(f"Processing {len(models)} models from full API data (no extra API calls)...")
+        self.logger.info(f"\nProcessing {len(models)} models from API response...")
+        self.logger.info("(No additional API calls - using full=True data)")
         
         try:
             models_data = []
@@ -513,10 +552,11 @@ class SimplifiedGGUFetcher:
             success_count = 0
             failed_count = 0
             
-            for model in tqdm(models, desc="Processing models", unit="model"):
+            for model in tqdm(models, desc="Extracting model data", unit="model"):
                 model_id = safe_getattr(model, 'id', 'unknown')
                 
                 try:
+                    # Extract all data from the model object (no API calls)
                     siblings = self._safe_extract_siblings(model)
                     likes = safe_getattr(model, 'likes', 0) or 0
                     downloads = safe_getattr(model, 'downloads', 0) or 0
@@ -544,6 +584,7 @@ class SimplifiedGGUFetcher:
                         'created_at': created_at
                     }
                     
+                    # Normalize date fields to ISO format strings
                     if model_dict['lastModified'] and hasattr(model_dict['lastModified'], 'isoformat'):
                         model_dict['lastModified'] = model_dict['lastModified'].isoformat()
                     elif not isinstance(model_dict['lastModified'], str):
@@ -557,6 +598,7 @@ class SimplifiedGGUFetcher:
                     models_data.append(model_dict)
                     success_count += 1
                     
+                    # Track engagement stats
                     if likes > 0:
                         engagement_stats['models_with_likes'] += 1
                         engagement_stats['total_likes'] += likes
@@ -575,17 +617,19 @@ class SimplifiedGGUFetcher:
             # In incremental mode, merge with existing raw data
             if self.incremental and self.raw_data_file.exists():
                 try:
+                    self.logger.info("\nMerging with existing raw data (incremental mode)...")
                     with open(self.raw_data_file, 'r', encoding='utf-8') as f:
                         existing_raw = json.load(f)
                     existing_by_id = {m.get('id', ''): m for m in existing_raw if isinstance(m, dict)}
                     for model_dict in models_data:
                         existing_by_id[model_dict.get('id', '')] = model_dict
                     models_data = list(existing_by_id.values())
-                    self.logger.info(f"Merged with {len(existing_raw)} existing models -> {len(models_data)} total")
+                    self.logger.info(f"Merged: {len(existing_raw)} existing + {success_count} new = {len(models_data)} total")
                 except Exception as e:
                     self.logger.warning(f"Failed to load existing raw data for merge: {e}")
 
             # Save to JSON file
+            self.logger.info(f"\nWriting to {self.raw_data_file}...")
             with open(self.raw_data_file, 'w', encoding='utf-8') as f:
                 json.dump(models_data, f, indent=2, ensure_ascii=False)
             
@@ -596,18 +640,24 @@ class SimplifiedGGUFetcher:
             
             file_size_mb = os.path.getsize(self.raw_data_file) / (1024 * 1024)
             
-            self.logger.info(f"Save summary:")
-            self.logger.info(f"  - Successfully saved: {success_count} models")
+            self.logger.info("\n" + "=" * 50)
+            self.logger.info("RAW DATA SAVE SUMMARY")
+            self.logger.info("=" * 50)
+            self.logger.info(f"Processing results:")
+            self.logger.info(f"  - Successfully processed: {success_count} models")
             self.logger.info(f"  - Failed: {failed_count} models")
-            self.logger.info(f"  - API calls: {self.stats['api_calls']} (single listing call only)")
-            self.logger.info(f"  - Output file: {self.raw_data_file} ({file_size_mb:.1f}MB)")
-            self.logger.info(f"Engagement metrics:")
+            self.logger.info(f"  - Total in file: {len(models_data)} models")
+            self.logger.info(f"\nFile information:")
+            self.logger.info(f"  - Output file: {self.raw_data_file}")
+            self.logger.info(f"  - File size: {file_size_mb:.1f} MB")
+            self.logger.info(f"\nEngagement metrics:")
             self.logger.info(f"  - Models with likes: {engagement_stats['models_with_likes']}")
             self.logger.info(f"  - Models with no likes: {engagement_stats['models_missing_likes']}")
             self.logger.info(f"  - Total likes: {engagement_stats['total_likes']:,}")
             if engagement_stats['models_with_likes'] > 0:
                 self.logger.info(f"  - Average likes: {avg_likes:.1f}")
                 self.logger.info(f"  - Like range: {engagement_stats['min_likes']} to {engagement_stats['max_likes']:,}")
+            self.logger.info("=" * 50)
             
         except Exception as e:
             self.logger.error(f"Critical error saving raw data: {e}")
@@ -615,26 +665,32 @@ class SimplifiedGGUFetcher:
     
     def process_data(self) -> None:
         """
-        Phase 2: Process downloaded data and generate final output.
+        Phase 2: Process downloaded data and generate final gguf_models.json.
+        
+        OPTIMIZATION: All filtering is done locally from raw data (no API calls).
+        Filters GGUF files, applies spam filtering, calculates hardware requirements.
         """
-        self.logger.info("=" * 50)
-        self.logger.info("STARTING PROCESS PHASE")
+        self.logger.info("=" * 70)
+        self.logger.info("PHASE 2: PROCESS RAW DATA → GGUF_MODELS.JSON")
+        self.logger.info("=" * 70)
+        self.logger.info(f"Local filtering only (no API calls)")
         self.logger.info(f"Dry run: {self.dry_run}")
-        self.logger.info("=" * 50)
+        self.logger.info("=" * 70)
         
         self.stats['start_time'] = datetime.now()
         
         try:
-            # Step 1: Load raw data
-            self.logger.info("Step 1/6: Loading raw model data...")
+            # Step 1: Load raw data (from Phase 1)
+            self.logger.info("\nStep 1/6: Loading raw model data from local file...")
             raw_models = self._load_raw_data()
             if not raw_models:
                 self.logger.warning("No raw data found, nothing to process")
+                self.logger.info("Run download phase first: python simplified_gguf_fetcher.py download")
                 self._generate_output([])
                 return
             
             # Step 2: Filter models with 10+ likes
-            self.logger.info(f"Step 2/6: Filtering models with {self.MIN_LIKES_THRESHOLD}+ likes...")
+            self.logger.info(f"\nStep 2/6: Filtering models with {self.MIN_LIKES_THRESHOLD}+ likes...")
             liked_models = self._filter_by_likes(raw_models)
             
             if not liked_models:
@@ -644,11 +700,11 @@ class SimplifiedGGUFetcher:
             
             # Step 3: Apply spam filtering or basic GGUF filtering
             if self.disable_spam_filter:
-                self.logger.info("Step 3/6: Basic GGUF filtering (spam filtering disabled)...")
+                self.logger.info("\nStep 3/6: Basic GGUF filtering (spam filtering disabled)...")
                 models_with_gguf = self._filter_gguf_models(liked_models)
                 
                 models_without_gguf = len(liked_models) - len(models_with_gguf)
-                self.logger.info(f"Basic filtering summary:")
+                self.logger.info(f"\nBasic filtering summary:")
                 self.logger.info(f"  - Models loaded: {len(liked_models)}")
                 self.logger.info(f"  - Models with GGUF files: {len(models_with_gguf)}")
                 self.logger.info(f"  - Models without GGUF files: {models_without_gguf}")
@@ -659,15 +715,15 @@ class SimplifiedGGUFetcher:
                     return
                 
                 # Step 4: Process each model
-                self.logger.info("Step 4/6: Processing models and extracting GGUF file information...")
+                self.logger.info("\nStep 4/6: Processing models and extracting GGUF file information...")
                 processed_models = self._process_models(models_with_gguf)
                 
                 # Step 5: Skip spam filtering
-                self.logger.info("Step 5/6: Skipping spam filtering (disabled)")
+                self.logger.info("\nStep 5/6: Skipping spam filtering (disabled)")
                 final_models = processed_models
                 
             else:
-                self.logger.info("Step 3/6: Applying integrated spam filtering...")
+                self.logger.info("\nStep 3/6: Applying integrated spam filtering...")
                 
                 filter_result = self.spam_engine.filter_models(liked_models)
                 
@@ -677,36 +733,39 @@ class SimplifiedGGUFetcher:
                         self.logger.error(f"  - {error}")
                     raise Exception("Spam filtering failed")
                 
-                self.logger.info("Step 4/6: Spam filtering completed")
+                self.logger.info("\nStep 4/6: Spam filtering completed")
                 report = self.spam_engine.generate_report(filter_result)
                 self.logger.info("\n" + report)
                 
-                self.logger.info("Step 5/6: Using spam-filtered models")
+                self.logger.info("\nStep 5/6: Using spam-filtered models")
                 final_models = filter_result.filtered_models
             
             # Step 5.5: Deduplicate across repos
-            self.logger.info("Step 5.5/6: Deduplicating models across repos...")
+            self.logger.info("\nStep 5.5/6: Deduplicating models across repos...")
+            pre_dedup_count = len(final_models)
             final_models = self._deduplicate_across_repos(final_models)
-            self.logger.info(f"After deduplication: {len(final_models)} models")
+            self.logger.info(f"After deduplication: {len(final_models)} models (removed {pre_dedup_count - len(final_models)} duplicates)")
             
             self.stats['models_processed'] = len(final_models)
             
             # Step 6: Generate final output
-            self.logger.info("Step 6/6: Generating final output...")
+            self.logger.info("\nStep 6/6: Generating final gguf_models.json...")
             if not self.dry_run:
                 self._generate_output(final_models)
             else:
                 self.logger.info(f"DRY RUN: Would generate output for {len(final_models)} models")
             
-            self._save_metadata()
+            if not self.dry_run:
+                self._save_metadata()
             
             self.stats['end_time'] = datetime.now()
             duration = (self.stats['end_time'] - self.stats['start_time']).total_seconds()
             
-            self.logger.info("=" * 50)
-            self.logger.info("PROCESS PHASE COMPLETED SUCCESSFULLY")
-            self.logger.info(f"Duration: {duration:.1f}s")
-            self.logger.info("=" * 50)
+            self.logger.info("\n" + "=" * 70)
+            self.logger.info("PROCESS PHASE COMPLETED")
+            self.logger.info(f"  Duration: {duration:.1f}s")
+            self.logger.info(f"  Final models in gguf_models.json: {len(final_models)}")
+            self.logger.info("=" * 70)
             
         except Exception as e:
             self.logger.error(f"Process phase failed: {e}")
