@@ -21,6 +21,13 @@ jobs:
       uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0  # Fetch all history for proper rebasing
+    
+    - name: Pull latest changes before processing
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git pull --rebase origin main || git pull origin main
         
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -152,9 +159,7 @@ jobs:
     - name: Commit and push changes
       if: steps.check_changes.outputs.changes == 'true'
       run: |
-        # Pull latest changes first to avoid conflicts
-        git pull --rebase origin main || git pull origin main
-        
+        # Add the modified files first
         git add gguf_models.json data/raw_models_data.json
         
         # Create enhanced commit message with verification data
@@ -174,8 +179,18 @@ jobs:
         - data/raw_models_data.json (raw API data)
         - gguf_models.json (processed model data)"
         
-        git commit -m "$COMMIT_MSG" || echo "Nothing to commit"
-        git push || git push --force-with-lease
+        # Commit changes
+        git commit -m "$COMMIT_MSG" || {
+          echo "Nothing to commit"
+          exit 0
+        }
+        
+        # Try to push, if it fails due to remote changes, pull and retry
+        git push origin main || {
+          echo "Push failed, pulling latest changes and retrying..."
+          git pull --rebase origin main
+          git push origin main
+        }
         
     - name: Trigger GitHub Pages deployment
       if: steps.check_changes.outputs.changes == 'true'
