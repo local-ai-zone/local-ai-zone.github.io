@@ -176,26 +176,33 @@ class DailyGGUFFetcher:
         self.logger.info("  - Filter: gguf")
         self.logger.info("  - Sort: likes (most popular first)")
         self.logger.info("  - Full data: Yes (siblings, metadata)")
+        self.logger.info(f"  - Limit: {self.max_models} models")
         
         try:
+            # Add limit parameter to the API call itself
+            model_iterator = self.api.list_models(
+                filter="gguf",
+                sort="likes",
+                direction=-1,
+                full=True,
+                limit=self.max_models  # Limit at API level
+            )
+            
             for model in tqdm(
-                self.api.list_models(
-                    filter="gguf",
-                    sort="likes",
-                    direction=-1,
-                    full=True
-                ),
+                model_iterator,
                 desc="Fetching models",
-                unit="model"
+                unit="model",
+                total=self.max_models  # Show progress with known total
             ):
-                if len(models) >= self.max_models:
-                    self.logger.info(f"Reached limit of {self.max_models} models")
-                    break
-                
                 # Convert to dict immediately
                 model_dict = self._model_to_dict(model)
                 if model_dict:
                     models.append(model_dict)
+                
+                # Safety check in case API doesn't respect limit
+                if len(models) >= self.max_models:
+                    self.logger.info(f"Reached limit of {self.max_models} models")
+                    break
         
         except Exception as e:
             self.logger.error(f"Error fetching models: {e}")

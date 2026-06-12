@@ -57,15 +57,16 @@ jobs:
         cd $GITHUB_WORKSPACE
         
         # Use NEW daily fetcher: clean, simple, focused
-        # Fetches ALL GGUF models, filters, deduplicates, outputs
+        # Fetches GGUF models, filters, deduplicates, outputs
         # --incremental: Merges with existing data (safe!)
         # --min-likes 1: Get all models with at least 1 like
-        FETCH_CMD="python scripts/daily_gguf_fetcher.py --incremental --min-likes 1 --output gguf_models.json"
+        # --max-models 5000: Limit to top 5000 models by popularity (prevents infinite runs)
+        FETCH_CMD="python scripts/daily_gguf_fetcher.py --incremental --min-likes 1 --max-models 5000 --output gguf_models.json"
         if [ -n "$HF_TOKEN" ]; then
           FETCH_CMD="$FETCH_CMD --token $HF_TOKEN"
           echo "Using authenticated Hugging Face API requests"
           echo "Mode: INCREMENTAL (merges with existing models)"
-          echo "Scope: ALL GGUF models (sorted by popularity)"
+          echo "Scope: Top 5000 GGUF models (sorted by popularity)"
           echo "Output: gguf_models.json"
         else
           echo "Warning: No HF_TOKEN provided, using unauthenticated requests (may hit rate limits)"
