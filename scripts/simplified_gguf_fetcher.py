@@ -399,6 +399,159 @@ class SimplifiedGGUFetcher:
             )
         
         return deduplicated
+    
+    def run_direct_mode(self) -> None:
+        """
+        Direct mode: Fetch and process in memory without saving raw data.
+        
+        This mode:
+        1. Fetches models directly from API (in memory)
+        2. Processes and filters immediately
+        3. Outputs only gguf_models.json
+        4. Never writes raw_models_data.json to disk
+        
+        Perfect for GitHub Actions where raw data cache isn't needed.
+        """
+        self.logger.info("=" * 70)
+        self.logger.info("DIRECT MODE: IN-MEMORY PROCESSING (NO RAW DATA FILE)")
+        self.logger.info("=" * 70)
+        self.logger.info(f"Mode: {'INCREMENTAL' if self.incremental else 'FULL'}")
+        self.logger.info(f"Looking back: {self.INCREMENTAL_DAYS_LIMIT if self.incremental else self.RECENT_DAYS_LIMIT} days")
+        self.logger.info(f"Dry run: {self.dry_run}")
+        self.logger.info("=" * 70)
+        
+        self.stats['start_time'] = datetime.now()
+        
+        try:
+            # Step 1: Fetch models (in memory only)
+            self.logger.info("\nStep 1/6: Fetching models from API (in memory)...")
+            recent_models = self._fetch_recent_models()
+            self.stats['models_fetched'] = len(recent_models)
+            
+            if not recent_models:
+                self.logger.warning("No models fetched")
+                self._generate_output([])
+                return
+            
+            # Step 2: Convert model objects to dictionaries (in memory)
+            self.logger.info(f"\nStep 2/6: Processing {len(recent_models)} models in memory...")
+            models_data = []
+            for model in tqdm(recent_models, desc="Converting models", unit="model"):
+                model_id = safe_getattr(model, 'id', 'unknown')
+                try:
+                    siblings = self._safe_extract_siblings(model)
+                    likes = safe_getattr(model, 'likes', 0) or 0
+                    downloads = safe_getattr(model, 'downloads', 0) or 0
+                    tags = safe_getattr(model, 'tags', []) or []
+                    card_data = safe_getattr(model, 'cardData', {}) or {}
+                    created_at = safe_getattr(model, 'created_at', None)
+                    
+                    likes = self._validate_engagement_metric(likes, model_id, 'likes')
+                    downloads = self._validate_engagement_metric(downloads, model_id, 'downloads')
+                    
+                    model_dict = {
+                        'id': model_id,
+                        'downloads': downloads,
+                        'likes': likes,
+                        'tags': list(tags) if tags else [],
+                        'siblings': siblings,
+                        'cardData': {
+                            'license': str(safe_getattr(card_data, 'license', '')) or '',
+                            'license_name': str(safe_getattr(card_data, 'license_name', '')) or '',
+                            'tags': list(safe_getattr(card_data, 'tags', []) or []),
+                            'metadata': {k: str(v) for k, v in (safe_getattr(card_data, 'metadata', {}) or {}).items() if isinstance(k, str)},
+                        } if card_data else {},
+                        'created_at': created_at.isoformat() if created_at and hasattr(created_at, 'isoformat') else None,
+                    }
+                    
+                    models_data.append(model_dict)
+                except Exception as e:
+                    self.logger.warning(f"Error processing {model_id}: {e}")
+                    continue
+            
+            self.logger.info(f"Converted {len(models_data)} models to dictionaries")
+            
+            # Step 3: Filter by likes
+            self.logger.info(f"\nStep 3/6: Filtering models with {self.MIN_LIKES_THRESHOLD}+ likes...")
+            liked_models = [m for m in models_data if m.get('likes', 0) >= self.MIN_LIKES_THRESHOLD]
+            self.logger.info(f"Models with {self.MIN_LIKES_THRESHOLD}+ likes: {len(liked_models)}")
+            
+            if not liked_models:
+                self.logger.warning(f"No models with {self.MIN_LIKES_THRESHOLD}+ likes found")
+                self._generate_output([])
+                return
+            
+            # Step 4: Apply spam filtering or basic GGUF filtering
+            if self.disable_spam_filter:
+                self.logger.info("\nStep 4/6: Basic GGUF filtering...")
+                models_with_gguf = self._filter_gguf_models(liked_models)
+                self.logger.info(f"Models with GGUF files: {len(models_with_gguf)}")
+                
+                if not models_with_gguf:
+                    self.logger.warning("No models with GGUF files found")
+                    self._generate_output([])
+                    return
+                
+                processed_models = self._process_models(models_with_gguf)
+                final_models = processed_models
+            else:
+                self.logger.info("\nStep 4/6: Applying spam filtering...")
+                filter_result = self.spam_engine.filter_models(liked_models)
+                
+                if not filter_result.success:
+                    self.logger.error("Spam filtering failed")
+                    raise Exception("Spam filtering failed")
+                
+                report = self.spam_engine.generate_report(filter_result)
+                self.logger.info("\n" + report)
+                final_models = filter_result.filtered_models
+            
+            # Step 5: Deduplicate
+            self.logger.info("\nStep 5/6: Deduplicating models across repos...")
+            pre_dedup = len(final_models)
+            final_models = self._deduplicate_across_repos(final_models)
+            self.logger.info(f"After deduplication: {len(final_models)} models (removed {pre_dedup - len(final_models)})")
+            
+            self.stats['models_processed'] = len(final_models)
+            
+            # Step 6: Generate output
+            self.logger.info("\nStep 6/6: Generating gguf_models.json...")
+            if not self.dry_run:
+                self._generate_output(final_models)
+            else:
+                self.logger.info(f"DRY RUN: Would output {len(final_models)} models")
+            
+            if not self.dry_run:
+                # Save minimal metadata (no raw data file info)
+                metadata = {
+                    'last_run': datetime.now().isoformat(),
+                    'mode': 'direct',
+                    'incremental': self.incremental,
+                    'stats': {
+                        'models_fetched': self.stats['models_fetched'],
+                        'models_processed': self.stats['models_processed'],
+                        'api_calls': self.stats['api_calls'],
+                    }
+                }
+                with open(self.metadata_file, 'w', encoding='utf-8') as f:
+                    json.dump(metadata, f, indent=2, ensure_ascii=False)
+            
+            self.stats['end_time'] = datetime.now()
+            duration = (self.stats['end_time'] - self.stats['start_time']).total_seconds()
+            
+            self.logger.info("\n" + "=" * 70)
+            self.logger.info("DIRECT MODE COMPLETED")
+            self.logger.info(f"  Duration: {duration:.1f}s")
+            self.logger.info(f"  API calls: {self.stats['api_calls']}")
+            self.logger.info(f"  Models fetched: {len(recent_models)}")
+            self.logger.info(f"  Final models: {len(final_models)}")
+            self.logger.info(f"  Memory usage: No raw data file created ✓")
+            self.logger.info("=" * 70)
+            
+        except Exception as e:
+            self.logger.error(f"Direct mode failed: {e}")
+            self.stats['errors'].append(str(e))
+            raise
 
     def download_data(self) -> None:
         """
@@ -1298,8 +1451,8 @@ Examples:
     parser.add_argument(
         'command',
         nargs='?',
-        choices=['download', 'process'],
-        help='Specific phase to run (default: run both phases)'
+        choices=['download', 'process', 'direct'],
+        help='Specific phase to run (default: run both phases). Use "direct" for in-memory processing (no raw data files saved)'
     )
     
     parser.add_argument(
@@ -1456,7 +1609,11 @@ Examples:
             fetcher.download_data()
         elif args.command == 'process':
             fetcher.process_data()
+        elif args.command == 'direct':
+            # Direct mode: in-memory processing, no raw data file
+            fetcher.run_direct_mode()
         else:
+            # Default: run both phases
             fetcher.download_data()
             fetcher.process_data()
         

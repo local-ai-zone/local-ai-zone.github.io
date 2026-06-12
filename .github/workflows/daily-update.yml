@@ -44,7 +44,7 @@ jobs:
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
         
-    - name: Run GGUF fetcher with retry logic
+    - name: Run GGUF fetcher in direct mode (in-memory processing)
       id: fetch_data
       env:
         HF_TOKEN: ${{ secrets.HF_TOKEN }}
@@ -56,12 +56,14 @@ jobs:
         # Change to repository root to ensure correct paths
         cd $GITHUB_WORKSPACE
         
-        # Prepare enhanced command with optimal configuration
-        # Output to repo root, data to ./data directory
-        FETCH_CMD="python scripts/simplified_gguf_fetcher.py --verbose --incremental --output-dir . --data-dir data"
+        # Use DIRECT mode: processes everything in memory without saving raw data
+        # This keeps the repo clean - only gguf_models.json is committed
+        FETCH_CMD="python scripts/simplified_gguf_fetcher.py direct --verbose --incremental --output-dir ."
         if [ -n "$HF_TOKEN" ]; then
           FETCH_CMD="$FETCH_CMD --token $HF_TOKEN"
-          echo "Using authenticated Hugging Face API requests in INCREMENTAL mode (last 7 days only)"
+          echo "Using authenticated Hugging Face API requests in DIRECT mode"
+          echo "Mode: INCREMENTAL (last 7 days only)"
+          echo "Processing: In-memory (no raw data file created)"
         else
           echo "Warning: No HF_TOKEN provided, using unauthenticated requests (may hit rate limits)"
         fi
@@ -73,11 +75,11 @@ jobs:
           echo "Attempt $attempt of $max_attempts"
           
           if eval $FETCH_CMD; then
-            echo "GGUF data fetch successful on attempt $attempt"
+            echo "✅ GGUF data processing successful on attempt $attempt"
             echo "success=true" >> $GITHUB_OUTPUT
             break
           else
-            echo "GGUF data fetch failed on attempt $attempt"
+            echo "❌ GGUF data processing failed on attempt $attempt"
             if [ $attempt -eq $max_attempts ]; then
               echo "All retry attempts failed"
               echo "success=false" >> $GITHUB_OUTPUT
@@ -94,14 +96,16 @@ jobs:
         done
         
         # Show what was created
-        echo "Files created:"
-        ls -lh gguf_models.json data/raw_models_data.json 2>/dev/null || echo "Warning: Expected files not found"
-    - name: Verify backup creation and data integrity
+        echo "✅ Output file created:"
+        ls -lh gguf_models.json 2>/dev/null || echo "⚠️ Warning: gguf_models.json not found"
+        
+        echo "✓ No raw data file created (direct mode - all processing in memory)"
+    - name: Verify data integrity
       id: verify_backup
       run: |
         echo "Verifying data integrity..."
         
-        # Verify output files exist and are valid JSON
+        # Verify output file exists and is valid JSON
         echo "Verifying output file integrity..."
         
         if [ -f "gguf_models.json" ]; then
@@ -124,23 +128,9 @@ jobs:
           exit 1
         fi
         
-        if [ -f "data/raw_models_data.json" ]; then
-          if python -m json.tool data/raw_models_data.json > /dev/null 2>&1; then
-            RAW_COUNT=$(python -c "import json; data=json.load(open('data/raw_models_data.json')); print(len(data))" 2>/dev/null || echo "0")
-            echo "✅ Raw data verification: data/raw_models_data.json is valid JSON"
-            echo "✅ Raw model count: $RAW_COUNT models"
-            echo "raw_data_valid=true" >> $GITHUB_OUTPUT
-            echo "raw_model_count=$RAW_COUNT" >> $GITHUB_OUTPUT
-          else
-            echo "❌ Raw data verification failed: data/raw_models_data.json is invalid JSON"
-            echo "raw_data_valid=false" >> $GITHUB_OUTPUT
-            exit 1
-          fi
-        else
-          echo "❌ Raw data file missing: data/raw_models_data.json not found"
-          echo "raw_data_valid=false" >> $GITHUB_OUTPUT
-          exit 1
-        fi
+        echo "✓ Direct mode: No raw data file (all processing done in memory)"
+        echo "raw_data_valid=true" >> $GITHUB_OUTPUT
+        echo "raw_model_count=N/A (direct mode)" >> $GITHUB_OUTPUT
         
     - name: Check for data changes
       id: check_changes
@@ -168,17 +158,18 @@ jobs:
 
         📊 Update Summary:
         - Processed models: ${{ steps.verify_backup.outputs.model_count }} GGUF models
-        - Raw data models: ${{ steps.verify_backup.outputs.raw_model_count }} total models (cached locally, not committed)
+        - Processing mode: Direct (in-memory, no raw data files)
         
         🔧 Processing Details:
+        - Mode: Direct (fetch + process in memory)
         - Spam filtering: Enabled with integrated processing
         - Authentication: ${{ env.HF_TOKEN && 'Authenticated API requests' || 'Unauthenticated requests' }}
         - Verbose logging: Enabled for detailed diagnostics
         - Data integrity: Verified (valid JSON output)
         
         🗂️ Files Updated:
-        - gguf_models.json (processed model data - committed)
-        - data/raw_models_data.json (raw API cache - local only, not committed due to size)"
+        - gguf_models.json (processed model data)
+        - No raw data committed (direct mode keeps repo clean)"
         
         # Commit changes
         git commit -m "$COMMIT_MSG" || {
