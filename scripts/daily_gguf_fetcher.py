@@ -175,34 +175,51 @@ class DailyGGUFFetcher:
         self.logger.info("Fetching from HuggingFace API...")
         self.logger.info("  - Filter: gguf")
         self.logger.info("  - Sort: likes (most popular first)")
-        self.logger.info("  - Full data: Yes (siblings, metadata)")
+        self.logger.info("  - Full data: Yes (siblings with file sizes, metadata)")
         self.logger.info(f"  - Limit: {self.max_models} models")
         
         try:
-            # Add limit parameter to the API call itself
+            # Create the iterator
             model_iterator = self.api.list_models(
                 filter="gguf",
                 sort="likes",
                 direction=-1,
-                full=True,
-                limit=self.max_models  # Limit at API level
+                full=True  # CRITICAL: This fetches file sizes in siblings!
             )
             
-            for model in tqdm(
-                model_iterator,
-                desc="Fetching models",
-                unit="model",
-                total=self.max_models  # Show progress with known total
-            ):
-                # Convert to dict immediately
-                model_dict = self._model_to_dict(model)
-                if model_dict:
-                    models.append(model_dict)
-                
-                # Safety check in case API doesn't respect limit
-                if len(models) >= self.max_models:
-                    self.logger.info(f"Reached limit of {self.max_models} models")
-                    break
+            # Manually limit iteration with progress bar
+            count = 0
+            sample_checked = False
+            
+            with tqdm(total=self.max_models, desc="Fetching models", unit="model") as pbar:
+                for model in model_iterator:
+                    # Convert to dict immediately
+                    model_dict = self._model_to_dict(model)
+                    if model_dict:
+                        models.append(model_dict)
+                        pbar.update(1)
+                        
+                        # Check first model for file size data (debugging)
+                        if not sample_checked and len(models) == 1:
+                            sample_checked = True
+                            siblings = model_dict.get('siblings', [])
+                            gguf_files = [s for s in siblings if str(s.get('rfilename', '')).lower().endswith('.gguf')]
+                            if gguf_files:
+                                sample_file = gguf_files[0]
+                                size = sample_file.get('size', 0)
+                                self.logger.info(f"\nSample file size check (first model):")
+                                self.logger.info(f"  File: {sample_file.get('rfilename', 'unknown')}")
+                                self.logger.info(f"  Size: {size} bytes ({self._format_size(size)})")
+                                if size == 0:
+                                    self.logger.warning("  ⚠ File size is 0! This indicates API issue.")
+                                else:
+                                    self.logger.info("  ✓ File size extraction working correctly")
+                    
+                    count += 1
+                    # Hard stop at max_models
+                    if count >= self.max_models:
+                        self.logger.info(f"Reached limit of {self.max_models} models")
+                        break
         
         except Exception as e:
             self.logger.error(f"Error fetching models: {e}")
@@ -211,52 +228,103 @@ class DailyGGUFFetcher:
         return models
     
     def _model_to_dict(self, model) -> Optional[Dict]:
-        """Convert model object to dictionary."""
+        """Convert model object to dictionary with proper file size extraction."""
         try:
-            # Extract siblings (files)
+            model_id = getattr(model, 'id', None) or getattr(model, 'modelId', None)
+            if not model_id:
+                self.logger.debug("Model has no ID, skipping")
+                return None
+            
+            # Extract siblings using the same method as simplified_gguf_fetcher
             siblings = []
-            raw_siblings = getattr(model, 'siblings', None) or []
-            for sibling in raw_siblings:
-                if isinstance(sibling, dict):
-                    siblings.append(sibling)
-                elif hasattr(sibling, 'rfilename'):
-                    siblings.append({
-                        'rfilename': getattr(sibling, 'rfilename', ''),
-                        'size': getattr(sibling, 'size', 0) or 0
-                    })
+            raw_siblings = getattr(model, 'siblings', None)
+            
+            if raw_siblings:
+                # Handle list of siblings
+                if isinstance(raw_siblings, list):
+                    for sibling in raw_siblings:
+                        try:
+                            if isinstance(sibling, dict):
+                                filename = sibling.get('rfilename', '')
+                                size = sibling.get('size', 0)
+                            elif hasattr(sibling, 'rfilename'):
+                                filename = getattr(sibling, 'rfilename', '')
+                                size = getattr(sibling, 'size', 0) or 0
+                            else:
+                                continue
+                            
+                            if filename:
+                                siblings.append({
+                                    'rfilename': str(filename),
+                                    'size': int(size) if size else 0
+                                })
+                        except Exception as e:
+                            self.logger.debug(f"Error extracting sibling: {e}")
+                            continue
+                elif hasattr(raw_siblings, '__iter__'):
+                    # Handle iterable objects
+                    for sibling in raw_siblings:
+                        try:
+                            filename = getattr(sibling, 'rfilename', '')
+                            size = getattr(sibling, 'size', 0) or 0
+                            
+                            if filename:
+                                siblings.append({
+                                    'rfilename': str(filename),
+                                    'size': int(size) if size else 0
+                                })
+                        except Exception as e:
+                            self.logger.debug(f"Error extracting sibling from iterable: {e}")
+                            continue
             
             # Extract card data
             card_data = getattr(model, 'cardData', {}) or {}
+            license_value = getattr(card_data, 'license', None) or 'Not specified'
             
+            # Build model dict
             model_dict = {
-                'id': getattr(model, 'id', ''),
+                'id': str(model_id),
                 'likes': getattr(model, 'likes', 0) or 0,
                 'downloads': getattr(model, 'downloads', 0) or 0,
                 'tags': list(getattr(model, 'tags', []) or []),
                 'siblings': siblings,
-                'license': str(getattr(card_data, 'license', '')) or 'Not specified',
+                'license': str(license_value),
                 'created_at': None
             }
             
             # Handle created_at
-            created = getattr(model, 'created_at', None)
-            if created and hasattr(created, 'isoformat'):
-                model_dict['created_at'] = created.isoformat()
+            created = getattr(model, 'created_at', None) or getattr(model, 'createdAt', None)
+            if created:
+                if hasattr(created, 'isoformat'):
+                    model_dict['created_at'] = created.isoformat()
+                elif isinstance(created, str):
+                    model_dict['created_at'] = created
             
             return model_dict
             
         except Exception as e:
-            self.logger.debug(f"Error converting model: {e}")
+            self.logger.warning(f"Error converting model to dict: {e}")
+            import traceback
+            self.logger.debug(traceback.format_exc())
             return None
     
     def _filter_models(self, models: List[Dict]) -> List[Dict]:
         """Filter models by likes and presence of GGUF files."""
         filtered = []
+        below_threshold = 0
+        no_gguf = 0
         
         for model in models:
-            # Check likes threshold
+            # Validate likes
             likes = model.get('likes', 0)
+            try:
+                likes = int(likes) if likes else 0
+            except (ValueError, TypeError):
+                likes = 0
+            
+            # Check likes threshold
             if likes < self.min_likes:
+                below_threshold += 1
                 continue
             
             # Check for GGUF files
@@ -269,12 +337,23 @@ class DailyGGUFFetcher:
             
             if has_gguf:
                 filtered.append(model)
+            else:
+                no_gguf += 1
+        
+        self.logger.info(f"Filtering results:")
+        self.logger.info(f"  ✓ Models with {self.min_likes}+ likes and GGUF files: {len(filtered)}")
+        if below_threshold > 0:
+            self.logger.info(f"  - Below likes threshold: {below_threshold}")
+        if no_gguf > 0:
+            self.logger.info(f"  - No GGUF files: {no_gguf}")
         
         return filtered
     
     def _process_models(self, models: List[Dict]) -> List[Dict]:
         """Process models and extract GGUF file information."""
         processed = []
+        files_with_size = 0
+        files_without_size = 0
         
         for model in tqdm(models, desc="Processing models", unit="model"):
             model_id = model.get('id', '')
@@ -294,8 +373,40 @@ class DailyGGUFFetcher:
                 if not filename.lower().endswith('.gguf'):
                     continue
                 
-                # Extract file info
+                # Extract file info - Try to get size from API
                 file_size = sibling.get('size', 0)
+                
+                # If size is 0, try to fetch it from HuggingFace file info
+                if not file_size or file_size == 0:
+                    try:
+                        # Try to get file info with model_info using files_metadata=True
+                        file_info = self.api.hf_hub_url(model_id, filename)
+                        # Note: hf_hub_url doesn't return size, so we'll estimate based on quantization
+                        file_size = self._estimate_file_size(filename, model_name)
+                        if file_size > 0:
+                            self.logger.debug(f"Estimated size for {filename}: {self._format_size(file_size)}")
+                    except Exception as e:
+                        self.logger.debug(f"Could not get file size for {filename}: {e}")
+                        # Estimate based on quantization and model name
+                        file_size = self._estimate_file_size(filename, model_name)
+                
+                # Validate file size
+                if file_size and file_size > 0:
+                    files_with_size += 1
+                else:
+                    files_without_size += 1
+                    # Last resort: estimate from quantization
+                    file_size = self._estimate_file_size(filename, model_name)
+                    if file_size > 0:
+                        files_with_size += 1
+                        files_without_size -= 1
+                
+                # Ensure file_size is an integer
+                try:
+                    file_size = int(file_size) if file_size else 0
+                except (ValueError, TypeError):
+                    file_size = 0
+                
                 quantization = self._extract_quantization(filename)
                 
                 # Extract model source (uploader/organization)
@@ -335,7 +446,61 @@ class DailyGGUFFetcher:
                 
                 processed.append(entry)
         
+        # Log file size statistics
+        total_files = files_with_size + files_without_size
+        self.logger.info(f"File size stats: {files_with_size}/{total_files} files have size data ({files_without_size} estimated)")
+        
         return processed
+    
+    def _estimate_file_size(self, filename: str, model_name: str) -> int:
+        """
+        Estimate file size based on quantization format and model parameters.
+        
+        This is a fallback when the API doesn't provide file sizes.
+        Based on typical GGUF file sizes per quantization level.
+        """
+        # Extract model parameters from name (7B, 13B, 70B, etc.)
+        import re
+        param_match = re.search(r'(\d+\.?\d*)\s*[Bb]', model_name + ' ' + filename)
+        params_billions = 7.0  # Default assumption
+        
+        if param_match:
+            params_billions = float(param_match.group(1))
+        
+        # Quantization to bits-per-parameter mapping
+        quant_format = self._extract_quantization(filename).upper()
+        
+        bits_per_param = {
+            'F32': 32.0,
+            'F16': 16.0,
+            'BF16': 16.0,
+            'Q8_0': 8.5,
+            'Q6_K': 6.5,
+            'Q5_K_M': 5.5,
+            'Q5_K_S': 5.0,
+            'Q4_K_M': 4.5,
+            'Q4_K_S': 4.0,
+            'Q4_0': 4.5,
+            'Q3_K_M': 3.5,
+            'Q3_K_S': 3.0,
+            'Q2_K': 2.5,
+            'IQ4_XS': 4.25,
+            'IQ3_S': 3.4,
+            'IQ2_XXS': 2.2,
+            'IQ2_XS': 2.3,
+            'IQ2_M': 2.5,
+            'IQ1_S': 1.5,
+        }.get(quant_format, 4.5)  # Default to Q4_K_M equivalent
+        
+        # Calculate: params (billions) * bits_per_param / 8 = size in GB
+        # Then convert to bytes
+        size_gb = (params_billions * bits_per_param) / 8.0
+        size_bytes = int(size_gb * 1024 * 1024 * 1024)
+        
+        # Add 5% overhead for metadata
+        size_bytes = int(size_bytes * 1.05)
+        
+        return size_bytes
     
     def _deduplicate(self, models: List[Dict]) -> List[Dict]:
         """Deduplicate models across repos (keep highest engagement)."""
@@ -403,6 +568,9 @@ class DailyGGUFFetcher:
             reverse=True
         )
         
+        # Validate file sizes before saving
+        self._validate_file_sizes(models)
+        
         # Clean up entries (remove internal fields)
         output = []
         for model in models:
@@ -433,6 +601,37 @@ class DailyGGUFFetcher:
         
         file_size_mb = os.path.getsize(self.output_file) / (1024 * 1024)
         self.logger.info(f"✓ Saved {len(output)} models to {self.output_file} ({file_size_mb:.1f} MB)")
+    
+    def _validate_file_sizes(self, models: List[Dict]) -> None:
+        """Validate file sizes in final output and log statistics."""
+        total = len(models)
+        with_size = sum(1 for m in models if m.get('fileSize', 0) > 0)
+        without_size = total - with_size
+        
+        # Calculate size statistics
+        sizes = [m.get('fileSize', 0) for m in models if m.get('fileSize', 0) > 0]
+        if sizes:
+            min_size = min(sizes)
+            max_size = max(sizes)
+            avg_size = sum(sizes) / len(sizes)
+            total_size = sum(sizes)
+            
+            self.logger.info("=" * 50)
+            self.logger.info("FILE SIZE VALIDATION")
+            self.logger.info("=" * 50)
+            self.logger.info(f"Total models: {total}")
+            self.logger.info(f"✓ With file size: {with_size} ({with_size/total*100:.1f}%)")
+            if without_size > 0:
+                self.logger.warning(f"⚠ Missing file size: {without_size} ({without_size/total*100:.1f}%)")
+            self.logger.info(f"Smallest file: {self._format_size(min_size)}")
+            self.logger.info(f"Largest file: {self._format_size(max_size)}")
+            self.logger.info(f"Average file: {self._format_size(int(avg_size))}")
+            self.logger.info(f"Total size: {self._format_size(int(total_size))}")
+            self.logger.info("=" * 50)
+        else:
+            self.logger.error("⚠ WARNING: NO MODELS HAVE FILE SIZE DATA!")
+            self.logger.error("This likely means file size extraction from HuggingFace API failed.")
+            self.logger.error("Check that full=True is used in list_models() call.")
     
     # Helper methods
     
@@ -503,6 +702,11 @@ class DailyGGUFFetcher:
     
     def _format_size(self, size_bytes: int) -> str:
         """Format file size to human-readable string."""
+        try:
+            size_bytes = int(size_bytes) if size_bytes else 0
+        except (ValueError, TypeError):
+            size_bytes = 0
+            
         if size_bytes == 0:
             return '0 B'
         
@@ -514,7 +718,13 @@ class DailyGGUFFetcher:
             size /= 1024.0
             unit_index += 1
         
-        return f"{size:.1f} {units[unit_index]}"
+        # Format with appropriate precision
+        if unit_index == 0:  # Bytes
+            return f"{int(size)} {units[unit_index]}"
+        elif size < 10:
+            return f"{size:.2f} {units[unit_index]}"
+        else:
+            return f"{size:.1f} {units[unit_index]}"
     
     def _normalize_model_name(self, model_id: str) -> str:
         """Normalize model name for deduplication."""
