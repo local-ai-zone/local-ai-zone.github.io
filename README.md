@@ -23,6 +23,29 @@ Live site: [https://local-ai-zone.github.io](https://local-ai-zone.github.io)
 - **Hardware Calculator**: Estimates RAM/CPU/GPU requirements from quantization
 - **Slug Unification**: Single canonical slug function shared by page generation and sitemap
 
+## 💡 Example Project: A Local AI Agent
+
+Want to see a complete agent built entirely on local, open-weight models? **Lawyer Assistant** is a working reference implementation of the RAG (Retrieval-Augmented Generation) pipeline — an open-source, MIT-licensed legal document assistant that runs 100% on-device.
+
+It demonstrates the same patterns this site's guides teach:
+
+- **RAG pipeline** — full ingest → index → retrieve → generate flow
+- **Multi-model orchestration** — BGE-M3 embeddings, ChromaDB vector store, and an Ollama-hosted LLM working as separate services
+- **Agent loop** — query routing, tool calls, and iterative retrieval
+- **Hybrid retrieval** — BM25 keyword + semantic vector search combined
+- **Grounding & citations** — answers link back to exact page & paragraph numbers
+- **Streaming responses** — REST + SSE (Server-Sent Events)
+
+| Resource | Link |
+|---|---|
+| **Project Website** | [lawyers-assistant.github.io](https://lawyers-assistant.github.io) |
+| **Source Code (GitHub)** | [github.com/haal-lab/Lawyer-Assistant](https://github.com/haal-lab/Lawyer-Assistant) |
+| **Case Study** | [blog/lawyer-assistant-privacy-first-legal-ai.html](blog/lawyer-assistant-privacy-first-legal-ai.html) |
+| **Build Guide** | [blog/how-to-build-local-ai-legal-assistant.html](blog/how-to-build-local-ai-legal-assistant.html) |
+| **RAG Infrastructure Guides** | [guides/best-ai-embedding-models-ultimate-ranking-2026.html](guides/best-ai-embedding-models-ultimate-ranking-2026.html) · [rerankers](guides/best-ai-reranker-models-ultimate-ranking-2026.html) · [OCR](guides/best-ai-ocr-models-ultimate-ranking-2026.html) |
+
+Built by **Hussain Nazary** — use it as a reference when building your own local AI agent.
+
 ## 🏗️ Architecture
 
 ### Frontend Structure

@@ -1,16 +1,16 @@
 # Analytics Verification Report
 
-**Generated:** 8/4/2026, 11:05:54 PM
+**Generated:** 8/5/2026, 2:37:55 AM
 
 **Status:** ⚠️ NEEDS ATTENTION
 
 ## Summary
 
-- Total Files: 78
+- Total Files: 81
 - Files with Analytics: 0
-- Files without Analytics: 78
+- Files without Analytics: 81
 - Coverage: 0%
-- Issues: 78
+- Issues: 81
 
 ## Analytics Providers
 
@@ -29,8 +29,11 @@
 - **guides\best-ai-analysis-models-ultimate-ranking-2025.html**: No analytics tracking
 - **guides\best-ai-brainstorming-models-ultimate-ranking-2025.html**: No analytics tracking
 - **guides\best-ai-coding-assistant-models-ultimate-ranking-2025.html**: No analytics tracking
+- **guides\best-ai-embedding-models-ultimate-ranking-2026.html**: No analytics tracking
 - **guides\best-ai-multilingual-models-ultimate-ranking-2025.html**: No analytics tracking
-- **guides\best-ai-research-assistant-models-ultimate-ranking-2025.html**: No analytics tracking
+- **guides\best-ai-ocr-models-ultimate-ranking-2026.html**: No analytics tracking
+- **guides\best-ai-reranker-models-ultimate-ranking-2026.html**: No analytics tracking
+- **guides\best-ai-research-assistant-models-ultimate-ranking.html**: No analytics tracking
 - **guides\context-length-optimization-ultimate-guide-2025.html**: No analytics tracking
 - **guides\top-20-local-ai-models-mobile-ai-agents-guide-2025.html**: No analytics tracking
 - **guides\what-is-ai-model-3b-7b-30b-parameters-guide-2025.html**: No analytics tracking

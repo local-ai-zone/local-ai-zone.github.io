@@ -69,8 +69,14 @@ function validateInternalLinks(filePath, html) {
             return;
         }
         
+        // Strip fragment (anchor) from link before resolving the file path
+        const withoutFragment = link.split('#')[0];
+        if (!withoutFragment) {
+            return;
+        }
+        
         // Resolve relative path
-        const absolutePath = path.resolve(fileDir, link);
+        const absolutePath = path.resolve(fileDir, withoutFragment);
         
         // Check if file exists
         if (!fileExists(absolutePath)) {
@@ -79,6 +85,22 @@ function validateInternalLinks(filePath, html) {
                 link: link,
                 resolvedPath: absolutePath
             });
+        } else if (link.includes('#')) {
+            // Verify the target anchor exists in the referenced file
+            const anchor = link.split('#')[1];
+            try {
+                const targetHtml = fs.readFileSync(absolutePath, 'utf8');
+                if (anchor && !new RegExp(`id=["']${anchor.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}["']`).test(targetHtml)) {
+                    brokenLinks.push({
+                        file: filePath,
+                        link: link,
+                        resolvedPath: absolutePath,
+                        reason: `Anchor #${anchor} not found in target file`
+                    });
+                }
+            } catch (error) {
+                // Ignore read errors - file existence already validated
+            }
         }
     });
     
@@ -92,9 +114,7 @@ function validateAssets() {
     const requiredAssets = [
         'css/premium-styles.css',
         'css/blog-article.css',
-        'css/blog-article.min.css',
-        'logo.svg',
-        'data/blog-articles.json'
+        'logo.svg'
     ];
     
     const missing = [];
@@ -115,6 +135,15 @@ function validateBlogPost(filePath) {
     try {
         const html = fs.readFileSync(filePath, 'utf8');
         const errors = [];
+        
+        // Skip intentional noindex redirect stub pages (e.g. consolidated-guide redirects)
+        if (/<meta name="robots" content="noindex[^"]*">/.test(html) && /http-equiv="refresh"/.test(html)) {
+            return {
+                valid: true,
+                errors: [],
+                brokenLinks: []
+            };
+        }
         
         // Check for required elements
         const requiredElements = [

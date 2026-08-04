@@ -403,8 +403,45 @@
                 </div>
             </section>
 
+            <!-- Example Project: Local AI Agent Reference -->
+            <section class="agent-spotlight" aria-label="Example project: local AI agent">
+                <div class="articles-header">
+                    <h2 class="articles-title">💡 Example Project: A Local AI Agent</h2>
+                    <p class="articles-subtitle">A complete open-source reference implementation. If you want to build an agent on local models, study how this one is wired together.</p>
+                </div>
+                <div class="spotlight-card">
+                    <div class="spotlight-main">
+                        <div class="spotlight-badges"><span class="trending-badge badge-new">REFERENCE PROJECT</span><span class="trending-badge badge-score">Open Source · MIT</span></div>
+                        <h3 class="spotlight-title">⚖️ Lawyer Assistant — A RAG Agent for Legal Documents</h3>
+                        <p class="spotlight-desc">A reference project showing a complete retrieval-augmented generation pipeline: it indexes contracts into a local vector store, retrieves relevant passages for a query, and answers with citations. It uses <strong>BGE-M3</strong> for embeddings, <strong>ChromaDB</strong> as the vector store, and <strong>Ollama</strong> for local LLM inference. Everything runs on-device; the source is MIT-licensed.</p>
+                        <p class="spotlight-patterns-label">Patterns you can study in the source:</p>
+                        <ul class="spotlight-patterns">
+                            <li><strong>RAG pipeline</strong> — full ingest → index → retrieve → generate flow</li>
+                            <li><strong>Multi-model orchestration</strong> — embeddings, rerankers &amp; LLM working as separate services</li>
+                            <li><strong>Agent loop</strong> — query routing, tool calls, and iterative retrieval</li>
+                            <li><strong>Hybrid retrieval</strong> — BM25 keyword + semantic vector search combined</li>
+                            <li><strong>Grounding &amp; citations</strong> — answers link back to exact page &amp; paragraph numbers</li>
+                            <li><strong>Streaming responses</strong> — REST + SSE (Server-Sent Events) output</li>
+                        </ul>
+                        <div class="spotlight-tech">
+                            <span class="spotlight-chip">BGE-M3 Embeddings</span>
+                            <span class="spotlight-chip">ChromaDB Vector Store</span>
+                            <span class="spotlight-chip">Ollama (Llama · Mistral · Gemma)</span>
+                            <span class="spotlight-chip">BM25 Keyword Search</span>
+                            <span class="spotlight-chip">OCR Document Parsing</span>
+                        </div>
+                        <div class="spotlight-actions">
+                            <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener noreferrer" class="spotlight-btn spotlight-btn-primary">View Source on GitHub ↗</a>
+                            <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener noreferrer" class="spotlight-btn spotlight-btn-secondary">Project Website ↗</a>
+                            <a href="blog/how-to-build-local-ai-legal-assistant.html" class="spotlight-btn spotlight-btn-ghost">Follow the Build Guide →</a>
+                            <a href="blog/lawyer-assistant-privacy-first-legal-ai.html" class="spotlight-btn spotlight-btn-ghost">Case Study &amp; Benchmarks →</a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Featured Articles Section -->
-            <section class="featured-articles" aria-label="Featured Articles">
+            <section id="educational-content-index" class="featured-articles" aria-label="Featured Articles">
                 <div class="articles-header">
                     <h2 class="articles-title">From the Blog</h2>
                     <p class="articles-subtitle">Expert guides and analysis to help you master local AI.</p>
