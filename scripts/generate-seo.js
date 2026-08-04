@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const { createSlug } = require('./slug-utils');
+const { deriveShardPartURLs, shardDirectoryOf, shardTreeUrl } = require('./shard-urls');
 
 /**
  * Improved SEO Sitemap Generation Script
@@ -127,17 +128,31 @@ class ContentScanner {
 
             this.logger.log(`📊 Found ${modelsData.length} model entries in JSON`);
 
+            // Mirror generate-minimal-pages.js EXACTLY: dedupe by modelName,
+            // keep the highest-likeCount entry per model (the entry whose
+            // page was actually generated), sort by likes, take the top-N.
+            // Shard metadata must come from the SELECTED entry, not from an
+            // aggregate across all quants of the model — a model whose top
+            // entry is Q4_K_M is a single-file page even if a lower-ranked
+            // BF16 variant of the same repo is sharded.
+            const topModels = new Map();
+            for (let i = 0; i < modelsData.length; i++) {
+                const model = modelsData[i];
+                if (!model || !model.modelName) continue;
+                const current = topModels.get(model.modelName);
+                if (!current || (model.likeCount || 0) > (current.likeCount || 0)) {
+                    topModels.set(model.modelName, model);
+                }
+            }
+            const selectedModels = Array.from(topModels.values())
+                .sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
+
             const processedModels = [];
             const seenSlugs = new Set();
 
-            for (let i = 0; i < modelsData.length; i++) {
+            for (let i = 0; i < selectedModels.length; i++) {
                 try {
-                    const model = modelsData[i];
-                    
-                    if (!model.modelName) {
-                        this.logger.warn(`Model at index ${i} has no modelName`);
-                        continue;
-                    }
+                    const model = selectedModels[i];
 
                     // Generate URL-safe slug (shared with generate-minimal-pages.js)
                     const slug = createSlug(model.modelName);
@@ -146,7 +161,8 @@ class ContentScanner {
                         continue;
                     }
 
-                    // Skip duplicates
+                    // Skip duplicate slugs (the generator also writes one page
+                    // per unique slug across the selection).
                     if (seenSlugs.has(slug)) {
                         continue;
                     }
@@ -155,13 +171,29 @@ class ContentScanner {
                     const htmlPath = `models/${slug}.html`;
                     const exists = fs.existsSync(htmlPath);
 
+                    // Mirror generate-minimal-pages.js exactly: a page is
+                    // sharded only when the SELECTED entry's shardParts field
+                    // says so (>1) AND it carries a modelId (the generator
+                    // gates its chip/tree links on the same condition).
+                    const shardParts = parseInt(model.shardParts, 10) || 0;
+                    const shardUrlCount = deriveShardPartURLs(model).length;
+                    const isSharded = shardParts > 1 && !!model.modelId;
+
                     const modelInfo = {
                         name: model.modelName,
                         slug: slug,
                         htmlPath: htmlPath,
                         exists: exists,
                         lastModified: exists ? fs.statSync(htmlPath).mtime.toISOString() : null,
-                        originalData: model
+                        originalData: model,
+                        shardParts: shardParts,
+                        isSharded: isSharded,
+                        shardUrlCount: shardUrlCount,
+                        shardTree: shardTreeUrl({
+                            modelId: model.modelId,
+                            filename: model.filename,
+                            shardParts: shardParts
+                        })
                     };
 
                     if (exists) {
@@ -244,7 +276,11 @@ class URLProcessor {
                     isDuplicate: false,
                     metadata: {
                         modelName: model.name,
-                        slug: model.slug
+                        slug: model.slug,
+                        isSharded: !!model.isSharded,
+                        shardParts: model.shardParts || 0,
+                        shardUrlCount: model.shardUrlCount || 0,
+                        shardTree: model.shardTree || ''
                     }
                 };
 
@@ -854,6 +890,16 @@ class SitemapOrchestrator {
     generateReport(data) {
         const logReport = this.logger.getReport();
         
+        // Multi-part awareness: count how many model URLs are sharded and
+        // how many shard parts they represent, so the report's model count
+        // reflects multi-part models (one URL per model, parts aggregated).
+        const modelURLs = data.enhancedURLs.filter(url => url.contentType === 'model' && url.validated && !url.isDuplicate);
+        const shardedModels = modelURLs.filter(url => url.metadata && url.metadata.isSharded);
+        const totalShardParts = shardedModels.reduce(
+            (sum, url) => sum + (parseInt(url.metadata.shardParts, 10) || 0),
+            0
+        );
+        
         return {
             timestamp: new Date().toISOString(),
             summary: {
@@ -863,6 +909,12 @@ class SitemapOrchestrator {
                 errorsCount: logReport.errorCount,
                 warningsCount: logReport.warningCount,
                 sitemapFiles: data.sitemapResult.sitemaps.map(s => s.filename)
+            },
+            shardedModels: {
+                totalModels: modelURLs.length,
+                sharded: shardedModels.length,
+                singleFile: modelURLs.length - shardedModels.length,
+                totalShardParts: totalShardParts
             },
             urlsByType: this.calculateURLsByType(data.enhancedURLs),
             contentInventory: {
@@ -908,6 +960,10 @@ class SitemapOrchestrator {
         
         for (const [type, count] of Object.entries(report.urlsByType)) {
             this.logger.log(`   - ${type} pages: ${count}`);
+        }
+        
+        if (report.shardedModels) {
+            this.logger.log(`   - Multi-part models: ${report.shardedModels.sharded} (${report.shardedModels.totalShardParts} total shard parts)`);
         }
         
         this.logger.log(`   - Duplicates resolved: ${report.summary.duplicatesResolved}`);

@@ -190,8 +190,11 @@ slug drift between the page generator and the sitemap, and the incremental
 merge silently collapsing the model catalog.
 
 ```bash
-npm test                  # Full suite: Node slug-parity + Python fetcher tests
+npm test                  # Full suite: Node (slug + shard suites) + Python fetcher tests
+npm run test:js          # Node only — all JS suites (serial: slug parity + shard parts + shard URLs)
 npm run test:slug         # Node only — slug parity, generator parity, zero-orphan checks
+npm run test:shard-parts  # Node only — shard resolve-URL derivation + copy formats for multi-part files
+npm run test:shard-urls   # Node only — static-page shard helpers + app parity + generator output
 npm run test:fetcher      # Python only — merge key, size estimator, clamp/backfill
 ```
 

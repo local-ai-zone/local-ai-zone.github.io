@@ -10,6 +10,7 @@
 const fs = require('fs').promises;
 const path = require('path');
 const { createSlug } = require('./slug-utils');
+const { deriveShardPartURLs, shardDirectoryOf, shardTreeUrl, htmlEscape } = require('./shard-urls');
 
 class MinimalPageGenerator {
     constructor() {
@@ -280,19 +281,88 @@ class MinimalPageGenerator {
         // Format engagement metrics
         const engagementMetrics = this.formatEngagementMetrics(model);
         
+        // Multi-part (sharded) files: derive the full URL set + repo tree.
+        // Static pages have no JS, so the copy affordance is a <details>
+        // block whose <textarea> holds every part URL for manual copy.
+        //
+        // "Sharded" is decided by the shardParts FIELD (like the app's
+        // getDownloadTargets), so a sharded-but-unparseable filename still
+        // gets the "· N parts" chip + tree download link; only the URL-list
+        // textarea needs a parseable filename (deriveShardPartURLs).
+        const shardPartsField = parseInt(model.shardParts, 10) || 0;
+        // Gated on modelId only (like shardTreeUrl): with modelId present,
+        // isSharded ⟹ shardTree non-empty, so chip ⟺ tree ⟺ label by
+        // construction. The huggingFaceLink OR would create a page that
+        // claims "· N parts" while the download button grabs a single part.
+        const isSharded = shardPartsField > 1 && !!(model.modelId);
+        const shardUrls = deriveShardPartURLs(model);
+        const shardTree = shardTreeUrl(model);
+        const shardDir = shardDirectoryOf(model);
+        const partsCount = isSharded ? shardPartsField : 0;
+        const downloadHref = isSharded && shardTree ? shardTree : (model.directDownloadLink || '#');
+        const downloadLabel = isSharded && shardTree ? `Download ${partsCount} Parts` : 'Download GGUF';
+        
+        // SEO: multi-part models get the "(N parts)" marker in the title and
+        // a "split into N parts" clause in the descriptions, differentiating
+        // them from single-file quant pages of the same model.
+        const titlePartsSuffix = partsCount > 1 ? ` (${partsCount} parts)` : '';
+        const descPartsClause = partsCount > 1 ? ` Split into ${partsCount} parts.` : '';
+        const seoTitle = `${model.modelName} - GGUF Model${titlePartsSuffix}`;
+        const seoDescription = `Download ${model.modelName} GGUF model. ${model.fileSizeFormatted || 'N/A'}, ${model.downloadCount.toLocaleString()} downloads, ${model.likeCount} likes.${descPartsClause}`;
+        const seoOgDescription = `Download ${model.modelName} GGUF model. ${model.fileSizeFormatted || 'N/A'}, ${model.downloadCount.toLocaleString()} downloads.${descPartsClause}`;
+        
+        // When the filename's own "of-N" total disagrees with shardParts
+        // (pathological repos with overlapping shard families), the derived
+        // URL list may point at files that don't exist. Mirror the app's
+        // "fall back to the tree on mismatch" behavior: keep the chip + tree
+        // link, skip the URL-list textarea.
+        const shardTotalMatches = (() => {
+            const m = /-(\d+)-of-(\d+)(?=\.gguf$)/i.exec(String(model.filename || '').replace(/\\/g, '/'));
+            return !m || parseInt(m[2], 10) === shardPartsField;
+        })();
+        const showCopyBlock = shardUrls.length > 1 && shardTotalMatches;
+        
+        // JSON-LD structured data for search engines: sharded pages expose
+        // the full multi-part file inventory (one DataDownload per shard).
+        // Only advertise the derived URL list when it's trustworthy — the
+        // same mismatch guard that skips the copy-block textarea applies,
+        // so pathological repos never publish possibly-404 shard URLs.
+        // Reuse the SEO title/description so JSON-LD never diverges from
+        // the visible <title> and meta description.
+        const jsonLd = this.generateJSONLD(model, showCopyBlock ? shardUrls : [], seoTitle, seoDescription);
+        
+        // Parts UI CSS is emitted only on sharded pages (keeps plain pages lean).
+        const partsCss = partsCount > 1
+            ? '.parts-count{font-size:0.75rem;color:var(--secondary-color);font-weight:500}'
+            + '.parts-box{margin-top:0.5rem;border:1px solid var(--border-color);border-radius:var(--border-radius);background:#F8FAFC}'
+            + '.parts-box summary{cursor:pointer;padding:0.625rem 0.75rem;font-size:0.8125rem;font-weight:600;color:var(--primary-color)}'
+            + '.parts-box summary:hover{background:#EFF6FF}'
+            + '.parts-list{display:block;width:100%;box-sizing:border-box;padding:0.5rem;margin:0;border:0;border-top:1px solid var(--border-color);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:0.6875rem;line-height:1.5;color:var(--text-primary);background:var(--card-background);resize:vertical;overflow:auto}'
+            + '.parts-hint{margin:0;padding:0.5rem 0.75rem;font-size:0.6875rem;color:var(--text-secondary)}'
+            + '.parts-hint a{color:var(--primary-color)}'
+            // The one-click copy button is a progressive enhancement: hidden
+            // by default, revealed only when the inline script adds the 'js'
+            // class to <html>. Without JS the select-all textarea remains.
+            + '.parts-copy-btn{display:none;margin:0.625rem 0.75rem 0;padding:0.375rem 0.75rem;border:0;border-radius:var(--border-radius);background:var(--primary-color);color:#fff;font-size:0.75rem;font-weight:600;cursor:pointer}'
+            + 'html.js .parts-copy-btn{display:inline-block}'
+            + '.parts-copy-btn:hover{background:#2563EB}'
+            + '.parts-status{color:var(--success-color);font-weight:600}'
+            : '';
+        
         return `<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${model.modelName} - GGUF Model</title>
-<meta name="description" content="Download ${model.modelName} GGUF model. ${model.fileSizeFormatted}, ${model.downloadCount.toLocaleString()} downloads, ${model.likeCount} likes.">
+<title>${seoTitle}</title>
+<meta name="description" content="${seoDescription}">
 <meta name="keywords" content="${model.modelName}, GGUF, ${model.quantFormat}, ${model.modelCapability || 'text'}, download, AI model">
 <link rel="canonical" href="${pageUrl}">
-<meta property="og:title" content="${model.modelName} - GGUF Model">
-<meta property="og:description" content="Download ${model.modelName} GGUF model. ${model.fileSizeFormatted}, ${model.downloadCount.toLocaleString()} downloads.">
+<meta property="og:title" content="${seoTitle}">
+<meta property="og:description" content="${seoOgDescription}">
 <meta property="og:url" content="${pageUrl}">
 <meta property="og:type" content="website">
+${jsonLd}
 <style>
 :root{--primary-color:#3B82F6;--secondary-color:#6B7280;--success-color:#10B981;--card-background:#FFFFFF;--text-primary:#111827;--text-secondary:#6B7280;--border-color:#E5E7EB;--border-radius:8px;--shadow-md:0 4px 6px -1px rgba(0,0,0,0.1);--transition:all 0.2s ease-in-out}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -334,6 +404,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .meta{margin-top:1.5rem;padding-top:1rem;border-top:1px solid var(--border-color);font-size:0.75rem;color:var(--text-secondary)}
 .meta a{color:var(--primary-color);text-decoration:none}
 .meta a:hover{text-decoration:underline}
+${partsCss}
 </style>
 </head>
 <body>
@@ -360,7 +431,7 @@ ${engagementMetrics.display ? engagementMetrics.html : ''}
 <span class="quantization-badge">${model.quantFormat || 'Unknown'}</span>
 </span>
 <span class="detail-label">File Size:</span>
-<span class="detail-value">${model.fileSizeFormatted}</span>
+<span class="detail-value">${model.fileSizeFormatted}${partsCount > 1 ? ` <span class="parts-count" title="Split into ${partsCount} parts — the size shown is the combined total">· ${partsCount} parts</span>` : ''}</span>
 <span class="detail-label">Capability:</span>
 <span class="detail-value">${this.formatCapability(model.modelCapability || 'text')}</span>
 <span class="detail-label">License:</span>
@@ -370,13 +441,13 @@ ${engagementMetrics.display ? engagementMetrics.html : ''}
 </div>
 ${this.generateSystemRequirementsHTML(hardwareReqs, model)}
 <div class="model-actions">
-<a href="${model.directDownloadLink}" class="btn btn-primary">
+<a href="${downloadHref}" class="btn btn-primary">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
 <polyline points="7,10 12,15 17,10"/>
 <line x1="12" y1="15" x2="12" y2="3"/>
 </svg>
-Download GGUF
+${downloadLabel}
 </a>
 <a href="${model.huggingFaceLink}" class="btn btn-secondary">
 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -385,6 +456,60 @@ Download GGUF
 Hugging Face
 </a>
 </div>
+${showCopyBlock ? `
+<details class="parts-box">
+<summary>Copy All Parts Links (${shardUrls.length})</summary>
+<button type="button" class="parts-copy-btn">Copy All ${shardUrls.length} Links</button>
+<textarea class="parts-list" readonly rows="${Math.min(8, shardUrls.length)}" onclick="this.select()" aria-label="All ${shardUrls.length} part download URLs">${htmlEscape(shardUrls.join('\n'))}</textarea>
+<p class="parts-hint"><span class="parts-status" aria-live="polite"></span>Select all (Ctrl+A / Cmd+A) then copy, or <a href="${shardTree}">browse the ${shardDir ? `${htmlEscape(shardDir)} folder` : 'files'} on Hugging Face</a>.</p>
+</details>
+<script>
+(function () {
+    'use strict';
+    // Progressive enhancement for the copy block: reveal the one-click
+    // button and wire it up. Without JS the button stays hidden and the
+    // select-all textarea above remains fully functional.
+    document.documentElement.classList.add('js');
+    var box = document.querySelector('.parts-box');
+    if (!box) return;
+    var btn = box.querySelector('.parts-copy-btn');
+    var list = box.querySelector('.parts-list');
+    var status = box.querySelector('.parts-status');
+    if (!btn || !list || !status) return;
+    btn.addEventListener('click', function () {
+        var text = list.value;
+        var count = text.split('\\n').length;
+        var done = function () {
+            status.textContent = 'Copied ' + count + ' part links to clipboard!';
+            btn.textContent = 'Copied!';
+            setTimeout(function () {
+                status.textContent = '';
+                btn.textContent = 'Copy All ' + count + ' Links';
+            }, 2500);
+        };
+        function fallbackCopy() {
+            list.focus(); list.select();
+            try {
+                if (document.execCommand('copy')) { done(); return; }
+            } catch (e) {}
+            // execCommand failed too — leave the textarea selected and tell
+            // the user to press Ctrl+C (the no-JS fallback still applies).
+            status.textContent = 'Select the text and press Ctrl+C to copy';
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text).then(done, function () {
+                // Async API rejected (permissions / sandboxed frame): fall
+                // back to the legacy execCommand path, which often still
+                // works where writeText is blocked.
+                fallbackCopy();
+            });
+        } else {
+            fallbackCopy();
+        }
+    });
+})();
+</script>
+` : ''}
 <div class="meta">
 <p>Pre-rendered page for ${model.modelName}. <a href="${this.baseUrl}/?model=${encodeURIComponent(slug)}">View in full site</a> | <a href="${this.baseUrl}">Browse all models</a></p>
 </div>
@@ -392,6 +517,65 @@ Hugging Face
 </div>
 </body>
 </html>`;
+    }
+
+    /**
+     * JSON-LD structured data (schema.org Dataset) for the page.
+     *
+     * Sharded model pages carry the FULL file inventory as a
+     * ``distribution`` array of ``DataDownload`` entries (one per part), so
+     * search engines index every shard URL, not just part 1. Emitted on
+     * sharded pages only; plain single-file pages stay lean.
+     *
+     * @param {Object} model - model entry
+     * @param {string[]} shardUrls - derived part URLs (may be [])
+     * @param {string} seoTitle - page title (already includes the parts marker)
+     * @param {string} seoDescription - meta description (already includes the
+     *   parts clause), kept in sync with the visible metadata
+     * @returns {string} JSON-LD <script> HTML, or '' for non-sharded pages
+     */
+    generateJSONLD(model, shardUrls, seoTitle, seoDescription) {
+        const parts = parseInt(model.shardParts, 10) || 0;
+        if (!(parts > 1)) return '';
+        
+        const slug = createSlug(model.modelName);
+        const pageUrl = `${this.baseUrl}/models/${slug}.html`;
+        const urls = Array.isArray(shardUrls) ? shardUrls : [];
+        
+        const distribution = urls.map((url) => {
+            let filename = String(url.split('/').pop() || '');
+            try {
+                filename = decodeURIComponent(filename);
+            } catch (error) {
+                // Un-decodable tail — keep raw
+            }
+            return {
+                '@type': 'DataDownload',
+                name: filename,
+                contentUrl: url,
+                encodingFormat: 'application/octet-stream'
+            };
+        });
+        
+        const data = {
+            '@context': 'https://schema.org',
+            '@type': 'Dataset',
+            name: seoTitle || `${model.modelName} - GGUF Model`,
+            description: seoDescription || `Download ${model.modelName} GGUF model. ${model.fileSizeFormatted || 'N/A'}, ${model.downloadCount.toLocaleString()} downloads, ${model.likeCount} likes.`,
+            url: pageUrl,
+            sameAs: model.huggingFaceLink || undefined,
+            license: model.license || 'Not specified',
+            dateCreated: model.uploadDate || undefined,
+            publisher: { '@type': 'Organization', name: 'Local AI Zone' },
+            mainEntityOfPage: { '@type': 'WebPage', '@id': pageUrl },
+            isAccessibleForFree: true,
+            ...(distribution.length > 1 ? { distribution } : {})
+        };
+        
+        // JSON-LD inside <script> must never contain "</script>": escape '<'
+        // as \u003c (valid JSON, decoded back to '<' by parsers).
+        const json = JSON.stringify(data).replace(/</g, '\\u003c');
+        return `\n<script type="application/ld+json">\n${json}\n</script>`;
     }
 
     /**

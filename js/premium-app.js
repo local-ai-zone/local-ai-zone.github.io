@@ -14,6 +14,15 @@ class PremiumGGUFApp {
         // Date calculation cache for performance optimization
         this.dateCache = new Map();
         
+        // Preferred copy format for multi-part files (list | aria2c | wget),
+        // persisted across pagination re-renders.
+        this.copyMode = 'list';
+        
+        // Cache of HF tree-API lookups for shard directories, so repeated
+        // copy clicks (or same-repo cards) don't hammer the API.
+        // key: `${modelId}::${dir}` → { verified: bool, urls: string[] }
+        this.shardTreeCache = new Map();
+        
         // Bind methods
         this.init = this.init.bind(this);
         this.loadModels = this.loadModels.bind(this);
@@ -321,6 +330,8 @@ class PremiumGGUFApp {
             const size = file.fileSizeFormatted || this.formatFileSize(file.fileSize);
             const key = `${file.quantFormat || 'Unknown'}|${size}`;
             let label = `${file.quantFormat || 'Unknown'} — ${size}`;
+            const parts = parseInt(file.shardParts, 10);
+            if (parts > 0) label += ` · ${parts} part${parts === 1 ? '' : 's'}`;
             if (pairCount[key] > 1) {
                 const shortName = String(file.filename || '').split('/').pop() || 'file';
                 label += ` (${shortName})`;
@@ -518,6 +529,7 @@ class PremiumGGUFApp {
                                 <polyline points="10,9 9,9 8,9"/>
                             </svg>
                             <span class="file-size-value">${model.fileSizeFormatted || this.formatFileSize(model.fileSize)}</span>
+                            ${this.generatePartsNote(model)}
                         </div>
                     </div>
                 </div>
@@ -588,25 +600,28 @@ class PremiumGGUFApp {
         `;
         
         if (model.directDownloadLink) {
+            const dl = this.getDownloadTargets(model);
+            const parts = parseInt(model.shardParts, 10);
             buttons += `
                 <div class="action-group">
-                    <a href="${model.directDownloadLink}" 
+                    <a href="${dl.href}" 
                        class="premium-btn btn-primary" 
                        target="_blank" 
                        rel="noopener noreferrer"
-                       data-action="direct-download">
+                       data-action="direct-download"
+                       ${parts > 0 ? `data-sharded="${parts}"` : ''}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                             <polyline points="7,10 12,15 17,10"/>
                             <line x1="12" y1="15" x2="12" y2="3"/>
                         </svg>
-                        Direct Download
+                        <span class="btn-label">${parts > 0 ? `Download ${parts} Parts` : 'Direct Download'}</span>
                     </a>
                     <button class="copy-btn" 
-                            data-copy-text="${model.directDownloadLink}" 
+                            data-copy-text="${dl.copy}" 
                             data-copy-download
-                            title="Copy download link"
-                            aria-label="Copy download link">
+                            title="${parts > 0 ? 'Copy all parts link' : 'Copy download link'}"
+                            aria-label="${parts > 0 ? 'Copy all parts link' : 'Copy download link'}">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                             <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
@@ -614,6 +629,48 @@ class PremiumGGUFApp {
                     </button>
                 </div>
             `;
+            // Show the "Copy All Parts Links" button whenever ANY file in the
+            // model is sharded (the default/largest file may not be), then
+            // sync its visibility to the file actually selected below.
+            const anySharded = (model.files || [model]).some(
+                (f) => parseInt(f && f.shardParts, 10) > 1
+            );
+            if (anySharded) {
+                const defaultUrls = this.getShardPartURLs(model);
+                const partCount = defaultUrls.length || parts || 0;
+                const defaultSharded = defaultUrls.length > 1;
+                const activeMode = this.copyMode || 'list';
+                const modeOptions = [
+                    { mode: 'list', label: 'List' },
+                    { mode: 'aria2c', label: 'aria2c' },
+                    { mode: 'wget', label: 'wget' },
+                ];
+                const modeButtons = modeOptions.map(({ mode, label }) => `
+                    <button type="button"
+                            class="copy-mode-opt${mode === activeMode ? ' active' : ''}"
+                            data-copy-mode="${mode}"
+                            aria-pressed="${mode === activeMode}"
+                            title="Copy as ${mode === 'list' ? 'one URL per line' : 'a single ' + mode + ' command'}">${label}</button>
+                `).join('');
+                buttons += `
+                    <div class="action-group copy-all-block" data-copy-mode="${activeMode}" style="display: ${defaultSharded ? '' : 'none'}">
+                        <div class="copy-mode-toggle" role="group" aria-label="Copy format">
+                            ${modeButtons}
+                        </div>
+                        <button class="premium-btn btn-secondary copy-all-parts-btn" 
+                                data-action="copy-all-parts"
+                                data-shard-count="${partCount}"
+                                title="Copy every part's download link so you can grab the whole model"
+                                aria-label="Copy all ${partCount} part download links">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                            </svg>
+                            <span class="btn-label">${this.copyAllLabel(activeMode, partCount)}</span>
+                        </button>
+                    </div>
+                `;
+            }
         }
         
         if (model.huggingFaceLink) {
@@ -719,15 +776,57 @@ class PremiumGGUFApp {
                 const badge = card.querySelector('.quantization-badge');
                 if (badge) badge.textContent = file.quantFormat || 'N/A';
                 
-                // File size
+                // File size + parts note
                 const sizeValue = card.querySelector('.file-size-value');
                 if (sizeValue) sizeValue.textContent = file.fileSizeFormatted || this.formatFileSize(file.fileSize);
+                const partsNote = card.querySelector('.file-parts-note');
+                const partsHTML = this.generatePartsNote(file);
+                if (partsNote && partsHTML) {
+                    partsNote.outerHTML = partsHTML;
+                } else if (partsNote) {
+                    partsNote.remove();
+                } else if (partsHTML) {
+                    const sizeDisplay = card.querySelector('.file-size-display');
+                    if (sizeDisplay) sizeDisplay.insertAdjacentHTML('beforeend', partsHTML);
+                }
                 
-                // Direct download link + its copy button
+                // Direct download link + its copy button (repo tree for shards)
+                const dl = this.getDownloadTargets(file);
                 const downloadLink = card.querySelector('[data-action="direct-download"]');
-                if (downloadLink) downloadLink.href = file.directDownloadLink;
+                if (downloadLink) downloadLink.href = dl.href;
+                const dlParts = parseInt(file.shardParts, 10);
+                if (downloadLink) {
+                    const label = downloadLink.querySelector('.btn-label');
+                    if (label) label.textContent = dlParts > 0 ? `Download ${dlParts} Parts` : 'Direct Download';
+                    if (dlParts > 0) downloadLink.setAttribute('data-sharded', dlParts);
+                    else downloadLink.removeAttribute('data-sharded');
+                }
                 const downloadCopy = card.querySelector('.copy-btn[data-copy-download]');
-                if (downloadCopy) downloadCopy.dataset.copyText = file.directDownloadLink;
+                if (downloadCopy) {
+                    downloadCopy.dataset.copyText = dl.copy;
+                    const tip = dlParts > 0 ? 'Copy all parts link' : 'Copy download link';
+                    downloadCopy.title = tip;
+                    downloadCopy.setAttribute('aria-label', tip);
+                }
+                
+                // Copy All Parts Links: show only for sharded files, update count
+                const copyAllBlock = card.querySelector('.copy-all-block');
+                if (copyAllBlock) {
+                    const urls = this.getShardPartURLs(file);
+                    if (urls.length > 1) {
+                        copyAllBlock.style.display = '';
+                        const copyAllParts = copyAllBlock.querySelector('[data-action="copy-all-parts"]');
+                        if (copyAllParts) {
+                            copyAllParts.dataset.shardCount = urls.length;
+                            const mode = copyAllBlock.dataset.copyMode || 'list';
+                            const label = copyAllParts.querySelector('.btn-label');
+                            if (label) label.textContent = this.copyAllLabel(mode, urls.length);
+                            copyAllParts.title = "Copy every part's download link so you can grab the whole model";
+                        }
+                    } else {
+                        copyAllBlock.style.display = 'none';
+                    }
+                }
                 
                 // Hardware requirements
                 const hardware = card.querySelector('.hardware-specs');
@@ -768,6 +867,74 @@ class PremiumGGUFApp {
                 }
             });
         });
+        
+        // Copy All Parts Links: join every shard's resolve URL, formatted by
+        // the selected mode (list / aria2c / wget).
+        const copyAllBlock = card.querySelector('.copy-all-block');
+        const copyAllParts = card.querySelector('[data-action="copy-all-parts"]');
+        if (copyAllBlock) {
+            // Mode toggle: flip active state, aria-pressed, and the button label
+            const modeButtons = copyAllBlock.querySelectorAll('.copy-mode-opt');
+            modeButtons.forEach((opt) => {
+                opt.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    modeButtons.forEach((o) => {
+                        o.classList.remove('active');
+                        o.setAttribute('aria-pressed', 'false');
+                    });
+                    opt.classList.add('active');
+                    opt.setAttribute('aria-pressed', 'true');
+                    const mode = opt.dataset.copyMode || 'list';
+                    this.copyMode = mode; // persist across pagination re-renders
+                    copyAllBlock.dataset.copyMode = mode;
+                    if (copyAllParts) {
+                        const label = copyAllParts.querySelector('.btn-label');
+                        if (label) label.textContent = this.copyAllLabel(mode, parseInt(copyAllParts.dataset.shardCount, 10) || 0);
+                    }
+                });
+            });
+        }
+        if (copyAllParts) {
+            copyAllParts.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                // Use the currently selected file so switching quants copies
+                // the right shard set.
+                const fileSelect = card.querySelector('.model-file-select');
+                const file = (fileSelect && model.files) ? model.files[parseInt(fileSelect.value, 10)] : model;
+                const derived = this.getShardPartURLs(file);
+                if (derived.length > 1) {
+                    const mode = (copyAllBlock && copyAllBlock.dataset.copyMode) || 'list';
+                    // Verify against the HF tree API; falls back to the repo
+                    // tree link when derived names don't match reality.
+                    const { verified, urls } = await this.verifyShardURLs(file);
+                    let text = this.formatShardCopy(urls, mode);
+                    if (!verified && urls.length < 2) {
+                        // No reliable per-part set: copy the tree link instead
+                        const tree = this.getDownloadTargets(file);
+                        text = tree.copy;
+                    }
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        const what = verified
+                            ? `${urls.length} part links (${mode})`
+                            : (urls.length < 2 ? 'repo tree link' : `${urls.length} part links (${mode})`);
+                        this.showNotification(`Copied ${what} to clipboard!`, 'success');
+                        copyAllParts.style.background = 'var(--success-100)';
+                        copyAllParts.style.color = 'var(--success-700)';
+                        setTimeout(() => {
+                            copyAllParts.style.background = '';
+                            copyAllParts.style.color = '';
+                        }, 2000);
+                    } catch (error) {
+                        this.showNotification('Failed to copy', 'error');
+                    }
+                } else {
+                    this.showNotification('Could not build part links for this file', 'error');
+                }
+            });
+        }
         
         // Download tracking
         const downloadLinks = card.querySelectorAll('[data-action]');
@@ -1709,6 +1876,211 @@ class PremiumGGUFApp {
      * @param {string} downloadLink - The download link URL
      * @returns {string} Repository name or 'Unknown Repository'
      */
+    /**
+     * Small "· N parts" note for sharded files, or '' when not sharded.
+     * @param {Object} file - model entry (may carry shardParts)
+     * @returns {string} HTML fragment
+     */
+    generatePartsNote(file) {
+        const parts = parseInt((file && file.shardParts) || 0, 10);
+        if (!(parts > 0)) return '';
+        return `<span class="file-parts-note" title="Split into ${parts} parts — the size shown is the combined total">· ${parts} part${parts === 1 ? '' : 's'}</span>`;
+    }
+
+    /**
+     * Download target for a file. Multi-part (sharded) files have no single
+     * self-contained download, so point at the repo tree (the directory that
+     * holds every part) instead of one part's resolve URL. Copy the tree link
+     * too, so users grabbing the URL get the whole set, not 1/N of it.
+     * @param {Object} file - model entry
+     * @returns {Object} { href, copy } URLs
+     */
+    getDownloadTargets(file) {
+        const parts = parseInt((file && file.shardParts) || 0, 10);
+        const modelId = (file && file.modelId) || '';
+        if (parts > 0 && modelId) {
+            // Directory containing the shards: strip the filename, keep subdirs.
+            // Encode each segment — GGUF filenames can contain spaces/parens
+            // (e.g. "Qwen2.5 7B/model.gguf" → tree/main/Qwen2.5%207B).
+            const filename = String(file.filename || '').replace(/\\/g, '/');
+            const dir = filename.includes('/') ? filename.split('/').slice(0, -1).map(encodeURIComponent).join('/') : '';
+            const tree = `https://huggingface.co/${modelId}/tree/main${dir ? '/' + dir : ''}`;
+            return { href: tree, copy: tree };
+        }
+        const direct = (file && file.directDownloadLink) || '';
+        return { href: direct, copy: direct };
+    }
+
+    /**
+     * Derive every individual shard resolve URL for a sharded file.
+     *
+     * The catalog stores only part 1's filename (e.g.
+     * ``BF16/model-00001-of-00041.gguf``) plus ``shardParts`` (41). Sibling
+     * parts follow the ``-NNNNN-of-NNNNN`` convention with the same zero-
+     * padding, so the full set is: ``model-00001-of-00041.gguf`` …
+     * ``model-00041-of-00041.gguf``, each resolved under the same repo.
+     *
+     * @param {Object} file - model entry (needs filename, modelId, shardParts)
+     * @returns {Array<string>} one resolve URL per part, or [] when not sharded
+     */
+    getShardPartURLs(file) {
+        const filename = String(file.filename || '').replace(/\\/g, '/');
+        // Lookahead keeps ".gguf" out of match[0] so it survives in suffix.
+        const match = /-(\d+)-of-(\d+)(?=\.gguf$)/i.exec(filename);
+        if (!match) return [];
+        // The filename's own "of-N" total is authoritative; shardParts is the
+        // fallback when the filename was normalized differently.
+        const total = parseInt(match[2], 10) || parseInt((file && file.shardParts) || 0, 10);
+        if (!(total > 1)) return [];
+        const modelId = (file && file.modelId) || '';
+        if (!modelId) return [];
+
+        const partNumWidth = match[1].length;
+        const totalWidth = match[2].length;
+        const prefix = filename.slice(0, match.index);
+        const suffix = filename.slice(match.index + match[0].length); // ".gguf"
+        const urls = [];
+        for (let i = 1; i <= total; i++) {
+            const part = String(i).padStart(partNumWidth, '0');
+            const totalStr = String(total).padStart(totalWidth, '0');
+            const partFilename = `${prefix}-${part}-of-${totalStr}${suffix}`;
+            urls.push(`https://huggingface.co/${modelId}/resolve/main/${partFilename}`);
+        }
+        return urls;
+    }
+
+    /**
+     * Resolve the repository path for a sharded file (its directory).
+     * @param {Object} file - model entry
+     * @returns {string} e.g. "BF16" or "" for root-level files
+     */
+    shardDirOf(file) {
+        const filename = String((file && file.filename) || '').replace(/\\/g, '/');
+        return filename.includes('/') ? filename.split('/').slice(0, -1).join('/') : '';
+    }
+
+    /**
+     * Verify derived shard URLs against the real HuggingFace repo tree.
+     *
+     * Derived URLs assume zero-padded naming matches the repo. Pathological
+     * repos (e.g. Mixtral-8x22B with 3 overlapping shard families) break that
+     * assumption, so before copying we ask the HF tree API which files actually
+     * exist and keep only the derived URLs that match. If fewer than two match,
+     * we fall back to the repo tree link (one URL) so users never copy a set
+     * of 404 links.
+     *
+     * Results are cached per (modelId, dir) so repeated clicks don't re-hit
+     * the API. The caller decides what to copy:
+     * - `verified: true`  → every URL in `urls` exists on disk
+     * - `verified: false` with `urls.length >= 2` → network/API failure; the
+     *   derived set is unverifiable but returned optimistically (better a
+     *   maybe-stale set than a broken copy).
+     * - `verified: false` with `urls.length < 2` → derivation mismatched the
+     *   repo; the caller should fall back to the repo tree link.
+     *
+     * @param {Object} file - model entry
+     * @returns {Promise<{verified: boolean, urls: string[]}>}
+     */
+    async verifyShardURLs(file) {
+        const modelId = (file && file.modelId) || '';
+        const dir = this.shardDirOf(file);
+        const cacheKey = `${modelId}::${dir}`;
+        if (this.shardTreeCache.has(cacheKey)) {
+            return this.shardTreeCache.get(cacheKey);
+        }
+        
+        const derived = this.getShardPartURLs(file);
+        // Nothing sharded → nothing to verify (shouldn't happen; defensive)
+        if (derived.length < 2) {
+            const empty = { verified: false, urls: derived };
+            this.shardTreeCache.set(cacheKey, empty);
+            return empty;
+        }
+        
+        // Ask the tree API which files exist in the shard directory.
+        const dirPath = dir ? '/' + dir.split('/').map(encodeURIComponent).join('/') : '';
+        const apiUrl = `https://huggingface.co/api/models/${modelId}/tree/main${dirPath}`;
+        let actualFiles = new Set();
+        try {
+            const response = await fetch(apiUrl, { headers: { Accept: 'application/json' } });
+            if (!response.ok) throw new Error(`tree API ${response.status}`);
+            const entries = await response.json();
+            for (const entry of Array.isArray(entries) ? entries : []) {
+                if (entry && entry.type === 'file' && entry.path) {
+                    actualFiles.add(String(entry.path).replace(/\\/g, '/'));
+                }
+            }
+        } catch (error) {
+            // Offline / rate-limited / CORS: keep the derived set, mark unverified
+            const fallback = { verified: false, urls: derived };
+            this.shardTreeCache.set(cacheKey, fallback);
+            return fallback;
+        }
+        
+        // Keep only derived URLs whose filename actually exists in the tree.
+        // Decode defensively: a literal '%' in a filename would make
+        // decodeURIComponent throw, which must not kill the copy handler.
+        const prefix = `https://huggingface.co/${modelId}/resolve/main/`;
+        const verifiedUrls = derived.filter((url) => {
+            const raw = url.slice(prefix.length);
+            let filename = raw;
+            try {
+                filename = decodeURIComponent(raw);
+            } catch (error) {
+                // Un-decodable (e.g. trailing '%') — compare raw, then give up
+                // if the tree only has the decoded form (rare; still safe).
+            }
+            return actualFiles.has(filename) || actualFiles.has(raw);
+        });
+        
+        // Cache the outcome (even verified results) so we never re-fetch.
+        const outcome = { verified: verifiedUrls.length >= 2, urls: verifiedUrls };
+        this.shardTreeCache.set(cacheKey, outcome);
+        return outcome;
+    }
+
+    /**
+     * Format a shard URL list for the clipboard in the chosen mode.
+     *
+     * Modes:
+     * - ``'list'``   — one URL per line (default, download managers/curl -K)
+     * - ``'aria2c'`` — a single aria2c command with every part as an argument,
+     *                  resumable via -c, 16 connections per server (-x16 -s16)
+     * - ``'wget'``   — a single wget command with every part, resumable (-c)
+     *
+     * URLs are double-quoted so filenames with spaces (e.g. "Qwen2.5 7B/")
+     * survive pasting into a shell.
+     *
+     * @param {Array<string>} urls - shard resolve URLs
+     * @param {string} mode - 'list' | 'aria2c' | 'wget'
+     * @returns {string} clipboard-ready text
+     */
+    formatShardCopy(urls, mode) {
+        const list = Array.isArray(urls) ? urls : [];
+        if (!list.length) return '';
+        if (mode === 'aria2c') {
+            return `aria2c -x16 -s16 -c ${list.map((u) => `"${u}"`).join(' ')}`;
+        }
+        if (mode === 'wget') {
+            return `wget -c ${list.map((u) => `"${u}"`).join(' ')}`;
+        }
+        // default: plain list, one per line
+        return list.join('\n');
+    }
+
+    /**
+     * Human-readable label for the copy-all button reflecting the mode.
+     * @param {string} mode - 'list' | 'aria2c' | 'wget'
+     * @param {number} count - number of shard parts
+     * @returns {string} e.g. "Copy All Parts Links (41)" / "Copy as aria2c (41)"
+     */
+    copyAllLabel(mode, count) {
+        const n = count || 0;
+        if (mode === 'aria2c') return `Copy as aria2c (${n})`;
+        if (mode === 'wget') return `Copy as wget (${n})`;
+        return `Copy All Parts Links (${n})`;
+    }
+
     extractRepositoryName(downloadLink) {
         if (!downloadLink) return 'Unknown Repository';
         

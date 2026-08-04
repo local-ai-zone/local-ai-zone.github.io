@@ -16,9 +16,12 @@
     "minify-css": "cleancss -o css/blog-article.min.css css/blog-article.css",
     "build:css": "npm run minify-css",
     "start-local-server": "node scripts/start-local-server.js",
-    "test": "node --test tests/slug-parity.test.js && python tests/run_all.py",
+    "test": "node --test --test-concurrency=1 tests/slug-parity.test.js tests/shard-parts.test.js tests/shard-urls.test.js && python tests/run_all.py",
     "test:slug": "node --test tests/slug-parity.test.js",
-    "test:fetcher": "python -m unittest discover -s tests -p 'test_*.py' -v"
+    "test:shard-parts": "node --test tests/shard-parts.test.js",
+    "test:fetcher": "python -m unittest discover -s tests -p 'test_*.py' -v",
+    "test:js": "node --test --test-concurrency=1 tests/slug-parity.test.js tests/shard-parts.test.js tests/shard-urls.test.js",
+    "test:shard-urls": "node --test tests/shard-urls.test.js"
   },
   "repository": {
     "type": "git",

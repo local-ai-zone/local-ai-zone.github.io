@@ -970,6 +970,22 @@ body {
     color: var(--neutral-400);
 }
 
+.file-parts-note {
+    font-size: 0.72em;
+    font-weight: 500;
+    color: var(--accent, #4f9cf9);
+    background: color-mix(in srgb, var(--accent, #4f9cf9) 12%, transparent);
+    padding: 1px 7px;
+    border-radius: 999px;
+    white-space: nowrap;
+    cursor: help;
+    transition: background 0.2s ease;
+}
+
+.file-parts-note:hover {
+    background: color-mix(in srgb, var(--accent, #4f9cf9) 22%, transparent);
+}
+
 /* Hardware Requirements Styling */
 .hardware-requirements .metadata-value {
     padding: 0;
@@ -1096,6 +1112,55 @@ body {
 .action-group {
     display: flex;
     gap: var(--space-2);
+}
+
+.premium-btn.btn-secondary.copy-all-parts-btn {
+    width: 100%;
+    border-style: dashed;
+    font-size: 0.7rem;
+}
+
+.premium-btn.btn-secondary.copy-all-parts-btn:hover {
+    border-color: #10b981;
+    color: #047857;
+    background: #ecfdf5;
+}
+
+.copy-all-block {
+    flex-direction: column;
+}
+
+.copy-mode-toggle {
+    display: flex;
+    gap: 4px;
+    align-self: flex-start;
+    background: #f1f5f9;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 2px;
+}
+
+.copy-mode-opt {
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.62rem;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    font-family: inherit;
+}
+
+.copy-mode-opt:hover {
+    color: #1d4ed8;
+}
+
+.copy-mode-opt.active {
+    background: #ffffff;
+    color: #1d4ed8;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .premium-btn {
