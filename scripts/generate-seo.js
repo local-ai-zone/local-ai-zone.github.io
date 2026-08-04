@@ -60,6 +60,7 @@ class ContentScanner {
             guides: [],
             cpu: [],
             brands: [],
+            blog: [],
             main: []
         };
     }
@@ -306,7 +307,8 @@ class URLProcessor {
         const contentTypeMap = {
             guides: { priority: '0.7', changefreq: 'monthly' },
             cpu: { priority: '0.6', changefreq: 'monthly' },
-            brands: { priority: '0.6', changefreq: 'monthly' }
+            brands: { priority: '0.6', changefreq: 'monthly' },
+            blog: { priority: '0.8', changefreq: 'weekly' }
         };
 
         for (const [contentType, files] of Object.entries(contentInventory)) {
@@ -787,7 +789,7 @@ class SitemapOrchestrator {
         
         this.config = {
             baseURL: 'https://local-ai-zone.github.io',
-            contentDirectories: ['guides', 'cpu', 'brands'],
+            contentDirectories: ['guides', 'cpu', 'brands', 'blog'],
             modelsJsonPath: 'gguf_models.json',
             outputFiles: {
                 sitemap: 'sitemap.xml',

@@ -12,7 +12,7 @@ const path = require('path');
  */
 
 const SITEMAP_PATH = path.join(__dirname, '..', 'sitemap.xml');
-const BLOG_DIRECTORIES = ['guides', 'brands', 'cpu'];
+const BLOG_DIRECTORIES = ['guides', 'brands', 'cpu', 'blog'];
 const BASE_URL = 'https://local-ai-zone.github.io';
 
 // Get current date in YYYY-MM-DD format
