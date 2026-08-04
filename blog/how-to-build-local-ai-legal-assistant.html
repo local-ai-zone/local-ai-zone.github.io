@@ -1,0 +1,1637 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Build a Local AI Assistant for Legal Documents - Complete 2026 Guide</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Learn how to build a local AI assistant for legal documents using Lawyer Assistant by Hussain Nazary. Complete guide covering RAG architecture, privacy-first design, and practical implementation with free open-source tools.">
+    <meta name="keywords" content="build AI assistant, local legal AI, document analysis, Lawyer Assistant, Hussain Nazary, RAG system, privacy-first AI, legal tech, ChromaDB, Ollama, BGE-M3, contract analysis, open source legal AI, haal-lab">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta property="og:title" content="How to Build a Local AI Assistant for Legal Documents - Complete Guide">
+    <meta property="og:description" content="Step-by-step guide to building a privacy-first AI assistant for legal documents. Learn from Lawyer Assistant by Hussain Nazary - a complete open-source implementation.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/how-to-build-local-ai-legal-assistant.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="article:published_time" content="2026-08-04T00:00:00Z">
+    <meta property="article:section" content="Legal Tech">
+    <meta property="article:tag" content="AI Development">
+    <meta property="article:tag" content="Legal Technology">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="How to Build a Local AI Assistant for Legal Documents">
+    <meta name="twitter:description" content="Complete guide to building privacy-first legal document AI. Learn from Lawyer Assistant's open-source implementation.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/how-to-build-local-ai-legal-assistant.html">
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "How to Build a Local AI Assistant for Legal Documents",
+        "description": "Complete technical guide to building a privacy-first AI assistant for legal document analysis using RAG architecture, vector databases, and local LLMs.",
+        "author": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-08-04T00:00:00Z",
+        "dateModified": "2026-08-04T00:00:00Z",
+        "mainEntityOfPage": "https://local-ai-zone.github.io/blog/how-to-build-local-ai-legal-assistant.html",
+        "keywords": "AI assistant development, legal document analysis, RAG architecture, vector database, local LLM",
+        "articleSection": "Technical Tutorial",
+        "about": {
+            "@type": "SoftwareApplication",
+            "name": "Lawyer Assistant",
+            "url": "https://lawyers-assistant.github.io",
+            "author": {
+                "@type": "Person",
+                "name": "Hussain Nazary",
+                "url": "https://github.com/haal-lab"
+            },
+            "applicationCategory": "LegalTech",
+            "operatingSystem": "Windows, macOS, Linux"
+        }
+    }
+    </script>
+
+    <!-- HowTo Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to Build a Local AI Assistant for Legal Documents",
+        "description": "Step-by-step guide to building a privacy-first AI system for analyzing legal documents locally",
+        "totalTime": "PT2H",
+        "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "USD",
+            "value": "0"
+        },
+        "step": [
+            {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Set up the document processing pipeline",
+                "text": "Create a system to ingest PDFs, Word documents, and images, then split them into searchable chunks with metadata."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Implement hybrid search",
+                "text": "Combine semantic embeddings (BGE-M3) with keyword search (BM25) for accurate legal terminology matching."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Deploy local LLM",
+                "text": "Set up Ollama or another local inference engine to process queries without cloud dependencies."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Add citation tracking",
+                "text": "Ensure every answer includes source document, page number, and exact text for verification."
+            }
+        ]
+    }
+    </script>
+
+    <style>
+        .article-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 80px 0;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        .article-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-10%, -10%) scale(1.1); }
+        }
+        .article-title {
+            font-size: 3.5em;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 25px;
+            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            position: relative;
+            z-index: 1;
+        }
+        .article-subtitle {
+            font-size: 1.3em;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 0 30px 0;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        .article-meta {
+            font-size: 1.05em;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 1;
+        }
+        .article-date, .article-category {
+            background: rgba(255,255,255,0.25);
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .article-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+        .article-section {
+            margin: 50px 0;
+            background: white;
+            border-radius: 16px;
+            padding: 45px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .article-section:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 2.3em;
+            color: #1d4ed8;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #eff6ff;
+            position: relative;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, #2563eb, #3b82f6);
+        }
+        .step-card {
+            background: linear-gradient(135deg, #eff6ff 0%, #eff6ff 100%);
+            border-left: 5px solid #2563eb;
+            padding: 30px;
+            margin: 25px 0;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            left: -15px;
+            top: 20px;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.3em;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4);
+        }
+        .step-card h3 {
+            margin-bottom: 15px;
+            color: #1d4ed8;
+            font-size: 1.5em;
+            margin-left: 40px;
+        }
+        .step-card p, .step-card ul {
+            margin-left: 40px;
+        }
+        .key-highlight {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 5px solid #2563eb;
+            padding: 35px;
+            margin: 40px 0;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.15);
+        }
+        .cta-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            margin: 40px 0;
+            border: 2px solid #3b82f6;
+        }
+
+        .code-block {
+            background: #1e1e2e;
+            color: #a5d6ff;
+            padding: 25px;
+            border-radius: 10px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            line-height: 1.6;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .architecture-diagram {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 30px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+        .btn-primary {
+            display: inline-block;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            color: white;
+            padding: 16px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+            font-size: 1.1em;
+        }
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+        }
+        .btn-secondary {
+            display: inline-block;
+            background: transparent;
+            color: #2563eb;
+            padding: 16px 40px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 2px solid #2563eb;
+            transition: all 0.3s ease;
+            font-size: 1.1em;
+        }
+
+        .btn-secondary:hover {
+            background: #2563eb;
+            color: white;
+        }
+        .tech-badge {
+            display: inline-block;
+            padding: 6px 15px;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            margin: 5px;
+        }
+        .article-header .back-to-blog {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 0 30px 0;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 10px;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        .article-header .back-to-blog:hover {
+            background: rgba(255,255,255,0.28);
+            transform: translateX(-3px);
+        }
+        @media (max-width: 768px) {
+            .article-title { font-size: 2.3em; }
+            .article-section { padding: 30px 25px; }
+            .section-title { font-size: 1.8em; }
+            .step-card { padding: 25px 20px; }
+            .step-number { left: -10px; width: 35px; height: 35px; font-size: 1.1em; }
+            .step-card h3, .step-card p, .step-card ul { margin-left: 30px; }
+        }
+    </style>
+</head>
+<body class="blog-article-page">
+
+    <!-- Premium Header (matches homepage) -->
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">How to Build a Local AI Assistant for Legal Documents</h1>
+                <p class="article-subtitle">A complete technical guide to building privacy-first legal document AI using RAG architecture, vector databases, and local LLMs — inspired by <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: white; text-decoration: underline; font-weight: 600;">Lawyer Assistant</a> by Hussain Nazary</p>
+                <div class="article-meta">
+                    <span class="article-date">August 4, 2026</span>
+                    <span class="article-category">Technical Tutorial</span>
+                    <span class="article-read-time">📖 15 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+
+            <div class="key-highlight">
+                <h3 style="margin-top: 0; font-size: 1.6em;">🎯 What You'll Learn</h3>
+                <p>In this comprehensive guide, you'll learn how to build a production-ready AI assistant for legal documents that runs entirely on your computer. We'll use <strong><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a></strong> by <strong><a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: #2563eb;">Hussain Nazary</a></strong> as our reference implementation — a complete, open-source system that demonstrates privacy-first AI architecture.</p>
+                <ul style="margin: 20px 0; font-size: 1.05em; line-height: 1.8;">
+                    <li>✅ <strong>RAG Architecture:</strong> Retrieval-Augmented Generation for accurate, cited answers</li>
+                    <li>✅ <strong>Hybrid Search:</strong> Combine semantic embeddings with keyword matching</li>
+                    <li>✅ <strong>Privacy-First Design:</strong> Keep sensitive documents 100% local</li>
+                    <li>✅ <strong>Production-Ready:</strong> Real-world implementation with error handling</li>
+                    <li>✅ <strong>Open Source:</strong> Complete MIT-licensed code you can use today</li>
+                </ul>
+            </div>
+
+            <div class="cta-box">
+                <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 1.5em;">🚀 Want to Skip the Build? Try It Now!</h3>
+                <p style="margin-bottom: 25px; font-size: 1.1em;">Lawyer Assistant is a complete, free implementation you can download and run immediately.</p>
+                <a href="https://lawyers-assistant.github.io" class="btn-primary" target="_blank" rel="noopener">Visit Lawyer Assistant →</a>
+                <a href="https://github.com/haal-lab/Lawyer-Assistant" class="btn-secondary" target="_blank" rel="noopener" style="margin-left: 15px;">View on GitHub</a>
+                <p style="margin-top: 20px; font-size: 0.95em; opacity: 0.85;">Created by <a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Hussain Nazary</a> • MIT License • 100% Free</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Why Build a Local Legal AI?</h2>
+                
+                <p style="font-size: 1.1em; line-height: 1.8;">Legal document analysis has three fundamental requirements that cloud-based AI can't satisfy:</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin: 30px 0;">
+                    <div style="background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #22c55e;">
+                        <h3 style="color: #16a34a; margin-bottom: 12px;">🔒 Privacy & Confidentiality</h3>
+                        <p>Attorney-client privilege means documents cannot leave your control. Cloud processing creates risk.</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #2563eb;">
+                        <h3 style="color: #2563eb; margin-bottom: 12px;">📄 Source Verification</h3>
+                        <p>Legal work requires exact citations with page numbers. Generic AI often hallucinates sources.</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #3b82f6;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 12px;">⚡ Instant Access</h3>
+                        <p>No upload delays, no API limits. Query thousands of pages in seconds, entirely offline.</p>
+                    </div>
+                </div>
+
+                <p style="font-size: 1.05em; margin-top: 30px;"><strong>The Solution:</strong> Build a local RAG (Retrieval-Augmented Generation) system that keeps documents on your machine while providing AI-powered analysis. <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a> proves this approach works — it's being used by freelancers, small businesses, and legal professionals to analyze contracts without compromising privacy.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">System Architecture Overview</h2>
+
+                <p style="font-size: 1.1em;">Before diving into implementation, let's understand the high-level architecture used by <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: #2563eb;">Lawyer Assistant</a>:</p>
+
+                <div class="architecture-diagram">┌────────────────────────────────────────────────────────────────┐
+│                  LOCAL AI LEGAL ASSISTANT                      │
+│                    (Privacy-First Architecture)                │
+├────────────────────────────────────────────────────────────────┤
+│                                                                │
+│  ┌─────────────┐       ┌──────────────┐      ┌─────────────┐  │
+│  │  INGESTION  │──────▶│   STORAGE    │─────▶│   SEARCH    │  │
+│  │   LAYER     │       │    LAYER     │      │    LAYER    │  │
+│  └─────────────┘       └──────────────┘      └─────────────┘  │
+│       │                      │                      │          │
+│   PDF, DOCX           Vector Database          Hybrid Query   │
+│   Images, TXT           ChromaDB              Semantic + BM25  │
+│   OCR Support          Embeddings                Reranking    │
+│                        (BGE-M3)                                │
+│                                                                │
+│  ┌─────────────┐       ┌──────────────┐      ┌─────────────┐  │
+│  │  RETRIEVAL  │──────▶│   ANSWER     │─────▶│  RESPONSE   │  │
+│  │   LAYER     │       │ GENERATION   │      │   LAYER     │  │
+│  └─────────────┘       └──────────────┘      └─────────────┘  │
+│       │                      │                      │          │
+│  Top N Chunks            Local LLM             Citations      │
+│  With Metadata           (Ollama)              Page Numbers   │
+│  Source Docs           Or Cloud API           Source Preview  │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘</div>
+
+                <p style="font-size: 1.05em; margin-top: 25px;"><strong>Key Design Principles:</strong></p>
+                <ul style="font-size: 1.05em; line-height: 1.8;">
+                    <li><strong>Data Never Leaves:</strong> All processing happens locally, even in API mode only context is sent</li>
+                    <li><strong>Verifiable Answers:</strong> Every response includes exact source location</li>
+                    <li><strong>Hybrid Approach:</strong> Semantic search + keyword matching for legal precision</li>
+                    <li><strong>Flexible Backend:</strong> Works with local LLMs (Ollama) or cloud APIs (optional)</li>
+                </ul>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Step 1: Document Ingestion Pipeline</h2>
+
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h3>Parse Multiple Document Formats</h3>
+                    <p>Legal work involves PDFs, Word documents, scanned images, and plain text. Your pipeline must handle all of these.</p>
+                </div>
+
+                <p><strong>Technologies Used in Lawyer Assistant:</strong></p>
+                <div style="margin: 20px 0;">
+                    <span class="tech-badge">PyPDF2 / pdfplumber</span>
+                    <span class="tech-badge">python-docx</span>
+                    <span class="tech-badge">Tesseract OCR</span>
+                    <span class="tech-badge">PIL / Pillow</span>
+                </div>
+
+                <div class="code-block"># Document Parsing Pipeline (Pseudocode)
+
+def ingest_document(file_path):
+    """
+    Parse document and extract text with metadata
+    """
+    if file_path.endswith('.pdf'):
+        text, page_count = extract_pdf(file_path)
+    elif file_path.endswith('.docx'):
+        text, page_count = extract_docx(file_path)
+    elif file_path.lower().endswith(('.png', '.jpg', '.jpeg')):
+        text = perform_ocr(file_path)
+        page_count = 1
+    else:
+        text = read_text_file(file_path)
+        page_count = 1
+    
+    # Split into chunks with overlap for context
+    chunks = split_text_with_overlap(
+        text, 
+        chunk_size=500,  # tokens
+        overlap=50       # token overlap between chunks
+    )
+    
+    # Add metadata to each chunk
+    for i, chunk in enumerate(chunks):
+        chunk.metadata = {
+            'source': file_path,
+            'page': calculate_page_number(i, text),
+            'chunk_index': i,
+            'total_chunks': len(chunks)
+        }
+    
+    return chunks</div>
+
+                <div class="key-highlight">
+                    <h3 style="margin-top: 0;">💡 Pro Tip: Smart Chunking</h3>
+                    <p>Don't split text at arbitrary character counts. Lawyer Assistant uses semantic chunking that respects paragraph boundaries and maintains context. For legal documents, keeping clause structure intact is critical.</p>
+                    <p style="margin-top: 15px;"><strong>Why Overlap Matters:</strong> If a clause spans two chunks, overlap ensures both chunks contain enough context for accurate retrieval.</p>
+                </div>
+
+                <p style="font-size: 1.05em; margin-top: 25px;">See the complete implementation at <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">github.com/haal-lab/Lawyer-Assistant</a> — the document parser handles edge cases like rotated PDFs, password-protected files, and mixed-language documents.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Step 2: Vector Embeddings & Storage</h2>
+
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h3>Generate Semantic Embeddings</h3>
+                    <p>Convert text chunks into vector representations that capture meaning, not just keywords.</p>
+                </div>
+
+                <p><strong>Why BGE-M3?</strong> Lawyer Assistant uses <a href="https://huggingface.co/BAAI/bge-m3" target="_blank" rel="noopener" style="color: #2563eb;">BAAI/BGE-M3</a>, a state-of-the-art embedding model because:</p>
+
+                <ul style="font-size: 1.05em; line-height: 1.8; margin: 20px 0;">
+                    <li>✅ <strong>Multilingual:</strong> Supports 100+ languages for international contracts</li>
+                    <li>✅ <strong>Long Context:</strong> Handles up to 8192 tokens per chunk</li>
+                    <li>✅ <strong>Hybrid Capabilities:</strong> Native dense + sparse retrieval</li>
+                    <li>✅ <strong>Open Source:</strong> Runs locally with ONNX optimization</li>
+                    <li>✅ <strong>Legal Performance:</strong> Trained on diverse domains including legal text</li>
+                </ul>
+
+                <div class="code-block"># Embedding Generation (Pseudocode)
+
+from sentence_transformers import SentenceTransformer
+
+# Initialize embedding model (runs locally)
+model = SentenceTransformer('BAAI/bge-m3')
+
+def generate_embeddings(chunks):
+    """
+    Create vector representations of text chunks
+    """
+    texts = [chunk.text for chunk in chunks]
+    
+    # Generate embeddings in batches for efficiency
+    embeddings = model.encode(
+        texts,
+        batch_size=32,
+        show_progress_bar=True,
+        normalize_embeddings=True  # For cosine similarity
+    )
+    
+    # Attach embeddings to chunks
+    for chunk, embedding in zip(chunks, embeddings):
+        chunk.embedding = embedding
+    
+    return chunks</div>
+
+                <p style="margin-top: 25px;"><strong>Storage with ChromaDB:</strong></p>
+
+                <div class="code-block"># Vector Database Storage (Pseudocode)
+
+import chromadb
+from chromadb.config import Settings
+
+# Initialize ChromaDB (persists to disk)
+client = chromadb.Client(Settings(
+    persist_directory="./legal_docs_db",
+    anonymized_telemetry=False  # Privacy-first
+))
+
+# Create collection for this project
+collection = client.create_collection(
+    name="contract_analysis",
+    metadata={"description": "Legal document embeddings"}
+)
+
+def store_chunks(chunks):
+    """
+    Store chunks with embeddings in vector database
+    """
+    collection.add(
+        embeddings=[chunk.embedding for chunk in chunks],
+        documents=[chunk.text for chunk in chunks],
+        metadatas=[chunk.metadata for chunk in chunks],
+        ids=[f"chunk_{chunk.metadata['chunk_index']}" for chunk in chunks]
+    )
+    
+    print(f"Stored {len(chunks)} chunks in vector database")</div>
+
+                <div class="key-highlight">
+                    <h3 style="margin-top: 0;">⚡ Performance Optimization</h3>
+                    <p><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a> uses ONNX-optimized models for 3-5x faster embedding generation on CPU. On a typical laptop, indexing 1000 pages takes under 5 minutes.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Step 3: Hybrid Search Implementation</h2>
+
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h3>Combine Semantic + Keyword Search</h3>
+                    <p>Legal terminology requires precision. Pure semantic search misses exact terms; pure keyword search misses meaning. Hybrid search gets both.</p>
+                </div>
+
+                <p style="font-size: 1.1em; margin: 25px 0;"><strong>The Problem with Single-Method Search:</strong></p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 25px 0;">
+                    <div style="background: #fef2f2; padding: 20px; border-radius: 10px; border-left: 4px solid #ef4444;">
+                        <h4 style="color: #dc2626; margin-bottom: 10px;">❌ Semantic Only</h4>
+                        <p><strong>Query:</strong> "indemnification clause"</p>
+                        <p><strong>Problem:</strong> Might return "liability provisions" but miss exact "indemnification" mentions</p>
+                    </div>
+                    <div style="background: #fef2f2; padding: 20px; border-radius: 10px; border-left: 4px solid #ef4444;">
+                        <h4 style="color: #dc2626; margin-bottom: 10px;">❌ Keyword Only</h4>
+                        <p><strong>Query:</strong> "Can I terminate early?"</p>
+                        <p><strong>Problem:</strong> Won't find "either party may end this agreement with 30 days notice"</p>
+                    </div>
+                </div>
+
+                <div style="background: #f0fdf4; padding: 25px; border-radius: 10px; border-left: 4px solid #22c55e; margin: 25px 0;">
+                    <h4 style="color: #16a34a; margin-bottom: 10px;">✅ Hybrid Approach</h4>
+                    <p>Lawyer Assistant uses <strong>BM25 keyword ranking + BGE-M3 semantic search + Cross-encoder reranking</strong></p>
+                    <p style="margin-top: 10px;">Result: Finds both exact legal terms AND semantically similar clauses, then reranks by relevance.</p>
+                </div>
+
+                <div class="code-block"># Hybrid Search Implementation (Pseudocode)
+
+from rank_bm25 import BM25Okapi
+import numpy as np
+
+class HybridSearch:
+    def __init__(self, collection, documents):
+        self.collection = collection  # ChromaDB
+        self.documents = documents
+        
+        # Initialize BM25 for keyword search
+        tokenized_docs = [doc.split() for doc in documents]
+        self.bm25 = BM25Okapi(tokenized_docs)
+    
+    def search(self, query, top_k=10):
+        # 1. Semantic Search (vector similarity)
+        query_embedding = model.encode([query])[0]
+        semantic_results = self.collection.query(
+            query_embeddings=[query_embedding],
+            n_results=top_k * 2  # Get more for fusion
+        )
+        
+        # 2. Keyword Search (BM25)
+        tokenized_query = query.split()
+        bm25_scores = self.bm25.get_scores(tokenized_query)
+        bm25_top_idx = np.argsort(bm25_scores)[-top_k*2:][::-1]
+        
+        # 3. Reciprocal Rank Fusion (combine rankings)
+        combined_scores = {}
+        k = 60  # RRF constant
+        
+        # Add semantic ranks
+        for rank, doc_id in enumerate(semantic_results['ids'][0]):
+            combined_scores[doc_id] = 1 / (k + rank + 1)
+        
+        # Add BM25 ranks
+        for rank, idx in enumerate(bm25_top_idx):
+            doc_id = f"chunk_{idx}"
+            combined_scores[doc_id] = combined_scores.get(doc_id, 0) + 1 / (k + rank + 1)
+        
+        # 4. Rerank top results with cross-encoder
+        top_candidates = sorted(combined_scores.items(), key=lambda x: x[1], reverse=True)[:top_k]
+        final_results = self.rerank(query, top_candidates)
+        
+        return final_results
+    
+    def rerank(self, query, candidates):
+        """Use cross-encoder for fine-grained relevance scoring"""
+        # Cross-encoder model for precise relevance
+        reranker = CrossEncoder('cross-encoder/ms-marco-MiniLM-L-6-v2')
+        
+        pairs = [[query, self.get_document(doc_id)] for doc_id, _ in candidates]
+        rerank_scores = reranker.predict(pairs)
+        
+        # Sort by reranker scores
+        reranked = sorted(zip(candidates, rerank_scores), key=lambda x: x[1], reverse=True)
+        return reranked</div>
+
+                <p style="margin-top: 25px; font-size: 1.05em;">This three-stage pipeline (semantic + keyword + reranking) is what makes <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a> so accurate for legal queries. It's the same approach used by enterprise search systems.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Step 4: Local LLM Integration</h2>
+
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h3>Set Up Ollama for Local Inference</h3>
+                    <p>To maintain privacy, run the language model on your own hardware. Ollama makes this simple.</p>
+                </div>
+
+                <p style="font-size: 1.1em;"><strong>Why Ollama?</strong> <a href="https://ollama.ai/" target="_blank" rel="noopener" style="color: #2563eb;">Ollama</a> is the standard for local LLM deployment:</p>
+
+                <ul style="font-size: 1.05em; line-height: 1.8; margin: 20px 0;">
+                    <li>✅ Supports 100+ models (Llama, Mistral, Gemma, DeepSeek, and more)</li>
+                    <li>✅ Automatic GPU acceleration (CUDA, ROCm, Metal)</li>
+                    <li>✅ Simple REST API for integration</li>
+                    <li>✅ Quantization support (4-bit, 8-bit for lower VRAM)</li>
+                    <li>✅ Cross-platform (Windows, Mac, Linux)</li>
+                </ul>
+
+                <div class="code-block"># Install Ollama
+# Visit https://ollama.ai/ for installers
+
+# Pull a legal-optimized model
+ollama pull llama3.1:8b-instruct-q8_0
+
+# Or for lower memory: ollama pull llama3.1:8b-instruct-q4_K_M
+
+# Start Ollama server (runs on localhost:11434)
+ollama serve</div>
+
+                <p style="margin-top: 25px;"><strong>Model Recommendations for Legal Work:</strong></p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 25px 0;">
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 10px; border-left: 4px solid #2563eb;">
+                        <h4 style="color: #1d4ed8;">🥇 Best Overall</h4>
+                        <p><strong>Llama 3.1 8B (Q8)</strong></p>
+                        <p style="font-size: 0.95em; margin-top: 8px;">~9GB VRAM • Excellent instruction following • Good legal reasoning</p>
+                    </div>
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 10px; border-left: 4px solid #2563eb;">
+                        <h4 style="color: #1d4ed8;">⚡ Best Speed</h4>
+                        <p><strong>Mistral 7B (Q4_K_M)</strong></p>
+                        <p style="font-size: 0.95em; margin-top: 8px;">~5GB VRAM • Fast inference • Solid accuracy</p>
+                    </div>
+                    <div style="background: #f5f5f5; padding: 20px; border-radius: 10px; border-left: 4px solid #2563eb;">
+                        <h4 style="color: #1d4ed8;">🎯 Best Reasoning</h4>
+                        <p><strong>DeepSeek-R1 7B</strong></p>
+                        <p style="font-size: 0.95em; margin-top: 8px;">~8GB VRAM • Chain-of-thought • Deep analysis</p>
+                    </div>
+                </div>
+
+                <div class="code-block"># LLM Integration (Pseudocode)
+
+import requests
+
+class LocalLLM:
+    def __init__(self, model="llama3.1:8b-instruct-q8_0"):
+        self.model = model
+        self.api_url = "http://localhost:11434/api/generate"
+    
+    def generate_answer(self, query, context_chunks):
+        """
+        Generate answer with citations from retrieved chunks
+        """
+        # Build prompt with context
+        prompt = self.build_prompt(query, context_chunks)
+        
+        # Call Ollama API
+        response = requests.post(
+            self.api_url,
+            json={
+                "model": self.model,
+                "prompt": prompt,
+                "stream": False,
+                "options": {
+                    "temperature": 0.1,  # Low temp for factual answers
+                    "top_p": 0.9,
+                    "num_predict": 512   # Max tokens
+                }
+            }
+        )
+        
+        answer = response.json()['response']
+        citations = self.extract_citations(answer, context_chunks)
+        
+        return {
+            "answer": answer,
+            "sources": citations
+        }
+    
+    def build_prompt(self, query, chunks):
+        """Create prompt with legal-specific instructions"""
+        context = "\n\n".join([
+            f"[Source: {chunk.metadata['source']}, Page {chunk.metadata['page']}]\n{chunk.text}"
+            for chunk in chunks
+        ])
+        
+        prompt = f"""You are a legal document analysis assistant. Answer the question based ONLY on the provided context.
+
+Rules:
+1. Only use information from the provided sources
+2. Cite specific page numbers for every claim
+3. If the answer isn't in the context, say "I cannot find this information in the provided documents"
+4. Use clear, precise language appropriate for legal documents
+5. Quote exact text when referencing specific clauses
+
+Context:
+{context}
+
+Question: {query}
+
+Answer:"""
+        
+        return prompt</div>
+
+                <p style="margin-top: 25px; font-size: 1.05em;">This is exactly how <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a> integrates with Ollama — with added features like streaming responses, error handling, and fallback to cloud APIs if needed.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Step 5: Citation & Source Tracking</h2>
+
+                <div class="step-card">
+                    <div class="step-number">5</div>
+                    <h3>Implement Verifiable Citations</h3>
+                    <p>Every answer MUST include exact sources. This is non-negotiable for legal work.</p>
+                </div>
+
+                <div class="key-highlight">
+                    <h3 style="margin-top: 0;">⚖️ Why Citations Matter in Legal AI</h3>
+                    <p>Generic ChatGPT-style responses are useless for legal documents because:</p>
+                    <ul style="margin: 15px 0;">
+                        <li>You can't verify claims without knowing the source</li>
+                        <li>Legal arguments require exact quotes with page references</li>
+                        <li>Hallucinations could lead to missed obligations or risks</li>
+                        <li>Attorney-client privilege requires knowing what was analyzed</li>
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Solution:</strong> Track metadata through every stage of the pipeline.</p>
+                </div>
+
+                <div class="code-block"># Citation System (Pseudocode)
+
+class CitationTracker:
+    def format_answer_with_citations(self, answer, source_chunks):
+        """
+        Format answer with clickable citations
+        """
+        citations = []
+        
+        for i, chunk in enumerate(source_chunks):
+            citation = {
+                'id': i + 1,
+                'document': chunk.metadata['source'],
+                'page': chunk.metadata['page'],
+                'text_preview': chunk.text[:200] + "...",
+                'relevance_score': chunk.score
+            }
+            citations.append(citation)
+        
+        # Format for display
+        formatted_answer = {
+            'answer': answer,
+            'citations': citations,
+            'confidence': self.calculate_confidence(source_chunks)
+        }
+        
+        return formatted_answer
+    
+    def calculate_confidence(self, chunks):
+        """
+        Assess answer confidence based on source quality
+        """
+        if not chunks:
+            return "Low - No sources found"
+        
+        avg_score = sum(c.score for c in chunks) / len(chunks)
+        
+        if avg_score > 0.8:
+            return "High - Strong source match"
+        elif avg_score > 0.6:
+            return "Medium - Relevant sources found"
+        else:
+            return "Low - Weak source match"</div>
+
+                <p style="font-size: 1.1em; margin-top: 30px;"><strong>Example Output Format:</strong></p>
+
+                <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; border: 2px solid #dee2e6; margin: 20px 0;">
+                    <p style="font-weight: 600; color: #1d4ed8; margin-bottom: 15px;">Question: What are the payment terms?</p>
+                    <p style="margin-bottom: 20px;"><strong>Answer:</strong> Payment is due within 30 days of invoice date. Late payments incur a 1.5% monthly interest charge.</p>
+                    <p style="font-weight: 600; margin-bottom: 10px;">Sources:</p>
+                    <div style="background: white; padding: 15px; border-left: 4px solid #2563eb; border-radius: 5px; margin-bottom: 10px;">
+                        <p style="margin: 0;"><strong>📄 service_agreement.pdf - Page 7</strong></p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.95em; color: #555;">"Client agrees to pay all invoices within thirty (30) days of the invoice date. Overdue balances shall..."</p>
+                    </div>
+                    <div style="background: white; padding: 15px; border-left: 4px solid #2563eb; border-radius: 5px;">
+                        <p style="margin: 0;"><strong>📄 service_agreement.pdf - Page 8</strong></p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.95em; color: #555;">"...accrue interest at a rate of 1.5% per month (18% per annum) on any outstanding balance..."</p>
+                    </div>
+                    <p style="margin-top: 15px; font-size: 0.9em; color: #666;"><strong>Confidence:</strong> High - Strong source match (0.89)</p>
+                </div>
+
+                <p style="font-size: 1.05em;">This level of citation detail is what makes <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a> trustworthy for real legal work. Users can click through to see the full context and verify every claim.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Step 6: Compliance Scanner (Advanced)</h2>
+
+                <div class="step-card">
+                    <div class="step-number">6</div>
+                    <h3>Automated Risk Detection</h3>
+                    <p>Beyond Q&A, automatically scan contracts for risky clauses—unlimited liability, auto-renewal, unfavorable terms.</p>
+                </div>
+
+                <p style="font-size: 1.1em;">One of <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant's</a> most powerful features is its compliance scanner. Here's how to build one:</p>
+
+                <div class="code-block"># Compliance Scanner (Pseudocode)
+
+class ComplianceScanner:
+    def __init__(self, rules_path="compliance_rules.json"):
+        self.rules = self.load_rules(rules_path)
+    
+    def scan_document(self, document):
+        """
+        Scan document for risky clauses
+        """
+        findings = []
+        
+        for rule in self.rules:
+            matches = self.find_matches(document, rule)
+            
+            for match in matches:
+                finding = {
+                    'rule_id': rule['id'],
+                    'risk_level': rule['risk_level'],  # High/Medium/Low
+                    'title': rule['title'],
+                    'description': rule['description'],
+                    'location': match['location'],
+                    'matched_text': match['text'],
+                    'recommendation': rule['recommendation']
+                }
+                findings.append(finding)
+        
+        return self.prioritize_findings(findings)
+    
+    def find_matches(self, document, rule):
+        """
+        Find clauses matching a compliance rule
+        """
+        # Use both keyword and semantic search
+        keyword_matches = self.keyword_search(document, rule['keywords'])
+        semantic_matches = self.semantic_search(document, rule['semantic_patterns'])
+        
+        # Combine and deduplicate
+        all_matches = self.merge_matches(keyword_matches, semantic_matches)
+        
+        # Apply rule-specific logic
+        validated_matches = rule['validator'](all_matches)
+        
+        return validated_matches</div>
+
+                <p style="margin-top: 25px;"><strong>Example Compliance Rules:</strong></p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 25px 0;">
+                    <div style="background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #ef4444;">
+                        <h4 style="color: #dc2626; margin-bottom: 10px;">🚨 High Risk</h4>
+                        <p style="font-weight: 600;">Unlimited Liability</p>
+                        <p style="font-size: 0.95em; margin-top: 8px;">Keywords: "unlimited", "without limit", "not limited"</p>
+                        <p style="font-size: 0.9em; margin-top: 8px; font-style: italic;">⚠️ Could expose you to catastrophic financial loss</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2563eb;">
+                        <h4 style="color: #2563eb; margin-bottom: 10px;">⚠️ Medium Risk</h4>
+                        <p style="font-weight: 600;">Auto-Renewal Clause</p>
+                        <p style="font-size: 0.95em; margin-top: 8px;">Keywords: "automatically renew", "auto-renew", "evergreen"</p>
+                        <p style="font-size: 0.9em; margin-top: 8px; font-style: italic;">Could lock you into unwanted contract extensions</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #3b82f6;">
+                        <h4 style="color: #1d4ed8; margin-bottom: 10px;">ℹ️ Low Risk</h4>
+                        <p style="font-weight: 600;">Vague Payment Terms</p>
+                        <p style="font-size: 0.95em; margin-top: 8px;">Patterns: No specific payment date, unclear amounts</p>
+                        <p style="font-size: 0.9em; margin-top: 8px; font-style: italic;">Could lead to payment disputes</p>
+                    </div>
+                </div>
+
+                <div class="key-highlight">
+                    <h3 style="margin-top: 0;">🛠️ Customizable Rule Sets</h3>
+                    <p>Lawyer Assistant includes default rules for common risks, but you can create custom playbooks for:</p>
+                    <ul style="margin: 15px 0;">
+                        <li>Industry-specific compliance (GDPR, HIPAA, SOC 2)</li>
+                        <li>Company policies (indemnification limits, payment terms)</li>
+                        <li>Jurisdiction requirements (state-specific clauses)</li>
+                        <li>Risk tolerance (flag aggressive vs. standard terms)</li>
+                    </ul>
+                    <p style="margin-top: 15px;">Rules are stored as JSON, making them easy to share and version control.</p>
+                </div>
+
+                <p style="font-size: 1.05em; margin-top: 25px;">The full compliance scanner implementation with 20+ default rules is available in the <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant repository</a>.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Complete System Integration</h2>
+
+                <p style="font-size: 1.1em;">Now let's tie everything together into a working system. Here's the main application logic:</p>
+
+                <div class="code-block"># Main Application (Pseudocode)
+
+class LegalAIAssistant:
+    def __init__(self, project_path):
+        # Initialize all components
+        self.project_path = project_path
+        self.db = ChromaDBClient(f"{project_path}/.vectordb")
+        self.embedder = BGEEmbedder()
+        self.search = HybridSearch(self.db, self.embedder)
+        self.llm = LocalLLM(model="llama3.1:8b-instruct-q8_0")
+        self.scanner = ComplianceScanner()
+        
+        # Watch for new documents
+        self.watcher = FileWatcher(project_path)
+        self.watcher.on_new_file(self.index_document)
+    
+    def index_document(self, file_path):
+        """
+        Process and index a new document
+        """
+        print(f"📄 Indexing {file_path}...")
+        
+        # 1. Parse document
+        chunks = ingest_document(file_path)
+        
+        # 2. Generate embeddings
+        chunks = generate_embeddings(chunks)
+        
+        # 3. Store in vector database
+        store_chunks(self.db, chunks)
+        
+        # 4. Run compliance scan
+        findings = self.scanner.scan_document(chunks)
+        if findings:
+            self.notify_user(f"⚠️ Found {len(findings)} compliance issues")
+        
+        print(f"✅ Indexed {len(chunks)} chunks from {file_path}")
+    
+    def ask(self, question):
+        """
+        Answer a question about the documents
+        """
+        print(f"🔍 Searching for: {question}")
+        
+        # 1. Retrieve relevant chunks
+        results = self.search.search(question, top_k=5)
+        
+        if not results:
+            return {
+                "answer": "I couldn't find any relevant information in your documents.",
+                "confidence": "None"
+            }
+        
+        # 2. Generate answer with LLM
+        response = self.llm.generate_answer(question, results)
+        
+        # 3. Format with citations
+        formatted = self.format_response(response, results)
+        
+        return formatted
+    
+    def scan_all_risks(self):
+        """
+        Run compliance scan on all documents
+        """
+        all_findings = []
+        
+        for document in self.get_all_documents():
+            findings = self.scanner.scan_document(document)
+            all_findings.extend(findings)
+        
+        # Group by risk level
+        report = {
+            'high': [f for f in all_findings if f['risk_level'] == 'High'],
+            'medium': [f for f in all_findings if f['risk_level'] == 'Medium'],
+            'low': [f for f in all_findings if f['risk_level'] == 'Low']
+        }
+        
+        return report
+
+
+# Usage Example
+if __name__ == "__main__":
+    # Initialize assistant for a project
+    assistant = LegalAIAssistant("./my_contracts")
+    
+    # Ask questions
+    result = assistant.ask("What are the termination rights?")
+    print(result['answer'])
+    print(f"\nSources: {len(result['citations'])} documents")
+    
+    # Run compliance scan
+    risks = assistant.scan_all_risks()
+    print(f"\n⚠️ Found {len(risks['high'])} high-risk issues")</div>
+
+                <div class="key-highlight">
+                    <h3 style="margin-top: 0;">🎓 Learning From a Real Implementation</h3>
+                    <p>This pseudocode shows the architecture, but <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant by Hussain Nazary</a> includes production-ready implementations with:</p>
+                    <ul style="margin: 15px 0;">
+                        <li><strong>Error handling:</strong> Graceful failures, retry logic, user-friendly messages</li>
+                        <li><strong>Performance optimization:</strong> Batch processing, caching, ONNX acceleration</li>
+                        <li><strong>Desktop UI:</strong> Electron-based interface with visual pipeline editor</li>
+                        <li><strong>API endpoints:</strong> REST + SSE streaming for integrations</li>
+                        <li><strong>Configuration:</strong> 75+ settings for customization</li>
+                        <li><strong>Documentation:</strong> 25+ pages covering every feature</li>
+                        <li><strong>Tests:</strong> Comprehensive test suite with benchmarks</li>
+                    </ul>
+                    <p style="margin-top: 20px; font-size: 1.1em;">Study the source code at <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">github.com/haal-lab/Lawyer-Assistant</a> to see how these concepts translate into production code.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Privacy & Security Considerations</h2>
+
+                <p style="font-size: 1.1em;">Building a legal AI isn't just about functionality—privacy and security are paramount. Here's how to do it right:</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin: 30px 0;">
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #3b82f6;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 12px;">🔒 Data Isolation</h3>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li>Keep vector databases local (never cloud-sync ChromaDB)</li>
+                            <li>Store embeddings on disk, not in memory-mapped cloud</li>
+                            <li>Use project-specific databases (isolate clients/cases)</li>
+                            <li>Clear temporary files after processing</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #22c55e;">
+                        <h3 style="color: #16a34a; margin-bottom: 12px;">🔐 Encryption</h3>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li>Encrypt database at rest (disk encryption)</li>
+                            <li>Use encrypted connections if using API mode</li>
+                            <li>Never log sensitive document content</li>
+                            <li>Implement secure key management</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #3b82f6;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 12px;">👁️ No Telemetry</h3>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li>Disable all analytics and tracking</li>
+                            <li>No error reporting to external services</li>
+                            <li>No usage statistics collection</li>
+                            <li>Open source for auditability</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #2563eb;">
+                        <h3 style="color: #2563eb; margin-bottom: 12px;">⚖️ Compliance</h3>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li>GDPR-compliant by design (data minimization)</li>
+                            <li>Support right to erasure (delete projects cleanly)</li>
+                            <li>Document data flows for compliance audits</li>
+                            <li>Respect attorney-client privilege requirements</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="key-highlight">
+                    <h3 style="margin-top: 0;">🛡️ How Lawyer Assistant Handles Privacy</h3>
+                    <p><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a> implements all these principles:</p>
+                    <ul style="margin: 15px 0;">
+                        <li><strong>Zero telemetry:</strong> No analytics, no error reporting, no tracking pixels</li>
+                        <li><strong>Local-first:</strong> Even in API mode, only small context snippets are sent</li>
+                        <li><strong>Project isolation:</strong> Each case gets its own database</li>
+                        <li><strong>Audit trail:</strong> All data flows are documented for compliance</li>
+                        <li><strong>Open source:</strong> MIT license means you can verify every line</li>
+                    </ul>
+                    <p style="margin-top: 15px; font-size: 1.05em;">This is why law firms and businesses trust it with confidential documents.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Performance Optimization Tips</h2>
+
+                <p style="font-size: 1.1em;">Making your legal AI fast enough for real-world use requires optimization at every layer:</p>
+
+                <div style="margin: 25px 0;">
+                    <h3 style="color: #2563eb; margin-bottom: 15px;">🚀 Embedding Generation</h3>
+                    <ul style="font-size: 1.05em; line-height: 1.8;">
+                        <li><strong>Use ONNX models:</strong> 3-5x faster than PyTorch on CPU</li>
+                        <li><strong>Batch processing:</strong> Process 32-64 chunks at once</li>
+                        <li><strong>GPU acceleration:</strong> CUDA for NVIDIA, ROCm for AMD</li>
+                        <li><strong>Quantization:</strong> INT8 embeddings with minimal quality loss</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 25px 0;">
+                    <h3 style="color: #2563eb; margin-bottom: 15px;">⚡ Vector Search</h3>
+                    <ul style="font-size: 1.05em; line-height: 1.8;">
+                        <li><strong>Index optimization:</strong> HNSW for fast approximate search</li>
+                        <li><strong>Metadata filtering:</strong> Pre-filter by document/date before search</li>
+                        <li><strong>Caching:</strong> Cache frequent queries and embeddings</li>
+                        <li><strong>Incremental indexing:</strong> Only re-index changed documents</li>
+                    </ul>
+                </div>
+
+                <div style="margin: 25px 0;">
+                    <h3 style="color: #2563eb; margin-bottom: 15px;">💻 LLM Inference</h3>
+                    <ul style="font-size: 1.05em; line-height: 1.8;">
+                        <li><strong>Quantization:</strong> Q4_K_M or Q8_0 for balance of speed/quality</li>
+                        <li><strong>Context length:</strong> Only send relevant chunks (not entire documents)</li>
+                        <li><strong>Streaming:</strong> Show partial results as they generate</li>
+                        <li><strong>GPU layers:</strong> Offload as many layers as VRAM allows</li>
+                    </ul>
+                </div>
+
+                <div style="background: #eff6ff; padding: 25px; border-radius: 12px; margin: 25px 0;">
+                    <h4 style="color: #2563eb; margin-bottom: 15px;">📊 Real-World Performance (Lawyer Assistant)</h4>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div style="text-align: center;">
+                            <p style="font-size: 2.5em; font-weight: 700; color: #2563eb; margin: 0;">2-3s</p>
+                            <p style="color: #666;">Query time (GPU)</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <p style="font-size: 2.5em; font-weight: 700; color: #2563eb; margin: 0;">5min</p>
+                            <p style="color: #666;">Index 1000 pages</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <p style="font-size: 2.5em; font-weight: 700; color: #2563eb; margin: 0;">9GB</p>
+                            <p style="color: #666;">VRAM (recommended)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Testing & Validation</h2>
+
+                <p style="font-size: 1.1em;">How do you know your legal AI actually works? Rigorous testing is essential:</p>
+
+                <div style="margin: 30px 0;">
+                    <h3 style="color: #2563eb; margin-bottom: 20px;">1. Create a Test Dataset</h3>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; border-left: 4px solid #2563eb;">
+                        <p style="margin-bottom: 15px;">Build a set of test questions with known correct answers:</p>
+                        <ul style="font-size: 1.05em; line-height: 1.8;">
+                            <li><strong>Basic retrieval:</strong> "What is the payment term?" (exact match)</li>
+                            <li><strong>Semantic understanding:</strong> "Can I end this agreement early?" (requires interpretation)</li>
+                            <li><strong>Multi-document:</strong> "Which contract has the best termination rights?" (comparison)</li>
+                            <li><strong>Negative cases:</strong> "What is the penalty for late delivery?" (when not mentioned)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div style="margin: 30px 0;">
+                    <h3 style="color: #2563eb; margin-bottom: 20px;">2. Measure Key Metrics</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                        <div style="background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 100%); padding: 20px; border-radius: 10px;">
+                            <p style="font-weight: 600; margin-bottom: 10px;">📊 Retrieval Accuracy</p>
+                            <p style="font-size: 0.95em;">Are the right chunks being retrieved? Measure precision@k and recall@k.</p>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 10px;">
+                            <p style="font-weight: 600; margin-bottom: 10px;">🎯 Answer Quality</p>
+                            <p style="font-size: 0.95em;">Is the LLM generating correct, relevant answers? Use human evaluation.</p>
+                        </div>
+                        <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 10px;">
+                            <p style="font-weight: 600; margin-bottom: 10px;">📄 Citation Accuracy</p>
+                            <p style="font-size: 0.95em;">Do citations point to correct sources? Critical for legal work.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="margin: 30px 0;">
+                    <h3 style="color: #2563eb; margin-bottom: 20px;">3. Benchmark Against Real Documents</h3>
+                    <p><a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a> includes a 200-question legal benchmark dataset covering:</p>
+                    <ul style="font-size: 1.05em; line-height: 1.8; margin: 15px 0;">
+                        <li>Contract clauses (termination, payment, liability)</li>
+                        <li>Complex multi-hop reasoning</li>
+                        <li>Comparison across multiple documents</li>
+                        <li>Edge cases (ambiguous language, conflicting terms)</li>
+                    </ul>
+                </div>
+
+                <div class="key-highlight">
+                    <h3 style="margin-top: 0;">✅ Validation Checklist</h3>
+                    <p>Before deploying your legal AI for real work:</p>
+                    <ol style="font-size: 1.05em; line-height: 1.8; margin: 15px 0;">
+                        <li>Test with at least 100 real-world questions</li>
+                        <li>Verify citation accuracy is >95%</li>
+                        <li>Check that "I don't know" responses are honest (no hallucinations)</li>
+                        <li>Test edge cases (scanned PDFs, multi-language, corrupted files)</li>
+                        <li>Benchmark performance on target hardware</li>
+                        <li>Get feedback from legal professionals on answer quality</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="cta-box" style="margin: 60px 0;">
+                <h2 style="color: #1d4ed8; margin-bottom: 20px;">🎓 Learn From a Complete Implementation</h2>
+                <p style="font-size: 1.15em; margin-bottom: 30px; line-height: 1.7;">Building a legal AI from scratch is complex, but you don't have to start alone. <strong><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a></strong> by <strong><a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: #2563eb;">Hussain Nazary</a></strong> provides a complete, production-ready reference implementation that you can study, modify, and deploy immediately.</p>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0; text-align: left;">
+                    <div>
+                        <p style="font-weight: 600; margin-bottom: 8px;">✅ Complete Source Code</p>
+                        <p style="font-size: 0.95em;">Every component we discussed, fully implemented with error handling</p>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; margin-bottom: 8px;">✅ 25+ Pages of Docs</p>
+                        <p style="font-size: 0.95em;">Architecture guides, API reference, deployment instructions</p>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; margin-bottom: 8px;">✅ Ready to Use</p>
+                        <p style="font-size: 0.95em;">Desktop app with UI, or use as a library in your projects</p>
+                    </div>
+                    <div>
+                        <p style="font-weight: 600; margin-bottom: 8px;">✅ MIT Licensed</p>
+                        <p style="font-size: 0.95em;">Free forever, modify and distribute as you need</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px;">
+                    <a href="https://lawyers-assistant.github.io" class="btn-primary" target="_blank" rel="noopener">Visit Lawyer Assistant Website →</a>
+                    <a href="https://github.com/haal-lab/Lawyer-Assistant" class="btn-secondary" target="_blank" rel="noopener" style="margin-left: 15px;">Explore GitHub Repository</a>
+                </div>
+
+                <p style="margin-top: 30px; font-size: 1.05em; color: #555;">Whether you want to use it as-is or learn from the implementation to build your own custom system, Lawyer Assistant gives you everything you need.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Common Challenges & Solutions</h2>
+
+                <p style="font-size: 1.1em; margin-bottom: 25px;">Building a legal AI comes with unique challenges. Here's how to solve them:</p>
+
+                <div style="margin: 30px 0;">
+                    <div style="background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%); padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="color: #dc2626; margin-bottom: 12px;">❌ Challenge: Hallucinated Citations</h3>
+                        <p style="margin-bottom: 12px;"><strong>Problem:</strong> LLM invents source page numbers that don't exist</p>
+                        <p style="font-weight: 600; color: #16a34a; margin-bottom: 8px;">✅ Solution:</p>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li>Never let the LLM generate page numbers—extract from metadata</li>
+                            <li>Validate all citations against actual document pages</li>
+                            <li>Return "Source not found" for unverifiable claims</li>
+                            <li>Include text preview to prove citation accuracy</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%); padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="color: #dc2626; margin-bottom: 12px;">❌ Challenge: Missing Legal Terminology</h3>
+                        <p style="margin-bottom: 12px;"><strong>Problem:</strong> Semantic search misses precise legal terms like "force majeure" or "liquidated damages"</p>
+                        <p style="font-weight: 600; color: #16a34a; margin-bottom: 8px;">✅ Solution:</p>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li>Use hybrid search (semantic + BM25 keyword)</li>
+                            <li>Boost exact matches in scoring algorithm</li>
+                            <li>Maintain a legal terminology dictionary for query expansion</li>
+                            <li>Train embeddings on legal corpus (or use BGE-M3 which includes legal data)</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%); padding: 25px; border-radius: 12px; margin-bottom: 20px;">
+                        <h3 style="color: #dc2626; margin-bottom: 12px;">❌ Challenge: Slow Performance on CPU</h3>
+                        <p style="margin-bottom: 12px;"><strong>Problem:</strong> Embedding generation and LLM inference too slow without GPU</p>
+                        <p style="font-weight: 600; color: #16a34a; margin-bottom: 8px;">✅ Solution:</p>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li>Use ONNX-optimized models for embeddings (3-5x faster)</li>
+                            <li>Deploy smaller quantized LLMs (7B Q4 vs 13B Q8)</li>
+                            <li>Cache embeddings—only generate once per document</li>
+                            <li>Show streaming results to hide latency</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%); padding: 25px; border-radius: 12px;">
+                        <h3 style="color: #dc2626; margin-bottom: 12px;">❌ Challenge: Poor OCR on Scanned Contracts</h3>
+                        <p style="margin-bottom: 12px;"><strong>Problem:</strong> Text extraction fails on low-quality scanned PDFs</p>
+                        <p style="font-weight: 600; color: #16a34a; margin-bottom: 8px;">✅ Solution:</p>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li>Pre-process images (deskew, denoise, contrast adjustment)</li>
+                            <li>Use Tesseract with legal-specific training data</li>
+                            <li>Try multiple OCR engines and merge results</li>
+                            <li>Warn users about low-confidence extractions</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <p style="font-size: 1.05em; margin-top: 30px;">All these solutions are implemented in <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a>—study the code to see production-ready error handling.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Deployment Options</h2>
+
+                <p style="font-size: 1.1em; margin-bottom: 25px;">Once built, how do you deploy your legal AI? Three common patterns:</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin: 30px 0;">
+                    <div style="background: white; padding: 25px; border-radius: 12px; border: 2px solid #eff6ff;">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">💻 Desktop Application</h3>
+                        <p style="font-weight: 600; margin-bottom: 10px;">Best for: Individual users, small teams</p>
+                        <ul style="font-size: 0.95em; line-height: 1.7; margin: 15px 0;">
+                            <li>✅ Maximum privacy (everything local)</li>
+                            <li>✅ No server maintenance</li>
+                            <li>✅ Works offline</li>
+                            <li>❌ Requires local GPU/CPU resources</li>
+                        </ul>
+                        <p style="margin-top: 15px; font-size: 0.9em; color: #666;"><em>This is what Lawyer Assistant uses—Electron + Python backend</em></p>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 12px; border: 2px solid #eff6ff;">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">🏢 Self-Hosted Server</h3>
+                        <p style="font-weight: 600; margin-bottom: 10px;">Best for: Law firms, companies</p>
+                        <ul style="font-size: 0.95em; line-height: 1.7; margin: 15px 0;">
+                            <li>✅ Centralized documents</li>
+                            <li>✅ Team collaboration</li>
+                            <li>✅ Dedicated GPU server</li>
+                            <li>❌ Requires IT infrastructure</li>
+                        </ul>
+                        <p style="margin-top: 15px; font-size: 0.9em; color: #666;"><em>Deploy with Docker + NGINX reverse proxy</em></p>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 12px; border: 2px solid #eff6ff;">
+                        <h3 style="color: #2563eb; margin-bottom: 15px;">📚 Python Library</h3>
+                        <p style="font-weight: 600; margin-bottom: 10px;">Best for: Developers, custom integrations</p>
+                        <ul style="font-size: 0.95em; line-height: 1.7; margin: 15px 0;">
+                            <li>✅ Integrate into existing tools</li>
+                            <li>✅ Maximum customization</li>
+                            <li>✅ Scriptable workflows</li>
+                            <li>❌ No GUI out of the box</li>
+                        </ul>
+                        <p style="margin-top: 15px; font-size: 0.9em; color: #666;"><em>Use as pip package in your Python projects</em></p>
+                    </div>
+                </div>
+
+                <div class="key-highlight">
+                    <h3 style="margin-top: 0;">🚀 Quick Start Deployment</h3>
+                    <p><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Lawyer Assistant</a> supports all three patterns:</p>
+                    <ul style="margin: 15px 0;">
+                        <li><strong>Desktop:</strong> Download installer from website, run <code>launch.bat</code> or <code>launch.sh</code></li>
+                        <li><strong>Server:</strong> Docker Compose file included for one-command deployment</li>
+                        <li><strong>Library:</strong> <code>pip install lawyer-assistant</code> for Python integration</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="article-section" style="background: linear-gradient(135deg, #eff6ff 0%, #bfdbfe 100%);">
+                <h2 class="section-title">Key Takeaways</h2>
+
+                <div style="font-size: 1.1em; line-height: 1.8;">
+                    <p style="margin-bottom: 25px;">Building a local AI assistant for legal documents requires six key components:</p>
+
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0;">
+                        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <p style="font-size: 2em; margin: 0 0 10px 0;">1️⃣</p>
+                            <p style="font-weight: 600; margin-bottom: 8px;">Document Ingestion</p>
+                            <p style="font-size: 0.95em;">Parse PDFs, DOCX, images with smart chunking</p>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <p style="font-size: 2em; margin: 0 0 10px 0;">2️⃣</p>
+                            <p style="font-weight: 600; margin-bottom: 8px;">Vector Embeddings</p>
+                            <p style="font-size: 0.95em;">BGE-M3 + ChromaDB for semantic search</p>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <p style="font-size: 2em; margin: 0 0 10px 0;">3️⃣</p>
+                            <p style="font-weight: 600; margin-bottom: 8px;">Hybrid Search</p>
+                            <p style="font-size: 0.95em;">Semantic + BM25 + reranking for precision</p>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <p style="font-size: 2em; margin: 0 0 10px 0;">4️⃣</p>
+                            <p style="font-weight: 600; margin-bottom: 8px;">Local LLM</p>
+                            <p style="font-size: 0.95em;">Ollama with Llama/Mistral for privacy</p>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <p style="font-size: 2em; margin: 0 0 10px 0;">5️⃣</p>
+                            <p style="font-weight: 600; margin-bottom: 8px;">Citation System</p>
+                            <p style="font-size: 0.95em;">Verifiable sources with page numbers</p>
+                        </div>
+                        <div style="background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
+                            <p style="font-size: 2em; margin: 0 0 10px 0;">6️⃣</p>
+                            <p style="font-weight: 600; margin-bottom: 8px;">Compliance Scanner</p>
+                            <p style="font-size: 0.95em;">Automated risk detection with custom rules</p>
+                        </div>
+                    </div>
+
+                    <div style="background: white; padding: 30px; border-radius: 12px; margin: 30px 0; border-left: 5px solid #2563eb;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 15px;">🎯 The Bottom Line</h3>
+                        <p style="margin-bottom: 15px;">Building a production-ready legal AI from scratch is a 100+ hour project that requires expertise in NLP, vector databases, LLMs, and legal domain knowledge.</p>
+                        <p style="font-weight: 600; font-size: 1.1em;">Or... you can start with <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb;">Lawyer Assistant</a> and have a working system in 15 minutes.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-box" style="background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%); color: white; border: none; margin: 60px 0;">
+                <h2 style="color: white; margin-bottom: 20px; font-size: 2.2em;">🚀 Ready to Build Your Legal AI?</h2>
+                <p style="font-size: 1.2em; margin-bottom: 30px; line-height: 1.7;">You have two paths forward:</p>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px; margin: 30px 0; text-align: left;">
+                    <div style="background: rgba(255,255,255,0.15); padding: 25px; border-radius: 12px; backdrop-filter: blur(10px);">
+                        <p style="font-size: 1.8em; margin: 0 0 12px 0;">📚</p>
+                        <p style="font-weight: 600; font-size: 1.2em; margin-bottom: 10px;">Build From Scratch</p>
+                        <p style="font-size: 0.95em; line-height: 1.6;">Use this guide to implement each component yourself. Great for learning and maximum customization.</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.15); padding: 25px; border-radius: 12px; backdrop-filter: blur(10px);">
+                        <p style="font-size: 1.8em; margin: 0 0 12px 0;">⚡</p>
+                        <p style="font-weight: 600; font-size: 1.2em; margin-bottom: 10px;">Start with Lawyer Assistant</p>
+                        <p style="font-size: 0.95em; line-height: 1.6;">Download a complete, tested implementation. Use as-is or customize for your needs.</p>
+                    </div>
+                </div>
+
+                <div style="margin: 40px 0;">
+                    <a href="https://lawyers-assistant.github.io" class="btn-primary" target="_blank" rel="noopener" style="background: white; color: #1d4ed8; font-size: 1.15em; padding: 18px 45px;">Visit Lawyer Assistant →</a>
+                    <a href="https://github.com/haal-lab/Lawyer-Assistant" class="btn-secondary" target="_blank" rel="noopener" style="border-color: white; color: white; font-size: 1.15em; padding: 18px 45px; margin-left: 15px;">View on GitHub</a>
+                </div>
+
+                <p style="font-size: 1.05em; margin-top: 35px; opacity: 0.95;">Created by <a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: white; font-weight: 600; text-decoration: underline;">Hussain Nazary</a> • MIT Licensed • 100% Free • Fully Open Source</p>
+                <p style="font-size: 0.95em; margin-top: 15px; opacity: 0.85;">⭐ Star the project on GitHub to support open-source legal tech!</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Further Resources</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; margin: 30px 0;">
+                    <div style="background: #f8f9fa; padding: 25px; border-radius: 12px;">
+                        <h3 style="color: #2563eb; margin-bottom: 12px;">📖 Documentation</h3>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: #2563eb;">Lawyer Assistant Official Site</a></li>
+                            <li><a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: #2563eb;">GitHub Repository</a></li>
+                            <li><a href="https://ollama.ai/" target="_blank" rel="noopener" style="color: #2563eb;">Ollama Documentation</a></li>
+                            <li><a href="https://www.trychroma.com/" target="_blank" rel="noopener" style="color: #2563eb;">ChromaDB Docs</a></li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 25px; border-radius: 12px;">
+                        <h3 style="color: #2563eb; margin-bottom: 12px;">🎓 Learning Resources</h3>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li><a href="../blog.html" style="color: #2563eb;">Local AI Zone Blog</a></li>
+                            <li><a href="https://huggingface.co/BAAI/bge-m3" target="_blank" rel="noopener" style="color: #2563eb;">BGE-M3 Model Card</a></li>
+                            <li>RAG Architecture Guides</li>
+                            <li>Vector Database Tutorials</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 25px; border-radius: 12px;">
+                        <h3 style="color: #2563eb; margin-bottom: 12px;">🛠️ Tools & Libraries</h3>
+                        <ul style="font-size: 0.95em; line-height: 1.7;">
+                            <li>LangChain / LlamaIndex</li>
+                            <li>Sentence Transformers</li>
+                            <li>Tesseract OCR</li>
+                            <li>rank-bm25</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <a href="../blog.html" class="back-to-blog" style="margin: 60px 0 40px 0;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                </svg>
+                Back to All Articles
+            </a>
+        </div>
+    </article>
+
+    <footer class="premium-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 Local AI Zone. All rights reserved. | Last updated: August 4, 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+    </div>
+
+    <script src="../js/components/contact-form.js"></script>
+    <script src="../js/theme-switcher.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+</body>
+</html>

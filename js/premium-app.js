@@ -1859,7 +1859,8 @@ class PremiumGGUFApp {
             embedding: { label: 'Embedding', color: '#06B6D4' },
             code: { label: 'Code', color: '#10B981' },
             audio: { label: 'Audio', color: '#F59E0B' },
-            text: { label: 'Text', color: '#6B7280' }
+            text: { label: 'Text', color: '#6B7280' },
+            moe: { label: 'Multi-Model (MoE)', color: '#EC4899' }
         };
         
         const config = capabilityConfig[capability] || capabilityConfig.text;

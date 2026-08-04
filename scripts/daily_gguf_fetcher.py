@@ -768,11 +768,30 @@ class DailyGGUFFetcher:
         
         return 'Unknown'
     
+    #: Regex for Mixture-of-Experts (multi-model) architectures. A MoE LLM is
+    #: really several smaller "expert" models routed per-token (Mixtral 8x7b,
+    #: Qwen3-30B-A3B, 8x22b, 4x7b, ...), so it must NOT be presented as a
+    #: single dense "Text" model in the UI.
+    MOE_PATTERN = re.compile(
+        r'\b(mixtral|moe|mixture|'
+        r'\d+[xX]\d+b|'                       # 8x7b, 4x7b, 2x8b, 8x22b
+        r'\d+(?:\.\d+)?[bB][-_ ]?[aA]\d+(?:\.\d+)?[bB]\b|'  # 30B-A3B, 397B-A17B
+        r'\d+[- ]experts?)\b'                 # "14-experts"; bare "Expert"
+    )                                          # is NOT a signal (Bible Expert)
+
+    @staticmethod
+    def is_moe(model_id: str, model_name: str = '', tags=None) -> bool:
+        """True when the model is a Mixture-of-Experts (multi-model) LLM."""
+        text = f"{model_id or ''} {model_name or ''} {' '.join(tags or [])}"
+        return bool(DailyGGUFFetcher.MOE_PATTERN.search(text.lower()))
+
     def _detect_capability(self, model_id: str, tags: List[str]) -> str:
-        """Detect model capability."""
+        """Detect model capability (MoE first, then vision/code/audio/text)."""
         text = (model_id + ' ' + ' '.join(tags)).lower()
         
-        if re.search(r'\b(vision|vl|visual|image|multimodal|llava|mtp)\b', text):
+        if DailyGGUFFetcher.is_moe(model_id, tags=tags):
+            return 'moe'
+        elif re.search(r'\b(vision|vl|visual|image|multimodal|llava|mtp)\b', text):
             return 'vision'
         elif re.search(r'\b(code|coder|coding|codellama|starcoder)\b', text):
             return 'code'

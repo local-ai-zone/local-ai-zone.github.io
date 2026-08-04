@@ -222,13 +222,13 @@
 
 .articles-title {
     font-size: 2.5em;
-    color: #ffffff;
+    color: var(--text-primary);
     margin: 0;
 }
 
 .articles-subtitle {
     font-size: 1.2em;
-    color: #a0a0a0;
+    color: var(--text-secondary);
     margin-top: 10px;
 }
 
@@ -257,6 +257,40 @@
     background-color: #4CAF50;
     border-radius: 10px;
     border: 2px solid #1e1e1e;
+}
+
+/* Trending Now badges (theme-aware via CSS variables defined in theme.css) */
+.trending-badges {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+}
+
+.trending-badge {
+    display: inline-block;
+    font-size: 0.72em;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 999px;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.badge-new {
+    background: var(--trending-new-bg);
+    color: var(--trending-new-color);
+}
+
+.badge-score {
+    background: var(--trending-score-bg);
+    color: var(--trending-score-color);
+    border: 1px solid var(--trending-score-border);
+}
+
+.article-card:hover .trending-badge.badge-score {
+    background: var(--trending-score-hover-bg);
 }
 
 .article-card {

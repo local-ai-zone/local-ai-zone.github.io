@@ -29,7 +29,16 @@ function getBlogPostFiles() {
         const dirPath = path.join(__dirname, '..', dir);
         if (fs.existsSync(dirPath)) {
             const files = fs.readdirSync(dirPath)
-                .filter(file => file.endsWith('.html') && file !== 'index.html' && file !== 'cpu_page_template.html');
+                .filter(file => file.endsWith('.html') && file !== 'index.html' && file !== 'cpu_page_template.html')
+                .filter(file => {
+                    // Skip redirect/noindex pages (e.g. deduplicated guides)
+                    try {
+                        const content = fs.readFileSync(path.join(dirPath, file), 'utf8');
+                        return !/noindex/.test(content);
+                    } catch (err) {
+                        return true;
+                    }
+                });
             
             files.forEach(file => {
                 blogPosts.push({

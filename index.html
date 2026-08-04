@@ -361,6 +361,48 @@
                 </div>
             </section>
 
+            <!-- Trending Now Section -->
+            <section class="trending-models" aria-label="Trending models">
+                <div class="articles-header">
+                    <h2 class="articles-title">🔥 Trending Now: July 2026</h2>
+                    <p class="articles-subtitle">The newest frontier models, ranked by latest benchmark scores. All available as GGUF for local deployment.</p>
+                </div>
+                <div class="articles-grid">
+                    <a href="models/kimi-k3.html" class="article-card">
+                        <div class="article-card-content">
+                            <div class="trending-badges"><span class="trending-badge badge-new">NEW · Jul 16</span><span class="trending-badge badge-score">GPQA 93.5</span></div>
+                            <h3 class="article-card-title">Kimi K3 — The Largest Open Model Ever</h3>
+                            <p class="article-card-excerpt">2.8T-parameter Moonshot MoE (896 experts, ~50B active). MMLU-Pro 89.4 · AIME 91.2 · 1M context · #4 globally, beating Claude Opus 4.8.</p>
+                            <div class="article-card-footer"><span class="read-more-link">View Model →</span></div>
+                        </div>
+                    </a>
+                    <a href="models/glm-5-2.html" class="article-card">
+                        <div class="article-card-content">
+                            <div class="trending-badges"><span class="trending-badge badge-new">NEW · Jun 13</span><span class="trending-badge badge-score">GPQA 88.5</span></div>
+                            <h3 class="article-card-title">GLM-5.2 — The Value King</h3>
+                            <p class="article-card-excerpt">~753B Zhipu MoE (~40B active). MMLU-Pro 84.1 · AIME 81.0 · SWE-bench ~79-81% · 1M context · ~168 tokens/sec — 3× faster than rivals.</p>
+                            <div class="article-card-footer"><span class="read-more-link">View Model →</span></div>
+                        </div>
+                    </a>
+                    <a href="models/deepseek-v4-flash-0731.html" class="article-card">
+                        <div class="article-card-content">
+                            <div class="trending-badges"><span class="trending-badge badge-new">NEW · Jul 31</span><span class="trending-badge badge-score">SWE-bench 80.6%</span></div>
+                            <h3 class="article-card-title">DeepSeek V4-Flash-0731 — The July Retrain</h3>
+                            <p class="article-card-excerpt">284B DeepSeek MoE (13B active). Now beats V4-Pro on agentic coding benchmarks. LiveCodeBench 93.5 · ~112 tok/s · 1M context.</p>
+                            <div class="article-card-footer"><span class="read-more-link">View Model →</span></div>
+                        </div>
+                    </a>
+                    <a href="models/minimax-m3.html" class="article-card">
+                        <div class="article-card-content">
+                            <div class="trending-badges"><span class="trending-badge badge-new">NEW · Jun 1</span><span class="trending-badge badge-score">GPQA 92+</span></div>
+                            <h3 class="article-card-title">MiniMax M3 — The Science Reasoning Specialist</h3>
+                            <p class="article-card-excerpt">428B MiniMax MoE (~23B active). GPQA past 92 · native text+image+video · 1M context at 1/20th the compute via MiniMax Sparse Attention.</p>
+                            <div class="article-card-footer"><span class="read-more-link">View Model →</span></div>
+                        </div>
+                    </a>
+                </div>
+            </section>
+
             <!-- Featured Articles Section -->
             <section class="featured-articles" aria-label="Featured Articles">
                 <div class="articles-header">
@@ -410,7 +452,7 @@
                             <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
                         </div>
                     </a>
-                    <a href="guides/best-ai-research-assistant-models-ultimate-ranking-2025.html" class="article-card">
+                    <a href="guides/best-ai-research-assistant-models-ultimate-ranking.html" class="article-card">
                         <div class="article-card-content">
                             <h3 class="article-card-title">AI Research Assistant Models</h3>
                             <p class="article-card-excerpt">A definitive ranking of models that can accelerate your research by summarizing papers, analyzing data, and generating insights.</p>
@@ -491,6 +533,7 @@
                         <select id="capability-filter" class="premium-select">
                             <option value="all">All Capabilities</option>
                             <option value="text">Text</option>
+                            <option value="moe">Multi-Model (MoE)</option>
                             <option value="vision">Vision</option>
                             <option value="code">Code</option>
                             <option value="embedding">Embedding</option>

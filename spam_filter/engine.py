@@ -301,13 +301,29 @@ class SpamFilterEngine:
         
         return 'Unknown'
     
+    #: Regex for Mixture-of-Experts (multi-model) architectures. A MoE LLM is
+    #: really several smaller "expert" models routed per-token (Mixtral 8x7b,
+    #: Qwen3-30B-A3B, 8x22b, 4x7b, ...), so it must NOT be presented as a
+    #: single dense "Text" model in the UI.
+    MOE_PATTERN = re.compile(
+        r'\b(mixtral|moe|mixture|'
+        r'\d+[xX]\d+b|'                       # 8x7b, 4x7b, 2x8b, 8x22b
+        r'\d+(?:\.\d+)?[bB][-_ ]?[aA]\d+(?:\.\d+)?[bB]\b|'  # 30B-A3B, 397B-A17B
+        r'\d+[- ]experts?)\b'                 # "14-experts"; bare "Expert"
+    )                                          # is NOT a signal (Bible Expert)
+
     def _detect_model_capability(self, model_id: str, model_name: str, tags: List[str]) -> str:
-        """Detect model capability type (vision, embedding, text, code, audio)"""
+        """Detect model capability type (moe, vision, embedding, text, code, audio)"""
         # Combine model_id and model_name for comprehensive matching
         search_text = f"{model_id} {model_name}".lower()
         tags_lower = [tag.lower() for tag in (tags or [])]
         all_text = search_text + ' ' + ' '.join(tags_lower)
-        
+
+        # MoE (multi-model) check FIRST: architecture, not modality — a MoE
+        # vision model must still be labeled multi-model, not just "vision".
+        if self.MOE_PATTERN.search(all_text):
+            return "moe"
+
         # Vision/Multimodal patterns
         vision_patterns = [
             'vision', 'vl', '-v-', '-v1', '-v2', 'image', 'llava', 'cogvlm', 

@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>July 2026 AI Model Roundup - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="July 2026 was the biggest month in open-weight AI history: Kimi K3 (2.8T), GLM-5.2, DeepSeek V4-Flash-0731, MiniMax M3, plus Claude Opus 5 and Gemini 3.6 Flash. Full roundup with local-deployment comparison table.">
+    <meta name="keywords" content="July 2026 AI roundup, Kimi K3, GLM-5.2, Claude Opus 5, Gemini 3.6 Flash, DeepSeek V4-Flash-0731, MiniMax M3, local AI, GGUF, open weight models">
+    <meta property="og:title" content="July 2026 AI Model Roundup: The Biggest Month in Open-Weight History">
+    <meta property="og:description" content="Kimi K3, GLM-5.2, DeepSeek V4-Flash-0731, MiniMax M3, Claude Opus 5 and Gemini 3.6 Flash — July 2026 delivered a wave of frontier releases. Local-deployment comparison table included.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:type" content="article">
+    
+    <style>
+        .article-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .article-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="white" opacity="0.05"/></svg>');
+        }
+        
+        .article-title {
+            font-size: 3.5em;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .article-meta {
+            font-size: 1.1em;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .article-date {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        
+        .article-category {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+        }
+        
+        .article-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+        
+        .article-section {
+            margin: 50px 0;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 2.2em;
+            color: var(--primary-600);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--border-color);
+            position: relative;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: var(--primary-500);
+        }
+        
+        .trend-card {
+            background: var(--primary-50);
+            border-left: 4px solid var(--primary-500);
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+        
+        .trend-card:hover {
+            transform: translateX(10px);
+        }
+        
+        .model-release {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        
+        .model-badge {
+            display: inline-block;
+            padding: 6px 15px;
+            background: var(--primary-600);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .key-takeaway {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 4px solid #2563eb;
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 8px;
+        }
+        
+        .stat-number {
+            font-size: 3.5em;
+            font-weight: 700;
+            color: var(--primary-600);
+            line-height: 1;
+            margin-bottom: 10px;
+        }
+        
+        .stat-label {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+        
+        .article-header .back-to-blog {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 0 30px 0;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 8px;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .article-header .back-to-blog:hover {
+            background: rgba(255,255,255,0.28);
+            transform: translateX(-3px);
+        }
+        
+        /* Local deployment comparison table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.95em;
+        }
+        
+        .comparison-table th {
+            background: var(--primary-600);
+            color: white;
+            padding: 12px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+        
+        .comparison-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+        
+        .comparison-table tr:nth-child(even) td {
+            background: var(--primary-50);
+        }
+        
+        .comparison-table tr:hover td {
+            background: var(--primary-100);
+        }
+        
+        .comparison-table .local-yes {
+            color: #16a34a;
+            font-weight: 700;
+        }
+        
+        .comparison-table .local-no {
+            color: #dc2626;
+            font-weight: 700;
+        }
+        
+        .model-link {
+            color: var(--primary-600);
+            font-weight: 600;
+            text-decoration: none;
+        }
+        
+        .model-link:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .article-title {
+                font-size: 2.5em;
+            }
+            
+            .article-section {
+                padding: 25px;
+            }
+            
+            .section-title {
+                font-size: 1.8em;
+            }
+            
+            .comparison-table {
+                font-size: 0.82em;
+            }
+            
+            .comparison-table th,
+            .comparison-table td {
+                padding: 8px 6px;
+            }
+        }
+    </style>
+</head>
+<body class="blog-article-page">
+
+    <!-- Premium Header (matches homepage) -->
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">July 2026 AI Model Roundup: The Biggest Month in Open-Weight History</h1>
+                <div class="article-meta">
+                    <span class="article-date">August 4, 2026</span>
+                    <span class="article-category">AI News & Updates</span>
+                    <span class="article-read-time">📖 7 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+            <div class="article-intro">
+                <p>July 2026 was arguably the most consequential month in the history of open-weight AI. Within four weeks, the community saw the largest open model ever released (Kimi K3), the fastest trillion-parameter-class MoE (GLM-5.2), a mid-cycle retrain that outranks its own flagship (DeepSeek V4-Flash-0731), a new science-reasoning specialist (MiniMax M3), plus major closed-source frontier updates from Anthropic and Google. Here's everything you need to know — and how to run it locally.</p>
+                
+                <div class="key-takeaway">
+                    <h3>🚀 Key Takeaway</h3>
+                    <p><strong>Open weights officially caught up.</strong> Kimi K3, GLM-5.2, and MiniMax M3 all post scores that rival or beat proprietary frontier models from earlier this year — and every one of them ships as GGUF for fully local deployment. If you have 64GB+ of RAM, you can run a genuinely frontier-class model on your own machine today.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">The Five Headline Releases</h2>
+                
+                <div class="model-release">
+                    <div class="model-badge">Moonshot AI</div>
+                    <div class="model-badge" style="background: #7c3aed;">Kimi K3</div>
+                    
+                    <h3>Kimi K3 — The Largest Open-Weight Model Ever (July 16, 2026)</h3>
+                    <p>Moonshot AI's Kimi K3 is a 2.8-trillion-parameter MoE with 896 total experts (~50B active) — the biggest open weights ever shipped. It ranks <strong>#4 globally across all models</strong>, ahead of Claude Opus 4.8, and took <strong>#1 on the Arena.ai Frontend Code Arena</strong>.</p>
+                    
+                    <ul>
+                        <li><strong>GPQA Diamond 93.5 · MMLU-Pro 89.4 · AIME 91.2</strong>: Frontier reasoning across science, math, and knowledge</li>
+                        <li><strong>1M-token context + native multimodal</strong>: Vision and text in a single window via Kimi Delta Attention</li>
+                        <li><strong>Modified MIT license</strong>: Attribution triggers only past 100M monthly active users</li>
+                        <li><strong>Local reality check</strong>: The 2.8T footprint means you'll want a 128GB+ workstation running Q4 quantization — GGUF builds are on <a href="../models/kimi-k3.html" class="model-link">Local AI Zone</a></li>
+                    </ul>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Zhipu AI</div>
+                    <div class="model-badge" style="background: #0891b2;">GLM-5.2</div>
+                    
+                    <h3>GLM-5.2 — The Value King (June 13, 2026)</h3>
+                    <p>Zhipu's newest open flagship (~753B total / ~40B active, MIT license) is the <strong>fastest trillion-parameter-class open MoE</strong>, clocking roughly <strong>168 tokens/sec</strong> — triple the speed of rivals — via IndexShare routing and KVShare speculative decoding.</p>
+                    
+                    <ul>
+                        <li><strong>GPQA Diamond ~88.5 · MMLU-Pro ~84.1 · AIME 2025 ~81.0</strong></li>
+                        <li><strong>SWE-bench Verified ~79-81%</strong>: Sharpened specifically for long-horizon agentic coding</li>
+                        <li><strong>1M-token context</strong>: IndexShare routing keeps long prompts cheap</li>
+                        <li><strong>Local reality check</strong>: ~168 tok/s means even a strong consumer workstation gets usable interactive speeds. GGUF builds are on <a href="../models/glm-5-2.html" class="model-link">Local AI Zone</a></li>
+                    </ul>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">DeepSeek</div>
+                    <div class="model-badge" style="background: #4d6bfe;">V4-Flash-0731</div>
+                    
+                    <h3>DeepSeek V4-Flash-0731 — The Retrain That Beat Its Flagship (July 31, 2026)</h3>
+                    <p>DeepSeek's mid-cycle retrain of V4-Flash (284B MoE / 13B active) targets coding and agent tool-use — and the result <strong>outperforms the larger V4-Pro on agentic benchmarks</strong> without any price increase.</p>
+                    
+                    <ul>
+                        <li><strong>LiveCodeBench 93.5</strong>: #1 globally across all models, including proprietary</li>
+                        <li><strong>SWE-bench Verified 80.6%</strong>: Top-tier real-world code fixing</li>
+                        <li><strong>~112 tokens/sec</strong> at flash-tier pricing (~$0.14/$0.28 per 1M tokens)</li>
+                        <li><strong>1M-token context</strong> via Compressed Sparse Attention (KV cache at 10% of prior generations)</li>
+                        <li><strong>Local reality check</strong>: 13B active is the most practical frontier-class coder for a single workstation. GGUF builds on <a href="../models/deepseek-v4-flash-0731.html" class="model-link">Local AI Zone</a></li>
+                    </ul>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">MiniMax</div>
+                    <div class="model-badge" style="background: #0d9488;">MiniMax M3</div>
+                    
+                    <h3>MiniMax M3 — The Science Reasoning Specialist (June 1, 2026)</h3>
+                    <p>MiniMax's newest flagship (428B MoE / ~23B active) posts <strong>GPQA scores past 92</strong> and is natively multimodal from the ground up — accepting text, image, and video input streams simultaneously.</p>
+                    
+                    <ul>
+                        <li><strong>MiniMax Sparse Attention (MSA)</strong>: 1M-token context at 1/20th the compute cost</li>
+                        <li><strong>Excellent at autonomous task decomposition</strong> and multi-tool invocation workflows</li>
+                        <li><strong>Community License</strong>: open weights with commercial use</li>
+                        <li><strong>Local reality check</strong>: ~23B active is demanding but feasible on a 64-128GB workstation. GGUF builds on <a href="../models/minimax-m3.html" class="model-link">Local AI Zone</a></li>
+                    </ul>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Anthropic</div>
+                    <div class="model-badge" style="background: #d97757;">Claude Opus 5</div>
+                    
+                    <h3>Claude Opus 5 — The Closed-Source Frontier Reference (July 24, 2026)</h3>
+                    <p>Anthropic's newest flagship arrived at unchanged pricing ($5/$25 per 1M tokens), anchoring Claude Max with <strong>near-Fable-5 performance at half the cost</strong> and a new 5-level effort toggle.</p>
+                    
+                    <ul>
+                        <li><strong>5-level effort control</strong>: Dynamic reasoning depth from quick answers to deep research</li>
+                        <li><strong>Claude Fable 5 (June 2026)</strong>: The "Mythos-class" tier opened to general availability</li>
+                        <li><strong>Claude Mythos 5</strong>: Restricted to specialized cyber-defense applications</li>
+                        <li><strong>Local reality check</strong>: Claude is API-only — the closest open coding alternatives are Qwen3-Coder-480B, DeepSeek-V4, and Kimi K3</li>
+                    </ul>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Google</div>
+                    <div class="model-badge" style="background: #4285f4;">Gemini 3.6 Flash</div>
+                    
+                    <h3>Gemini 3.6 Flash — The Stable Agentic Workhorse (July 21, 2026)</h3>
+                    <p>Google's most efficient model went stable, streamlining reasoning steps and tool calls for multi-step agentic workflows and coding tasks — the default low-latency pick for production agents.</p>
+                    
+                    <ul>
+                        <li><strong>Stable API tier</strong>: Production-ready reliability after months of preview</li>
+                        <li><strong>Streamlined tool calls</strong>: Built for high-volume agent orchestration</li>
+                        <li><strong>Local reality check</strong>: API-only; for local agents the open Gemma 4 family is Google's route (Apache 2.0, GGUF on Local AI Zone)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Local Deployment Comparison Table</h2>
+                
+                <p>Here's how the July 2026 lineup stacks up for running AI on your own hardware:</p>
+                
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Release</th>
+                            <th>Params (total / active)</th>
+                            <th>Context</th>
+                            <th>License</th>
+                            <th>Key Benchmarks</th>
+                            <th>Local?</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><a href="../models/kimi-k3.html" class="model-link">Kimi K3</a></td>
+                            <td>Jul 16</td>
+                            <td>2.8T / ~50B (MoE)</td>
+                            <td>1M tokens</td>
+                            <td>Modified MIT</td>
+                            <td>GPQA 93.5 · MMLU-Pro 89.4 · AIME 91.2</td>
+                            <td class="local-yes">Yes (128GB+)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="../models/glm-5-2.html" class="model-link">GLM-5.2</a></td>
+                            <td>Jun 13</td>
+                            <td>~753B / ~40B (MoE)</td>
+                            <td>1M tokens</td>
+                            <td>MIT</td>
+                            <td>GPQA 88.5 · MMLU-Pro 84.1 · SWE-bench ~80%</td>
+                            <td class="local-yes">Yes (128GB+)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="../models/deepseek-v4-flash-0731.html" class="model-link">V4-Flash-0731</a></td>
+                            <td>Jul 31</td>
+                            <td>284B / 13B (MoE)</td>
+                            <td>1M tokens</td>
+                            <td>MIT</td>
+                            <td>LiveCodeBench 93.5 · SWE-bench 80.6%</td>
+                            <td class="local-yes">Yes (32GB+)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="../models/minimax-m3.html" class="model-link">MiniMax M3</a></td>
+                            <td>Jun 1</td>
+                            <td>428B / ~23B (MoE)</td>
+                            <td>1M tokens</td>
+                            <td>Community</td>
+                            <td>GPQA 92+</td>
+                            <td class="local-yes">Yes (64GB+)</td>
+                        </tr>
+                        <tr>
+                            <td>Claude Opus 5</td>
+                            <td>Jul 24</td>
+                            <td>Undisclosed</td>
+                            <td>—</td>
+                            <td>Proprietary</td>
+                            <td>Near-Fable-5, 5-level effort</td>
+                            <td class="local-no">No (API)</td>
+                        </tr>
+                        <tr>
+                            <td>Gemini 3.6 Flash</td>
+                            <td>Jul 21</td>
+                            <td>Undisclosed</td>
+                            <td>—</td>
+                            <td>Proprietary</td>
+                            <td>Stable agentic tier</td>
+                            <td class="local-no">No (API)</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="trend-card">
+                    <h3>⚡ Which One Should You Download?</h3>
+                    <ul>
+                        <li><strong>Best all-rounder on big iron (128GB+)</strong>: <a href="../models/kimi-k3.html" class="model-link">Kimi K3</a> — the most capable open model on the planet right now</li>
+                        <li><strong>Best speed-to-quality ratio</strong>: <a href="../models/glm-5-2.html" class="model-link">GLM-5.2</a> — ~168 tok/s changes how interactive local use feels</li>
+                        <li><strong>Best coding agent on a single workstation (32GB+)</strong>: <a href="../models/deepseek-v4-flash-0731.html" class="model-link">DeepSeek V4-Flash-0731</a> — 13B active with #1 LiveCodeBench</li>
+                        <li><strong>Best for science &amp; multimodal data</strong>: <a href="../models/minimax-m3.html" class="model-link">MiniMax M3</a> — GPQA 92+ with native video input</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">What This Means for Local AI</h2>
+                
+                <div class="trend-card">
+                    <h3>💻 The 64GB Barrier Has Fallen</h3>
+                    <p>For the first time, a model ranked in the global top 5 (<strong>Kimi K3</strong>) is open-weight and locally runnable. Combined with DeepSeek's efficiency breakthroughs (KV cache at 10% of prior generations), the cost of frontier-class intelligence is collapsing faster than anyone predicted at the start of 2026.</p>
+                </div>
+                
+                <div class="trend-card">
+                    <h3>🔓 Open Weights Officially Caught Up</h3>
+                    <p>The July 2026 benchmark picture is unambiguous: <strong>Kimi K3 (GPQA 93.5), MiniMax M3 (GPQA 92+), and GLM-5.2 (GPQA 88.5)</strong> all clear scores that only proprietary frontier models reached in early 2026. The open-vs-closed gap that dominated 2024-2025 discourse is now single digits — or reversed.</p>
+                </div>
+                
+                <div class="trend-card">
+                    <h3>📱 Efficiency Is the New Arms Race</h3>
+                    <p>GLM-5.2's IndexShare routing, DeepSeek's Compressed Sparse Attention, and MiniMax's Sparse Attention all attack the same problem: getting 1M-token context at a fraction of the compute. The winners here are local users, who get more intelligence per gigabyte of RAM than ever before.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Actionable Next Steps</h2>
+                
+                <div class="trend-card">
+                    <h3>📋 For Individual Users</h3>
+                    <ol>
+                        <li><strong>Check your RAM</strong>: 32GB → DeepSeek V4-Flash-0731; 64GB+ → MiniMax M3; 128GB+ → GLM-5.2 or Kimi K3</li>
+                        <li><strong>Try GLM-5.2 first</strong>: It's the fastest way to experience frontier quality locally</li>
+                        <li><strong>Watch the quantization guides</strong>: New GGUF formats keep improving quality-per-gigabyte</li>
+                    </ol>
+                </div>
+                
+                <div class="trend-card">
+                    <h3>🏢 For Organizations</h3>
+                    <ol>
+                        <li><strong>Re-evaluate your API budget</strong>: Open-weight July 2026 models may now beat your closed-source tier at zero marginal cost</li>
+                        <li><strong>Start with V4-Flash-0731</strong>: The 13B-active coder is ideal for private code agents</li>
+                        <li><strong>Plan for 128GB workstations</strong>: The gap between "frontier" and "local" is now a hardware purchase away</li>
+                    </ol>
+                </div>
+                
+                <div class="trend-card">
+                    <h3>👨‍💻 For Developers</h3>
+                    <ol>
+                        <li><strong>Benchmark on your own tasks</strong>: July's models flipped several leaderboards — re-test your workloads</li>
+                        <li><strong>Master 1M-context workflows</strong>: Whole-repo and whole-corpus prompting is now practical locally</li>
+                        <li><strong>Explore agent harnesses</strong>: Kimi K3's Frontend Arena #1 and V4-Flash's agentic gains point to agents, not raw chat</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="key-takeaway" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left-color: #2563eb;">
+                <h3>💎 Summary</h3>
+                <p><strong>July 2026 was the month open-weight AI came of age.</strong> The largest model ever released (Kimi K3), the fastest flagship-class MoE (GLM-5.2), a retrain that beat its own giant (V4-Flash-0731), and a science specialist (MiniMax M3) all arrived within weeks of each other — while Claude Opus 5 and Gemini 3.6 Flash kept the closed-source frontier moving.</p>
+                
+                <p>Every open model in this roundup ships as GGUF right here on <a href="../index.html" class="model-link">Local AI Zone</a>. Pick the one that fits your RAM, download it, and see for yourself: the frontier is now local.</p>
+            </div>
+
+            <a href="../blog.html" class="back-to-blog" style="margin-top: 60px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                </svg>
+                Back to All Articles
+            </a>
+        </div>
+    </article>
+
+    <footer class="premium-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Local AI Zone. All rights reserved. | Last updated: August 4, 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <!-- Contact form content -->
+    </div>
+
+    <script src="../js/components/contact-form.js"></script>
+    <script src="../js/theme-switcher.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+        
+        // Add reading time calculation
+        document.addEventListener('DOMContentLoaded', () => {
+            const articleContent = document.querySelector('.article-content');
+            const wordCount = articleContent.textContent.split(/\s+/).length;
+            const readTime = Math.ceil(wordCount / 200); // 200 words per minute
+            
+            const readTimeElement = document.querySelector('.article-read-time');
+            if (readTimeElement) {
+                readTimeElement.textContent = `📖 ${readTime} min read`;
+            }
+        });
+    </script>
+
+</body>
+</html>

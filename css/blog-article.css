@@ -2,8 +2,165 @@
 
 /* Page-level styles */
 .blog-article-page {
-    background: var(--neutral-50);
+    background: linear-gradient(135deg, var(--neutral-50) 0%, var(--primary-50) 100%);
     min-height: 100vh;
+}
+
+/* ==========================================================
+   Premium Header (matches main home screen theme)
+   ========================================================== */
+.blog-header {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.blog-header .header-content {
+    flex-wrap: wrap;
+}
+
+.blog-nav {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex-wrap: wrap;
+}
+
+.blog-nav a {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    color: var(--neutral-600);
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+.blog-nav a:hover {
+    color: var(--primary-600);
+    background: var(--primary-50);
+}
+
+.blog-nav a.active {
+    color: var(--primary-700);
+    background: var(--primary-100);
+    font-weight: 600;
+}
+
+.blog-header .theme-switcher-btn {
+    margin-left: 0;
+}
+
+/* Mobile: blog header stacks and stays visible (no JS collapse needed) */
+@media (max-width: 768px) {
+    .blog-header .header-content {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--space-3);
+        max-height: none;
+        opacity: 1;
+        padding: var(--space-3) 0;
+        margin: 0;
+        border-top: none;
+    }
+
+    .blog-header .header-left,
+    .blog-header .header-right {
+        width: 100%;
+    }
+
+    .blog-header .header-right {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-2);
+        flex-wrap: wrap;
+    }
+
+    .blog-nav {
+        justify-content: center;
+        flex: 1;
+    }
+}
+
+/* ==========================================================
+   Article sections (cards matching homepage premium cards)
+   ========================================================== */
+/* The light mode keeps each post's own inline gradients; we only
+   standardize the plain white sections and hover affordance. */
+.blog-article-page .article-section {
+    border: 1px solid var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.blog-article-page .article-section:hover {
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.blog-article-page .section-title {
+    color: var(--primary-700);
+}
+
+/* ==========================================================
+   Dark mode adjustments for blog article content
+   ========================================================== */
+html[data-theme='dark'] .blog-article-page .article-section {
+    background: var(--card-background);
+    border-color: var(--border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+html[data-theme='dark'] .blog-article-page .section-title {
+    color: var(--primary-400);
+}
+
+html[data-theme='dark'] .blog-article-page .article-content,
+html[data-theme='dark'] .blog-article-page .article-intro {
+    color: var(--text-primary);
+}
+
+html[data-theme='dark'] .blog-article-page .key-highlight,
+html[data-theme='dark'] .blog-article-page .key-takeaway,
+html[data-theme='dark'] .blog-article-page .privacy-box,
+html[data-theme='dark'] .blog-article-page .feature-card,
+html[data-theme='dark'] .blog-article-page .trend-card,
+html[data-theme='dark'] .blog-article-page .model-release,
+html[data-theme='dark'] .blog-article-page .step-card {
+    background: var(--card-background);
+    color: var(--text-primary);
+}
+
+/* Preserve the blue accent left borders in dark mode */
+html[data-theme='dark'] .blog-article-page .key-highlight,
+html[data-theme='dark'] .blog-article-page .key-takeaway,
+html[data-theme='dark'] .blog-article-page .privacy-box,
+html[data-theme='dark'] .blog-article-page .feature-card,
+html[data-theme='dark'] .blog-article-page .trend-card,
+html[data-theme='dark'] .blog-article-page .step-card {
+    border-left-color: var(--primary-500) !important;
+    border-top-color: var(--border-color) !important;
+    border-right-color: var(--border-color) !important;
+    border-bottom-color: var(--border-color) !important;
+}
+
+/* Theme the stat boxes in dark mode */
+html[data-theme='dark'] .blog-article-page .stat-item {
+    background: var(--card-background);
+    border: 1px solid var(--border-color);
+}
+
+html[data-theme='dark'] .blog-article-page .code-block,
+html[data-theme='dark'] .blog-article-page .architecture-diagram {
+    background: #1e1e2e;
+    color: #a5d6ff;
+}
+
+html[data-theme='dark'] .blog-article-page .step-card h3 {
+    color: var(--primary-400);
+}
+
+html[data-theme='dark'] .blog-article-page .article-content a {
+    color: var(--primary-400);
 }
 
 /* Skip Link for Accessibility */
@@ -120,9 +277,14 @@ select:focus,
 
 /* Article Header */
 .article-header {
-    margin-bottom: var(--space-8);
-    padding-bottom: var(--space-6);
-    border-bottom: 2px solid var(--neutral-200);
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    color: white;
+    padding: 64px 32px;
+    margin-bottom: 40px;
+    border-bottom: none;
+    border-radius: var(--radius-lg);
+    position: relative;
+    overflow: hidden;
 }
 
 /* Back to Blog Button */

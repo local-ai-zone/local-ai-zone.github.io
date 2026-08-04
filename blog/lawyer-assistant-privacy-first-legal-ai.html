@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How to Build a Local AI Assistant for Legal Documents (Free Guide) - Lawyer Assistant by Hussain Nazary</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Build a local AI assistant for legal documents with Lawyer Assistant by Hussain Nazary. Free open-source RAG system for contract analysis, clause detection, and document Q&A - 100% private, runs on your computer. Complete guide with installation, features, and examples.">
+    <meta name="keywords" content="Lawyer Assistant, build local AI assistant, legal document AI, contract search, find clauses in contracts, risky clause detection, legal document search, contract review AI, privacy-first AI, local AI, contract analysis, terms and conditions search, Ollama, RAG, retrieval augmented generation, open source AI, Hussain Nazary, haal-lab, legal tech, AI legal assistant, document analysis tool, ChromaDB, BGE-M3, legal compliance scanner, offline legal AI, GDPR compliant AI, free legal AI tool, lawyers assistant github">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Hussain Nazary">
+    <meta name="publisher" content="Local AI Zone">
+    <meta property="og:title" content="How to Build a Local AI Assistant for Legal Documents - Free Privacy-First Guide">
+    <meta property="og:description" content="Complete guide to building a local AI assistant for legal documents using Lawyer Assistant. Free, open-source, 100% private RAG system for contract analysis and clause detection by Hussain Nazary.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/lawyer-assistant-privacy-first-legal-ai.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-08-04T00:00:00Z">
+    <meta property="article:modified_time" content="2026-08-04T00:00:00Z">
+    <meta property="article:section" content="Legal Tech">
+    <meta property="article:tag" content="Legal AI">
+    <meta property="article:tag" content="Document Analysis">
+    <meta property="article:tag" content="RAG Systems">
+    <meta property="article:tag" content="Privacy-First AI">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="How to Build a Local AI Assistant for Legal Documents - Free Guide">
+    <meta name="twitter:description" content="Complete guide to Lawyer Assistant by Hussain Nazary: Build your own privacy-first legal document AI with RAG. Free, open-source, 100% local.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/lawyer-assistant-privacy-first-legal-ai.html">
+
+    <!-- Structured Data - Article Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "How to Build a Local AI Assistant for Legal Documents - Complete Guide",
+        "alternativeHeadline": "Stop Searching Contracts Manually: Free AI That Finds Clauses & Risks Instantly",
+        "description": "Complete guide to building a local AI assistant for legal documents using Lawyer Assistant by Hussain Nazary. Free, open-source RAG system for contract analysis, clause detection, and document Q&A that runs 100% on your computer.",
+        "image": "https://local-ai-zone.github.io/og-image.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-08-04T00:00:00Z",
+        "dateModified": "2026-08-04T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/lawyer-assistant-privacy-first-legal-ai.html"
+        },
+        "keywords": "local AI assistant, legal document AI, contract analysis, RAG system, privacy-first AI, Lawyer Assistant, Hussain Nazary, legal tech, document analysis",
+        "articleSection": "Legal Technology",
+        "wordCount": 3500,
+        "inLanguage": "en-US",
+        "about": {
+            "@type": "SoftwareApplication",
+            "name": "Lawyer Assistant",
+            "url": "https://lawyers-assistant.github.io",
+            "author": {
+                "@type": "Person",
+                "name": "Hussain Nazary"
+            },
+            "applicationCategory": "LegalTech",
+            "operatingSystem": "Windows, macOS, Linux",
+            "softwareVersion": "1.0",
+            "offers": {
+                "@type": "Offer",
+                "price": "0",
+                "priceCurrency": "USD"
+            },
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": "4.8",
+                "ratingCount": "150"
+            },
+            "featureList": "RAG Pipeline, Hybrid Search, Clause Detection, Document Q&A, Privacy-First, Offline Mode, Multi-format Support"
+        },
+        "mentions": [
+            {
+                "@type": "SoftwareSourceCode",
+                "name": "Lawyer Assistant",
+                "codeRepository": "https://github.com/haal-lab/Lawyer-Assistant",
+                "programmingLanguage": "Python",
+                "runtimePlatform": "Cross-platform"
+            }
+        ]
+    }
+    </script>
+
+    <!-- FAQ Schema for SEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is Lawyer Assistant?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Lawyer Assistant is a free, open-source desktop application created by Hussain Nazary that uses AI to analyze legal documents locally on your computer. It employs RAG (Retrieval-Augmented Generation) technology to answer questions about contracts, detect risky clauses, and search documents with citations - all while keeping your data 100% private."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does Lawyer Assistant protect my privacy?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Lawyer Assistant runs entirely on your computer with no cloud uploads required. In local mode, all processing happens offline using Ollama. Even in API mode, only small text snippets needed for answers are sent - never your full documents. There's no telemetry, analytics, or tracking built into the application."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I run Lawyer Assistant offline?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, Lawyer Assistant works completely offline in local mode using Ollama as the LLM backend. Your documents are indexed locally with ChromaDB, and all searches and answers are generated on your machine without internet connectivity."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What are the system requirements for Lawyer Assistant?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The recommended setup is 16GB RAM and an 8GB graphics card (NVIDIA, AMD, or Apple M-series) with approximately 14GB of disk space. It can also run in CPU-only mode on 8GB RAM with slower performance. The application has been tested on laptops with 8-16GB RAM."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What file formats does Lawyer Assistant support?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Lawyer Assistant supports PDFs (including scanned/image PDFs), Word documents (DOCX), text files, and images with text. Files are automatically indexed when added to your project folder."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is Lawyer Assistant really free?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, Lawyer Assistant is completely free and open-source under the MIT license. There are no subscriptions, hidden costs, or enterprise tiers. You can download, use, modify, and distribute it freely."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How accurate is the clause detection feature?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Lawyer Assistant uses hybrid search (BGE-M3 embeddings + BM25 keyword matching) with AI reranking to provide accurate clause detection. Every answer includes the exact page number and source text for verification. The system is designed to say 'I don't know' when information isn't in your documents rather than hallucinating answers."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I customize the compliance rules?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes, Lawyer Assistant allows you to create custom compliance rule sets via JSON playbooks. You can define your own risky clause patterns and adjust the risk levels (High/Medium/Low) based on your specific needs."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <!-- HowTo Schema for Tutorial -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to Build a Local AI Assistant for Legal Documents",
+        "description": "Step-by-step guide to setting up Lawyer Assistant, a privacy-first AI system for analyzing legal documents locally",
+        "image": "https://local-ai-zone.github.io/og-image.png",
+        "totalTime": "PT15M",
+        "estimatedCost": {
+            "@type": "MonetaryAmount",
+            "currency": "USD",
+            "value": "0"
+        },
+        "tool": [
+            {
+                "@type": "HowToTool",
+                "name": "Computer with 8-16GB RAM"
+            },
+            {
+                "@type": "HowToTool",
+                "name": "GPU with 8GB VRAM (optional)"
+            }
+        ],
+        "step": [
+            {
+                "@type": "HowToStep",
+                "position": 1,
+                "name": "Download Lawyer Assistant",
+                "text": "Visit the Lawyer Assistant GitHub repository at https://github.com/haal-lab/Lawyer-Assistant or the official website at https://lawyers-assistant.github.io and download the installer for your operating system.",
+                "url": "https://github.com/haal-lab/Lawyer-Assistant"
+            },
+            {
+                "@type": "HowToStep",
+                "position": 2,
+                "name": "Run the installer",
+                "text": "Execute launch.bat on Windows or launch.sh on Mac/Linux to start the installation process."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 3,
+                "name": "Install AI models",
+                "text": "The setup page will automatically download and install the required AI models including BGE-M3 for embeddings and your choice of LLM. This takes 5-10 minutes on first run."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 4,
+                "name": "Create a project folder",
+                "text": "Click 'Work in a folder' and select or create a directory where your legal documents are stored."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 5,
+                "name": "Add documents",
+                "text": "Drop your PDF, DOCX, or image files into the project folder. Lawyer Assistant will automatically index them in the background."
+            },
+            {
+                "@type": "HowToStep",
+                "position": 6,
+                "name": "Ask questions",
+                "text": "Type questions in plain English like 'What are the payment terms?' or 'Can I terminate this contract early?' and get instant, cited answers with exact page numbers."
+            }
+        ]
+    }
+    </script>
+
+    <style>
+        .article-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .article-title {
+            font-size: 3.2em;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        .article-meta {
+            font-size: 1.1em;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .article-date, .article-category {
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .article-content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px 60px;
+        }
+
+        .article-intro {
+            font-size: 1.15em;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .article-section {
+            margin: 50px 0;
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: var(--primary-600);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--border-color);
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: var(--primary-500);
+        }
+
+        .feature-card {
+            background: var(--primary-50);
+            border-left: 4px solid var(--primary-500);
+            padding: 25px;
+            margin: 20px 0;
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateX(10px);
+        }
+
+        .feature-card h3 {
+            margin-bottom: 10px;
+            color: var(--primary-600);
+        }
+
+        .key-takeaway {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 4px solid #2563eb;
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 8px;
+        }
+
+        .privacy-box {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-left: 4px solid #2563eb;
+            padding: 30px;
+            margin: 40px 0;
+            border-radius: 8px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: var(--primary-50);
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 2.4em;
+            font-weight: 700;
+            color: var(--primary-600);
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 0.95em;
+            color: var(--text-secondary);
+        }
+
+        .architecture-diagram {
+            background: #1e1e2e;
+            border-radius: 12px;
+            padding: 30px;
+            margin: 25px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85em;
+            line-height: 1.7;
+            color: #a5d6ff;
+            overflow-x: auto;
+            white-space: pre;
+        }
+
+        .compare-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.92em;
+        }
+
+        .compare-table th, .compare-table td {
+            border: 1px solid var(--border-color);
+            padding: 12px 15px;
+            text-align: left;
+        }
+
+        .compare-table th {
+            background: var(--primary-600);
+            color: white;
+            font-weight: 600;
+        }
+
+        .compare-table tr:nth-child(even) {
+            background: var(--primary-50);
+        }
+
+        .yes {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .no {
+            color: #ef4444;
+            font-weight: 700;
+        }
+
+        .article-header .back-to-blog {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 0 30px 0;
+            padding: 10px 20px;
+            background: rgba(255,255,255,0.15);
+            border: 1px solid rgba(255,255,255,0.35);
+            border-radius: 8px;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .article-header .back-to-blog:hover {
+            background: rgba(255,255,255,0.28);
+            transform: translateX(-3px);
+        }
+
+        .btn-primary {
+            display: inline-block;
+            background: var(--primary-600);
+            color: white;
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn-secondary {
+            display: inline-block;
+            background: transparent;
+            color: var(--primary-600);
+            padding: 14px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 2px solid var(--primary-600);
+            transition: all 0.3s ease;
+            margin-left: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: var(--primary-600);
+            color: white;
+        }
+
+        ol li, ul li {
+            margin: 8px 0;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 768px) {
+            .article-title {
+                font-size: 2.2em;
+            }
+            .article-section {
+                padding: 25px;
+            }
+            .section-title {
+                font-size: 1.6em;
+            }
+            .btn-secondary {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+<body class="blog-article-page">
+
+    <!-- Premium Header (matches homepage) -->
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">How to Build a Local AI Assistant for Legal Documents</h1>
+                <p style="font-size: 1.15em; opacity: 0.9; max-width: 760px; margin: 0 0 20px 0;">Complete guide to <strong><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: white; text-decoration: underline;">Lawyer Assistant</a></strong> by <strong><a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: white; text-decoration: underline;">Hussain Nazary</a></strong> — a free, open-source AI that finds clauses &amp; risks instantly, 100% on your computer.</p>
+                <div class="article-meta">
+                    <span class="article-date">August 4, 2026</span>
+                    <span class="article-category">Open Source Projects</span>
+                    <span class="article-read-time">📖 7 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+            <div class="article-intro">
+                <p>Your legal documents deserve better than Ctrl+F. That's the simple idea behind <strong><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: var(--primary-600); text-decoration: none; border-bottom: 2px solid var(--primary-600);"></a>Lawyer Assistant</a></strong> — a free, open-source desktop AI created by <strong><a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: var(--primary-600);">Hussain Nazary</a></strong> that reads, searches, and checks your contracts, entirely on your own computer.</p>
+
+                <p>Instead of reading through hundreds of pages hunting for payment terms or renewal clauses, you ask a question in plain English and get an instant answer with the exact page number and source text — fully verifiable, no hallucinations, and no part of your document ever leaves your machine.</p>
+
+                <div class="key-takeaway">
+                    <h3>🚀 Key Takeaway</h3>
+                    <p><strong>Lawyer Assistant is like having a smart assistant who has read all your contracts.</strong> Ask anything in natural language, get answers with exact sources, automatically detect risky clauses like unlimited liability or auto-renewal — and keep every byte of your data 100% local. No cloud, no subscriptions, no tracking.</p>
+                    <p style="margin-top: 15px; text-align: center;">
+                        <a href="https://lawyers-assistant.github.io" class="btn-primary" target="_blank" rel="noopener" style="display: inline-block; margin-right: 10px;">🌐 Visit Official Website</a>
+                        <a href="https://github.com/haal-lab/Lawyer-Assistant" class="btn-secondary" target="_blank" rel="noopener" style="display: inline-block;">⭐ GitHub Repository</a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Why Your Contracts Deserve Better Than Ctrl+F</h2>
+
+                <p>Most of us review legal documents the way people searched the web before Google: manually, slowly, and with a real risk of missing the important parts. Here's the problem with how contract review works today:</p>
+
+                <ul>
+                    <li><strong>Searching contracts is slow and frustrating</strong> — Ctrl+F only finds exact text, not meaning.</li>
+                    <li><strong>Important clauses get missed</strong> — buried in dense legalese, buried in page 47.</li>
+                    <li><strong>Online AI tools are a privacy risk</strong> — upload a contract to a web chatbot and your document goes to someone else's server.</li>
+                    <li><strong>Professional tools are expensive</strong> — legal SaaS platforms like Kira or eBrevia are enterprise-priced, and generic AI chat gives unreliable citations.</li>
+                </ul>
+
+                <p><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600;"></a>Lawyer Assistant</a> solves all four at once — and it's completely free under the MIT license.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">About the Creator: Hussain Nazary</h2>
+
+                <p><strong><a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: var(--primary-600);">Hussain Nazary</a></strong> is the creator behind Lawyer Assistant, an open-source project that demonstrates how privacy-preserving AI can be powerful, accessible, and completely free. Through the <a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: var(--primary-600);">haal-lab</a> organization on GitHub, Nazary has built a sophisticated legal document analysis system that prioritizes user privacy above all else.</p>
+
+                <div class="feature-card">
+                    <h3>🎯 Project Philosophy</h3>
+                    <p>The project embodies three core principles that set it apart from commercial legal AI solutions:</p>
+                    <ul>
+                        <li><strong>Privacy-First Design</strong> — Your documents never leave your machine, period.</li>
+                        <li><strong>Open Source Transparency</strong> — Every line of code is reviewable under the MIT license.</li>
+                        <li><strong>True Free Software</strong> — No freemium model, no enterprise upsells, just free forever.</li>
+                    </ul>
+                </div>
+
+                <p>The official website at <strong><a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600;">lawyers-assistant.github.io</a></strong> serves as the central hub for documentation, downloads, and community resources. Whether you're a solo practitioner, small business owner, or developer looking to build privacy-first AI applications, Lawyer Assistant provides a complete reference implementation.</p>
+
+                <div style="text-align: center; margin: 30px 0; padding: 30px; background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-radius: 12px;">
+                    <h3 style="margin-bottom: 15px; color: var(--primary-600);">🚀 Ready to Get Started?</h3>
+                    <p style="margin-bottom: 20px;">Visit the official website for complete documentation and downloads</p>
+                    <a href="https://lawyers-assistant.github.io" class="btn-primary" target="_blank" rel="noopener" style="font-size: 1.1em; padding: 16px 40px;">Visit Lawyer Assistant →</a>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">What You Can Do With It</h2>
+
+                <div class="feature-card">
+                    <h3>💬 Ask Questions in Plain English</h3>
+                    <p>"What are the payment terms?" · "Can I terminate this contract early?" · "What are my obligations under this agreement?" The app searches every document in your project and answers with the exact page number, document name, and a preview of the relevant text. Click through to see the full context — no guessing, everything verifiable.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>⚠️ Find Risky Clauses Automatically</h3>
+                    <p>Scan any contract for problems the way a careful paralegal would: unlimited liability, automatic renewal, broad indemnification, vague payment terms, missing termination rights. Each finding is flagged <strong>High / Medium / Low risk</strong> with a plain-English explanation of why it matters — and you can customize your own rule sets via JSON playbooks.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📄 Work With Any Document Type</h3>
+                    <p>PDFs (even scanned image PDFs), Word documents, text files, and images with text. Drop files into your project folder and the app automatically indexes them in the background — no manual "upload" button needed.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🗂️ Organized by Project</h3>
+                    <p>Work on different cases in separate folders, each with its own documents and search history. No mixing between projects, full isolation.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🔗 Every Answer Comes With Its Source</h3>
+                    <p>Every response includes the exact document name, the page number, and a preview of the supporting text. For legal work, knowing <em>where</em> an answer came from — and being told honestly when it isn't in your documents at all — is just as important as the answer itself.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🧠 Visual Pipeline Editor</h3>
+                    <p>A drag-and-drop node editor (think n8n or Node-RED) lets you build your search pipeline visually: Search, Rerank, Filter, and Merge nodes you connect yourself. Fine-tune how the app retrieves answers without touching a configuration file.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Real-World Use Cases</h2>
+
+                <p>Lawyer Assistant isn't just a tech demo—it's a practical tool being used by real people to solve real legal document challenges. Here are the most common use cases:</p>
+
+                <div class="feature-card">
+                    <h3>🏢 Small Business Owners</h3>
+                    <p><strong>The Challenge:</strong> Reviewing vendor contracts, client agreements, and terms of service without paying hundreds per hour for legal review.</p>
+                    <p><strong>The Solution:</strong> Upload all your contracts to Lawyer Assistant and ask questions like "What are my termination rights?" or "Are there any auto-renewal clauses?" Get instant answers with exact citations you can verify yourself.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>👨‍💼 Freelancers & Consultants</h3>
+                    <p><strong>The Challenge:</strong> Understanding client contracts before signing, especially payment terms, IP ownership, and liability clauses.</p>
+                    <p><strong>The Solution:</strong> Run the compliance scanner to automatically flag risky clauses like unlimited liability, unclear payment terms, or unfavorable IP transfers. Get a plain-English risk assessment in seconds.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🎓 Law Students & Researchers</h3>
+                    <p><strong>The Challenge:</strong> Analyzing large volumes of case law, statutes, or legal documents for research without expensive legal databases.</p>
+                    <p><strong>The Solution:</strong> Create project folders for different research topics, index all relevant documents, and use semantic search to find connections across your entire document collection.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🏠 Property & Real Estate</h3>
+                    <p><strong>The Challenge:</strong> Understanding lease agreements, property management contracts, and HOA bylaws.</p>
+                    <p><strong>The Solution:</strong> Search across multiple property documents simultaneously—ask "What are the maintenance responsibilities?" and get answers from every lease in your portfolio with exact references.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>💼 Paralegals & Legal Support Staff</h3>
+                    <p><strong>The Challenge:</strong> Preliminary document review and due diligence work that's time-consuming but doesn't require attorney-level expertise.</p>
+                    <p><strong>The Solution:</strong> Pre-screen documents for common issues, extract key terms and dates, and prepare summaries for attorney review—all while maintaining strict client confidentiality with local processing.</p>
+                </div>
+
+                <p style="margin-top: 30px; padding: 20px; background: var(--primary-50); border-radius: 8px; text-align: center;">
+                    <strong>Want to see these use cases in action?</strong> Visit <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600;">lawyers-assistant.github.io</a> for video tutorials and example workflows.
+                </p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">How It Works: Local Retrieval + AI Answers</h2>
+
+                <p>The magic is a classic RAG (Retrieval-Augmented Generation) pipeline, run entirely on your hardware in local mode:</p>
+
+                <div class="architecture-diagram">┌──────────────────────────────────────────────────────────────┐
+│              LAWYER ASSISTANT — ARCHITECTURE                 │
+├──────────────────────────────────────────────────────────────┤
+│  ┌──────────────┐   ┌────────────────────┐   ┌────────────┐  │
+│  │  Your        │──▶│  Retrieval         │──▶│  LLM       │  │
+│  │  Documents   │   │  Pipeline          │   │  Answer    │  │
+│  │  (local)     │   │  BGE-M3 + ChromaDB │   │  Ollama or │  │
+│  │  PDF, DOCX,  │   │  BM25 + Reranker   │   │  Cloud API │  │
+│  │  Images...   │   │                    │   │  +citations│  │
+│  └──────────────┘   └────────────────────┘   └────────────┘  │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  Compliance Scanner                                    │  │
+│  │  Clause classification ──▶ Playbook rules ──▶ Flags     │  │
+│  └────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────┘</div>
+
+                <ul>
+                    <li><strong>Hybrid search</strong> — semantic (BGE-M3 embeddings) + keyword (BM25) matching, with AI reranking on top, so legal terminology is handled correctly.</li>
+                    <li><strong>Local vector store</strong> — ChromaDB keeps your index on disk, in your folder.</li>
+                    <li><strong>No hallucination policy</strong> — when the answer isn't in your documents, the app says so honestly instead of inventing one. For legal work, that honesty is a feature, not a bug.</li>
+                </ul>
+
+                <div class="feature-card">
+                    <h3>🔧 Technology Stack Deep Dive</h3>
+                    <p>For developers and technical users, here's what powers Lawyer Assistant under the hood:</p>
+                    <ul>
+                        <li><strong>Embedding Model:</strong> <a href="https://huggingface.co/BAAI/bge-m3" target="_blank" rel="noopener" style="color: var(--primary-600);">BGE-M3</a> (BAAI General Embedding) for multilingual semantic search</li>
+                        <li><strong>Vector Database:</strong> <a href="https://www.trychroma.com/" target="_blank" rel="noopener" style="color: var(--primary-600);">ChromaDB</a> for efficient similarity search with metadata filtering</li>
+                        <li><strong>Keyword Search:</strong> BM25 (Best Matching 25) algorithm for precise term matching</li>
+                        <li><strong>LLM Backend:</strong> <a href="https://ollama.ai/" target="_blank" rel="noopener" style="color: var(--primary-600);">Ollama</a> for local inference (supports 100+ models including Llama, Mistral, Gemma)</li>
+                        <li><strong>Document Parsing:</strong> OCR-enabled PDF/image processing for scanned documents</li>
+                        <li><strong>API Support:</strong> REST + SSE (Server-Sent Events) for streaming responses</li>
+                    </ul>
+                    <p style="margin-top: 15px;">Learn more about the architecture on the <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600;">GitHub repository</a> or visit <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600;">lawyers-assistant.github.io</a> for detailed documentation.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Building Your Own Legal AI: Step-by-Step Tutorial</h2>
+
+                <p>Want to build a similar system for your specific needs? Here's how Lawyer Assistant's architecture can serve as a blueprint for building local AI applications:</p>
+
+                <h3 style="color: var(--primary-600); margin: 25px 0 15px 0;">Step 1: Document Ingestion Pipeline</h3>
+                <pre style="background: #f5f5f5; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.9em;"><code>1. Watch project folder for new files
+2. Parse documents (PDF, DOCX, images via OCR)
+3. Split into chunks (with overlap for context)
+4. Generate embeddings using BGE-M3
+5. Store in ChromaDB with metadata (filename, page number, chunk position)</code></pre>
+
+                <h3 style="color: var(--primary-600); margin: 25px 0 15px 0;">Step 2: Hybrid Search Implementation</h3>
+                <pre style="background: #f5f5f5; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.9em;"><code>1. User asks a question
+2. Generate embedding for the question (semantic search)
+3. Perform BM25 keyword search in parallel
+4. Combine results using Reciprocal Rank Fusion
+5. Re-rank top candidates using cross-encoder
+6. Return top N most relevant chunks</code></pre>
+
+                <h3 style="color: var(--primary-600); margin: 25px 0 15px 0;">Step 3: Answer Generation with Citations</h3>
+                <pre style="background: #f5f5f5; padding: 15px; border-radius: 8px; overflow-x: auto; font-size: 0.9em;"><code>1. Take retrieved chunks as context
+2. Construct prompt with source attribution requirements
+3. Send to LLM (Ollama locally or API)
+4. Parse response and extract cited sources
+5. Format answer with clickable page numbers
+6. Display source preview for verification</code></pre>
+
+                <p style="margin-top: 25px;">The complete implementation is available at <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600;">github.com/haal-lab/Lawyer-Assistant</a> under the MIT license—use it as a starting point for your own projects.</p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Two Modes: Local & Cloud</h2>
+
+                <table class="compare-table">
+                    <tr>
+                        <th></th>
+                        <th>Local Mode (100% Private)</th>
+                        <th>API Mode (Faster Answers)</th>
+                    </tr>
+                    <tr>
+                        <td><strong>LLM</strong></td>
+                        <td>Ollama — runs on your GPU/CPU, 100+ models</td>
+                        <td>Claude, ChatGPT, DeepSeek, Groq, Gemini + 13 providers</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Search</strong></td>
+                        <td class="yes">✅ Local (always)</td>
+                        <td class="yes">✅ Local (always)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Documents</strong></td>
+                        <td class="yes">✅ Never leave your machine</td>
+                        <td class="yes">✅ Never leave your machine</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Offline</strong></td>
+                        <td class="yes">✅ Yes</td>
+                        <td class="no">❌ Needs internet for the LLM</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Setup</strong></td>
+                        <td>Install the app only</td>
+                        <td>Paste an API key</td>
+                    </tr>
+                </table>
+
+                <p>Here's the crucial privacy detail about API mode: even when you use ChatGPT or Claude, only the tiny piece of text needed to answer the current question is sent — never your full documents. Your files stay on your computer in both modes.</p>
+
+                <div class="privacy-box">
+                    <h3>🔒 Privacy & Security, By Design</h3>
+                    <ul>
+                        <li><strong>No telemetry, no analytics, no tracking</strong> — nothing phones home.</li>
+                        <li><strong>Open source (MIT)</strong> — you can read every line of code and verify the privacy claims yourself.</li>
+                        <li><strong>Safe by design</strong> — the app only touches the folders you choose.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Lawyer Assistant vs. The Alternatives</h2>
+
+                <table class="compare-table">
+                    <tr>
+                        <th>Feature</th>
+                        <th>Lawyer Assistant</th>
+                        <th>Generic AI Chat</th>
+                        <th>Legal SaaS Tools</th>
+                    </tr>
+                    <tr>
+                        <td>100% local / private</td>
+                        <td class="yes">✅ Yes (local mode)</td>
+                        <td class="no">❌ Cloud-only</td>
+                        <td class="no">❌ Cloud-only</td>
+                    </tr>
+                    <tr>
+                        <td>Works offline</td>
+                        <td class="yes">✅ Yes (local mode)</td>
+                        <td class="no">❌ No</td>
+                        <td class="no">❌ No</td>
+                    </tr>
+                    <tr>
+                        <td>Source citations</td>
+                        <td class="yes">✅ Every answer + page</td>
+                        <td>⚠️ Sometimes, unreliable</td>
+                        <td>⚠️ Limited</td>
+                    </tr>
+                    <tr>
+                        <td>Compliance scanning</td>
+                        <td class="yes">✅ Built-in + custom playbooks</td>
+                        <td class="no">❌ No</td>
+                        <td>⚠️ Extra cost, enterprise only</td>
+                    </tr>
+                    <tr>
+                        <td>Hybrid search</td>
+                        <td class="yes">✅ Dense + Sparse + Reranker</td>
+                        <td>⚠️ Semantic only</td>
+                        <td>⚠️ Keyword only</td>
+                    </tr>
+                    <tr>
+                        <td>Visual pipeline editor</td>
+                        <td class="yes">✅ Drag &amp; drop</td>
+                        <td class="no">❌ No</td>
+                        <td class="no">❌ No</td>
+                    </tr>
+                    <tr>
+                        <td>Multi-format support</td>
+                        <td class="yes">✅ PDF, DOCX, images, text</td>
+                        <td>⚠️ Limited</td>
+                        <td>⚠️ PDF only (most)</td>
+                    </tr>
+                    <tr>
+                        <td>Open source</td>
+                        <td class="yes">✅ MIT license</td>
+                        <td class="no">❌ Closed</td>
+                        <td class="no">❌ Closed</td>
+                    </tr>
+                    <tr>
+                        <td>No subscription</td>
+                        <td class="yes">✅ Free forever</td>
+                        <td class="no">❌ $20–200/month</td>
+                        <td class="no">❌ $$$-$$$$</td>
+                    </tr>
+                    <tr>
+                        <td>REST API for automation</td>
+                        <td class="yes">✅ REST + SSE streaming</td>
+                        <td>⚠️ API-only, no desktop</td>
+                        <td class="no">❌ No</td>
+                    </tr>
+                </table>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Getting Started with Lawyer Assistant</h2>
+
+                <p>Setting up your own local AI legal assistant takes less than 15 minutes. Here's the complete walkthrough:</p>
+
+                <h3 style="color: var(--primary-600); margin: 25px 0 15px 0;">📥 Installation Process</h3>
+
+                <ol style="font-size: 1.05em; line-height: 1.8;">
+                    <li><strong>Download the installer</strong> from <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600;">lawyers-assistant.github.io</a> or the <a href="https://github.com/haal-lab/Lawyer-Assistant/releases" target="_blank" rel="noopener" style="color: var(--primary-600);">GitHub releases page</a>.</li>
+                    <li><strong>Run the installer</strong> — <code>launch.bat</code> on Windows, <code>launch.sh</code> on Mac/Linux.</li>
+                    <li><strong>Wait for initial setup</strong> — the app automatically downloads required AI models (BGE-M3 embeddings + your chosen LLM). This takes 5–10 minutes on first run.</li>
+                    <li><strong>Choose your mode</strong>:
+                        <ul>
+                            <li><strong>Local Mode:</strong> Install <a href="https://ollama.ai/" target="_blank" rel="noopener" style="color: var(--primary-600);">Ollama</a> for 100% offline operation</li>
+                            <li><strong>API Mode:</strong> Connect to Claude, ChatGPT, DeepSeek, or other providers</li>
+                        </ul>
+                    </li>
+                    <li><strong>Create a project</strong> — Click "Work in a folder" and select where your documents live.</li>
+                    <li><strong>Add documents</strong> — Drop PDFs, DOCX files, or images into the folder. Indexing happens automatically in the background.</li>
+                    <li><strong>Start asking questions</strong> — Type questions like "What are the payment terms?" and get instant, cited answers.</li>
+                </ol>
+
+                <div style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%); border-left: 4px solid #4caf50; padding: 25px; margin: 30px 0; border-radius: 8px;">
+                    <h3 style="margin-top: 0;">✅ Pro Tip: Start with a Test Document</h3>
+                    <p>Before uploading sensitive contracts, test the system with a sample document like a Creative Commons license or public domain contract. This lets you understand how the search works and verify accuracy before committing real legal documents.</p>
+                </div>
+
+                <div class="stat-grid">
+                    <div class="stat-item">
+                        <div class="stat-number">200+</div>
+                        <div class="stat-label">Features</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">13</div>
+                        <div class="stat-label">AI providers</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">7</div>
+                        <div class="stat-label">CLI tools</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">6</div>
+                        <div class="stat-label">File formats</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">$0</div>
+                        <div class="stat-label">Subscriptions</div>
+                    </div>
+                </div>
+
+                <h3 style="color: var(--primary-600); margin-top: 40px; margin-bottom: 15px;">💻 Hardware Requirements</h3>
+                <p>The recommended setup is <strong>16GB RAM + an 8GB graphics card</strong> (NVIDIA, AMD, or Apple M-series), with ~14GB of disk space. The app also runs in CPU-only mode on 8GB RAM with slower searches, and it's been tested on laptops with 8–16GB of RAM.</p>
+
+                <table class="compare-table" style="margin-top: 20px;">
+                    <tr>
+                        <th>Configuration</th>
+                        <th>Performance</th>
+                        <th>Use Case</th>
+                    </tr>
+                    <tr>
+                        <td><strong>8GB RAM, CPU only</strong></td>
+                        <td>3-5 seconds per query</td>
+                        <td>Light usage, small document sets</td>
+                    </tr>
+                    <tr>
+                        <td><strong>16GB RAM, 8GB GPU</strong></td>
+                        <td>1-2 seconds per query</td>
+                        <td>Recommended for regular use</td>
+                    </tr>
+                    <tr>
+                        <td><strong>32GB+ RAM, 16GB+ GPU</strong></td>
+                        <td>&lt;1 second per query</td>
+                        <td>Heavy use, large document collections</td>
+                    </tr>
+                </table>
+
+                <p style="margin-top: 30px; text-align: center; font-size: 1.1em;">
+                    <strong>Need detailed setup instructions?</strong> Visit the comprehensive guide at <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600; text-decoration: none; border-bottom: 2px solid var(--primary-600);">lawyers-assistant.github.io</a>
+                </p>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">Frequently Asked Questions</h2>
+
+                <div class="feature-card">
+                    <h3>❓ Is Lawyer Assistant really free?</h3>
+                    <p><strong>Yes, completely.</strong> It's open source under the MIT license with no subscriptions, freemium tiers, or hidden costs. Download, use, modify, and distribute freely.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>❓ How does it handle attorney-client privilege?</h3>
+                    <p><strong>Your documents never leave your machine.</strong> In local mode, everything runs offline. Even in API mode, only small text snippets needed for answers are sent—never full documents. This makes it suitable for confidential legal work, though you should always consult your jurisdiction's specific rules.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>❓ Can I use this for client work as a lawyer?</h3>
+                    <p><strong>It's a tool, not legal advice.</strong> Lawyer Assistant helps with document search and analysis, but all outputs should be reviewed by a qualified attorney. Think of it as a smart search assistant, not a replacement for human legal judgment.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>❓ What languages does it support?</h3>
+                    <p><strong>BGE-M3 supports 100+ languages.</strong> While optimized for English legal documents, the underlying embedding model works with multilingual text. The LLM's language support depends on which model you choose (Ollama offers many multilingual options).</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>❓ How accurate is the clause detection?</h3>
+                    <p><strong>Every answer includes verifiable sources.</strong> The hybrid search (semantic + keyword + reranking) provides high accuracy for legal terminology. Since every response shows the exact page number and text preview, you can verify accuracy immediately.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>❓ Can I integrate this with my existing tools?</h3>
+                    <p><strong>Yes, via the REST API.</strong> Lawyer Assistant includes a REST API with SSE streaming for integration with other applications. Full API documentation is available at <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: var(--primary-600);">github.com/haal-lab/Lawyer-Assistant</a>.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>❓ Where can I get support?</h3>
+                    <p><strong>Community support is available on GitHub.</strong> Check the <a href="https://github.com/haal-lab/Lawyer-Assistant/issues" target="_blank" rel="noopener" style="color: var(--primary-600);">Issues page</a> for troubleshooting, or visit <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: var(--primary-600);">lawyers-assistant.github.io</a> for documentation and guides.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">For Developers</h2>
+
+                <p>Lawyer Assistant is fully open source under the <strong>MIT license</strong>:</p>
+
+                <pre><code>git clone https://github.com/haal-lab/Lawyer-Assistant.git
+cd Lawyer-Assistant
+npm install
+npm run dev</code></pre>
+
+                <ul>
+                    <li><strong>Stack</strong> — desktop app with a backend, frontend, and full test suite (<code>pytest</code> + <code>npm run typecheck</code>).</li>
+                    <li><strong>REST API</strong> with SSE streaming, for automation and integration.</li>
+                    <li><strong>75+ configuration options</strong> and custom compliance rule sets.</li>
+                    <li><strong>25+ documentation pages</strong> covering architecture, API reference, GPU memory management, and troubleshooting.</li>
+                    <li><strong>Benchmarking system</strong> — a 200-question legal dataset with performance charts.</li>
+                </ul>
+
+                <div style="margin-top: 30px; text-align: center;">
+                    <a href="https://github.com/haal-lab/Lawyer-Assistant" class="btn-primary" target="_blank" rel="noopener">⭐ View on GitHub</a>
+                    <a href="https://github.com/haal-lab/Lawyer-Assistant#readme" class="btn-secondary" target="_blank" rel="noopener">Read the Docs</a>
+                </div>
+            </div>
+
+            <div class="key-takeaway" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left-color: #2563eb;">
+                <h3>💎 Summary: Build Your Own Privacy-First Legal AI</h3>
+                <p><strong>Lawyer Assistant by <a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Hussain Nazary</a> proves that serious AI tools don't have to trade away your privacy.</strong> It combines a genuinely useful RAG pipeline — hybrid search, AI reranking, source citations, and a compliance scanner — with a hard rule that your documents never leave your machine. In local mode it runs completely offline via Ollama; in API mode it sends only the snippet needed for the answer.</p>
+
+                <p>For anyone who handles contracts — freelancers, small businesses, students, or professionals — it's the local-first answer to document AI, and it's completely free. Try it out, and if it helps you, give the project a star to help others find it.</p>
+
+                <div style="text-align: center; margin-top: 30px; padding-top: 25px; border-top: 2px solid rgba(0,0,0,0.1);">
+                    <h3 style="margin-bottom: 20px; font-size: 1.3em;">🚀 Get Started Today</h3>
+                    <a href="https://lawyers-assistant.github.io" class="btn-primary" target="_blank" rel="noopener" style="display: inline-block; margin: 0 10px 10px 0; font-size: 1.05em;">Visit Official Website</a>
+                    <a href="https://github.com/haal-lab/Lawyer-Assistant" class="btn-secondary" target="_blank" rel="noopener" style="display: inline-block; margin: 0 10px 10px 0; font-size: 1.05em;">View on GitHub</a>
+                    <p style="margin-top: 20px; font-size: 0.95em; opacity: 0.8;">Created by <a href="https://github.com/haal-lab" target="_blank" rel="noopener" style="color: #2563eb; font-weight: 600;">Hussain Nazary</a> • MIT Licensed • 100% Free Forever</p>
+                </div>
+            </div>
+
+            <div class="article-section" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
+                <h2 class="section-title">Related Resources</h2>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+                    <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+                        <h3 style="color: var(--primary-600); margin-bottom: 12px;">📚 Official Documentation</h3>
+                        <p>Complete setup guides, API reference, and troubleshooting.</p>
+                        <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600;">Visit lawyers-assistant.github.io →</a>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+                        <h3 style="color: var(--primary-600); margin-bottom: 12px;">⭐ GitHub Repository</h3>
+                        <p>Source code, issues, discussions, and contributions.</p>
+                        <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener" style="color: var(--primary-600); font-weight: 600;">Explore on GitHub →</a>
+                    </div>
+
+                    <div style="background: white; padding: 25px; border-radius: 10px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
+                        <h3 style="color: var(--primary-600); margin-bottom: 12px;">🛠️ Local AI Setup Guides</h3>
+                        <p>Learn about running AI models locally with Ollama and ChromaDB.</p>
+                        <a href="../index.html" style="color: var(--primary-600); font-weight: 600;">Browse Local AI Zone →</a>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px; padding: 30px; background: white; border-radius: 10px; text-align: center;">
+                    <h3 style="color: var(--primary-600); margin-bottom: 15px;">📰 Stay Updated</h3>
+                    <p style="margin-bottom: 20px;">Follow the latest developments in local AI and privacy-first tools</p>
+                    <a href="../blog.html" style="display: inline-block; padding: 12px 30px; background: var(--primary-600); color: white; text-decoration: none; border-radius: 8px; font-weight: 600;">Read More Articles</a>
+                </div>
+            </div>
+
+            <a href="../blog.html" class="back-to-blog" style="margin-top: 60px;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                </svg>
+                Back to All Articles
+            </a>
+        </div>
+    </article>
+
+    <footer class="premium-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 Local AI Zone. All rights reserved. | Last updated: August 4, 2026</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button"
+            class="contact-tab-button"
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel"
+         class="contact-form-panel"
+         role="dialog"
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <!-- Contact form content -->
+    </div>
+
+    <script src="../js/components/contact-form.js"></script>
+    <script src="../js/theme-switcher.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+
+        // Add reading time calculation
+        document.addEventListener('DOMContentLoaded', () => {
+            const articleContent = document.querySelector('.article-content');
+            const wordCount = articleContent.textContent.split(/\s+/).length;
+            const readTime = Math.ceil(wordCount / 200); // 200 words per minute
+
+            const readTimeElement = document.querySelector('.article-read-time');
+            if (readTimeElement) {
+                readTimeElement.textContent = `📖 ${readTime} min read`;
+            }
+        });
+    </script>
+
+</body>
+</html>

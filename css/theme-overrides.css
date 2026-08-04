@@ -555,6 +555,16 @@ body {
     color: var(--text-primary) !important;
 }
 
+/* Keep hero header text white on the blue gradient (blog article pages) */
+.article-header .article-title,
+.article-header .article-subtitle,
+.article-header .article-meta,
+.article-header .article-date,
+.article-header .article-category,
+.article-header .article-read-time {
+    color: white !important;
+}
+
 .article-content {
     color: var(--text-primary) !important;
 }
@@ -563,6 +573,25 @@ body {
 .article-content h3,
 .article-content h4 {
     color: var(--text-primary) !important;
+}
+
+/* Blog post section titles use the homepage blue accent */
+.blog-article-page .section-title {
+    color: var(--primary-600) !important;
+}
+
+/* Blog post card headings keep the blue accent on hero/cards */
+.blog-article-page .article-header .article-title {
+    color: white !important;
+}
+
+.blog-article-page .step-card h3,
+.blog-article-page .feature-card h3,
+.blog-article-page .trend-card h3,
+.blog-article-page .model-release h3,
+.blog-article-page .key-highlight h3,
+.blog-article-page .cta-box h3 {
+    color: var(--primary-600) !important;
 }
 
 .article-content p {

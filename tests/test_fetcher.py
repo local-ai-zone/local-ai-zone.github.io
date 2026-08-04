@@ -351,6 +351,88 @@ class TestDeduplicateKeepsAllFiles(unittest.TestCase):
         self.assertEqual(self.fetcher._deduplicate([]), [])
 
 
+class TestMoeCapability(unittest.TestCase):
+    """MoE (multi-model) detection: Mixtral/8x7b/A3B etc. must be labeled
+    'moe' (Multi-Model (MoE)) instead of the vague single-model 'text'."""
+
+    def setUp(self):
+        self.fetcher = _make_fetcher(Path(tempfile.mkdtemp()))
+
+    def _cap(self, model_id, tags=()):
+        return self.fetcher._detect_capability(model_id, list(tags))
+
+    def test_mixtral_is_moe(self):
+        self.assertEqual(self._cap('mistralai/Mixtral-8x7B-Instruct-v0.1'), 'moe')
+        self.assertEqual(self._cap('mlabonne/Mixtral-8x22b-Instruct'), 'moe')
+
+    def test_sparse_a3b_models_are_moe(self):
+        # Qwen3-30B-A3B / Qwen3-235B-A22B style sparse (MoE) variants
+        self.assertEqual(self._cap('unsloth/Qwen3-30B-A3B'), 'moe')
+        self.assertEqual(self._cap('Qwen/Qwen3-235B-A22B'), 'moe')
+        self.assertEqual(self._cap('unsloth/Qwen3-4B-A3B-Instruct'), 'moe')
+
+    def test_xb_dense_routing_models_are_moe(self):
+        self.assertEqual(self._cap('org/Gemma-3-4x7b-MoE'), 'moe')
+        self.assertEqual(self._cap('org/anything-2x8b-moe'), 'moe')
+
+    def test_moe_word_in_name_or_tags(self):
+        self.assertEqual(self._cap('org/Stories15M-MoE'), 'moe')
+        self.assertEqual(self._cap('org/some-model', tags=['moe']), 'moe')
+        self.assertEqual(self._cap('org/Model-Mixture-Of-Experts'), 'moe')
+
+    def test_counted_experts_are_moe(self):
+        self.assertEqual(self._cap('org/Ultra-7-Experts-Model'), 'moe')
+        self.assertEqual(self._cap('org/42-experts-8b'), 'moe')
+
+    def test_dense_models_are_not_moe(self):
+        self.assertEqual(self._cap('meta-llama/Llama-3.1-8B-Instruct'), 'text')
+        self.assertEqual(self._cap('Qwen/Qwen3-8B'), 'text')
+        self.assertEqual(self._cap('google/gemma-2-27b'), 'text')
+        self.assertEqual(self._cap('microsoft/Phi-3-mini-4k-instruct'), 'text')
+
+    def test_bare_expert_word_is_not_moe(self):
+        # "Bible Expert", "Code Expert", "Coding Expert" — capability
+        # labels, not MoE architectures.
+        self.assertEqual(self._cap('org/Baptist-Christian-Bible-Expert-V2.0'), 'text')
+        self.assertEqual(self._cap('org/Qwen3-0.6B-Code-Expert'), 'code')
+        self.assertEqual(self._cap('org/DeepSeek-R1-Distill-Llama-8b-Medical-Expert'), 'text')
+
+    def test_moe_precedes_vision_and_code(self):
+        # MoE is an architecture, not a modality: a MoE vision model must be
+        # labeled moe, not vision.
+        self.assertEqual(self._cap('org/Qwen3-VL-30B-A3B'), 'moe')
+        self.assertEqual(self._cap('org/Mixtral-Coder-8x7b'), 'moe')
+
+    def test_parity_across_all_three_detectors(self):
+        # daily fetcher, simplified fetcher, and spam_filter engine must all
+        # agree on the same MoE regex.
+        from scripts.simplified_gguf_fetcher import SimplifiedGGUFetcher  # noqa: E402
+        from spam_filter.engine import SpamFilterEngine  # noqa: E402
+
+        cases = [
+            ('mistralai/Mixtral-8x7B-Instruct-v0.1', 'moe'),
+            ('unsloth/Qwen3-30B-A3B', 'moe'),
+            ('meta-llama/Llama-3.1-8B-Instruct', 'text'),
+            ('org/Christian-Bible-Expert-Model', 'text'),
+        ]
+
+        # Simplified fetcher needs an instance (bypass __init__)
+        simp = object.__new__(SimplifiedGGUFetcher)
+        simp.logger = logging.getLogger('test-simplified')
+        simp.logger.disabled = True
+
+        # spam_filter engine bypasses network-heavy init
+        eng = object.__new__(SpamFilterEngine)
+
+        for model_id, expected in cases:
+            d = self.fetcher._detect_capability(model_id, [])
+            s = simp._detect_model_capability(model_id, [], '')
+            e = eng._detect_model_capability(model_id, '', [])
+            self.assertEqual(d, expected, f'daily: {model_id}')
+            self.assertEqual(s, expected, f'simplified: {model_id}')
+            self.assertEqual(e, expected, f'engine: {model_id}')
+
+
 class TestMeaningfulGgufFilter(unittest.TestCase):
     """_is_meaningful_gguf must drop mmproj/MTP auxiliary weights but KEEP
     every shard part — parts are re-combined later by _aggregate_shard_sizes."""
