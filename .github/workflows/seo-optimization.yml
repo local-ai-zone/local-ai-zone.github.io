@@ -28,14 +28,12 @@ jobs:
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         
+    # generate-seo.js only imports Node built-ins (fs, path) and the local
+    # slug-utils module — no npm packages are needed, so skip npm ci.
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
-        
-    - name: Install Node.js dependencies
-      run: npm ci
         
     - name: Configure Git
       run: |
@@ -188,13 +186,11 @@ jobs:
           - robots.txt - Crawling directives
           - seo-metadata.json - Model metadata
           - index.html - Meta tags and structured data
-          - premium-index.html - Meta tags and structured data
           - models/ - Individual minimal pages for top models
           
           ### Next Steps
           - Review and fix any issues with the SEO generation script
           - Re-run the workflow manually once issues are resolved
-          - Verify Node.js dependencies are properly installed
           `;
           
           github.rest.issues.create({

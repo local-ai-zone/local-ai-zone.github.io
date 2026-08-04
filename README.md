@@ -1,42 +1,26 @@
 # GGUF Model Discovery
 
-A professional, premium web application for discovering and browsing GGUF (GPT-Generated Unified Format) machine learning models. This platform provides an elegant interface to explore thousands of quantized AI models with detailed information, engagement metrics, and direct download links.
+A professional web application for discovering and browsing GGUF (GPT-Generated Unified Format) machine learning models. Browse thousands of quantized AI models with detailed metadata, engagement metrics, and direct download links.
 
-## 📋 Recent Updates
-
-### v2.0 - Model Capability Detection System
-- **Intelligent Capability Detection**: Automatic classification of models into 5 categories (Text, Vision, Code, Embedding, Audio)
-- **Enhanced Filtering**: Replaced model type filter with capability-based filtering for better model discovery
-- **Improved Data Pipeline**: Two-phase processing system with capability detection and spam filtering
-- **Better Model Cards**: Display model capabilities with color-coded badges for quick identification
-- **Static Page Generation**: Pre-rendered model pages with capability information for improved SEO
-- **Optimized Storage**: Removed backup files to reduce storage overhead
+Live site: [https://local-ai-zone.github.io](https://local-ai-zone.github.io)
 
 ## 🚀 Features
 
 ### Core Functionality
-- **Model Discovery**: Browse 4,000+ GGUF format AI models with detailed metadata
-- **Advanced Search**: Real-time search with fuzzy matching across model names and descriptions
+- **Model Discovery**: Browse 16,000+ GGUF format AI models with detailed metadata
+- **Advanced Search**: Real-time search across model names, quant formats, types, and licenses
 - **Smart Filtering**: Filter by quantization type, model capability, and license
-- **Model Capabilities**: Automatic detection of model types (Text, Vision, Code, Embedding, Audio)
+- **Model Capabilities**: Automatic classification (Text, Vision, Code, Audio)
 - **Engagement Metrics**: Like counts, download statistics, and popularity indicators
-- **Responsive Design**: Premium mobile-first responsive interface
-- **Performance Optimized**: Fast loading with efficient data handling and lazy loading
-
-### Premium UI/UX
-- **Professional Design**: Business-class styling with premium aesthetics
-- **Interactive Elements**: Smooth animations and hover effects
-- **Accessibility**: WCAG compliant with keyboard navigation support
-- **Dark Mode**: Automatic dark mode support based on user preferences
-- **Mobile Optimized**: Collapsible header and mobile-friendly interactions
+- **Pre-rendered Model Pages**: 1,000+ static pages at `/models/{slug}.html` for SEO (regenerated nightly for the top ~1,300 models by likes)
+- **Responsive Design**: Mobile-first interface with dark mode support
 
 ### Technical Features
-- **SEO Optimized**: Structured data, meta tags, and prerendering support
-- **Automated Data Pipeline**: Daily GitHub Actions workflow for model data updates
-- **Capability Detection**: Intelligent model type classification (Vision, Embedding, Code, Audio, Text)
-- **Spam Filtering**: Integrated filtering system to remove low-quality and duplicate models
-- **Modular Architecture**: Component-based JavaScript architecture with service layer
-- **Performance Monitoring**: Built-in analytics and performance tracking
+- **Automated Data Pipeline**: Daily GitHub Actions workflow fetches from Hugging Face
+- **SEO Automation**: Daily sitemap, robots.txt, and metadata generation
+- **Spam Filtering**: Deduplication and quality filtering of model entries
+- **Hardware Calculator**: Estimates RAM/CPU/GPU requirements from quantization
+- **Slug Unification**: Single canonical slug function shared by page generation and sitemap
 
 ## 🏗️ Architecture
 
@@ -45,66 +29,111 @@ A professional, premium web application for discovering and browsing GGUF (GPT-G
 ├── index.html              # Main application entry point
 ├── css/
 │   ├── premium-styles.css  # Main premium styling
-│   └── *.css              # Component-specific styles
+│   ├── theme.css           # Dark/light theming
+│   └── contact-form.css    # Contact form styles
 ├── js/
-│   ├── premium-app.js     # Main application controller
-│   ├── components/        # Reusable UI components
-│   ├── services/          # Data and business logic services
-│   ├── state/            # Application state management
-│   └── utils/            # Utility functions and helpers
-└── scripts/              # Build and automation scripts
+│   ├── premium-app.js      # Main application controller
+│   ├── theme-switcher.js   # Theme toggling
+│   ├── components/         # Reusable UI components
+│   │   └── contact-form.js
+│   └── utils/              # Helper functions
+│       ├── formatters.js
+│       ├── helpers.js
+│       └── notifications.js
+├── blog/                   # Blog posts
+├── models/                 # Pre-rendered model pages (generated)
+└── scripts/                # Build, fetch, and automation scripts
 ```
 
+### Automation Scripts (`scripts/`)
+| Script | Purpose |
+| --- | --- |
+| `daily_gguf_fetcher.py` | **Production fetcher** — fetches, filters, merges, outputs `gguf_models.json` |
+| `simplified_gguf_fetcher.py` | Legacy two-phase fetcher (download → process) |
+| `generate-minimal-pages.js` | Generates pre-rendered pages in `models/` |
+| `generate-seo.js` | Generates `sitemap.xml`, `robots.txt`, `seo-metadata.json` |
+| `slug-utils.js` | Shared `createSlug()` used by both generators |
+| `generate-banner.js` / `create-fallback-banner.js` | Social banner generation |
+| `start-local-server.js` | Local static server |
+
 ### Data Flow
-1. **Data Fetching**: Python scripts fetch model data from Hugging Face
-2. **Processing**: Data is processed and enriched with engagement metrics
-3. **Storage**: JSON files store processed model information
-4. **Rendering**: JavaScript dynamically renders the UI
-5. **Interaction**: User interactions update filters and views
+1. **Fetching**: `daily_gguf_fetcher.py` fetches GGUF models from the Hugging Face API
+2. **Processing**: Models are filtered, deduplicated, and enriched with hardware requirements
+3. **Merging**: Incremental mode merges with existing `gguf_models.json` data
+4. **Storage**: `gguf_models.json` at the repository root
+5. **Rendering**: `premium-app.js` renders the frontend from the JSON
+6. **Pre-rendering**: `generate-minimal-pages.js` creates static pages for top models
+7. **SEO**: `generate-seo.js` builds the sitemap from the same slugs
+
+## 🔄 GitHub Actions Workflows
+
+| Workflow | Schedule | Purpose |
+| --- | --- | --- |
+| **Daily GGUF Model Data Update** | 23:59 UTC | Runs the fetcher, commits `gguf_models.json` (model-count floor guard prevents catalog-collapse regressions) |
+| **Pre-render Model Pages** | 02:00 UTC | Regenerates static pages in `models/` |
+| **SEO Optimization** | 03:00 UTC | Regenerates `sitemap.xml` and metadata |
+
+**Note**: The Node-based workflows (`Pre-render`, `SEO`) run scripts that import only Node built-ins and local modules — they no longer install any npm packages (no `npm ci`, no Puppeteer). Only the Python dependency (`huggingface_hub`, `tqdm`) is installed in the daily update workflow.
 
 ## 🛠️ Installation & Setup
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- Python 3.8+
+- Node.js 18+
+- Python 3.11+
 - Git
 
 ### Quick Start
 ```bash
 # Clone the repository
 git clone https://github.com/local-ai-zone/local-ai-zone.github.io.git
-cd gguf-model-discovery
+cd local-ai-zone.github.io
 
 # Install Python dependencies
 pip install -r scripts/requirements.txt
 
 # Start local development server
-python -m http.server 8000
-
-# Open in browser
-open http://localhost:8000
+npm run start-local-server
+# or: python -m http.server 8000
 ```
 
-### Development Setup
+## 📊 Data Pipeline
+
+### Running the fetcher manually
 ```bash
-# Install development dependencies
-npm install
+# Incremental merge (safe — preserves existing data):
+python scripts/daily_gguf_fetcher.py --incremental --min-likes 1 --max-models 2000
 
-# Run data fetching script
-python scripts/simplified_gguf_fetcher.py
+# With Hugging Face token (recommended for rate limits):
+python scripts/daily_gguf_fetcher.py --incremental --min-likes 1 --max-models 2000 --token $HF_TOKEN
 
-# Start development server with live reload
-npm run dev
+# Full replace mode (no merge):
+python scripts/daily_gguf_fetcher.py --min-likes 1 --max-models 2000
 ```
 
-## 📊 Data Management
+### Fetcher options
+| Flag | Default | Description |
+| --- | --- | --- |
+| `--incremental` | off | Merge with existing `gguf_models.json` instead of replacing |
+| `--min-likes` | 1 | Minimum likes threshold |
+| `--max-models` | 10000 | Maximum models to fetch |
+| `--token` | — | Hugging Face API token |
+| `--output` | `gguf_models.json` | Output file path |
+
+### Regenerating pre-rendered pages and sitemap
+```bash
+# Generate static model pages:
+node scripts/generate-minimal-pages.js
+
+# Regenerate sitemap.xml, robots.txt, seo-metadata.json:
+node scripts/generate-seo.js
+```
 
 ### Model Data Structure
 ```json
 {
   "modelName": "string",
   "modelType": "string",
-  "modelCapability": "text|vision|code|embedding|audio",
+  "modelCapability": "text|vision|code|audio",
   "quantFormat": "string",
   "fileSize": "number",
   "fileSizeFormatted": "string",
@@ -113,6 +142,8 @@ npm run dev
   "license": "string",
   "huggingFaceLink": "string",
   "directDownloadLink": "string",
+  "modelId": "string",
+  "filename": "string",
   "minRamGB": "number",
   "minCpuCores": "number",
   "gpuRequired": "boolean",
@@ -121,196 +152,92 @@ npm run dev
 }
 ```
 
-### Model Capability Types
-- **Text**: General-purpose language models and chat models (70.4%)
-- **Vision**: Multimodal models with image understanding capabilities (21.2%)
-- **Code**: Specialized models for code generation and programming tasks (7.1%)
-- **Audio**: Speech recognition, text-to-speech, and audio processing models (0.8%)
-- **Embedding**: Models for generating text embeddings and semantic search (0.5%)
-
-### Data Sources
-- **Primary**: Hugging Face Hub API with authenticated requests
-- **Processing**: Two-phase pipeline (download → process)
-- **Enrichment**: Capability detection, spam filtering, and hardware requirements calculation
-- **Updates**: Automated daily refresh via GitHub Actions with retry logic
-
-## 🎨 Styling & Theming
-
-### Design System
-- **Color Palette**: Professional blue and neutral tones
-- **Typography**: Inter font family for modern readability
-- **Spacing**: Consistent 8px grid system
-- **Components**: Reusable design tokens and components
-
-### CSS Architecture
-- **CSS Variables**: Centralized theming system
-- **BEM Methodology**: Block-Element-Modifier naming convention
-- **Responsive Design**: Mobile-first approach with breakpoints
-- **Performance**: Optimized CSS with minimal unused styles
+### Current Model Distribution (16,771 models)
+- **Text**: 81.7% (13,705 models)
+- **Vision**: 9.8% (1,644 models)
+- **Code**: 7.5% (1,257 models)
+- **Audio**: 1.0% (165 models)
 
 ## 🧠 Model Capability Detection
 
-### How It Works
-The application automatically detects model capabilities by analyzing:
-- Model names and identifiers
-- Hugging Face tags and metadata
-- Known model architecture patterns
-
-### Detection Patterns
-- **Vision**: Detects models with "vision", "vl", "image", "llava", "cogvlm", "qwen-vl", "internvl", etc.
-- **Embedding**: Identifies "embed", "bge-", "e5-", "gte-", "sentence-", "all-minilm", etc.
-- **Code**: Recognizes "code", "coder", "codellama", "starcoder", "deepseek-coder", etc.
-- **Audio**: Detects "whisper", "audio", "speech", "tts", "voice", "wav2vec", etc.
-- **Text**: Default classification for general-purpose language models
-
-### Current Distribution
-- Text: 70.4% (3,088 models)
-- Vision: 21.2% (930 models)
-- Code: 7.1% (311 models)
-- Audio: 0.8% (37 models)
-- Embedding: 0.5% (21 models)
+The pipeline automatically classifies models by analyzing model IDs and Hugging Face tags:
+- **Vision**: `vision`, `vl`, `visual`, `image`, `multimodal`, `llava`
+- **Code**: `code`, `coder`, `coding`, `codellama`, `starcoder`
+- **Audio**: `audio`, `speech`, `whisper`, `tts`
+- **Text**: Default classification
 
 ## 🔧 Configuration
 
 ### Environment Variables
 ```bash
-# Optional: Hugging Face API token for authenticated requests
+# Hugging Face API token for authenticated requests (recommended)
 HF_TOKEN=your_token_here
-
-# Optional: Analytics
-ANALYTICS_ID=your_analytics_id
 ```
 
-### Data Pipeline Configuration
-The data fetcher supports several command-line options:
-
+### npm Scripts
 ```bash
-# Download phase only
-python scripts/simplified_gguf_fetcher.py download --verbose --token $HF_TOKEN
-
-# Process phase only
-python scripts/simplified_gguf_fetcher.py process --verbose
-
-# Disable spam filtering
-python scripts/simplified_gguf_fetcher.py process --disable-spam-filter
-
-# Full pipeline (download + process)
-python scripts/simplified_gguf_fetcher.py --verbose --token $HF_TOKEN
+npm run update-banner          # Generate + validate social banners
+npm run build:css              # Minify CSS
+npm run start-local-server     # Serve the site locally
+npm test                       # Run the full regression suite (Node + Python)
 ```
-
-### Build Configuration
-- **Prerendering**: Static page generation for SEO
-- **Minification**: CSS and JS optimization
-- **Compression**: Gzip compression for assets
-
-## 🚀 Deployment
-
-### GitHub Pages (Recommended)
-```bash
-# Build for production
-npm run build
-
-# Deploy to GitHub Pages
-npm run deploy
-```
-
-### Data Pipeline
-The application uses a two-phase automated data pipeline:
-
-**Phase 1 - Download**: 
-- Fetches recent models (last 90 days) and top liked models from Hugging Face
-- Deduplicates and saves raw data
-- Includes retry logic with exponential backoff
-
-**Phase 2 - Process**:
-- Applies capability detection to classify models
-- Filters spam and low-quality models
-- Calculates hardware requirements
-- Generates final output with 4,000+ curated models
-
-### Manual Deployment
-1. Build the project: `npm run build`
-2. Upload `dist/` folder to your web server
-3. Configure server for SPA routing (if needed)
 
 ## 🧪 Testing
 
-### Test Structure
-```
-test-*.html           # Integration tests
-verify-*.js          # Unit tests
-*-test.html          # Component tests
-```
+Regression tests guard the two production-bug classes found in 2026-08:
+slug drift between the page generator and the sitemap, and the incremental
+merge silently collapsing the model catalog.
 
-### Running Tests
 ```bash
-# Run all tests
-npm test
-
-# Run specific test suite
-npm run test:engagement
-npm run test:filters
-npm run test:mobile
+npm test                  # Full suite: Node slug-parity + Python fetcher tests
+npm run test:slug         # Node only — slug parity, generator parity, zero-orphan checks
+npm run test:fetcher      # Python only — merge key, size estimator, clamp/backfill
 ```
 
-## 📈 Performance
+- **`tests/slug-parity.test.js`** — `createSlug` edge cases, verifies both
+  generators use the shared `slug-utils` module, and validates against the real
+  `gguf_models.json` + `sitemap.xml` that every pre-rendered page is linked and
+  every sitemap URL exists (zero orphans both directions).
+- **`tests/test_fetcher.py`** — unit tests for `_merge_key` (legacy entries never
+  collapse), `_estimate_file_size` (timestamps not misread as billions of
+  params), and `_save_output` (bogus sizes clamped, `modelId`/`filename`
+  backfilled).
+- **`tests/run_all.py`** — Python-side runner used by `npm test`.
 
-### Optimization Features
-- **Lazy Loading**: Images and components loaded on demand
-- **Virtual Scrolling**: Efficient rendering of large model lists
-- **Caching**: Intelligent caching of API responses
-- **Compression**: Optimized asset delivery
+Requires Python 3.11+ with `scripts/requirements.txt` installed. The Node tests
+use Node's built-in `node:test` runner — no extra npm packages needed.
 
-### Performance Metrics
-- **First Contentful Paint**: < 1.5s
-- **Largest Contentful Paint**: < 2.5s
-- **Cumulative Layout Shift**: < 0.1
-- **First Input Delay**: < 100ms
+## 🚀 Deployment
+
+The site is deployed automatically on GitHub Pages:
+1. **Daily update** workflow fetches new model data and commits `gguf_models.json`
+2. **Pre-render** workflow regenerates static model pages
+3. **SEO** workflow regenerates the sitemap
+4. Each workflow triggers a Pages rebuild when changes are committed
+
+Manual deployment: push to `main` — GitHub Actions handles the rest.
 
 ## 🔒 Security & Privacy
 
-### Security Measures
-- **Content Security Policy**: Strict CSP headers
-- **HTTPS Only**: Secure connections required
-- **Input Sanitization**: XSS prevention
-- **Rate Limiting**: API abuse prevention
-
-### Privacy
-- **No Personal Data**: No user data collection
-- **External Links**: Clear disclaimer about third-party content
-- **Transparency**: Open source and auditable code
+- **No user data collection**: The site is fully static
+- **External links**: All model files are hosted on Hugging Face — this site links, never hosts
+- **Open source**: Fully auditable code
 
 ## 🤝 Contributing
 
-### Development Workflow
 1. Fork the repository
 2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Make your changes and test thoroughly
-4. Commit with conventional commits: `git commit -m "feat: add amazing feature"`
-5. Push to your branch: `git push origin feature/amazing-feature`
-6. Open a Pull Request
-
-### Code Standards
-- **JavaScript**: ES6+ with modern syntax
-- **CSS**: BEM methodology with CSS variables
-- **HTML**: Semantic markup with accessibility
-- **Testing**: Comprehensive test coverage
+3. Test thoroughly — run `npm test` before pushing
+4. Push and open a Pull Request
 
 ## 📝 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+See the [LICENSE](LICENSE) file.
 
 ## 🙏 Acknowledgments
 
 - **Hugging Face**: For providing the model data and API
 - **GGUF Community**: For inspiration and support
-- **Contributors**: For feedback and contributions
-
-## 📞 Support
-
-- **Issues**: [GitHub Issues](https://github.com/your-repo/issues)  
-- **Discussions**: [GitHub Discussions](https://github.com/your-repo/discussions)  
-- **Email**: support@gguf-discovery.com  
 
 ---
 

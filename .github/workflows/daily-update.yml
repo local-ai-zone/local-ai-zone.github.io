@@ -119,6 +119,27 @@ jobs:
             echo "✅ File size: $FILE_SIZE bytes"
             echo "output_valid=true" >> $GITHUB_OUTPUT
             echo "model_count=$MODEL_COUNT" >> $GITHUB_OUTPUT
+
+            # ── Model-count floor guard ────────────────────────────────────────
+            # Regression protection: on 2026-08-04 the incremental merge
+            # collapsed the catalog from 16,519 → 1,751 models while STILL
+            # producing valid JSON, so the check above passed and the wiped
+            # dataset would have shipped. Fail loudly instead if the count
+            # collapses. Compare against the last committed count (HEAD).
+            PREV_COUNT=$(git show HEAD:gguf_models.json 2>/dev/null | python -c "import json,sys; d=json.load(sys.stdin); print(len(d))" 2>/dev/null || echo "0")
+            ABSOLUTE_FLOOR=3000  # healthy catalog is ~16K; <3K means something broke
+            echo "ℹ️ Previous committed count: $PREV_COUNT"
+            if [ "$MODEL_COUNT" -lt "$ABSOLUTE_FLOOR" ]; then
+              echo "❌ MODEL COUNT GUARD: only $MODEL_COUNT models (absolute floor $ABSOLUTE_FLOOR). Catalog appears collapsed. Refusing to publish."
+              echo "output_valid=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            if [ "$PREV_COUNT" -gt "$ABSOLUTE_FLOOR" ] && [ "$MODEL_COUNT" -lt $((PREV_COUNT / 2)) ]; then
+              echo "❌ MODEL COUNT GUARD: dropped from $PREV_COUNT to $MODEL_COUNT models (>50% loss vs HEAD). Refusing to publish."
+              echo "output_valid=false" >> $GITHUB_OUTPUT
+              exit 1
+            fi
+            echo "✅ Model count guard passed ($MODEL_COUNT models vs previous $PREV_COUNT)"
           else
             echo "❌ Output file verification failed: gguf_models.json is invalid JSON"
             echo "output_valid=false" >> $GITHUB_OUTPUT
@@ -241,7 +262,7 @@ jobs:
           - Enhanced error reporting
           
           ### Affected Components
-          - [x] Data files (data/raw_models_data.json, gguf_models.json)
+          - [x] Data file (gguf_models.json)
           - [x] Data verification and integrity checks
           - [ ] Dependencies  
           - [ ] Deployment
@@ -253,23 +274,21 @@ jobs:
           3. **Authentication Status**: Verify HF_TOKEN secret configuration
           
           ### Recommended Actions
-          1. **Check Enhanced Logs**: Review verbose output from simplified_gguf_fetcher.py
+          1. **Check Workflow Logs**: Review the daily_gguf_fetcher.py output
           2. **Verify Authentication**: Ensure HF_TOKEN secret is properly configured
-          3. **Check Data Integrity**: Review verification step outputs
+          3. **Check Data Integrity**: Review verification step outputs (model-count guard)
           4. **API Status**: Verify Hugging Face API accessibility and rate limits
           5. **Disk Space**: Ensure sufficient space for data files
           
           ### Configuration Details
-          - **Script Command**: \`python scripts/simplified_gguf_fetcher.py --verbose --token [REDACTED]\`
-          - **Spam Filtering**: Enabled with integrated processing
-          - **Data Verification**: JSON validation and model count verification
+          - **Script Command**: \`python scripts/daily_gguf_fetcher.py --incremental --min-likes 1 --max-models 2000 --output gguf_models.json\`
+          - **Data Verification**: JSON validation + model-count floor guard
           - **Retry Logic**: 3 attempts with exponential backoff (5min, 10min, 20min)
           
           ### Next Steps
           - Review workflow logs for specific error messages
           - Verify HF_TOKEN secret is valid and has appropriate permissions
           - Re-run the workflow manually once issues are resolved
-          - Consider temporary --disable-spam-filter flag if spam filtering is causing issues
           `;
           
           github.rest.issues.create({
@@ -306,7 +325,7 @@ jobs:
         if [ "${{ steps.check_changes.outputs.changes }}" == "true" ]; then
           echo "### 🚀 Deployment Status" >> $GITHUB_STEP_SUMMARY
           echo "- **GitHub Pages**: ✅ Deployment triggered" >> $GITHUB_STEP_SUMMARY
-          echo "- **Files Updated**: data/raw_models_data.json, gguf_models.json" >> $GITHUB_STEP_SUMMARY
+          echo "- **Files Updated**: gguf_models.json" >> $GITHUB_STEP_SUMMARY
         else
           echo "### ℹ️ No Deployment Needed" >> $GITHUB_STEP_SUMMARY
           echo "- **Reason**: No changes detected in data files" >> $GITHUB_STEP_SUMMARY
@@ -318,7 +337,7 @@ jobs:
         echo "✅ Daily GGUF model data update completed successfully"
         echo "📊 Processed ${{ steps.verify_backup.outputs.model_count }} GGUF models from ${{ steps.verify_backup.outputs.raw_model_count }} total models"
         echo "🔧 Enhanced execution: authenticated API, verbose logging, spam filtering, data verification"
-        echo "📁 Data files updated and committed (data/raw_models_data.json, gguf_models.json)"
+        echo "📁 Data file updated and committed (gguf_models.json)"
         echo "🚀 GitHub Pages deployment triggered"
         
     - name: Notify on no changes

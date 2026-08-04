@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { createSlug } = require('./slug-utils');
 
 /**
  * Improved SEO Sitemap Generation Script
@@ -138,8 +139,8 @@ class ContentScanner {
                         continue;
                     }
 
-                    // Generate URL-safe slug
-                    const slug = this.generateSlug(model.modelName);
+                    // Generate URL-safe slug (shared with generate-minimal-pages.js)
+                    const slug = createSlug(model.modelName);
                     if (!slug) {
                         this.logger.warn(`Generated empty slug for model: ${model.modelName}`);
                         continue;
@@ -181,15 +182,6 @@ class ContentScanner {
             this.logger.error('Error scanning models data', error);
             return [];
         }
-    }
-
-    generateSlug(text) {
-        return text
-            .toLowerCase()
-            .replace(/[^a-z0-9\s-]/g, '')
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-')
-            .replace(/^-+|-+$/g, '');
     }
 
     validateFiles(files) {

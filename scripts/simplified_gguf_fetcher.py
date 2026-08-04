@@ -141,6 +141,20 @@ def safe_dict_get(obj: Any, key: str, default: Any = None) -> Any:
         return default
 
 
+def _parse_download_link(link: str) -> Optional[Tuple[str, str]]:
+    """
+    Parse ``modelId``/``filename`` out of a ``directDownloadLink`` URL.
+
+    Used by the merge key, the legacy-entry backfill, and the size clamp so
+    all three always agree on the same pair. Returns ``None`` if the link
+    isn't a ``.../resolve/main/...`` download URL.
+    """
+    match = re.match(r'https://huggingface\.co/(.+?)/resolve/main/(.+)$', link or '')
+    if match:
+        return match.group(1), match.group(2)
+    return None
+
+
 class SimplifiedGGUFetcher:
     """
     Main class for fetching and processing GGUF model data from Hugging Face.
@@ -213,6 +227,12 @@ class SimplifiedGGUFetcher:
         self.disable_spam_filter = disable_spam_filter
         self.spam_engine = None if disable_spam_filter else SpamFilterEngine(self.filter_config)
         
+        # Sane upper bound for a GGUF file (largest real models ≈ 860 GB at
+        # FP16 / ~430 GB at Q8). Anything above this is an API/estimation
+        # glitch (e.g. the old estimator regex turned "1781204855.BF16" into
+        # "1781204855 billion params" → "3652861.5 TB").
+        self.MAX_SANE_FILE_SIZE = 2 * 1024 ** 4  # 2 TiB
+
         # Hardware requirements calculator
         self.hardware_calculator = HardwareRequirementsCalculator(self.filter_config)
         
@@ -269,7 +289,7 @@ class SimplifiedGGUFetcher:
                         if filename:
                             siblings.append({
                                 'rfilename': str(filename),
-                                'size': int(size) if size else 0
+                                'size': self._resolve_file_size(filename, size, model_data)
                             })
                     except Exception as e:
                         self.logger.debug(f"Error extracting sibling: {e}")
@@ -284,7 +304,7 @@ class SimplifiedGGUFetcher:
                         if filename:
                             siblings.append({
                                 'rfilename': str(filename),
-                                'size': int(size) if size else 0
+                                'size': self._resolve_file_size(filename, size, model_data)
                             })
                     except Exception as e:
                         self.logger.debug(f"Error extracting sibling from iterable: {e}")
@@ -295,6 +315,55 @@ class SimplifiedGGUFetcher:
         
         return siblings
     
+    def _resolve_file_size(self, filename: str, size: int, model_data: Any = None) -> int:
+        """
+        Resolve a GGUF file's size, estimating it when the API returns 0/None.
+
+        Newer huggingface_hub versions no longer include file sizes in
+        ``list_models(full=True)`` results, so missing sizes are estimated from
+        the quantization format and model parameter count to keep downstream
+        size-based filtering (e.g. spam filter) working.
+        """
+        size = int(size) if size else 0
+        if size > 0:
+            return size
+        if not filename or not str(filename).lower().endswith('.gguf'):
+            return 0
+        model_id = safe_getattr(model_data, 'id', '') or safe_dict_get(model_data, 'id', '')
+        return self._estimate_file_size(filename, model_id)
+
+    def _estimate_file_size(self, filename: str, model_id: str = '') -> int:
+        """
+        Estimate GGUF file size from quantization format and model parameters.
+
+        Used as a fallback when the HuggingFace API doesn't provide file sizes.
+        """
+        # Extract model parameters from id/name (7B, 13B, 70B, etc.)
+        # The lookahead prevents matching timestamps/IDs like "1781204855.BF16"
+        # as "1781204855 billion" parameters (which produced absurd sizes).
+        param_match = re.search(r'(\d+(?:\.\d+)?)\s*[Bb](?![A-Za-z0-9])', f"{model_id} {filename}")
+        params_billions = 7.0  # Default assumption
+        if param_match:
+            params_billions = float(param_match.group(1))
+
+        # Quantization to bits-per-parameter mapping
+        quant_format = self._extract_quantization(filename).upper()
+        bits_per_param = {
+            'F32': 32.0, 'F16': 16.0, 'BF16': 16.0, 'Q8_0': 8.5, 'Q6_K': 6.5,
+            'Q5_K_M': 5.5, 'Q5_K_S': 5.0, 'Q5_0': 5.0, 'Q5_1': 5.5,
+            'Q4_K_M': 4.5, 'Q4_K_S': 4.0, 'Q4_0': 4.5, 'Q4_1': 4.5,
+            'Q3_K_M': 3.5, 'Q3_K_S': 3.0, 'Q2_K': 2.5,
+            'IQ4_XS': 4.25, 'IQ3_S': 3.4, 'IQ3_XXS': 3.1, 'IQ2_XXS': 2.2,
+            'IQ2_XS': 2.3, 'IQ1_S': 1.5,
+        }.get(quant_format, 4.5)  # Default to Q4_K_M equivalent
+
+        # params (billions) * bits_per_param / 8 = size in GB, then to bytes
+        size_gb = (params_billions * bits_per_param) / 8.0
+        size_bytes = int(size_gb * 1024 * 1024 * 1024)
+
+        # Add 5% overhead for metadata
+        return int(size_bytes * 1.05)
+
     def _normalize_base_model_name(self, model_id: str, model_name: str = '') -> str:
         """
         Normalize model name to a canonical form for cross-repo deduplication.
@@ -637,7 +706,6 @@ class SimplifiedGGUFetcher:
             for model in self.api.list_models(
                 filter="gguf",
                 sort="likes",      # Sort by likes for most popular models
-                direction=-1,      # Descending (most likes first)
                 full=True,         # CRITICAL: Gets all data in ONE call (siblings, cardData, etc.)
             ):
                 # Check model limit
@@ -1110,7 +1178,11 @@ class SimplifiedGGUFetcher:
             if not filename.lower().endswith('.gguf'):
                 continue
             
-            file_size = sibling.get('size', 0)
+            file_size = sibling.get('size', 0) or 0
+            # Clamp implausible sizes (API glitches / estimator bugs)
+            if file_size > self.MAX_SANE_FILE_SIZE:
+                file_size = self._estimate_file_size(filename, model_id)
+                file_size = int(file_size) if file_size else 0
             file_size_formatted = self._format_file_size(file_size)
             quantization = self._extract_quantization(filename)
             _, direct_download_link = self._generate_links(model_id, filename)
@@ -1141,8 +1213,31 @@ class SimplifiedGGUFetcher:
         
         return processed_entries
     
+    def _merge_key(self, model: Dict) -> str:
+        """
+        Build a stable merge key for a model entry.
+
+        New entries carry ``modelId``/``filename``; legacy entries (older
+        ``gguf_models.json`` snapshots) don't, so fall back to parsing them out
+        of the ``directDownloadLink`` URL. Without this fallback, every legacy
+        entry collapses to the key ``"::"`` and an incremental run wipes the
+        existing dataset (16,519 → ~1,750 models).
+        """
+        model_id = model.get('modelId') or ''
+        filename = model.get('filename') or ''
+        if model_id and filename:
+            return f"{model_id}::{filename}"
+        parsed = _parse_download_link(model.get('directDownloadLink') or '')
+        if parsed:
+            return f"{parsed[0]}::{parsed[1]}"
+        # Last resort: key on the full link so distinct entries never collapse
+        return f"link::{model.get('directDownloadLink') or model.get('huggingFaceLink') or ''}"
+
     def _generate_output(self, processed_models: List[Dict]) -> None:
         """Generate final JSON output file."""
+        if self.dry_run:
+            self.logger.info(f"DRY RUN: Skipping output generation for {len(processed_models)} models")
+            return
         existing_models = []
         if self.incremental and self.output_file.exists():
             self.logger.info("INCREMENTAL MODE: Loading existing models for merge...")
@@ -1163,13 +1258,13 @@ class SimplifiedGGUFetcher:
         if self.incremental and existing_models:
             model_dict = {}
             for model in existing_models:
-                key = f"{model.get('modelId', '')}::{model.get('filename', '')}"
+                key = self._merge_key(model)
                 model_dict[key] = model
             
             new_count = 0
             updated_count = 0
             for model in processed_models:
-                key = f"{model.get('modelId', '')}::{model.get('filename', '')}"
+                key = self._merge_key(model)
                 if key in model_dict:
                     updated_count += 1
                 else:
@@ -1192,11 +1287,29 @@ class SimplifiedGGUFetcher:
             else:
                 like_count = int(like_count)
             
+            # Backfill modelId/filename from the download link for legacy
+            # entries that predate those fields, so future incremental merges
+            # always key on the primary fields (see _merge_key).
+            model_id = model.get('modelId') or ''
+            filename = model.get('filename') or ''
+            if not model_id or not filename:
+                parsed = _parse_download_link(model.get('directDownloadLink') or '')
+                if parsed:
+                    model_id = model_id or parsed[0]
+                    filename = filename or parsed[1]
+
+            # Clamp legacy bogus sizes so incremental merges self-heal
+            # previously-corrupted entries (e.g. old "3652861.5 TB" values).
+            file_size = model.get('fileSize', 0) or 0
+            if file_size > self.MAX_SANE_FILE_SIZE:
+                file_size = self._estimate_file_size(filename, model_id)
+                file_size = int(file_size) if file_size else 0
+
             output_entry = {
                 'modelName': model.get('modelName', ''),
                 'quantFormat': model.get('quantFormat', 'Unknown'),
-                'fileSize': model.get('fileSize', 0),
-                'fileSizeFormatted': model.get('fileSizeFormatted', '0 B'),
+                'fileSize': file_size,
+                'fileSizeFormatted': self._format_file_size(file_size),
                 'modelType': model.get('modelType', 'Unknown'),
                 'modelCapability': model.get('modelCapability', 'text'),
                 'license': model.get('license', 'Not specified'),
@@ -1204,6 +1317,8 @@ class SimplifiedGGUFetcher:
                 'likeCount': like_count,
                 'huggingFaceLink': model.get('huggingFaceLink', ''),
                 'directDownloadLink': model.get('directDownloadLink', ''),
+                'modelId': model_id,
+                'filename': filename,
                 'minRamGB': model.get('minRamGB', 8),
                 'minCpuCores': model.get('minCpuCores', 4),
                 'gpuRequired': model.get('gpuRequired', True),

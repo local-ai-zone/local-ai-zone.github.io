@@ -35,7 +35,7 @@ import sys
 from collections import defaultdict
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 from huggingface_hub import HfApi
 from tqdm import tqdm
@@ -52,6 +52,20 @@ logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
+
+
+def _parse_download_link(link: str) -> Optional[Tuple[str, str]]:
+    """
+    Parse ``modelId``/``filename`` out of a ``directDownloadLink`` URL.
+
+    Used by the merge key, the legacy-entry backfill, and the size clamp so
+    all three always agree on the same pair. Returns ``None`` if the link
+    isn't a ``.../resolve/main/...`` download URL.
+    """
+    match = re.match(r'https://huggingface\.co/(.+?)/resolve/main/(.+)$', link or '')
+    if match:
+        return match.group(1), match.group(2)
+    return None
 
 
 class DailyGGUFFetcher:
@@ -87,6 +101,12 @@ class DailyGGUFFetcher:
         self.output_file = Path(output_file)
         self.logger = logging.getLogger(__name__)
         
+        # Sane upper bound for a GGUF file (largest real models ≈ 860 GB at
+        # FP16 / ~430 GB at Q8). Anything above this is an API/estimation
+        # glitch (e.g. the old estimator regex turned "1781204855.BF16" into
+        # "1781204855 billion params" → "3652861.5 TB").
+        self.MAX_SANE_FILE_SIZE = 2 * 1024 ** 4  # 2 TiB
+
         # Hardware calculator
         self.hardware_calculator = HardwareRequirementsCalculator(FilterConfig())
         
@@ -183,7 +203,6 @@ class DailyGGUFFetcher:
             model_iterator = self.api.list_models(
                 filter="gguf",
                 sort="likes",
-                direction=-1,
                 full=True  # CRITICAL: This fetches file sizes in siblings!
             )
             
@@ -407,6 +426,15 @@ class DailyGGUFFetcher:
                 except (ValueError, TypeError):
                     file_size = 0
                 
+                # Clamp implausible sizes (API glitches / estimator bugs)
+                if file_size > self.MAX_SANE_FILE_SIZE:
+                    self.logger.warning(
+                        f"Suspicious size {self._format_size(file_size)} for {filename}; "
+                        f"re-estimating instead"
+                    )
+                    file_size = self._estimate_file_size(filename, model_name)
+                    file_size = int(file_size) if file_size else 0
+                
                 quantization = self._extract_quantization(filename)
                 
                 # Extract model source (uploader/organization)
@@ -460,8 +488,10 @@ class DailyGGUFFetcher:
         Based on typical GGUF file sizes per quantization level.
         """
         # Extract model parameters from name (7B, 13B, 70B, etc.)
+        # The lookahead prevents matching timestamps/IDs like "1781204855.BF16"
+        # as "1781204855 billion" parameters (which produced absurd sizes).
         import re
-        param_match = re.search(r'(\d+\.?\d*)\s*[Bb]', model_name + ' ' + filename)
+        param_match = re.search(r'(\d+(?:\.\d+)?)\s*[Bb](?![A-Za-z0-9])', f"{model_name} {filename}")
         params_billions = 7.0  # Default assumption
         
         if param_match:
@@ -542,17 +572,17 @@ class DailyGGUFFetcher:
         
         # Merge if incremental
         if self.incremental and existing:
-            # Create dict keyed by model+file
+            # Create dict keyed by model+file (robust against legacy entries
+            # that lack modelId/filename fields — see _merge_key)
             merged = {}
             for model in existing:
-                key = f"{model.get('modelId', '')}::{model.get('filename', '')}"
-                merged[key] = model
+                merged[self._merge_key(model)] = model
             
             # Update/add new models
             new_count = 0
             updated_count = 0
             for model in models:
-                key = f"{model.get('modelId', '')}::{model.get('filename', '')}"
+                key = self._merge_key(model)
                 if key in merged:
                     updated_count += 1
                 else:
@@ -567,19 +597,38 @@ class DailyGGUFFetcher:
             key=lambda x: (x.get('downloadCount', 0), x.get('likeCount', 0)),
             reverse=True
         )
-        
+
         # Validate file sizes before saving
         self._validate_file_sizes(models)
-        
+
         # Clean up entries (remove internal fields)
         output = []
         for model in models:
+            # Backfill modelId/filename from the download link for legacy
+            # entries that predate those fields, so future incremental merges
+            # always key on the primary fields (see _merge_key).
+            model_id = model.get('modelId') or ''
+            filename = model.get('filename') or ''
+            if not model_id or not filename:
+                parsed = _parse_download_link(model.get('directDownloadLink') or '')
+                if parsed:
+                    model_id = model_id or parsed[0]
+                    filename = filename or parsed[1]
+
+            # Clamp legacy bogus sizes (e.g. old "3652861.5 TB" entries) so
+            # incremental merges self-heal previously-corrupted data.
+            file_size = model.get('fileSize', 0) or 0
+            if file_size > self.MAX_SANE_FILE_SIZE:
+                model_name = model.get('modelName', '') or ''
+                file_size = self._estimate_file_size(filename, model_name)
+                file_size = int(file_size) if file_size else 0
+
             clean = {
                 'modelName': model.get('modelName', ''),
                 'modelSource': model.get('modelSource', 'Unknown'),
                 'quantFormat': model.get('quantFormat', 'Unknown'),
-                'fileSize': model.get('fileSize', 0),
-                'fileSizeFormatted': model.get('fileSizeFormatted', '0 B'),
+                'fileSize': file_size,
+                'fileSizeFormatted': self._format_size(file_size),
                 'modelType': model.get('modelType', 'Unknown'),
                 'modelCapability': model.get('modelCapability', 'text'),
                 'license': model.get('license', 'Not specified'),
@@ -587,6 +636,8 @@ class DailyGGUFFetcher:
                 'likeCount': model.get('likeCount', 0),
                 'huggingFaceLink': model.get('huggingFaceLink', ''),
                 'directDownloadLink': model.get('directDownloadLink', ''),
+                'modelId': model_id,
+                'filename': filename,
                 'minRamGB': model.get('minRamGB', 8),
                 'minCpuCores': model.get('minCpuCores', 4),
                 'gpuRequired': model.get('gpuRequired', True),
@@ -594,14 +645,34 @@ class DailyGGUFFetcher:
                 'uploadDate': model.get('uploadDate')
             }
             output.append(clean)
-        
+
         # Write to file
         with open(self.output_file, 'w', encoding='utf-8') as f:
             json.dump(output, f, indent=2, ensure_ascii=False)
-        
+
         file_size_mb = os.path.getsize(self.output_file) / (1024 * 1024)
         self.logger.info(f"✓ Saved {len(output)} models to {self.output_file} ({file_size_mb:.1f} MB)")
-    
+
+    def _merge_key(self, model: Dict) -> str:
+        """
+        Build a stable merge key for a model entry.
+
+        New entries carry ``modelId``/``filename``; legacy entries (older
+        ``gguf_models.json`` snapshots) don't, so fall back to parsing them out
+        of the ``directDownloadLink`` URL. Without this fallback, every legacy
+        entry collapses to the key ``"::"`` and an incremental run wipes the
+        existing dataset (16,519 → ~1,750 models).
+        """
+        model_id = model.get('modelId') or ''
+        filename = model.get('filename') or ''
+        if model_id and filename:
+            return f"{model_id}::{filename}"
+        parsed = _parse_download_link(model.get('directDownloadLink') or '')
+        if parsed:
+            return f"{parsed[0]}::{parsed[1]}"
+        # Last resort: key on the full link so distinct entries never collapse
+        return f"link::{model.get('directDownloadLink') or model.get('huggingFaceLink') or ''}"
+
     def _validate_file_sizes(self, models: List[Dict]) -> None:
         """Validate file sizes in final output and log statistics."""
         total = len(models)

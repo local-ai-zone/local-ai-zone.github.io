@@ -35,23 +35,14 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
-        cache: 'npm'
         
-    - name: Install dependencies
-      run: |
-        npm ci
-        # Install Puppeteer with Chromium (without saving to package.json)
-        npm install puppeteer --no-save
-        
+    # generate-minimal-pages.js only imports Node built-ins (fs, path) and
+    # the local slug-utils module — no npm packages are needed, so skip the
+    # npm ci / puppeteer install entirely (faster + fewer failure modes).
     - name: Configure Git
       run: |
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
-        
-    - name: Clean up any package-lock.json changes
-      run: |
-        # Reset any changes to package-lock.json that might have occurred during npm install
-        git checkout -- package-lock.json 2>/dev/null || true
         
     - name: Generate minimal model pages
       id: prerender
@@ -166,10 +157,9 @@ jobs:
           
           ### Recommended Actions
           1. Check the workflow logs for specific error messages
-          2. Verify Puppeteer is working correctly
-          3. Ensure the main site is accessible
-          4. Check if there are memory or timeout issues
-          5. Verify gguf_models.json file is accessible
+          2. Verify gguf_models.json is valid and accessible
+          3. Check if there are memory or timeout issues
+          4. Re-run the workflow manually once resolved
           
           ### Pre-rendering Process
           - **Target**: Top 1000 models by likes

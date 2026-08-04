@@ -1,8 +1,38 @@
 {
   "name": "gguf-indexing-website",
   "version": "1.0.0",
-  "main": "verify-mobile-enhancements.js",
+  "main": "js/premium-app.js",
   "dependencies": {
+    "cheerio": "^1.1.2",
+    "jsdom": "^25.0.1",
+    "puppeteer": "^24.15.0"
+  },
+  "scripts": {
+    "generate-banner": "node scripts/generate-banner.js",
+    "create-fallback-banner": "node scripts/create-fallback-banner.js",
+    "validate-banner-setup": "node scripts/validate-banner-setup.js",
+    "update-banner": "npm run generate-banner && npm run create-fallback-banner && npm run validate-banner-setup",
+    "update-banner-local": "node scripts/update-banner-local.js",
+    "minify-css": "cleancss -o css/blog-article.min.css css/blog-article.css",
+    "build:css": "npm run minify-css",
+    "start-local-server": "node scripts/start-local-server.js",
+    "test": "node --test tests/slug-parity.test.js && python tests/run_all.py",
+    "test:slug": "node --test tests/slug-parity.test.js",
+    "test:fetcher": "python -m unittest discover -s tests -p 'test_*.py' -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/local-ai-zone/local-ai-zone.github.io.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/local-ai-zone/local-ai-zone.github.io/issues"
+  },
+  "homepage": "https://github.com/local-ai-zone/local-ai-zone.github.io#readme",
+  "description": "",
+  "devDependencies": {
     "agent-base": "^7.1.4",
     "ansi-regex": "^6.1.0",
     "ansi-styles": "^6.2.1",
@@ -14,7 +44,7 @@
     "ast-types": "^0.13.4",
     "asynckit": "^0.4.0",
     "autoprefixer": "^10.4.21",
-    "b4a": "^1.6.7",
+    "b4a": "^1.7.6",
     "balanced-match": "^1.0.2",
     "bare-events": "^2.6.0",
     "bare-fs": "^4.1.6",
@@ -34,9 +64,9 @@
     "caniuse-lite": "^1.0.30001727",
     "chai": "^5.2.1",
     "check-error": "^2.1.1",
-    "cheerio": "^1.1.2",
     "chokidar": "^3.6.0",
     "chromium-bidi": "^7.2.0",
+    "clean-css-cli": "^5.6.3",
     "cliui": "^8.0.1",
     "color-convert": "^2.0.1",
     "color-name": "^1.1.4",
@@ -108,7 +138,7 @@
     "is-arrayish": "^0.2.1",
     "is-binary-path": "^2.1.0",
     "is-core-module": "^2.16.1",
-    "is-extglob": "^2.1.1",
+    "is-extglob": "^2.1.0",
     "is-fullwidth-code-point": "^3.0.0",
     "is-glob": "^4.0.3",
     "is-number": "^7.0.0",
@@ -119,7 +149,6 @@
     "js-tokens": "^9.0.1",
     "js-yaml": "^4.1.0",
     "jsbn": "^1.1.0",
-    "jsdom": "^25.0.1",
     "json-parse-even-better-errors": "^2.3.1",
     "lighthouse": "^12.8.2",
     "lilconfig": "^3.1.3",
@@ -176,7 +205,6 @@
     "proxy-from-env": "^1.1.0",
     "pump": "^3.0.3",
     "punycode": "^2.3.1",
-    "puppeteer": "^24.15.0",
     "puppeteer-core": "^24.15.0",
     "queue-microtask": "^1.2.3",
     "read-cache": "^1.0.0",
@@ -257,35 +285,5 @@
     "yargs-parser": "^21.1.1",
     "yauzl": "^2.10.0",
     "zod": "^3.25.76"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "generate-banner": "node scripts/generate-banner.js",
-    "test-banner": "node scripts/test-banner-generation.js",
-    "create-fallback-banner": "node scripts/create-fallback-banner.js",
-    "validate-banner-setup": "node scripts/validate-banner-setup.js",
-    "update-banner": "npm run generate-banner && npm run create-fallback-banner && npm run validate-banner-setup",
-    "update-banner-local": "node scripts/update-banner-local.js",
-    "minify-css": "cleancss -o css/blog-article.min.css css/blog-article.css",
-    "build:css": "npm run minify-css",
-    "verify-css-optimization": "node scripts/verify-css-optimization.js",
-    "performance-test": "node scripts/performance-test.js",
-    "test:contact-form": "node scripts/run-qa-tests.js",
-    "test:contact-form-manual": "node scripts/start-local-server.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/local-ai-zone/local-ai.zone.github.io.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/local-ai-zone/local-ai.zone.github.io/issues"
-  },
-  "homepage": "https://github.com/local-ai-zone/local-ai.zone.github.io#readme",
-  "description": "",
-  "devDependencies": {
-    "clean-css-cli": "^5.6.3"
   }
 }

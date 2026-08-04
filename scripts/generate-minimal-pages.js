@@ -9,6 +9,7 @@
 
 const fs = require('fs').promises;
 const path = require('path');
+const { createSlug } = require('./slug-utils');
 
 class MinimalPageGenerator {
     constructor() {
@@ -56,16 +57,6 @@ class MinimalPageGenerator {
             console.error('❌ Error loading models data:', error);
             throw error;
         }
-    }
-
-    /**
-     * Create URL-friendly slug
-     */
-    createSlug(name) {
-        return name
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-+|-+$/g, '');
     }
 
     /**
@@ -275,7 +266,7 @@ class MinimalPageGenerator {
      * Generate minimal HTML template that replicates the model card design
      */
     generateMinimalHTML(model) {
-        const slug = this.createSlug(model.modelName);
+        const slug = createSlug(model.modelName);
         const pageUrl = `${this.baseUrl}/models/${slug}.html`;
         const formattedDownloadCount = this.formatDownloadCount(model.downloadCount);
         const formattedModelName = this.formatModelName(model.modelName);
@@ -448,7 +439,7 @@ Hugging Face
             const model = models[i];
             
             try {
-                const slug = this.createSlug(model.modelName);
+                const slug = createSlug(model.modelName);
                 const filename = `${slug}.html`;
                 const filepath = path.join(this.outputDir, filename);
                 
