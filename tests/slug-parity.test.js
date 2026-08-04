@@ -14,8 +14,78 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 
+const os = require('os');
+
 const ROOT = path.resolve(__dirname, '..');
 const { createSlug } = require(path.join(ROOT, 'scripts', 'slug-utils.js'));
+const MinimalPageGenerator = require(path.join(ROOT, 'scripts', 'generate-minimal-pages.js'));
+
+/**
+ * Build a generator pointed at a throwaway directory.
+ * @returns {{gen: MinimalPageGenerator, dir: string}}
+ */
+function makeTempGenerator() {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'gguf-cleanup-'));
+    const gen = new MinimalPageGenerator();
+    gen.outputDir = dir;
+    return { gen, dir };
+}
+
+/**
+ * Drop dummy page files into the generator's output dir.
+ * @param {string} dir - output dir
+ * @param {string[]} names - file names to create
+ */
+function seedPages(dir, names) {
+    fs.mkdirSync(dir, { recursive: true });
+    for (const name of names) {
+        fs.writeFileSync(path.join(dir, name), '<html>stub</html>', 'utf8');
+    }
+}
+
+// ── 0. Stale-page cleanup (generate-minimal-pages.js) ────────────────────
+test('cleanupStalePages: removes pages outside the selection', async () => {
+    const { gen, dir } = makeTempGenerator();
+    seedPages(dir, ['qwen-3-5.html', 'stale-model.html', 'other-old.html']);
+    gen.generatedSlugs = new Set(['qwen-3-5']);
+
+    await gen.cleanupStalePages();
+
+    assert.ok(fs.existsSync(path.join(dir, 'qwen-3-5.html')), 'selected page kept');
+    assert.ok(!fs.existsSync(path.join(dir, 'stale-model.html')), 'stale page removed');
+    assert.ok(!fs.existsSync(path.join(dir, 'other-old.html')), 'stale page removed');
+    assert.strictEqual(gen.stats.removedStale, 2);
+    fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('cleanupStalePages: never touches non-slug files', async () => {
+    const { gen, dir } = makeTempGenerator();
+    seedPages(dir, ['README.md', 'assets', 'page-1.html', '.hidden', 'UPPER.HTML']);
+    gen.generatedSlugs = new Set();
+
+    await gen.cleanupStalePages();
+
+    // Only slug-shaped .html files are candidates; nothing qualifies here
+    assert.ok(fs.existsSync(path.join(dir, 'README.md')), 'README kept');
+    assert.ok(fs.existsSync(path.join(dir, 'assets')), 'asset kept');
+    assert.ok(fs.existsSync(path.join(dir, '.hidden')), 'hidden file kept');
+    assert.ok(fs.existsSync(path.join(dir, 'UPPER.HTML')), 'non-slug html kept');
+    assert.strictEqual(gen.stats.removedStale, 0);
+    fs.rmSync(dir, { recursive: true, force: true });
+});
+
+test('cleanupStalePages: empty selection never wipes the directory', async () => {
+    const { gen, dir } = makeTempGenerator();
+    seedPages(dir, ['qwen-3-5.html', 'llama-8b.html']);
+    gen.generatedSlugs = new Set(); // empty catalog guard
+
+    await gen.cleanupStalePages();
+
+    assert.ok(fs.existsSync(path.join(dir, 'qwen-3-5.html')), 'page survives empty selection');
+    assert.ok(fs.existsSync(path.join(dir, 'llama-8b.html')), 'page survives empty selection');
+    assert.strictEqual(gen.stats.removedStale, 0);
+    fs.rmSync(dir, { recursive: true, force: true });
+});
 
 // ── 1. createSlug unit behaviour ─────────────────────────────────────────
 test('createSlug: canonical rule', () => {

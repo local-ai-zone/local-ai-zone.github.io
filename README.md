@@ -8,6 +8,7 @@ Live site: [https://local-ai-zone.github.io](https://local-ai-zone.github.io)
 
 ### Core Functionality
 - **Model Discovery**: Browse 16,000+ GGUF format AI models with detailed metadata
+- **Multi-File Support**: Models with several quantization files (Q4_K_M, Q8_0, F16, ...) expose an in-card file selector — pick the quant that fits your hardware
 - **Advanced Search**: Real-time search across model names, quant formats, types, and licenses
 - **Smart Filtering**: Filter by quantization type, model capability, and license
 - **Model Capabilities**: Automatic classification (Text, Vision, Code, Audio)
@@ -195,9 +196,11 @@ npm run test:fetcher      # Python only — merge key, size estimator, clamp/bac
 ```
 
 - **`tests/slug-parity.test.js`** — `createSlug` edge cases, verifies both
-  generators use the shared `slug-utils` module, and validates against the real
+  generators use the shared `slug-utils` module, validates against the real
   `gguf_models.json` + `sitemap.xml` that every pre-rendered page is linked and
-  every sitemap URL exists (zero orphans both directions).
+  every sitemap URL exists (zero orphans both directions), and covers the
+  stale-page cleanup in `generate-minimal-pages.js` (removes pages outside the
+  top-N selection, never touches non-slug files, never wipes on empty catalog).
 - **`tests/test_fetcher.py`** — unit tests for `_merge_key` (legacy entries never
   collapse), `_estimate_file_size` (timestamps not misread as billions of
   params), and `_save_output` (bogus sizes clamped, `modelId`/`filename`

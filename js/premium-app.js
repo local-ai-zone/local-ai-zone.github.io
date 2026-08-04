@@ -68,6 +68,12 @@ class PremiumGGUFApp {
             this.hideLoadingScreen();
             console.log('✅ Loading screen hidden');
             
+            // Restore persisted grid/list view preference
+            this.applySavedView();
+            
+            // Honor deep links (#model=<slug>&quant=<QUANT>)
+            this.applyDeepLinkState();
+            
             console.log('🎉 Premium GGUF Discovery initialized successfully!');
             
         } catch (error) {
@@ -99,8 +105,10 @@ class PremiumGGUFApp {
                 throw new Error('No models found in data');
             }
             
-            this.models = data;
-            this.filteredModels = [...data];
+            // Group entries by model repo: one card per model, with every
+            // GGUF file available via a file/quantization selector.
+            this.models = this.groupModelsByRepo(data);
+            this.filteredModels = [...this.models];
             
             // Sort by like count (most liked first)
             this.filteredModels.sort((a, b) => (b.likeCount || 0) - (a.likeCount || 0));
@@ -110,7 +118,7 @@ class PremiumGGUFApp {
             this.updateHeaderStats();
             console.log('📊 Header stats updated');
             
-            console.log(`✅ Successfully loaded ${this.models.length} models`);
+            console.log(`✅ Successfully loaded ${this.models.length} models (${data.length} files)`);
             
         } catch (error) {
             console.error('❌ Error loading models:', error);
@@ -118,6 +126,221 @@ class PremiumGGUFApp {
         }
     }
     
+    /**
+     * Group flat file entries into model objects.
+     *
+     * gguf_models.json contains ONE entry per (model, file) pair, so a model
+     * with Q4_K_M + Q8_0 + F16 files appears multiple times. Group by repo
+     * so the grid shows one card per model, with `model.files` holding every
+     * file for the file/quantization selector.
+     *
+     * @param {Array} entries - flat file entries from gguf_models.json
+     * @returns {Array} grouped model objects: {...primaryEntry, files: [...]}
+     */
+    groupModelsByRepo(entries) {
+        const groups = new Map();
+        
+        for (const entry of entries) {
+            const key = entry.modelId || entry.huggingFaceLink || entry.modelName;
+            if (!groups.has(key)) {
+                groups.set(key, { entries: [] });
+            }
+            groups.get(key).entries.push(entry);
+        }
+        
+        const models = [];
+        for (const group of groups.values()) {
+            // Sort files biggest first: default selector entry = largest file
+            group.entries.sort((a, b) => (b.fileSize || 0) - (a.fileSize || 0));
+            // Base the card on the largest (default-selected) file so the
+            // badge/size/hardware shown match what the selector starts on.
+            // Like/download counts are repo-level, identical across files.
+            const model = Object.assign({}, group.entries[0], { files: group.entries });
+            models.push(model);
+        }
+        
+        return models;
+    }
+
+    /**
+     * Quantization values for a model (all its files, or just the primary).
+     * @param {Object} model - grouped model object
+     * @returns {Array<string>} quantization formats
+     */
+    getModelQuants(model) {
+        if (model.files && model.files.length > 1) {
+            return model.files.map((f) => f.quantFormat || 'Unknown');
+        }
+        return [model.quantFormat || 'Unknown'];
+    }
+
+    /**
+     * Mirror of scripts/slug-utils.js createSlug — single source of truth is
+     * the shared script, kept in sync so #model= deep links match prerendered
+     * page slugs (models/{slug}.html).
+     * @param {string} name - model name
+     * @returns {string} URL-safe slug
+     */
+    createSlug(name) {
+        return String(name || '')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+    }
+
+    /**
+     * Parse deep-link state from the URL hash (#model=<slug>&quant=<QUANT>).
+     * @returns {{model: string, quant: string}} empty strings when absent
+     */
+    getDeepLinkState() {
+        const params = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+        return {
+            model: (params.get('model') || '').toLowerCase(),
+            quant: (params.get('quant') || '').toUpperCase(),
+        };
+    }
+
+    /**
+     * Persist a file selection in the URL hash so reloads and shares keep it.
+     * @param {Object} model - grouped model object
+     * @param {Object} file - selected file entry
+     */
+    updateDeepLinkHash(model, file) {
+        const slug = this.createSlug(model.modelName);
+        const quant = (file && file.quantFormat) || '';
+        const hash = `#model=${encodeURIComponent(slug)}&quant=${encodeURIComponent(quant)}`;
+        if (window.location.hash === hash) return;
+        try {
+            // replaceState avoids history spam; may throw on file:// or
+            // sandboxed iframes, so the URL simply stays stale in those cases.
+            window.history.replaceState(null, '', hash);
+        } catch (error) {
+            console.warn('Could not update URL hash:', error);
+        }
+    }
+
+    /**
+     * Apply deep-link state from the URL hash on load / hashchange.
+     * Locates the model, jumps to its page, selects the matching file,
+     * and scrolls the card into view.
+     */
+    applyDeepLinkState() {
+        const { model: slug, quant } = this.getDeepLinkState();
+        if (!slug) return;
+        
+        // The slug must reference a real model — otherwise keep the user's
+        // current filter/search state untouched (no noisy filter reset).
+        const allModel = this.models.find((m) => this.createSlug(m.modelName) === slug);
+        if (!allModel) return;
+        
+        // Find the model in the current filtered set; if filtered out, reset
+        // filters so the deep-linked model is guaranteed visible.
+        let model = this.filteredModels.find((m) => this.createSlug(m.modelName) === slug);
+        if (!model) {
+            this.clearAllFilters();
+            model = this.filteredModels.find((m) => this.createSlug(m.modelName) === slug);
+        }
+        if (!model) return;
+        
+        // Jump to the page that contains this model
+        const modelIndex = this.filteredModels.indexOf(model);
+        const targetPage = Math.floor(modelIndex / this.itemsPerPage) + 1;
+        if (this.currentPage !== targetPage) {
+            this.currentPage = targetPage;
+            this.renderModels();
+        }
+        
+        // Find the rendered card and select the matching file/quant
+        const card = document.querySelector(`.premium-model-card[data-model-slug="${slug}"]`);
+        if (!card) return;
+        
+        if (quant && model.files && model.files.length > 1) {
+            const fileIndex = model.files.findIndex((f) => (f.quantFormat || '').toUpperCase() === quant);
+            if (fileIndex > -1) {
+                const select = card.querySelector('.model-file-select');
+                if (select && select.value !== String(fileIndex)) {
+                    select.value = String(fileIndex);
+                    select.dispatchEvent(new Event('change', { bubbles: true }));
+                }
+            }
+        }
+        
+        // Scroll to + briefly highlight the card
+        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        card.classList.add('deep-link-flash');
+        setTimeout(() => card.classList.remove('deep-link-flash'), 2500);
+        
+        console.log(`🔗 Deep link applied: ${slug}${quant ? ` (${quant})` : ''}`);
+    }
+
+    /**
+     * Count distinct quantization formats offered by a multi-file model.
+     * @param {Object} model - grouped model object
+     * @returns {number} distinct quants (falls back to file count for
+     *   legacy entries where every file is 'Unknown')
+     */
+    getQuantCount(model) {
+        if (!model.files || model.files.length < 2) return 1;
+        const quants = new Set(
+            model.files.map((f) => f.quantFormat).filter((q) => q && q !== 'Unknown')
+        );
+        return quants.size > 0 ? quants.size : model.files.length;
+    }
+
+    /**
+     * Small "N quants" chip shown on the card header of multi-file models.
+     * @param {Object} model - grouped model object
+     * @returns {string} chip HTML or '' for single-file models
+     */
+    generateQuantChipHTML(model) {
+        if (!model.files || model.files.length < 2) return '';
+        const count = this.getQuantCount(model);
+        // Hide when only one distinct quant (e.g. base + MTP variant of the
+        // same Q4_K_M) — a "1 quants" chip would be confusing.
+        if (count < 2) return '';
+        return `<span class="model-quant-chip" title="${count} quantization formats available">${count} quants</span>`;
+    }
+
+    /**
+     * Build a file/quantization selector for models with multiple files.
+     * @param {Object} model - grouped model object
+     * @returns {string} HTML or '' when the model has a single file
+     */
+    generateFileSelectorHTML(model) {
+        if (!model.files || model.files.length < 2) return '';
+        
+        // When several files share the same quant+size (e.g. MTP variants),
+        // append a short filename so options are distinguishable.
+        const pairCount = {};
+        model.files.forEach((file) => {
+            const key = `${file.quantFormat || 'Unknown'}|${file.fileSizeFormatted || this.formatFileSize(file.fileSize)}`;
+            pairCount[key] = (pairCount[key] || 0) + 1;
+        });
+        
+        const options = model.files.map((file, i) => {
+            const size = file.fileSizeFormatted || this.formatFileSize(file.fileSize);
+            const key = `${file.quantFormat || 'Unknown'}|${size}`;
+            let label = `${file.quantFormat || 'Unknown'} — ${size}`;
+            if (pairCount[key] > 1) {
+                const shortName = String(file.filename || '').split('/').pop() || 'file';
+                label += ` (${shortName})`;
+            }
+            const selected = i === 0 ? ' selected' : '';
+            return `<option value="${i}"${selected}>${label}</option>`;
+        }).join('');
+        
+        return `
+            <div class="metadata-item file-selector-item">
+                <div class="metadata-label">Available Files (${model.files.length})</div>
+                <div class="metadata-value">
+                    <select class="model-file-select" aria-label="Select model file">
+                        ${options}
+                    </select>
+                </div>
+            </div>
+        `;
+    }
+
     updateHeaderStats() {
         const modelCountDisplay = document.getElementById('model-count-display');
         const timestampDisplay = document.getElementById('data-timestamp');
@@ -205,6 +428,7 @@ class PremiumGGUFApp {
         const card = document.createElement('div');
         card.className = 'premium-model-card';
         card.setAttribute('data-model-id', sequentialNumber);
+        card.setAttribute('data-model-slug', this.createSlug(model.modelName));
         
         // Determine popularity level
         const downloadCount = model.downloadCount || 0;
@@ -224,8 +448,11 @@ class PremiumGGUFApp {
         
         card.innerHTML = `
             <div class="model-card-header">
-                <div class="model-number-badge">
-                    #${sequentialNumber}
+                <div class="model-badge-group">
+                    <div class="model-number-badge">
+                        #${sequentialNumber}
+                    </div>
+                    ${this.generateQuantChipHTML(model)}
                 </div>
                 <div class="download-stats">
                     <div class="download-count">
@@ -250,19 +477,23 @@ class PremiumGGUFApp {
                 </div>
             </div>
             
-            <div class="model-repository-section">
-                <div class="repository-name" title="${this.extractRepositoryName(model.directDownloadLink)}">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
-                    </svg>
-                    ${this.extractRepositoryName(model.directDownloadLink)}
+            <div class="model-info">
+                <div class="model-repository-section">
+                    <div class="repository-name" title="${this.extractRepositoryName(model.directDownloadLink)}">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+                        </svg>
+                        ${this.extractRepositoryName(model.directDownloadLink)}
+                    </div>
                 </div>
-            </div>
-            
-            <div class="model-title-section">
-                <h3 class="model-name" title="${model.modelName}">
-                    ${this.formatModelName(model.modelName)}
-                </h3>
+                
+                <div class="model-title-section">
+                    <h3 class="model-name" title="${model.modelName}">
+                        ${this.formatModelName(model.modelName)}
+                    </h3>
+                </div>
+                
+                ${this.generateFileSelectorHTML(model)}
             </div>
             
             <div class="model-metadata">
@@ -286,7 +517,7 @@ class PremiumGGUFApp {
                                 <line x1="16" y1="17" x2="8" y2="17"/>
                                 <polyline points="10,9 9,9 8,9"/>
                             </svg>
-                            ${model.fileSizeFormatted || this.formatFileSize(model.fileSize)}
+                            <span class="file-size-value">${model.fileSizeFormatted || this.formatFileSize(model.fileSize)}</span>
                         </div>
                     </div>
                 </div>
@@ -373,6 +604,7 @@ class PremiumGGUFApp {
                     </a>
                     <button class="copy-btn" 
                             data-copy-text="${model.directDownloadLink}" 
+                            data-copy-download
                             title="Copy download link"
                             aria-label="Copy download link">
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -476,6 +708,38 @@ class PremiumGGUFApp {
     }
     
     addCardEventListeners(card, model) {
+        // File / quantization selector: swap size, download link, and hardware
+        const fileSelect = card.querySelector('.model-file-select');
+        if (fileSelect && model.files && model.files.length > 1) {
+            fileSelect.addEventListener('change', (e) => {
+                const file = model.files[parseInt(e.target.value, 10)];
+                if (!file) return;
+                
+                // Quantization badge
+                const badge = card.querySelector('.quantization-badge');
+                if (badge) badge.textContent = file.quantFormat || 'N/A';
+                
+                // File size
+                const sizeValue = card.querySelector('.file-size-value');
+                if (sizeValue) sizeValue.textContent = file.fileSizeFormatted || this.formatFileSize(file.fileSize);
+                
+                // Direct download link + its copy button
+                const downloadLink = card.querySelector('[data-action="direct-download"]');
+                if (downloadLink) downloadLink.href = file.directDownloadLink;
+                const downloadCopy = card.querySelector('.copy-btn[data-copy-download]');
+                if (downloadCopy) downloadCopy.dataset.copyText = file.directDownloadLink;
+                
+                // Hardware requirements
+                const hardware = card.querySelector('.hardware-specs');
+                if (hardware) hardware.innerHTML = this.generateHardwareRequirements(file);
+                
+                // Persist the selection in the URL hash for deep-linking
+                this.updateDeepLinkHash(model, file);
+                
+                console.log(`🔄 Switched ${model.modelName} to ${file.filename}`);
+            });
+        }
+        
         // Copy button functionality
         const copyButtons = card.querySelectorAll('.copy-btn');
         copyButtons.forEach(button => {
@@ -626,6 +890,54 @@ class PremiumGGUFApp {
                 this.clearAllFilters();
             });
         }
+        
+        // Re-apply deep links when the hash changes (back/forward, manual edits)
+        window.addEventListener('hashchange', () => {
+            this.applyDeepLinkState();
+        });
+        
+        // Grid / List view toggle
+        const viewButtons = document.querySelectorAll('.view-btn[data-view]');
+        viewButtons.forEach((btn) => {
+            btn.addEventListener('click', () => this.setView(btn.dataset.view));
+        });
+    }
+    
+    /**
+     * Switch between grid and list card layouts, persisting the choice.
+     * @param {string} view - 'grid' or 'list'
+     */
+    setView(view) {
+        if (view !== 'grid' && view !== 'list') return;
+        
+        const modelGrid = document.getElementById('model-grid');
+        if (modelGrid) {
+            modelGrid.classList.toggle('list-view', view === 'list');
+        }
+        
+        document.querySelectorAll('.view-btn[data-view]').forEach((btn) => {
+            btn.classList.toggle('active', btn.dataset.view === view);
+        });
+        
+        try {
+            localStorage.setItem('gguf-view', view);
+        } catch (error) {
+            // localStorage may be unavailable (private mode / file://)
+        }
+        
+        console.log(`👁 View switched to ${view}`);
+    }
+    
+    /**
+     * Restore the persisted view preference on load.
+     */
+    applySavedView() {
+        try {
+            const saved = localStorage.getItem('gguf-view');
+            if (saved === 'list') this.setView('list');
+        } catch (error) {
+            // ignore
+        }
     }
     
     handleSearch(query, resetFilters = true) {
@@ -650,7 +962,7 @@ class PremiumGGUFApp {
             const selectedRecent = recentFilter ? recentFilter.value : 'all';
             
             baseModels = this.models.filter(model => {
-                if (selectedQuantization !== 'all' && model.quantFormat !== selectedQuantization) {
+                if (selectedQuantization !== 'all' && !this.getModelQuants(model).includes(selectedQuantization)) {
                     return false;
                 }
                 if (selectedCapability !== 'all' && (model.modelCapability || 'text') !== selectedCapability) {
@@ -711,12 +1023,13 @@ class PremiumGGUFApp {
             this.filteredModels = [...baseModels];
         } else {
             const lowerQuery = query.toLowerCase();
-            this.filteredModels = baseModels.filter(model => 
-                (model.modelName && model.modelName.toLowerCase().includes(lowerQuery)) ||
-                (model.quantFormat && model.quantFormat.toLowerCase().includes(lowerQuery)) ||
-                (model.modelType && model.modelType.toLowerCase().includes(lowerQuery)) ||
-                (model.license && model.license.toLowerCase().includes(lowerQuery))
-            );
+            this.filteredModels = baseModels.filter(model => {
+                const quants = this.getModelQuants(model).join(' ').toLowerCase();
+                return (model.modelName && model.modelName.toLowerCase().includes(lowerQuery)) ||
+                    quants.includes(lowerQuery) ||
+                    (model.modelType && model.modelType.toLowerCase().includes(lowerQuery)) ||
+                    (model.license && model.license.toLowerCase().includes(lowerQuery));
+            });
         }
         
         this.currentPage = 1;
@@ -747,8 +1060,10 @@ class PremiumGGUFApp {
     }
     
     populateFilterOptions() {
-        // Get unique values for filters
-        const quantizations = [...new Set(this.models.map(m => m.quantFormat).filter(q => q && q !== 'Unknown'))].sort();
+        // Get unique values for filters (across ALL files of every model)
+        const quantizations = [...new Set(
+            this.models.flatMap(m => this.getModelQuants(m))
+        )].filter(q => q && q !== 'Unknown').sort();
         const licenses = [...new Set(this.models.map(m => m.license).filter(l => l && l !== 'Not specified'))].sort();
         
         // Populate quantization filter
@@ -802,7 +1117,7 @@ class PremiumGGUFApp {
         });
         
         this.filteredModels = this.models.filter(model => {
-            if (selectedQuantization !== 'all' && model.quantFormat !== selectedQuantization) {
+            if (selectedQuantization !== 'all' && !this.getModelQuants(model).includes(selectedQuantization)) {
                 return false;
             }
             if (selectedCapability !== 'all' && (model.modelCapability || 'text') !== selectedCapability) {

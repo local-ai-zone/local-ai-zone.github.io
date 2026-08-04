@@ -106,7 +106,7 @@ class DailyGGUFFetcher:
         # glitch (e.g. the old estimator regex turned "1781204855.BF16" into
         # "1781204855 billion params" → "3652861.5 TB").
         self.MAX_SANE_FILE_SIZE = 2 * 1024 ** 4  # 2 TiB
-
+        self.MAX_FILES_PER_MODEL = 30  # cap files kept per model (UI selector bound)
         # Hardware calculator
         self.hardware_calculator = HardwareRequirementsCalculator(FilterConfig())
         
@@ -389,7 +389,7 @@ class DailyGGUFFetcher:
                     continue
                 
                 filename = sibling.get('rfilename', '')
-                if not filename.lower().endswith('.gguf'):
+                if not self._is_meaningful_gguf(filename):
                     continue
                 
                 # Extract file info - Try to get size from API
@@ -474,6 +474,10 @@ class DailyGGUFFetcher:
                 
                 processed.append(entry)
         
+        # Re-combine multi-part shards into one entry per quant with the SUM
+        # of all parts, so the UI selector shows the true total size.
+        processed = self._aggregate_shard_sizes(processed)
+        
         # Log file size statistics
         total_files = files_with_size + files_without_size
         self.logger.info(f"File size stats: {files_with_size}/{total_files} files have size data ({files_without_size} estimated)")
@@ -533,7 +537,15 @@ class DailyGGUFFetcher:
         return size_bytes
     
     def _deduplicate(self, models: List[Dict]) -> List[Dict]:
-        """Deduplicate models across repos (keep highest engagement)."""
+        """
+        Deduplicate models across repos — but keep ALL GGUF files per model.
+
+        When the same base model (e.g. "Qwen3-Coder-30B") is uploaded to
+        multiple HuggingFace repos, only the highest-engagement repo survives.
+        However, every GGUF file of that winning repo is kept (Q4_K_M, Q8_0,
+        F16, ...) so the UI can offer a file/quantization selector instead of
+        hiding all but one file.
+        """
         if not models:
             return models
         
@@ -543,17 +555,24 @@ class DailyGGUFFetcher:
             canonical = self._normalize_model_name(model.get('modelId', ''))
             groups[canonical].append(model)
         
-        # Keep best from each group
         deduplicated = []
         for canonical, group in groups.items():
-            if len(group) == 1:
-                deduplicated.append(group[0])
-            else:
-                # Pick model with highest engagement
-                best = max(group, key=lambda m: (
-                    m.get('likeCount', 0) * 10 + m.get('downloadCount', 0)
-                ))
-                deduplicated.append(best)
+            # Pick the winning REPO (not file) by engagement
+            best_repo = max(group, key=lambda m: (
+                m.get('likeCount', 0) * 10 + m.get('downloadCount', 0)
+            ))
+            best_repo_id = best_repo.get('modelId', '')
+            
+            # Keep ALL files from the winning repo
+            winner_files = [m for m in group if m.get('modelId', '') == best_repo_id]
+            if not winner_files:
+                winner_files = [best_repo]
+            
+            # Sort biggest first so the largest/premium file is the default
+            winner_files.sort(key=lambda m: m.get('fileSize', 0) or 0, reverse=True)
+            
+            # Safety cap: bound output size for repos with dozens of quants
+            deduplicated.extend(winner_files[:self.MAX_FILES_PER_MODEL])
         
         return deduplicated
     
@@ -617,8 +636,11 @@ class DailyGGUFFetcher:
 
             # Clamp legacy bogus sizes (e.g. old "3652861.5 TB" entries) so
             # incremental merges self-heal previously-corrupted data.
+            # Aggregated shard entries are exempt: their size is the verified
+            # SUM of real API sizes (each part clamped individually), which can
+            # legitimately exceed the per-file sanity cap.
             file_size = model.get('fileSize', 0) or 0
-            if file_size > self.MAX_SANE_FILE_SIZE:
+            if file_size > self.MAX_SANE_FILE_SIZE and not model.get('shardParts'):
                 model_name = model.get('modelName', '') or ''
                 file_size = self._estimate_file_size(filename, model_name)
                 file_size = int(file_size) if file_size else 0
@@ -642,7 +664,8 @@ class DailyGGUFFetcher:
                 'minCpuCores': model.get('minCpuCores', 4),
                 'gpuRequired': model.get('gpuRequired', True),
                 'osSupported': model.get('osSupported', ['Windows', 'Linux', 'macOS']),
-                'uploadDate': model.get('uploadDate')
+                'uploadDate': model.get('uploadDate'),
+                'shardParts': model.get('shardParts')
             }
             output.append(clean)
 
@@ -662,14 +685,19 @@ class DailyGGUFFetcher:
         of the ``directDownloadLink`` URL. Without this fallback, every legacy
         entry collapses to the key ``"::"`` and an incremental run wipes the
         existing dataset (16,519 → ~1,750 models).
+
+        Shard filenames are normalized to their base name (e.g.
+        ``model-00001-of-00004.gguf`` → ``model.gguf``) so an aggregated entry
+        (which keeps part 1's filename) MERGE-REPLACES every stale per-part
+        entry from earlier snapshots instead of leaving them behind.
         """
         model_id = model.get('modelId') or ''
         filename = model.get('filename') or ''
         if model_id and filename:
-            return f"{model_id}::{filename}"
+            return f"{model_id}::{self._shard_base_name(filename)}"
         parsed = _parse_download_link(model.get('directDownloadLink') or '')
         if parsed:
-            return f"{parsed[0]}::{parsed[1]}"
+            return f"{parsed[0]}::{self._shard_base_name(parsed[1])}"
         # Last resort: key on the full link so distinct entries never collapse
         return f"link::{model.get('directDownloadLink') or model.get('huggingFaceLink') or ''}"
 
@@ -753,6 +781,95 @@ class DailyGGUFFetcher:
         else:
             return 'text'
     
+    @staticmethod
+    def _is_meaningful_gguf(filename: str) -> bool:
+        """
+        Filter GGUF filenames that should NOT appear as separate files in the
+        UI file selector:
+
+        - ``mmproj-*.gguf`` / ``/mmproj/*.gguf``  — vision projector weights
+          (auxiliary, not the model itself)
+        - ``MTP/*.gguf`` / ``mtp-*.gguf``          — multi-token-prediction
+          auxiliary weights
+
+        Shard parts (``...-00001-of-00004.gguf`` … ``...-00004-of-00004.gguf``)
+        are KEPT — they are later re-combined by :meth:`_aggregate_shard_sizes`
+        into one entry whose size is the SUM of all parts, so the selector
+        shows the true total instead of a single shard.
+        """
+        name = str(filename or '').lower().replace('\\', '/')
+        if not name.endswith('.gguf'):
+            return False
+        # Auxiliary weights
+        base = name.rsplit('/', 1)[-1]
+        if 'mmproj' in base or base.startswith('mtp-') or '/mtp/' in name:
+            return False
+        return True
+
+    @staticmethod
+    def _shard_base_name(filename: str) -> str:
+        """
+        Strip the shard suffix from a filename so all parts of a split map to
+        one key: ``model-Q8_0-00001-of-00002.gguf`` and ``...-00002-of-00002``
+        both become ``model-Q8_0.gguf`` (subdirectories and imatrix-style
+        suffixes are preserved).
+        """
+        return re.sub(r'-(\d+)-of-(\d+)(?=[.-]|$)', '', str(filename or ''))
+
+    def _aggregate_shard_sizes(self, entries: List[Dict]) -> List[Dict]:
+        """
+        Combine multi-part GGUF shards into one entry whose ``fileSize`` is the
+        SUM of all parts.
+
+        The HuggingFace API reports each shard separately (``-00001-of-00002``
+        at ~half the real size), so the selector would otherwise show a wrong
+        per-part size. Entries are grouped by :meth:`_shard_base_name` within a
+        repo; the first part's entry is kept with the summed size. Non-sharded
+        entries pass through unchanged.
+        """
+        if not entries:
+            return entries
+        
+        # Only files that actually look like shard parts (\-N-of-M\) can be
+        # grouped. A repo that ships BOTH an unsplit ``model-fp16.gguf`` and a
+        # sharded ``model-fp16-00001-of-00002.gguf`` must not have them summed
+        # into one entry — they are distinct files.
+        shard_pattern = re.compile(r'-(\d+)-of-(\d+)\.gguf', re.IGNORECASE)
+        groups = defaultdict(list)
+        non_sharded = []
+        for entry in entries:
+            filename = str(entry.get('filename', '') or '')
+            if not shard_pattern.search(filename):
+                non_sharded.append(entry)
+                continue
+            key = (
+                entry.get('modelId', ''),
+                self._shard_base_name(filename),
+            )
+            groups[key].append(entry)
+        
+        aggregated = list(non_sharded)
+        for (model_id, base_name), group in groups.items():
+            if len(group) == 1:
+                aggregated.append(group[0])
+                continue
+            
+            # Keep the first part's metadata, but sum every part's size
+            kept = dict(group[0])
+            total = sum(int(e.get('fileSize', 0) or 0) for e in group)
+            # Sanity guard: the HuggingFace list API sometimes reports each
+            # shard at the FULL model size, so the sum is Nx too big (e.g. a
+            # 550B BF16 at 27.1 TB instead of ~1.2 TB). Re-estimate from the
+            # base filename instead of trusting the inflated sum.
+            if total > self.MAX_SANE_FILE_SIZE:
+                total = int(self._estimate_file_size(base_name, kept.get('modelName', '')) or 0)
+            kept['fileSize'] = total
+            kept['fileSizeFormatted'] = self._format_size(total)
+            kept['shardParts'] = len(group)
+            aggregated.append(kept)
+        
+        return aggregated
+
     def _extract_quantization(self, filename: str) -> str:
         """Extract quantization format from filename."""
         # Common patterns

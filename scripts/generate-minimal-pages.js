@@ -21,8 +21,10 @@ class MinimalPageGenerator {
             total: 0,
             processed: 0,
             failed: 0,
-            totalSize: 0
+            totalSize: 0,
+            removedStale: 0
         };
+        this.generatedSlugs = new Set();
     }
 
     /**
@@ -451,6 +453,9 @@ Hugging Face
                 }
                 
                 await fs.writeFile(filepath, html, 'utf8');
+                // Redundant on the run() path (selection pre-populates the set),
+                // but a safety net when generatePages() is called directly.
+                this.generatedSlugs.add(slug);
                 
                 const stats = await fs.stat(filepath);
                 const sizeKB = (stats.size / 1024).toFixed(2);
@@ -472,6 +477,61 @@ Hugging Face
     }
 
     /**
+     * Remove pre-rendered pages whose models are no longer in the current
+     * top-N selection, so stale pages can't accumulate and produce 404s.
+     *
+     * Only deletes slug-shaped files (``<slug>.html``) — anything else in the
+     * output directory (README, assets, subfolders) is left untouched.
+     */
+    async cleanupStalePages() {
+        // Safety guard: an empty keep-set means the catalog produced no models
+        // (e.g. gguf_models.json is `[]`). Deleting every page then would wipe
+        // the whole models/ directory — never do that.
+        if (this.generatedSlugs.size === 0) {
+            console.log('⚠️  Skipping cleanup: no models in the current selection');
+            return;
+        }
+        
+        console.log('🧹 Cleaning up stale pages...');
+        
+        let files;
+        try {
+            files = await fs.readdir(this.outputDir);
+        } catch (error) {
+            console.error(`⚠️  Could not read output directory ${this.outputDir}:`, error.message);
+            return;
+        }
+        
+        const slugShape = /^[a-z0-9-]+\.html$/;
+        
+        for (const file of files) {
+            // Only consider slug-shaped model pages
+            if (!slugShape.test(file)) {
+                continue;
+            }
+            
+            const slug = file.replace(/\.html$/, '');
+            if (this.generatedSlugs.has(slug)) {
+                continue;
+            }
+            
+            try {
+                await fs.unlink(path.join(this.outputDir, file));
+                this.stats.removedStale++;
+                console.log(`🗑️  Removed stale page: ${file}`);
+            } catch (error) {
+                console.warn(`⚠️  Could not remove ${file}:`, error.message);
+            }
+        }
+        
+        if (this.stats.removedStale === 0) {
+            console.log('✨ No stale pages to remove');
+        } else {
+            console.log(`🧹 Cleanup complete: removed ${this.stats.removedStale} stale page(s)`);
+        }
+    }
+
+    /**
      * Main execution
      */
     async run() {
@@ -481,7 +541,17 @@ Hugging Face
             console.log('🚀 Features: Hardware requirements, engagement metrics, system requirements\n');
             
             const models = await this.loadModelsData();
+            
+            // The keep-set comes from the SELECTION (top-N models), not from
+            // which writes happened to succeed this run. If a page write fails
+            // transiently, its existing page must NOT be treated as stale and
+            // deleted — cleanup only removes pages outside the selection.
+            this.generatedSlugs = new Set(
+                models.map((m) => createSlug(m.modelName)).filter(Boolean)
+            );
+            
             await this.generatePages(models);
+            await this.cleanupStalePages();
             
             const avgSize = (this.stats.totalSize / this.stats.processed / 1024).toFixed(2);
             const totalSizeMB = (this.stats.totalSize / 1024 / 1024).toFixed(2);
@@ -497,6 +567,7 @@ Hugging Face
             console.log('\n✅ Enhanced minimal page generation completed!');
             console.log(`📊 Generated: ${this.stats.processed} pages`);
             console.log(`❌ Failed: ${this.stats.failed} pages`);
+            console.log(`🗑️ Stale pages removed: ${this.stats.removedStale}`);
             console.log(`📏 Average size: ${avgSize} KB per page`);
             console.log(`💾 Total size: ${totalSizeMB} MB`);
             console.log(`🖥️ Models with hardware requirements: ${modelsWithHardwareReqs}`);
