@@ -1572,27 +1572,8 @@ print(response)
         </div>
     </footer>
 
+    <script src="../js/theme-switcher.js"></script>
     <script>
-        // Theme switcher functionality
-        const themeToggle = document.getElementById('theme-toggle-button');
-        const body = document.body;
-        
-        // Check for saved theme preference or default to 'light'
-        const currentTheme = localStorage.getItem('theme') || 'light';
-        body.classList.add(currentTheme + '-theme');
-        
-        themeToggle.addEventListener('click', function() {
-            if (body.classList.contains('light-theme')) {
-                body.classList.remove('light-theme');
-                body.classList.add('dark-theme');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                body.classList.remove('dark-theme');
-                body.classList.add('light-theme');
-                localStorage.setItem('theme', 'light');
-            }
-        });
-
         // Smooth scroll for internal links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {

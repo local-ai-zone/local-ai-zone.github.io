@@ -561,7 +561,9 @@ body {
 .article-header .article-meta,
 .article-header .article-date,
 .article-header .article-category,
-.article-header .article-read-time {
+.article-header .article-read-time,
+.article-header .article-author,
+.article-header .article-updated {
     color: white !important;
 }
 
@@ -592,6 +594,23 @@ body {
 .blog-article-page .key-highlight h3,
 .blog-article-page .cta-box h3 {
     color: var(--primary-600) !important;
+}
+
+/* Dark mode: brighten blog headings, section titles and stat numbers so
+   they stay readable on the dark cards (overrides the light-mode blue). */
+html[data-theme='dark'] .blog-article-page .section-title,
+html[data-theme='dark'] .blog-article-page .step-card h3,
+html[data-theme='dark'] .blog-article-page .feature-card h3,
+html[data-theme='dark'] .blog-article-page .trend-card h3,
+html[data-theme='dark'] .blog-article-page .model-release h3,
+html[data-theme='dark'] .blog-article-page .key-highlight h3,
+html[data-theme='dark'] .blog-article-page .cta-box h3,
+html[data-theme='dark'] .blog-article-page .stat-number {
+    color: var(--primary-400) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .stat-label {
+    color: var(--text-secondary) !important;
 }
 
 .article-content p {
