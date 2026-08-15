@@ -663,6 +663,43 @@ html[data-theme='dark'] .blog-article-page .stat-label {
     color: var(--text-primary) !important;
 }
 
+/* Dark mode: theme blog benchmark/comparison tables — replaces the bright striped
+   rows and light win/loss highlight cells that wash out on dark backgrounds. */
+html[data-theme='dark'] .blog-article-page .benchmark-table tr:nth-child(even) td,
+html[data-theme='dark'] .blog-article-page .comparison-table tr:nth-child(even) td,
+html[data-theme='dark'] .blog-article-page .compare-table tr:nth-child(even) {
+    background: var(--background-secondary) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .benchmark-table tr:hover td,
+html[data-theme='dark'] .blog-article-page .comparison-table tr:hover td {
+    background: var(--card-background) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .highlight-number {
+    color: var(--primary-400) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .winner {
+    background: color-mix(in srgb, #22c55e 22%, transparent) !important;
+    color: #86efac !important;
+}
+
+html[data-theme='dark'] .blog-article-page .loser {
+    background: color-mix(in srgb, #ef4444 22%, transparent) !important;
+    color: #fecaca !important;
+}
+
+html[data-theme='dark'] .blog-article-page .local-yes,
+html[data-theme='dark'] .blog-article-page .yes {
+    color: #86efac !important;
+}
+
+html[data-theme='dark'] .blog-article-page .local-no,
+html[data-theme='dark'] .blog-article-page .no {
+    color: #fecaca !important;
+}
+
 .article-meta,
 .article-author,
 .article-date,
