@@ -26,6 +26,17 @@ class MinimalPageGenerator {
             removedStale: 0
         };
         this.generatedSlugs = new Set();
+
+        // Number of top models (by likes) to pre-render. Defaults to 5000;
+        // override with: node scripts/generate-minimal-pages.js --limit <n>
+        this.maxPages = 5000;
+        const limitIdx = process.argv.indexOf('--limit');
+        if (limitIdx !== -1 && process.argv[limitIdx + 1]) {
+            const parsed = parseInt(process.argv[limitIdx + 1], 10);
+            if (Number.isFinite(parsed) && parsed > 0) {
+                this.maxPages = parsed;
+            }
+        }
     }
 
     /**
@@ -48,10 +59,10 @@ class MinimalPageGenerator {
                 }
             });
             
-            // Sort by likes and take top 1000
+            // Sort by likes and take the top N (default 5000)
             const sortedModels = Array.from(this.uniqueModels.values())
                 .sort((a, b) => b.likeCount - a.likeCount)
-                .slice(0, 1000);
+                .slice(0, this.maxPages);
             
             console.log(`🎯 Selected top ${sortedModels.length} models for minimal pages`);
             return sortedModels;

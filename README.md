@@ -13,7 +13,7 @@ Live site: [https://local-ai-zone.github.io](https://local-ai-zone.github.io)
 - **Smart Filtering**: Filter by quantization type, model capability, and license
 - **Model Capabilities**: Automatic classification (Text, Vision, Code, Audio)
 - **Engagement Metrics**: Like counts, download statistics, and popularity indicators
-- **Pre-rendered Model Pages**: 1,000+ static pages at `/models/{slug}.html` for SEO (regenerated nightly for the top ~1,300 models by likes)
+- **Pre-rendered Model Pages**: 5,000+ static pages at `/models/{slug}.html` for SEO (regenerated nightly for the top 5,000 models by likes)
 - **Responsive Design**: Mobile-first interface with dark mode support
 
 ### Technical Features

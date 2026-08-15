@@ -53,7 +53,7 @@ jobs:
         echo "- Enhanced engagement metrics"
         echo "- System requirements display"
         echo "- Hardware compatibility indicators"
-        node scripts/generate-minimal-pages.js
+        node scripts/generate-minimal-pages.js --limit 5000
         echo "Minimal page generation completed with all features"
         
     - name: Check for generated files
@@ -84,7 +84,7 @@ jobs:
           else
             git commit -m "Automated pre-rendering: Generated ${{ steps.check_files.outputs.file_count }} model pages $(date -u '+%Y-%m-%d %H:%M:%S UTC')
 
-            - Pre-rendered top 1000 models by likes
+            - Pre-rendered top 5000 models by likes
             - Generated static HTML files for better SEO
             - Files saved in models/ directory
             - Each model now has its own addressable URL
@@ -127,7 +127,7 @@ jobs:
         echo "✅ **Pre-rendering completed successfully**" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
         echo "📊 **Generated Files**: ${{ steps.check_files.outputs.file_count }} HTML pages" >> $GITHUB_STEP_SUMMARY
-        echo "🎯 **Target**: Top 1000 models by likes" >> $GITHUB_STEP_SUMMARY
+        echo "🎯 **Target**: Top 5000 models by likes" >> $GITHUB_STEP_SUMMARY
         echo "📁 **Location**: \`models/\` directory" >> $GITHUB_STEP_SUMMARY
         echo "🔗 **URLs**: Each model now accessible at \`/models/{model-slug}.html\`" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
@@ -162,7 +162,7 @@ jobs:
           4. Re-run the workflow manually once resolved
           
           ### Pre-rendering Process
-          - **Target**: Top 1000 models by likes
+          - **Target**: Top 5000 models by likes
           - **Features**: Hardware requirements, engagement metrics, system requirements
           - **Output**: models/ directory
           - **Enhanced**: Hardware compatibility indicators

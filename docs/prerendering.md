@@ -10,7 +10,7 @@ The model pre-rendering system creates static HTML files for individual model pa
 - Loads model data from `gguf_models.json`
 - Creates unique models map (avoiding duplicates)
 - Sorts models by likes in descending order
-- Selects top 500 models for pre-rendering
+- Selects top 5,000 models for pre-rendering (override with `--limit <n>`)
 
 ### 2. Pre-rendering Process
 - Uses Puppeteer with 5 concurrent browser tabs
