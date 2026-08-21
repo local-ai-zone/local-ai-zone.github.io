@@ -354,16 +354,173 @@
 
         <div class="article-content">
             <div class="article-intro">
-                <p>July 2026 was arguably the most consequential month in the history of open-weight AI. Within four weeks, the community saw the largest open model ever released (Kimi K3), the fastest trillion-parameter-class MoE (GLM-5.2), a mid-cycle retrain that outranks its own flagship (DeepSeek V4-Flash-0731), a new science-reasoning specialist (MiniMax M3), plus major closed-source frontier updates from Anthropic and Google. August kept the momentum going with nine major releases in the first week alone: Alibaba's 2.4T Qwen3.8-Max, OpenAI's GPT-5.6 thinking sliders, Meta's first coding agent, and native-audio video generation from Black Forest Labs. Here's everything you need to know — and how to run it locally.</p>
+                <p>July and August 2026 delivered the most consequential eight weeks in open-weight AI history. August brought over a dozen major releases including DeepSeek V4 Pro (with controversial 14× price jump and peak/off-peak billing), GLM-5.3 (achieving 6× coding gains through post-training alone and claiming #1 on CyberGym at 84.5%), GPT-5.6-Cyber (purpose-trained for offensive security with 95% task completion), plus Qwen3.8-Max (2.4T parameters at $2/$6), Meta's Muse Code coding agent, OpenAI's thinking sliders, and FLUX 3 Video with native audio. July set the stage with the largest open model ever (Kimi K3 at 2.8T), the fastest flagship MoE (GLM-5.2), and frontier updates from Anthropic and Google. Here's everything you need to know — with newest releases first — and how to run it locally.</p>
                 
                 <div class="key-takeaway">
                     <h3>🚀 Key Takeaway</h3>
-                    <p><strong>Open weights officially caught up, and the price war went public.</strong> Kimi K3, Qwen3.8-Max, GLM-5.2, and MiniMax M3 all post scores that rival or beat proprietary frontier models from earlier this year — and every one of them ships (or will ship) as GGUF for fully local deployment. Meanwhile, aggressive pricing from Alibaba ($2/$6), Meta's 21× cheaper contributor tier, and Claude's promotional pricing cliff signal an explicit margin battle across the entire frontier. If you have 64GB+ of RAM, you can run genuinely frontier-class intelligence on your own machine today.</p>
+                    <p><strong>Open weights officially caught up, and the business models are fracturing.</strong> Kimi K3, Qwen3.8-Max, GLM-5.3, and DeepSeek V4 Pro all post scores rivaling or beating proprietary frontier models — and every one ships (or will ship) as GGUF for local deployment. Meanwhile, DeepSeek's 14× price increase with peak/off-peak billing, GLM-5.3's post-training breakthrough (6× gains without retraining), aggressive Chinese lab pricing ($1.40-$2.60 vs. Western $5-$10), and OpenAI's cybersecurity-specialized GPT-5.6-Cyber signal that the AI market is splitting: budget Chinese open-weights, mid-tier Western APIs, and specialized offensive/defensive models. If you have 64GB+ of RAM, you can run genuinely frontier-class intelligence on your own machine today.</p>
                 </div>
             </div>
 
             <div class="article-section">
-                <h2 class="section-title">The Five Headline Releases</h2>
+                <h2 class="section-title">🆕 August 2026 Releases (Most Recent)</h2>
+                
+                <p class="stat-label">August 2026 brought over a dozen major releases, including three new flagship models, cybersecurity-specialized AI, and aggressive pricing moves. Here's what shipped, ordered by release date (newest first):</p>
+                
+                <div class="model-release">
+                    <div class="model-badge">DeepSeek</div>
+                    <div class="model-badge">V4 Pro GA</div>
+                    
+                    <h3>DeepSeek V4 Pro — Official Release with Price Increase (August 13, 2026)</h3>
+                    <p>DeepSeek formally released V4 Pro (checkpoint V4-Pro-0813) on August 13, ending a four-month preview period and introducing <strong>14× higher pricing than its cheapest model</strong> plus peak/off-peak billing.</p>
+                    
+                    <ul>
+                        <li><strong>New pricing: $1.32/$3.96 per MTok</strong>: Up from preview rates, with off-peak at half price (effective August 16, 16:00 UTC)</li>
+                        <li><strong>Peak/off-peak billing introduced</strong>: First major lab to implement time-of-day pricing at scale</li>
+                        <li><strong>Enhanced agentic capabilities</strong>: Improved long-horizon reasoning and multi-step tool use</li>
+                        <li><strong>Open weights (MIT license)</strong>: Text-only, 1,048,576-token context window</li>
+                        <li><strong>Local reality check</strong>: Same MoE architecture as V4-Flash, feasible on 64GB+ systems. GGUF builds on <a href="../index.html" class="model-link">Local AI Zone</a></li>
+                    </ul>
+                    
+                    <p><strong>Why the price jump matters:</strong> DeepSeek spent 18 months as the market's value champion. V4 Pro at $1.32/$3.96 (still cheaper than GPT-5.6 Sol's $5/$25) signals that even the budget leader is moving upmarket. The peak/off-peak model is the first at frontier scale and could reshape how enterprises plan batch workloads.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Zhipu AI / Z.ai</div>
+                    <div class="model-badge">GLM-5.3</div>
+                    
+                    <h3>GLM-5.3 — Post-Training Coding Specialist (August 14, 2026)</h3>
+                    <p>Zhipu AI (internationally Z.ai) released GLM-5.3 on August 14, achieving <strong>6× coding improvements without retraining the base model</strong> — purely through advanced post-training techniques.</p>
+                    
+                    <ul>
+                        <li><strong>84.5% on CyberGym</strong>: #1 globally, ahead of Claude Mythos 5 (83.8%) and GPT-5.6 Sol (83.6%) on vulnerability identification</li>
+                        <li><strong>50% coding improvement over GLM-5.2</strong>: Via post-training only, base model unchanged</li>
+                        <li><strong>Pricing unchanged: $1.40/$4.40 per MTok</strong>: Same as GLM-5.2, undercutting all Western frontier models</li>
+                        <li><strong>Open weights promised</strong>: Scheduled for ~2 weeks post-launch on Hugging Face</li>
+                        <li><strong>AI index rose from 53 to 60</strong>: Now matching Kimi K3 on composite benchmarks</li>
+                    </ul>
+                    
+                    <p><strong>The post-training breakthrough:</strong> GLM-5.3's 6× gains without base model retraining represent a major efficiency milestone. If post-training can deliver these improvements at a fraction of full retrain costs, the entire economics of model development shifts. This is the signal other labs will chase.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">OpenAI</div>
+                    <div class="model-badge">GPT-5.6-Cyber</div>
+                    
+                    <h3>GPT-5.6-Cyber + Daybreak Blue/Red — Cybersecurity-Specialized Model (August 10, 2026)</h3>
+                    <p>OpenAI expanded its Daybreak defender program into two tiers and released <strong>GPT-5.6-Cyber</strong>, a model purpose-trained for zero-day discovery, exploit validation, and offensive security research.</p>
+                    
+                    <ul>
+                        <li><strong>95% task completion on cyber benchmarks</strong>: vs. 1.5% for standard GPT-5.6 Sol and 2% for Daybreak Blue</li>
+                        <li><strong>Daybreak Blue</strong>: De-guardrailed GPT-5.6 Sol for authorized defensive work (vulnerability discovery, malware analysis, incident response)</li>
+                        <li><strong>Daybreak Red</strong>: Access to GPT-5.6-Cyber for vetted security teams doing exploit validation and red teaming</li>
+                        <li><strong>Trained to refuse less</strong>: Dramatically reduced refusals on dual-use cyber tasks while maintaining safety boundaries</li>
+                        <li><strong>Application-gated access</strong>: Not publicly available; requires vetting and approval from OpenAI security team</li>
+                    </ul>
+                    
+                    <p><strong>The offense-grade AI debate:</strong> OpenAI paused a model over cyber risk on Friday, then shipped one trained to refuse less on Monday. GPT-5.6-Cyber completing 95% of offensive security tasks (vs. 1.5% for the public model) raises the stakes on AI-enabled cyber capabilities and who gets access to them.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">OpenAI</div>
+                    <div class="model-badge">GPT-5.6 Updates</div>
+                    
+                    <h3>GPT-5.6 Sol & Luna — Thinking Sliders and Free Tier Upgrades (August 6, 2026)</h3>
+                    <p>OpenAI shipped three simultaneous updates to its GPT-5.6 family: an improved Sol with explicit reasoning control, Luna becoming the free-tier default, and unlimited text chats for Free/Go users.</p>
+                    
+                    <ul>
+                        <li><strong>GPT-5.6 Sol: New thinking slider</strong>: Plus and Pro users can now adjust reasoning depth from quick answers to deep research — consumer products converging on explicit effort controls</li>
+                        <li><strong>62% fewer factual errors</strong>: Luna vs. prior free-tier default (vendor-reported metric)</li>
+                        <li><strong>Luna goes free with unlimited text</strong>: Free and Go tier users get unlimited text chats plus a "Think" button for harder questions (subject to abuse guardrails; file uploads, images, and tools remain rate-limited)</li>
+                        <li><strong>Pricing unchanged</strong>: Sol at $5/$25, Terra at $3/$15, Luna at $0.80 per MTok (after July 30's 80% price cut)</li>
+                        <li><strong>Multi-agent support</strong>: Sol can now delegate to Luna subagents in OpenAI Codex for cheaper parallel processing</li>
+                    </ul>
+                    
+                    <p><strong>Key distinction:</strong> The "unlimited" headline applies only to Free/Go tier <em>text chats on Luna</em> — not Sol, not paid tiers, and not multimodal features. This is a strategic free-tier upgrade, not a usage-limit removal across the product.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Meta</div>
+                    <div class="model-badge">Muse Code</div>
+                    
+                    <h3>Meta Muse Code + Spark 1.2 — First Terminal Coding Agent (August 5, 2026)</h3>
+                    <p>Meta shipped its first dedicated coding agent on August 5: <strong>Muse Code</strong> (terminal-native agent) powered by <strong>Muse Spark 1.2</strong> (1M-context coding model), with the model co-trained against the harness that runs it.</p>
+                    
+                    <ul>
+                        <li><strong>Purpose-built multi-agent architecture</strong>: Every subagent spawn, tool call, steer, and cancel is observable and replayable through an event log</li>
+                        <li><strong>1M-token context + context compaction</strong>: Whole-repository training with async and parallel tool calls</li>
+                        <li><strong>Aggressive contributor pricing</strong>: $0.10/$0.20 per MTok (21.25× cheaper on output than standard $1.25/$4.25 tier) — but prompts may be used to improve Meta's products</li>
+                        <li><strong>Co-training caveat</strong>: Model was trained with this harness, making cross-vendor benchmark comparison harder to interpret</li>
+                        <li><strong>Terminal-native install</strong>: Single command installation, same category as Claude Code and OpenAI Codex CLI</li>
+                    </ul>
+                    
+                    <p><strong>The contributor tier trade-off:</strong> Output is 21.25× cheaper ($4.25 ÷ $0.20), and agent loops are output-heavy — so the economic benefit is massive. The cost: your prompts and completions train future Meta models. For proprietary codebases, the standard tier is the only viable option.</p>
+                    
+                    <p><strong>Security note:</strong> The Information reported that Muse Spark 1.1 (prior version) breached an external company's systems during third-party evaluation, attributed to sandbox misconfiguration. This is a reported incident about a different model version, not a property of the 1.2 release.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Black Forest Labs</div>
+                    <div class="model-badge">FLUX 3 Video</div>
+                    
+                    <h3>FLUX 3 Video — 20-Second Clips with Native Audio (August 4, 2026)</h3>
+                    <p>Black Forest Labs opened general availability for its video model on August 4, generating <strong>up to 20-second clips with natively synchronized audio and dialogue</strong> in a single API call.</p>
+                    
+                    <ul>
+                        <li><strong>Native audio generation</strong>: Audio is generated alongside frames rather than dubbed afterwards, with lip-sync across ~14 languages</li>
+                        <li><strong>720p native, 1080p upscaling</strong>: Full HD available via post-processing</li>
+                        <li><strong>Multiple input modes</strong>: Text-to-video, image-to-video with multiple keyframes, continuation from up to 4 seconds of seed video</li>
+                        <li><strong>Multi-shot and multi-angle</strong>: Single generation can produce multiple camera angles or shot changes</li>
+                        <li><strong>Draft mode</strong>: Fast previews before full render ($0.06/sec vs. $0.17/sec for full HD render)</li>
+                        <li><strong>Realistic pricing</strong>: $0.17/sec base = $3.40 for a full 20-second clip before re-rolls</li>
+                    </ul>
+                    
+                    <p><strong>Production reality:</strong> The per-second rate sounds cheap until you multiply by 20 seconds and factor in iteration. Budget for 3-5× the base cost per usable clip when planning video production workflows.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Alibaba</div>
+                    <div class="model-badge">Qwen3.8-Max</div>
+                    
+                    <h3>Qwen3.8-Max — The 2.4T Parameter Challenger (August 3, 2026)</h3>
+                    <p>Alibaba released its largest model yet on August 3: a <strong>2.4-trillion-parameter MoE with 95B active parameters</strong>, challenging Kimi K3's dominance with aggressive pricing and promised open weights.</p>
+                    
+                    <ul>
+                        <li><strong>2.4T total / 95B active</strong>: Second only to Kimi K3's 2.8T, using sparse MoE architecture</li>
+                        <li><strong>1M-token context + multimodal</strong>: Text, image, and video input in a single request (~200 pages or 100 hours of footage)</li>
+                        <li><strong>Aggressive pricing: $2/$6 per MTok</strong>: Undercutting GPT-5.6 and Claude tiers by 50-60%</li>
+                        <li><strong>Open weights promised</strong>: First Max-class open-weight Qwen model, scheduled for week of August 10 (license undisclosed at publication)</li>
+                        <li><strong>Local reality check</strong>: At 95B active, this is feasible on a 128GB workstation with Q4 quantization. GGUF builds coming to <a href="../index.html" class="model-link">Local AI Zone</a> once weights publish</li>
+                    </ul>
+                    
+                    <p><strong>Why it matters:</strong> Qwen3.8-Max positions itself between GLM-5.2 (value champion) and Kimi K3 (capability leader), with pricing that forces a margin battle across the entire frontier tier. If the open weights ship as promised, this becomes the most accessible 2T+ class model for local deployment.</p>
+                </div>
+
+                <div class="trend-card">
+                    <h3>📊 August Market Patterns</h3>
+                    <ul>
+                        <li><strong>Price competition meets price increases</strong>: Qwen3.8-Max at $2/$6 and GLM-5.3 at $1.40/$4.40 undercut Western models, while DeepSeek V4 Pro jumped to $1.32/$3.96 (14× its cheapest model) with peak/off-peak billing — first frontier lab to do time-of-day pricing</li>
+                        <li><strong>Post-training as competitive moat</strong>: GLM-5.3's 6× coding gains without base model retraining signals a major shift in model development economics</li>
+                        <li><strong>Cybersecurity models go mainstream</strong>: GPT-5.6-Cyber (95% offensive task completion) and GLM-5.3 (84.5% CyberGym, #1 globally) mark the arrival of purpose-built security AI</li>
+                        <li><strong>Thinking effort becomes user-facing</strong>: GPT-5.6 Sol's slider joins Claude's 5-level effort toggle — explicit reasoning control is now a consumer feature</li>
+                        <li><strong>Co-training models with harnesses</strong>: Muse Spark 1.2 was trained with Muse Code — the harness becomes a lock-in surface</li>
+                        <li><strong>Open weights catching up at scale</strong>: Qwen3.8-Max (2.4T), GLM-5.3, and DeepSeek V4 Pro all promise open weights with permissive licensing</li>
+                        <li><strong>Video + audio convergence</strong>: FLUX 3 Video's native audio generation (not post-dub) sets a new baseline for multimodal models</li>
+                    </ul>
+                </div>
+
+                <div class="trend-card">
+                    <h3>⚠️ Important August Deadlines</h3>
+                    <p><strong>August 31, 2026:</strong> Claude Sonnet 5 promotional pricing ends — $2/$10 becomes $3/$15 per million tokens (uniform 50% increase). A workload costing $2,000/month at promotional rate becomes $3,000/month in September with no usage change. <strong>Forecast it now.</strong></p>
+                    
+                    <p><strong>Also retiring in August:</strong> OpenAI o3 from ChatGPT (August 26, ChatGPT only), DALL·E GPT from ChatGPT (August 30), and Google Imagen 4 endpoints (August 17, migrate to Gemini 3.1 Flash image model).</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title">July 2026 Releases</h2>
+                
+                <p class="stat-label">Five headline releases that marked July 2026 as the breakthrough month for open-weight AI:</p>
                 
                 <div class="model-release">
                     <div class="model-badge">Moonshot AI</div>
@@ -459,7 +616,7 @@
             <div class="article-section">
                 <h2 class="section-title">Local Deployment Comparison Table</h2>
                 
-                <p>Here's how the July 2026 lineup stacks up for running AI on your own hardware:</p>
+                <p>Here's how the July-August 2026 lineup stacks up for running AI on your own hardware (August releases first):</p>
                 
                 <table class="comparison-table">
                     <thead>
@@ -475,21 +632,48 @@
                     </thead>
                     <tbody>
                         <tr>
+                            <td><a href="../models/glm-5-3.html" class="model-link">GLM-5.3</a></td>
+                            <td>Aug 14</td>
+                            <td>~753B / ~40B (MoE)</td>
+                            <td>1M tokens</td>
+                            <td>Weights pending</td>
+                            <td>CyberGym 84.5% (#1) · 50% coding improvement vs 5.2</td>
+                            <td class="local-yes">Yes (128GB+)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="../models/deepseek-v4-pro.html" class="model-link">DeepSeek V4 Pro</a></td>
+                            <td>Aug 13</td>
+                            <td>~671B / ~37B (MoE)</td>
+                            <td>1M tokens</td>
+                            <td>MIT</td>
+                            <td>Enhanced agentic capabilities · Long-horizon reasoning</td>
+                            <td class="local-yes">Yes (64GB+)</td>
+                        </tr>
+                        <tr>
+                            <td>GPT-5.6-Cyber</td>
+                            <td>Aug 10</td>
+                            <td>Undisclosed</td>
+                            <td>—</td>
+                            <td>Proprietary</td>
+                            <td>95% cyber task completion · Zero-day discovery</td>
+                            <td class="local-no">No (Gated)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="../models/qwen3-8-max.html" class="model-link">Qwen3.8-Max</a></td>
+                            <td>Aug 3</td>
+                            <td>2.4T / 95B (MoE)</td>
+                            <td>1M tokens</td>
+                            <td>Weights pending</td>
+                            <td>Multimodal · Aggressive $2/$6 pricing</td>
+                            <td class="local-yes">Yes (128GB+)</td>
+                        </tr>
+                        <tr>
                             <td><a href="../models/kimi-k3.html" class="model-link">Kimi K3</a></td>
                             <td>Jul 16</td>
                             <td>2.8T / ~50B (MoE)</td>
                             <td>1M tokens</td>
                             <td>Modified MIT</td>
                             <td>GPQA 93.5 · MMLU-Pro 89.4 · AIME 91.2</td>
-                            <td class="local-yes">Yes (128GB+)</td>
-                        </tr>
-                        <tr>
-                            <td><a href="../models/glm-5-2.html" class="model-link">GLM-5.2</a></td>
-                            <td>Jun 13</td>
-                            <td>~753B / ~40B (MoE)</td>
-                            <td>1M tokens</td>
-                            <td>MIT</td>
-                            <td>GPQA 88.5 · MMLU-Pro 84.1 · SWE-bench ~80%</td>
                             <td class="local-yes">Yes (128GB+)</td>
                         </tr>
                         <tr>
@@ -500,6 +684,15 @@
                             <td>MIT</td>
                             <td>LiveCodeBench 93.5 · SWE-bench 80.6%</td>
                             <td class="local-yes">Yes (32GB+)</td>
+                        </tr>
+                        <tr>
+                            <td><a href="../models/glm-5-2.html" class="model-link">GLM-5.2</a></td>
+                            <td>Jun 13</td>
+                            <td>~753B / ~40B (MoE)</td>
+                            <td>1M tokens</td>
+                            <td>MIT</td>
+                            <td>GPQA 88.5 · MMLU-Pro 84.1 · SWE-bench ~80%</td>
+                            <td class="local-yes">Yes (128GB+)</td>
                         </tr>
                         <tr>
                             <td><a href="../models/minimax-m3.html" class="model-link">MiniMax M3</a></td>
@@ -534,10 +727,13 @@
                 <div class="trend-card">
                     <h3>⚡ Which One Should You Download?</h3>
                     <ul>
-                        <li><strong>Best all-rounder on big iron (128GB+)</strong>: <a href="../models/kimi-k3.html" class="model-link">Kimi K3</a> — the most capable open model on the planet right now</li>
-                        <li><strong>Best speed-to-quality ratio</strong>: <a href="../models/glm-5-2.html" class="model-link">GLM-5.2</a> — ~168 tok/s changes how interactive local use feels</li>
-                        <li><strong>Best coding agent on a single workstation (32GB+)</strong>: <a href="../models/deepseek-v4-flash-0731.html" class="model-link">DeepSeek V4-Flash-0731</a> — 13B active with #1 LiveCodeBench</li>
-                        <li><strong>Best for science &amp; multimodal data</strong>: <a href="../models/minimax-m3.html" class="model-link">MiniMax M3</a> — GPQA 92+ with native video input</li>
+                        <li><strong>Best all-rounder on big iron (128GB+)</strong>: <a href="../models/kimi-k3.html" class="model-link">Kimi K3</a> — still the most capable open model globally at 2.8T parameters</li>
+                        <li><strong>Best for coding & cybersecurity (128GB+)</strong>: <a href="../models/glm-5-3.html" class="model-link">GLM-5.3</a> — #1 on CyberGym (84.5%), 6× coding improvement via post-training</li>
+                        <li><strong>Best value flagship (128GB+)</strong>: <a href="../models/qwen3-8-max.html" class="model-link">Qwen3.8-Max</a> — 2.4T parameters with aggressive pricing, once weights publish</li>
+                        <li><strong>Best for agentic work (64GB+)</strong>: <a href="../models/deepseek-v4-pro.html" class="model-link">DeepSeek V4 Pro</a> — Enhanced long-horizon reasoning, MIT license</li>
+                        <li><strong>Best speed-to-quality ratio (128GB+)</strong>: <a href="../models/glm-5-2.html" class="model-link">GLM-5.2</a> — ~168 tok/s changes how interactive local use feels</li>
+                        <li><strong>Best coding agent on modest hardware (32GB+)</strong>: <a href="../models/deepseek-v4-flash-0731.html" class="model-link">DeepSeek V4-Flash-0731</a> — 13B active with #1 LiveCodeBench</li>
+                        <li><strong>Best for science & multimodal data (64GB+)</strong>: <a href="../models/minimax-m3.html" class="model-link">MiniMax M3</a> — GPQA 92+ with native video input</li>
                     </ul>
                 </div>
             </div>
@@ -592,113 +788,11 @@
                 </div>
             </div>
 
-            <div class="article-section" style="background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-left: 4px solid #f59e0b;">
-                <h2 class="section-title" style="color: #d97706;">🆕 August 2026 Update: The Momentum Continues</h2>
-                
-                <div class="key-takeaway" style="background: white; border-left-color: #f59e0b; margin-bottom: 30px;">
-                    <h3>⚡ What's New This Month</h3>
-                    <p><strong>August 2026 kept the frontier moving at record pace.</strong> Nine major releases landed in the first week alone: Alibaba's 2.4T Qwen3.8-Max, OpenAI's GPT-5.6 Sol/Luna updates with thinking sliders, Meta's first coding agent (Muse Code + Spark 1.2), and Black Forest Labs' FLUX 3 Video with native audio. Here's what you need to know — updated August 21, 2026.</p>
-                </div>
-
-                <div class="model-release" style="background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);">
-                    <div class="model-badge" style="background: #ea580c;">Alibaba</div>
-                    <div class="model-badge" style="background: #dc2626;">Qwen3.8-Max</div>
-                    
-                    <h3>Qwen3.8-Max — The 2.4T Parameter Challenger (August 3, 2026)</h3>
-                    <p>Alibaba released its largest model yet on August 3: a <strong>2.4-trillion-parameter MoE with 95B active parameters</strong>, challenging Kimi K3's dominance with aggressive pricing and promised open weights.</p>
-                    
-                    <ul>
-                        <li><strong>2.4T total / 95B active</strong>: Second only to Kimi K3's 2.8T, using sparse MoE architecture</li>
-                        <li><strong>1M-token context + multimodal</strong>: Text, image, and video input in a single request (~200 pages or 100 hours of footage)</li>
-                        <li><strong>Aggressive pricing: $2/$6 per MTok</strong>: Undercutting GPT-5.6 and Claude tiers by 50-60%</li>
-                        <li><strong>Open weights promised</strong>: First Max-class open-weight Qwen model, scheduled for week of August 10 (license undisclosed at publication)</li>
-                        <li><strong>Local reality check</strong>: At 95B active, this is feasible on a 128GB workstation with Q4 quantization. GGUF builds coming to <a href="../index.html" class="model-link">Local AI Zone</a> once weights publish</li>
-                    </ul>
-                    
-                    <p><strong>Why it matters:</strong> Qwen3.8-Max positions itself between GLM-5.2 (value champion) and Kimi K3 (capability leader), with pricing that forces a margin battle across the entire frontier tier. If the open weights ship as promised, this becomes the most accessible 2T+ class model for local deployment.</p>
-                </div>
-
-                <div class="model-release" style="background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);">
-                    <div class="model-badge" style="background: #16a34a;">OpenAI</div>
-                    <div class="model-badge" style="background: #0891b2;">GPT-5.6 Updates</div>
-                    
-                    <h3>GPT-5.6 Sol & Luna — Thinking Sliders and Free Tier Upgrades (August 6, 2026)</h3>
-                    <p>OpenAI shipped three simultaneous updates to its GPT-5.6 family: an improved Sol with explicit reasoning control, Luna becoming the free-tier default, and unlimited text chats for Free/Go users.</p>
-                    
-                    <ul>
-                        <li><strong>GPT-5.6 Sol: New thinking slider</strong>: Plus and Pro users can now adjust reasoning depth from quick answers to deep research — consumer products converging on explicit effort controls</li>
-                        <li><strong>62% fewer factual errors</strong>: Luna vs. prior free-tier default (vendor-reported metric)</li>
-                        <li><strong>Luna goes free with unlimited text</strong>: Free and Go tier users get unlimited text chats plus a "Think" button for harder questions (subject to abuse guardrails; file uploads, images, and tools remain rate-limited)</li>
-                        <li><strong>Pricing unchanged</strong>: Sol at $5/$25, Terra at $3/$15, Luna at $0.80 per MTok (after July 30's 80% price cut)</li>
-                        <li><strong>Multi-agent support</strong>: Sol can now delegate to Luna subagents in OpenAI Codex for cheaper parallel processing</li>
-                    </ul>
-                    
-                    <p><strong>Key distinction:</strong> The "unlimited" headline applies only to Free/Go tier <em>text chats on Luna</em> — not Sol, not paid tiers, and not multimodal features. This is a strategic free-tier upgrade, not a usage-limit removal across the product.</p>
-                </div>
-
-                <div class="model-release" style="background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);">
-                    <div class="model-badge" style="background: #0066ff;">Meta</div>
-                    <div class="model-badge" style="background: #7c3aed;">Muse Code</div>
-                    
-                    <h3>Meta Muse Code + Spark 1.2 — First Terminal Coding Agent (August 5, 2026)</h3>
-                    <p>Meta shipped its first dedicated coding agent on August 5: <strong>Muse Code</strong> (terminal-native agent) powered by <strong>Muse Spark 1.2</strong> (1M-context coding model), with the model co-trained against the harness that runs it.</p>
-                    
-                    <ul>
-                        <li><strong>Purpose-built multi-agent architecture</strong>: Every subagent spawn, tool call, steer, and cancel is observable and replayable through an event log</li>
-                        <li><strong>1M-token context + context compaction</strong>: Whole-repository training with async and parallel tool calls</li>
-                        <li><strong>Aggressive contributor pricing</strong>: $0.10/$0.20 per MTok (21.25× cheaper on output than standard $1.25/$4.25 tier) — but prompts may be used to improve Meta's products</li>
-                        <li><strong>Co-training caveat</strong>: Model was trained with this harness, making cross-vendor benchmark comparison harder to interpret</li>
-                        <li><strong>Terminal-native install</strong>: Single command installation, same category as Claude Code and OpenAI Codex CLI</li>
-                    </ul>
-                    
-                    <p><strong>The contributor tier trade-off:</strong> Output is 21.25× cheaper ($4.25 ÷ $0.20), and agent loops are output-heavy — so the economic benefit is massive. The cost: your prompts and completions train future Meta models. For proprietary codebases, the standard tier is the only viable option.</p>
-                    
-                    <p><strong>Security note:</strong> The Information reported that Muse Spark 1.1 (prior version) breached an external company's systems during third-party evaluation, attributed to sandbox misconfiguration. This is a reported incident about a different model version, not a property of the 1.2 release.</p>
-                </div>
-
-                <div class="model-release" style="background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);">
-                    <div class="model-badge" style="background: #ec4899;">Black Forest Labs</div>
-                    <div class="model-badge" style="background: #8b5cf6;">FLUX 3 Video</div>
-                    
-                    <h3>FLUX 3 Video — 20-Second Clips with Native Audio (August 4, 2026)</h3>
-                    <p>Black Forest Labs opened general availability for its video model on August 4, generating <strong>up to 20-second clips with natively synchronized audio and dialogue</strong> in a single API call.</p>
-                    
-                    <ul>
-                        <li><strong>Native audio generation</strong>: Audio is generated alongside frames rather than dubbed afterwards, with lip-sync across ~14 languages</li>
-                        <li><strong>720p native, 1080p upscaling</strong>: Full HD available via post-processing</li>
-                        <li><strong>Multiple input modes</strong>: Text-to-video, image-to-video with multiple keyframes, continuation from up to 4 seconds of seed video</li>
-                        <li><strong>Multi-shot and multi-angle</strong>: Single generation can produce multiple camera angles or shot changes</li>
-                        <li><strong>Draft mode</strong>: Fast previews before full render ($0.06/sec vs. $0.17/sec for full HD render)</li>
-                        <li><strong>Realistic pricing</strong>: $0.17/sec base = $3.40 for a full 20-second clip before re-rolls</li>
-                    </ul>
-                    
-                    <p><strong>Production reality:</strong> The per-second rate sounds cheap until you multiply by 20 seconds and factor in iteration. Budget for 3-5× the base cost per usable clip when planning video production workflows.</p>
-                </div>
-
-                <div class="trend-card" style="background: #fef3c7; border-left-color: #f59e0b;">
-                    <h3>📊 August Market Patterns</h3>
-                    <ul>
-                        <li><strong>Price competition intensifies</strong>: Qwen3.8-Max at $2/$6, Muse contributor tier at $0.10/$0.20, and Sonnet 5 promotional pricing ending August 31 (reverting from $2/$10 to $3/$15) — the margin battle is real</li>
-                        <li><strong>Thinking effort becomes user-facing</strong>: GPT-5.6 Sol's slider joins Claude's 5-level effort toggle — explicit reasoning control is now a consumer feature, not just an API parameter</li>
-                        <li><strong>Co-training models with harnesses</strong>: Muse Spark 1.2 was trained with Muse Code — this makes the harness itself a lock-in surface and complicates benchmark comparison</li>
-                        <li><strong>Open weights catching up at scale</strong>: Qwen3.8-Max promises the first 2T+ class open-weight model with permissive licensing (if it ships as announced)</li>
-                        <li><strong>Video + audio convergence</strong>: FLUX 3 Video's native audio generation (not post-dub) sets a new baseline for multimodal video models</li>
-                    </ul>
-                </div>
-
-                <div class="trend-card" style="background: #fef3c7; border-left-color: #f59e0b;">
-                    <h3>⚠️ Important August Deadlines</h3>
-                    <p><strong>August 31, 2026:</strong> Claude Sonnet 5 promotional pricing ends — $2/$10 becomes $3/$15 per million tokens (uniform 50% increase). A workload costing $2,000/month at promotional rate becomes $3,000/month in September with no usage change. <strong>Forecast it now.</strong></p>
-                    
-                    <p><strong>Also retiring in August:</strong> OpenAI o3 from ChatGPT (August 26, ChatGPT only), DALL·E GPT from ChatGPT (August 30), and Google Imagen 4 endpoints (August 17, migrate to Gemini 3.1 Flash image model).</p>
-                </div>
-            </div>
-
-            <div class="key-takeaway" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left-color: #2563eb;">
+            <div class="key-takeaway">
                 <h3>💎 Summary</h3>
                 <p><strong>July 2026 was the month open-weight AI came of age.</strong> The largest model ever released (Kimi K3), the fastest flagship-class MoE (GLM-5.2), a retrain that beat its own giant (V4-Flash-0731), and a science specialist (MiniMax M3) all arrived within weeks of each other — while Claude Opus 5 and Gemini 3.6 Flash kept the closed-source frontier moving.</p>
                 
-                <p><strong>August 2026 confirmed the trend and accelerated the pace.</strong> Qwen3.8-Max brought 2.4T parameters at $2/$6 pricing, OpenAI made thinking sliders a consumer feature, Meta shipped its first coding agent with 21× cheaper contributor pricing, and Black Forest Labs opened native-audio video generation. The open-vs-closed gap continues to collapse, and the price war is now explicit.</p>
+                <p><strong>August 2026 confirmed the trend and accelerated it dramatically.</strong> DeepSeek V4 Pro went GA with 14× price increases and peak/off-peak billing. GLM-5.3 achieved 6× coding gains through post-training alone, claiming #1 globally on CyberGym (84.5%). OpenAI released GPT-5.6-Cyber for offensive security (95% task completion vs. 1.5% for public models). Qwen3.8-Max brought 2.4T parameters at $2/$6 pricing. Meta shipped Muse Code with 21× cheaper contributor tier. And FLUX 3 Video opened native-audio generation. The open-vs-closed gap continues to collapse, the price war is now explicit, and specialized security AI has arrived at frontier scale.</p>
                 
                 <p>Every open model in this roundup ships (or will ship) as GGUF right here on <a href="../index.html" class="model-link">Local AI Zone</a>. Pick the one that fits your RAM, download it, and see for yourself: the frontier is now local.</p>
             </div>
