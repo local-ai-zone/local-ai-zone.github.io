@@ -106,7 +106,15 @@
         .article-section { margin: 40px 0; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .section-title { font-size: 2em; color: #1e40af; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
         .key-takeaway { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 24px; margin: 30px 0; border-radius: 0 8px 8px 0; }
-    </style>
+    
+        /* Dark mode table overrides */
+        html[data-theme='dark'] table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table td { background: #1e1e2e !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table tr:nth-child(even) td { background: #252535 !important; }
+        html[data-theme='dark'] table tr:nth-child(odd) td { background: #1e1e2e !important; }
+        html[data-theme='dark'] table tr:hover td { background: rgba(124, 58, 237, 0.1) !important; }
+        html[data-theme='dark'] table { border-color: #374151 !important; }
+</style>
 
     <!-- Structured Data - TechArticle Schema -->
     <script type="application/ld+json">

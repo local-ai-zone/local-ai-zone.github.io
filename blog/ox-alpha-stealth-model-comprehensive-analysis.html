@@ -460,7 +460,15 @@
             background: rgba(124, 58, 237, 0.1) !important;
         }
     
-    </style>
+    
+        /* Dark mode table overrides */
+        html[data-theme='dark'] table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table td { background: #1e1e2e !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table tr:nth-child(even) td { background: #252535 !important; }
+        html[data-theme='dark'] table tr:nth-child(odd) td { background: #1e1e2e !important; }
+        html[data-theme='dark'] table tr:hover td { background: rgba(124, 58, 237, 0.1) !important; }
+        html[data-theme='dark'] table { border-color: #374151 !important; }
+</style>
 
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
