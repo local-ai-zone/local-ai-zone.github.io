@@ -1,0 +1,1740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qwen3.8-Flash-Next: A Deep-Dive into Alibaba Qwen4 Architecture Preview - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Qwen3.8-Flash-Next: 125B+51B multimodal MoE with 6B active parameters. Gated DeltaNet + QSA + N-gram Embedding architecture previews Qwen4. Beats Claude Opus 4.6 on SWE-bench Pro (62.5 vs 53.4). $0.16/$0.47 per M tokens. Released August 26, 2026.">
+    <meta name="keywords" content="Qwen3.8-Flash-Next, Qwen4, Alibaba AI, Gated DeltaNet, Qwen Sparse Attention, QSA, N-gram Embedding, Gated Residual, Muon optimizer, sparse MoE, 512 experts, SWE-bench, DeepSWE, agentic coding, open-weight model, GGUF, multimodal AI, long context, 1M tokens, cost efficiency, AI benchmarks">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Qwen3.8-Flash-Next: 125B MoE Beats Claude Opus 4.6 on SWE-bench (62.5 vs 53.4)">
+    <meta property="og:description" content="Technical deep-dive: Qwen3.8-Flash-Next with 125B+51B N-gram params, 6B active, GDN + QSA + N-gram + Muon architecture. $0.16/$0.47 per M tokens, 12x cheaper than Qwen3.8-Max. Previewing Qwen4.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Qwen3.8-Flash-Next Architecture Deep Dive - Local AI Zone">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/qwen3-8-flash-next-deep-dive.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-08-27T00:00:00Z">
+    <meta property="article:modified_time" content="2026-08-27T00:00:00Z">
+    <meta property="article:section" content="AI Models">
+    <meta property="article:tag" content="Qwen3.8-Flash-Next">
+    <meta property="article:tag" content="Qwen4">
+    <meta property="article:tag" content="Alibaba AI">
+    <meta property="article:tag" content="Gated DeltaNet">
+    <meta property="article:tag" content="Sparse Attention">
+    <meta property="article:tag" content="MoE Architecture">
+    <meta property="article:tag" content="Open-Weight Models">
+    <meta property="article:tag" content="AI Benchmarks">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/qwen3-8-flash-next-deep-dive.html">
+    <meta name="twitter:title" content="Qwen3.8-Flash-Next: 125B MoE Beats Claude Opus 4.6 on SWE-bench">
+    <meta name="twitter:description" content="Technical deep-dive: 125B+51B N-gram, 6B active, GDN + QSA + N-gram + Muon. $0.16/$0.47 per M tokens, 12x cheaper than Qwen3.8-Max. Previewing Qwen4.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta name="twitter:image:alt" content="Qwen3.8-Flash-Next Architecture Deep Dive">
+    
+    <!-- Additional AEO/GEO Meta Tags -->
+    <meta name="application-name" content="Local AI Zone">
+    <meta name="msapplication-TileColor" content="#7c3aed">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="article-publisher" content="https://local-ai-zone.github.io">
+    <meta name="article-content-ttl" content="P1Y">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/qwen3-8-flash-next-deep-dive.html">
+    
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/qwen3-8-flash-next-deep-dive.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/qwen3-8-flash-next-deep-dive.html">
+    <style>
+        .back-to-blog { display: inline-flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-weight: 600; margin: 0 0 30px 0; padding: 10px 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; backdrop-filter: blur(8px); transition: all 0.3s ease; position: relative; z-index: 1; }
+        .back-to-blog:hover { background: rgba(255,255,255,0.28); transform: translateX(-3px); }
+        .article-content { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        .article-content p { margin-bottom: 1em; line-height: 1.8; }
+        .article-content ul { margin: 10px 0 10px 20px; }
+        .article-content li { margin-bottom: 6px; line-height: 1.7; }
+        .article-content table { margin: 20px 0; width: 100%; border-collapse: collapse; }
+        .article-content table th, .article-content table td { padding: 10px 12px; border: 1px solid #e5e7eb; text-align: left; font-size: 0.9em; }
+        .article-content table th { background: #1e40af; color: white; font-weight: 600; }
+        .article-content table tr:nth-child(even) td { background: #f9fafb; }
+        .article-section { margin: 40px 0; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .section-title { font-size: 2em; color: #1e40af; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
+        .article-header::before { display: none !important; }
+        .article-header .article-title { text-shadow: none !important; }
+        .article-header .container { background: transparent !important; }
+        .premium-header { position: static !important; }
+    </style>
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Qwen3.8-Flash-Next: A Deep-Dive into Alibaba Qwen4 Architecture Preview",
+        "alternativeHeadline": "125B+51B Multimodal MoE Previewing Qwen4 Architecture",
+        "description": "7200-word technical deep-dive into Qwen3.8-Flash-Next: Alibaba's 125B+51B multimodal MoE with 6B active parameters, Gated DeltaNet + QSA + N-gram Embedding architecture previewing Qwen4.",
+        "image": "https://local-ai-zone.github.io/og-image.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-08-27T00:00:00Z",
+        "dateModified": "2026-08-27T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/qwen3-8-flash-next-deep-dive.html"
+        },
+        "keywords": "Qwen3.8-Flash-Next, Qwen4, Gated DeltaNet, Qwen Sparse Attention, N-gram Embedding, Muon optimizer, MoE, SWE-bench, open-weight model",
+        "articleSection": "AI Models",
+        "wordCount": 7200,
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "about": {
+            "@type": "Thing",
+            "name": "Qwen3.8-Flash-Next",
+            "description": "Alibaba's 125B+51B multimodal MoE model with 6B active parameters, previewing the Qwen4 architecture"
+        },
+        "mentions": [
+            {
+                "@type": "SoftwareApplication",
+                "name": "Qwen3.8-Flash-Next",
+                "description": "Open-weight multimodal MoE model with 6B active parameters",
+                "applicationCategory": "AIApplication",
+                "operatingSystem": "Linux, macOS"
+            },
+            {
+                "@type": "SoftwareApplication",
+                "name": "vLLM",
+                "description": "Serving framework with Flash-Next support",
+                "applicationCategory": "DeveloperApplication"
+            },
+            {
+                "@type": "SoftwareApplication",
+                "name": "SGLang",
+                "description": "High-throughput serving framework",
+                "applicationCategory": "DeveloperApplication"
+            }
+        ],
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
+    }
+    </script>
+    
+    <!-- FAQ Schema for SEO/AEO -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is Qwen3.8-Flash-Next?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Qwen3.8-Flash-Next is a 125B+51B multimodal MoE model from Alibaba with 6B active parameters per token. It uses Gated DeltaNet + QSA + N-gram Embedding + Muon optimizer architecture, previewing the upcoming Qwen4 family. Released August 26, 2026."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does Qwen3.8-Flash-Next compare to Claude Opus 4.6?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Flash-Next beats Claude Opus 4.6 on SWE-bench Pro (62.5 vs 53.4), DeepSWE 1.1 (58.7), CoWorkBench (73.9 vs 68.2), and IFBench (81.3 vs 62.5). It trails on HLE (35.9 vs 40.0) for frontier reasoning."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is the pricing for Qwen3.8-Flash-Next API?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "$0.16 per 1M input tokens and $0.47 per 1M output tokens on QwenCloud (DashScope). Roughly 12x cheaper than Qwen3.8-Max and 30-50x cheaper than Claude Opus 4.6 Max on output tokens."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can you run Qwen3.8-Flash-Next locally?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Yes. A 4-bit GGUF quantization is approximately 82 GB (58 GB main + 24 GB N-gram). It runs on 128GB-class unified memory systems like Mac Studio, DGX Spark, or RTX 5090 + 96 GB DDR5 via Ollama or llama.cpp."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What is Gated DeltaNet in Qwen3.8-Flash-Next?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Gated DeltaNet (GDN) is a linear-attention layer that compresses sequence history into a fixed-size recurrent state, keeping KV cost constant regardless of sequence length. Flash-Next uses 36 GDN layers across 48 total layers."
+                }
+            }
+        ]
+    }
+    </script>
+    
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://local-ai-zone.github.io/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://local-ai-zone.github.io/blog.html"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "Qwen3.8-Flash-Next Deep Dive",
+                "item": "https://local-ai-zone.github.io/blog/qwen3-8-flash-next-deep-dive.html"
+            }
+        ]
+    }
+    </script>
+    
+</head></head>
+<body class="blog-article-page">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">Qwen3.8-Flash-Next: A Deep-Dive into Alibaba Qwen4 Architecture Preview</h1>
+                <div class="article-meta">
+                    <span class="article-date">August 27, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Technical Analysis</span>
+                    <span class="article-read-time">📖 30 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:20px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;text-align:center;line-height:1.8;">
+                <div style="font-size:0.85em;letter-spacing:4px;text-transform:uppercase;margin-bottom:10px;">TECHNICAL ANALYSIS</div>
+                <div style="font-size:1.8em;font-weight:700;margin-bottom:8px;">Qwen3.8-Flash-Next</div>
+                <div style="font-size:1.1em;font-weight:400;margin-bottom:15px;opacity:0.95;">A Deep-Dive into Alibaba's Qwen4 Architecture Preview</div>
+                <div style="font-size:0.95em;margin-bottom:12px;opacity:0.9;">Hybrid Gated DeltaNet + Sparse Attention + 51B N-gram Embedding, 6B active, 1M context, $0.16/$0.47 per M tokens</div>
+                <div style="font-size:0.85em;margin-bottom:4px;">Released: August 26, 2026</div>
+                <div style="font-size:0.85em;margin-bottom:4px;">Model: Qwen/Qwen3.8-Flash-Next (arch: qwen4_exp)</div>
+                <div style="font-size:0.85em;margin-bottom:4px;">Class: 125B main + 51B N-gram + 4B MTP | 6B active per token</div>
+                <div style="font-size:0.85em;margin-bottom:15px;">Reading time: ~30 min | Length: ~7,200 words</div>
+                <div style="font-size:0.85em;opacity:0.8;">Open-weight technical analysis | Prepared: August 27, 2026</div>
+            </th>
+            </tr>
+            </table>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">TL;DR — What you need to know in 90 seconds</h1>
+            <p>Qwen3.8-Flash-Next is the second-generation &quot;Next&quot; architecture preview from Alibaba's Qwen team, released August 26, 2026 as the open-weight counterpart to the production API SKU qwen3.8-flash. It is, by some distance, the most architecturally ambitious open-weight model released this year — and almost every choice in it points in the same direction: drive down the cost of a token without giving up capability. The headline numbers below are the ones a technical reader should walk away with even if they read nothing else.</p>
+            <ul><li>Architecture: 48 layers arranged as 12 macro-blocks of 3×(Gated DeltaNet → MoE) → 1×(Qwen Sparse Attention → MoE), wrapped in a 4-branch Gated Residual. 125B main backbone (6B active per token, 512 experts / 10 routed + 1 shared) plus a 51B N-gram embedding table (20M bigram+trigram entries, offloadable to host RAM) plus a 4B MTP head — ~180B stored, ~6B computed.</li></ul>
+            <ul><li>Headline benchmarks (self-reported): DeepSWE 1.1 = 58.7 (vs Qwen3.7-Plus 16.5), SWE-bench Pro = 62.5 (beats Claude Opus 4.6 Max at 53.4), CoWorkBench = 73.9, GPQA Diamond = 91.7, LiveCodeBench v6 = 91.9, AndroidWorld = 84.5. Loses on NL2Repo-Bench (48.1 vs DeepSeek-V4-Flash 54.2), HLE (35.9 vs Claude 40.0), and OSWorld 2.0 binary (19.4).</li></ul>
+            <ul><li>Pricing: $0.16 per 1M input tokens, $0.47 per 1M output tokens on QwenCloud (DashScope). Roughly 12× cheaper than Qwen3.8-Max on both axes, and at or below DeepSeek-V4-Flash pricing for a meaningfully stronger agentic-coding profile.</li></ul>
+            <ul><li>Training: Muon optimizer for 2D linear maps (Attention, GDN, MoE experts) + AdamW for embeddings / router / low-rank Gated Residual params. Refitted scaling law. No batch-size warmup (Qwen claims this saves 18.8% optimizer steps). Vendor-reported training cost ~1/9 of Qwen3.7-Plus.</li></ul>
+            <ul><li>Hardware footprint: BF16 = 335.28 GiB, FP8 = 172.78 GiB, 4-bit GGUF ≈ 82 GB (58 GB main + 24 GB N-gram). FP8 wants TP2 minimum on GB300 (TP4 recommended) or TEP8 on 8×H200 — note that TP8 is incompatible with the checkpoint's 128-wide quantization blocks. 4-bit fits on 128GB-class Mac Studio / DGX Spark / Strix Halo with the N-gram table in system RAM.</li></ul>
+            <ul><li>Caveats: License is qwen-community-1.0 (NOT Apache 2.0 for this specific checkpoint — verify terms before commercial use). All benchmark numbers are vendor self-reported; the model is one day old as of writing, so independent verification is essentially nonexistent. N-gram host-RAM offload is NVIDIA-only. Static YaRN to 1M context can hurt short-prompt quality.</li></ul>
+            <p>If you only remember three things: (1) the QSA + Gated Residual + N-gram combo is the most credible open-weight preview of Qwen4 to date; (2) on agentic-coding and office-task benchmarks it is meaningfully ahead of everything in its price tier; (3) on frontier reasoning (HLE) and full computer-use (OSWorld binary) it still sits clearly below Claude Opus 4.6 Max and the Qwen3.8-Max flagship. The rest of this post unpacks why.</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">Introduction: Why Flash-Next matters</h1>
+            <p>Alibaba's Qwen team has been shipping at a pace that makes most Western labs look deliberate. In the four weeks before this post, they released Qwen3.8-Max (August 3, 2026 — the 2.4T-total / 95B-active flagship, priced at $2.00 / $6.00 per M tokens), Qwen3.8-27B (August 14 — a dense, hybrid-thinking, Apache-2.0 model that runs in ~17 GB of VRAM and turned out to be surprisingly good at single-file app generation), and now Qwen3.8-Flash-Next (August 26) — the model this post is about. Flash-Next is the cheapest SKU in the Qwen3.8 family and the architectural preview for the upcoming Qwen4 generation.</p>
+            <p>Before going further, a naming clarification that has tripped up a lot of early coverage. The user-requested &quot;Qwen3-Next Flash&quot; does not exist as a single named model. What was actually released — and what almost certainly matches the intent — is Qwen3.8-Flash-Next, an open-weight multimodal MoE shipped under the HuggingFace org Qwen/Qwen3.8-Flash-Next and served in production as the API SKU qwen3.8-flash. There is also an older related release called Qwen3-Next-80B-A3B (Sep 10–11, 2025), which first introduced the &quot;Next&quot; architectural line — the Gated DeltaNet + Gated Attention hybrid. Flash-Next is the second-generation &quot;Next&quot; model and the direct successor to Qwen3-Next-80B-A3B, with substantial architectural additions on top of the original Next skeleton.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">The Qwen3.8 family timeline</h2>
+            <p>The three Qwen3.8 releases slot into clearly defined roles:</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 1 — Qwen3.8 family release timeline</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Model</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Release</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Type</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Headline</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">API price (in/out per M)</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Qwen3.8-Max</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Aug 3, 2026</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">2.4T / 95B active MoE</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Frontier flagship, 1M ctx</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">$2.00 / $6.00</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Qwen3.8-27B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Aug 14, 2026</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">27B dense hybrid-thinking</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">~17 GB VRAM, Apache-2.0</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">(self-hosted)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Qwen3.8-Flash-Next</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Aug 26, 2026</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">125B+51B+4B / 6B active MoE</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Qwen4 arch preview, cost tier</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">$0.16 / $0.47</td>
+            </tr>
+            </table>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">Why the &quot;Next&quot; branding?</h2>
+            <p>The Qwen team is explicit about the role Flash-Next plays. In their own words from the launch blog: &quot;It plays the same role that Qwen3-Next played for Qwen3.5 — the hybrid Gated DeltaNet + Gated Attention design introduced at that time has since been used across the Qwen3.5, Qwen3.6, Qwen3.7 and Qwen3.8 series. We are again releasing the architectural changes early, so that the community can examine them before the full Qwen4 model family is built on top of them.&quot;</p>
+            <p>In other words, &quot;Next&quot; is Qwen's research-preview branding. The GDN + Gated-Attention design from Qwen3-Next (Sep 2025) was the architecture that powered every Qwen release for the next year. The GDN + QSA + Gated Residual + N-gram Embedding + Muon design from Flash-Next is intended to underpin Qwen4. The &quot;Flash&quot; suffix is the cost-class branding — Qwen3.5-Flash was the hosted name for Qwen3.5-35B-A3B, Qwen3.6-Flash was Qwen3.6-35B-A3B, and Qwen3.8-Flash (the production API SKU behind Flash-Next) continues the pattern. The open weights and the API SKU are not literally the same checkpoint — the API version adds production-only features like 1M context by default and built-in tools — but they share the same architecture.</p>
+            <p>The strategic significance is hard to overstate. Qwen is shipping real research as production weights, on a one-year cadence, before committing it to a mainline family. By the time Qwen4 arrives, the community will have already stress-tested QSA, Gated Residual, N-gram Embedding, and Muon at scale for months. That is a fundamentally different release philosophy from the &quot;paper ships months after weights&quot; pattern that still dominates most labs.</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">Architecture Deep Dive</h1>
+            <p>This is the technical core of the post. We will work through the model layer by layer, then look at how training and deployment fit around it. All numerical specs in this section are taken from the official HuggingFace model card for Qwen/Qwen3.8-Flash-Next and cross-checked against the Alibaba Cloud launch blog. Where the public artifacts are silent on a parameter, that is called out explicitly.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.1 Headline parameters</h2>
+            <p>Flash-Next is best understood as three loosely-coupled parameter pools, only one of which actually does per-token matrix-multiplies:</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 2 — Headline parameter budget</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Pool</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Params</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Role</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">In per-token FLOPs?</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Main backbone (MoE)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">125B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">GDN + QSA + MoE layers + LM head</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Yes — but only 6B activated per token (≈4.8% sparsity)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">N-gram Embedding table</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">51B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">20M bigram+trigram entries at layer 2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">No — deterministic lookup, not a matmul</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Multi-Token Prediction head</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">4B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">1 extra layer + LM head for speculative decoding</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Only during training / spec-decode inference</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Total stored (&quot;on disk&quot;)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">≈180B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Sum of the three pools</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Active per token</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">6B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">What actually gets computed for a forward pass</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Yes</td>
+            </tr>
+            </table>
+            <p>The 6B-active number is the one that matters for cost. At 6B activated parameters per token, Flash-Next is in the same compute band as a 6B dense model — but with the knowledge capacity of a 180B store. The 51B N-gram table is the architectural sleight-of-hand that makes this work: it stores an enormous amount of phrase-level knowledge in a form that costs essentially zero compute to query, because the lookup keys are deterministic (current token + preceding tokens) and the result is asynchronously prefetched into GPU memory in parallel with the main forward pass.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.2 Layer layout — the heart of the architecture</h2>
+            <p>The 48 layers are arranged as 12 macro-blocks of four layers each. Within each macro-block, the structure is:</p>
+            <p>12 × ( 3 × (Gated DeltaNet → MoE)  →  1 × (Qwen Sparse Attention → MoE) )</p>
+            <p>Across all 48 layers that is 36 GDN layers and 12 QSA layers — a 3:1 GDN-to-attention ratio. Every layer, regardless of type, is followed by a Sparse MoE with identical configuration, and is wrapped by the Gated Residual structure described in section 5.6. The previous Qwen3-Next-80B-A3B (Sep 2025) used the identical macro-block skeleton, but with full Gated Attention in the attention slot instead of QSA, hidden dim 2048 (vs 2560 here), and no N-gram embedding, no Gated Residual, and no Muon. So the macro-block layout is the lineage; the contents of the attention slot and the residual stream are the novelty.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.3 Gated DeltaNet — linear attention</h2>
+            <p>Gated DeltaNet (GDN) is a linear-attention layer originally introduced in the paper &quot;Gated Delta Networks: Improving Mamba2 with Delta Rule&quot; (arXiv:2502.05246). It compresses the entire history of a sequence into a fixed-size recurrent state and updates that state with a learned gate, so the KV cost does not grow with sequence length. For Flash-Next, which targets 1M-token context, this is the mechanism that keeps prefill tractable on the 36 of every 48 layers that are not QSA.</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 3 — Gated DeltaNet configuration</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Spec</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Flash-Next</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Qwen3-Next-80B-A3B (predecessor)</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Linear-attention V heads</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">48</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">32</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Linear-attention QK heads</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">16</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">16</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Head dimension</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">128</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">128</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Total GDN layers</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">36</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">36</td>
+            </tr>
+            </table>
+            <p>Flash-Next widens the V-head count from 32 to 48 — a 50% increase that roughly tracks the increase in hidden dim (2048 → 2560). The QK head count and head dim are unchanged, which suggests Qwen is scaling the value-projection width without scaling the key/query projection, a pattern that empirically improves expressiveness at modest compute cost.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.4 Qwen Sparse Attention (QSA) — the headline novelty</h2>
+            <p>This is the single most important architectural change in Flash-Next. The &quot;Gated Attention&quot; of Qwen3-Next was full attention — every query attends to every key, with the standard O(N²) cost. Flash-Next replaces it with Qwen Sparse Attention (QSA), which performs block-level sparse attention with a learned indexer.</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 4 — Qwen Sparse Attention configuration</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Spec</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Value</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Number of Q heads</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">24</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Number of KV heads</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">2  (grouped-query)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Head dimension</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">256</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">RoPE dim (partial rotary)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">64  (partial_rotary_factor = 0.25)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Indexer structure</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">MQA with 4 query heads + 1 shared key head</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Indexer head dim</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">128</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Budget (per layer)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">512 blocks OR 2,048 tokens</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Total QSA layers</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">12 (one per macro-block)</td>
+            </tr>
+            </table>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">How QSA differs from prior sparse attention</h3>
+            <p>Most modern sparse-attention schemes (DeepSeek's DSA, NSMA-style learned sparse attention, MoBA) operate at the token level — the indexer picks which individual token positions to attend to. As context grows, the indexer itself becomes a non-negligible source of compute. QSA takes a different approach: it first aggregates the sequence into &quot;micro-blocks,&quot; estimates importance at the block level (not the token level), then selects the most relevant blocks for full attention within that layer. The result is that attention cost grows with the budget (a fixed 512 blocks per layer), not with sequence length.</p>
+            <p>Crucially, QSA compresses independently within each layer rather than sharing indices across layers (as in IndexCache-style cross-layer reuse). The Qwen team's stated reason is that this makes QSA well-suited to hybrid architectures where GDN and attention layers are interleaved — because GDN's recurrent state does not produce a usable index for the next attention layer, cross-layer index reuse breaks down in a hybrid layout. Per-layer compression is the price you pay for a hybrid that actually works.</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Design intent
+&quot;GDN efficiently 'remembers,' while QSA precisely 'retrieves.'&quot; — Alibaba Cloud launch blog. The two-layer-type split is not accidental: GDN handles the long-tail history compression, QSA handles targeted retrieval of the parts that matter for the current token. This division of labor is the central design thesis of the architecture.</th>
+            </tr>
+            </table>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Reported speedups</h3>
+            <p>The QSA attention kernel is the headline throughput story. Qwen reports up to 7.6× prefill and 4.9× decode speedup versus full attention at 1M-token context (kernel-level micro-benchmark, vendor-reported). In a high-cache-reuse online-serving scenario at 90% prefix-cache hit rate, Flash-Next hits 8.6× the prefill throughput of Qwen3.7-Plus at 1M context. The SGLang cookbook cites 10.2× and the vLLM recipe cites 6.6× — but these measure different things (kernel vs end-to-end, different frameworks, different baselines), so the numbers are not directly comparable across bars. Treat all of them as preliminary until independent measurement exists.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.5 Sparse Mixture-of-Experts</h2>
+            <p>Every layer — whether GDN or QSA — is followed by a Sparse MoE with identical configuration:</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 5 — Sparse MoE configuration</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Spec</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Value</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Total experts</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">512</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Routed experts per token</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">10</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Shared experts</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">1</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Expert intermediate dim</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">640</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Activation ratio</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">≈2% of experts per token (10/512)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Load balancing</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Global (not per-batch)</td>
+            </tr>
+            </table>
+            <p>Qwen3-Next-80B-A3B used the same 512-expert / 10-routed + 1-shared topology, but with a narrower expert_intermediate dim of 512. Flash-Next widens each expert's FFN to 640, which combined with the wider hidden dim (2560 vs 2048) gives each expert materially more capacity per activation. The blog explicitly attributes the choice to global load balancing: &quot;With global load balancing, increasing total expert parameters while keeping the number of activated experts fixed steadily reduces training loss.&quot; The implication is that Qwen sees expert-count scaling as a more efficient axis than per-token active-param scaling — a stance that aligns with the broader industry trend toward ultra-fine-grained MoE.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.6 Gated Residual — the second novel component</h2>
+            <p>Traditional Transformers read and write to a single residual stream. Flash-Next widens that stream into 4 parallel branches with an element-wise, data-dependent read gate (per-token, per-channel) and a per-branch scalar write gate. The configuration:</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 6 — Gated Residual configuration</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Spec</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Value</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Number of branches</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">4</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Bottleneck rank</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">320</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Read gate</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Element-wise, data-dependent (per-token, per-channel)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Write gate</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Per-branch scalar</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Residual state dtype</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">FP8 (cuts memory traffic)</td>
+            </tr>
+            </table>
+            <p>Qwen describes Gated Residual as a combination of two prior ideas: Hyper-Connection (Sun et al., arXiv:2409.19606) — multi-branch residual widening — and GatedNorm (arXiv:2504.16086) — element-wise dynamic gating in the residual read. Empirically, Qwen reports that one of the four branches spontaneously becomes a long-range pathway linking the first attention layer to most middle and later layers. The Gate also &quot;effectively suppresses activation outliers and improves training stability&quot; — a non-trivial claim, because activation outliers are the dominant reason FP8 training of large MoE models is hard. Storing the residual state in FP8 cuts memory traffic proportionally, which matters more for memory-bound decode than for compute-bound prefill.</p>
+            <p>Gated Residual simplifies Hyper-Connection by dropping the extra branch-mixing operations once the read/write gates are expressive enough to do that mixing implicitly. The result is a wider, more stable residual stream at lower implementation complexity than the original Hyper-Connection design.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.7 N-gram Embedding — the third novel component</h2>
+            <p>This is the architectural choice that has drawn the most community attention, because it is the most obviously local-friendly. The configuration:</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 7 — N-gram Embedding configuration</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Spec</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Value</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Table size</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">20,000,000 entries (bigrams + trigrams)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Insertion point</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Layer 2 (near the start of the network)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Total params in table</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">51B</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Compute per token</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Effectively zero (deterministic lookup, no matmul)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Offload target</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Host system RAM, asynchronously prefetched</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Offload platform support</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">NVIDIA-only (as of release)</td>
+            </tr>
+            </table>
+            <p>A standard token embedding looks up a vector based on a single token. An N-gram embedding looks up a vector based on the current token plus several preceding tokens (bigrams and trigrams in this case), providing ready-made representations for common phrases and local patterns. The 51B parameters are deterministically addressed — the lookup location is fully known in advance from the token sequence — so they do not enter the per-token matrix-multiply FLOPs budget. Because the lookup is deterministic, the table can be stored in host RAM (not GPU memory) and asynchronously prefetched in parallel with model compute. This is a parameter scaling axis that is far cheaper than adding MoE experts, because it does not require a single additional FLOP of GPU compute.</p>
+            <p>Reddit user pmv143 estimated that an ideal 4-bit quant of Flash-Next lands around 82 GB total (58 GB main weights + 24 GB N-gram tables), with real-world quants in the 80–90 GB range. This is the &quot;local-friendly&quot; angle: the bulk of the model (the N-gram table) is sparsely accessed and ideal for system-RAM offload. The concept is not new — it is inspired by Per-Layer Embedding in Gemma 3n and by DeepSeek's &quot;Engram&quot; work (arXiv:2507.13028, Conditional Memory via Scalable Lookup). DeepSeek's contribution was the demonstration that this idea works at scale; Qwen's contribution is productionizing it at 51B params and making it the centerpiece of a cost-tier model.</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Community framing
+The 51B N-gram table is the architectural decision that lets a 6B-active model punch like a much larger one. It is essentially a giant cheat sheet for common short patterns, freeing the sparse 6B-active backbone to focus on harder reasoning. — synthesized from r/LocalLLaMA coverage</th>
+            </tr>
+            </table>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.8 Multi-Token Prediction (MTP)</h2>
+            <p>Flash-Next ships a 4B MTP head — one extra layer plus a duplicate LM head — that predicts multiple future tokens in a single forward pass. The configuration:</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 8 — MTP configuration</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Spec</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Value</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">MTP layers</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">1</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">MTP params</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">4B</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Attention type in MTP</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">QSA (replaces full attention used in Qwen3-Next)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Training mode</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Multi-step (training and inference consistent)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">vLLM flag</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">--speculative-config '{&quot;method&quot;:&quot;qwen3_next_mtp&quot;,&quot;num_speculative_tokens&quot;:2}'</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">SGLang flag</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">--speculative-algo NEXTN --speculative-num-steps 3 --speculative-eagle-topk 1 --speculative-num-draft-tokens 4</td>
+            </tr>
+            </table>
+            <p>MTP improves speculative-decoding acceptance rate in real serving scenarios and also improves backbone performance during training (the multi-token objective acts as a regularizer on the main trunk's hidden states). The MTP module is opt-in at inference time — if you do not pass the speculative-config flags, it simply is not invoked. Note that the MTP head uses QSA, the same sparse attention as the main backbone, which keeps the spec-decode path cheap.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.9 Positional encoding, vocab, and vision encoder</h2>
+            <p>Positional encoding is RoPE with rope_theta = 10,000,000, partial rotary factor 0.25 (RoPE dim 64 in the QSA heads). For vision/text fusion the model uses mrope_interleaved = true with mrope_section = [11, 11, 10] — multimodal RoPE sections for time / height / width. Native context is 262,144 tokens; YaRN extension to 1,000,000 with factor = 4.0 and original_max_position_embeddings = 262144. The blog warns that users should pick a smaller factor (e.g., 2.0 for 524K) when possible, because static YaRN can hurt short-prompt quality.</p>
+            <p>The padded vocabulary is 248,320 — both the LM head and the token embedding are padded to this size. The tokenizer is the same BPE family as Qwen3 / Qwen3.5 (~151k base tokens), with padding to 248,320 done for alignment reasons that the public artifacts do not fully explain. Flash-Next does not document a brand-new tokenizer; it inherits the Qwen3 tokenizer's coverage of 100+ languages.</p>
+            <p>The model is multimodal — text + image + video in, text out — and the HF card lists the architecture string as qwen4_exp. The vision encoder and multimodal fusion details are not fully spelled out in the public artifacts, but the recommended video_preprocessor_config.json longest_edge of 469,762,048 (corresponding to 224k video tokens) suggests heavy video-frame sampling for hour-scale video understanding. The processor is loaded as AutoProcessor returning multimodal inputs.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.10 Architecture diagram</h2>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Figure 1 — Qwen3.8-Flash-Next architecture schematic. Macro-block layout (12 × [3×GDN+MoE → 1×QSA+MoE]), with N-gram embedding at layer 2 and Gated Residual wrapping every layer. Training-side annotations on the right.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">5.11 Stability optimizations — carried over from Qwen3-Next</h2>
+            <p>Three stability techniques first introduced in Qwen3-Next-80B-A3B are reused here without modification:</p>
+            <ul><li>Zero-centered RMSNorm with weight decay on norm weights — prevents norm scales from drifting during long pretraining.</li></ul>
+            <ul><li>Attention output gating mechanism (Gated Attention lineage, arXiv:2502.05711) — adds a non-linearity and sparsity to attention outputs, and is attention-sink-free.</li></ul>
+            <ul><li>Normalized MoE router initialization (arXiv:2501.11873) — stabilizes expert assignment during early training.</li></ul>
+            <p>These are not new, but they are non-obvious — most production MoE training recipes do not use all three together. The fact that Qwen carries them forward from Qwen3-Next suggests they are doing real work.</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">What Changed vs Previous Qwen Models</h1>
+            <p>Flash-Next is best understood as a delta on top of Qwen3-Next-80B-A3B (September 2025), with a secondary comparison to Qwen3.7-Plus — the direct cost competitor Qwen is benchmarking against. This section walks through those deltas explicitly. The original Qwen3 (April–May 2025) and Qwen2.5 are mentioned only briefly because they are now sufficiently far behind that the comparison is mostly historical.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">6.1 Delta vs Qwen3-Next-80B-A3B (Sep 2025) — the direct predecessor</h2>
+            <p>This is the comparison that matters. Flash-Next is the second-generation &quot;Next&quot; model and the direct successor to Qwen3-Next-80B-A3B. The macro-block layout is identical; everything inside the macro-blocks has been redesigned.</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 9 — Component-by-component delta vs Qwen3-Next-80B-A3B</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Component</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Qwen3-Next-80B-A3B (Sep 2025)</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Qwen3.8-Flash-Next (Aug 2026)</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Total main params</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">80B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">125B</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Active params</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">3B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">6B</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Hidden dim</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">2,048</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">2,560</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Expert intermediate dim</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">512</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">640</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Layer count</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">48</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">48 (same)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Attention type</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Gated Attention (full)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Qwen Sparse Attention (block-level, budget 512 blocks / 2048 tokens)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">GDN V heads</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">32</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">48</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">N-gram Embedding</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">None</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">51B params, 20M-entry bigram/trigram table at layer 2</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Residual structure</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Standard residual stream</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Gated Residual — 4 branches, bottleneck rank 320, FP8 state</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">MTP attention</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Full attention</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">QSA (same as backbone)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Optimizer</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">AdamW (assumed)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Muon for 2D linear maps + AdamW for embeddings/router/low-rank GR</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Batch-size warmup</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Standard practice</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Eliminated (saves 18.8% optimizer steps)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Scaling law</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Standard</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Refitted for new arch + Muon</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Modality</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Text-only</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Multimodal (text + image + video)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Context (native)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">262,144</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">262,144 (same)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Context (YaRN-extended)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">1,010,000</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">1,000,000</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Vocab (padded)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">~151k</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">248,320</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Architecture string</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">qwen3_next</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">qwen4_exp</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">License</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Apache-2.0</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">qwen-community-1.0</td>
+            </tr>
+            </table>
+            <p>Six changes stand out as architecturally meaningful. First, the swap from full Gated Attention to QSA is the single largest compute win — it is what makes 1M-token context actually servable. Second, the addition of the 51B N-gram embedding table adds enormous knowledge capacity at near-zero compute cost. Third, the Gated Residual widens the residual stream and (per Qwen) suppresses the activation outliers that make FP8 training hard. Fourth, the Muon + AdamW split optimizer roughly doubles FLOPs efficiency per step on the 2D-linear-map parameters. Fifth, the elimination of batch-size warmup is a direct 18.8% optimizer-step reduction. Sixth, the multimodal extension is a meaningful product-surface expansion — Qwen3-Next was text-only.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">6.2 Delta vs Qwen3.7-Plus — the direct cost competitor</h2>
+            <p>Qwen's marketing positions Flash-Next as comparable to Qwen3.7-Plus at roughly 1/9 the training cost, with stronger coding and office-task performance. The numbers bear this out for the agentic-coding and office-task suites, though Flash-Next does still lose on a couple of benchmarks.</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 10 — Capability delta vs Qwen3.7-Plus</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Metric</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Qwen3.7-Plus</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Qwen3.8-Flash-Next</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Direction</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Total params</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">397B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">125B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Flash-Next smaller (3.2×)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Active params</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">17B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">6B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Flash-Next smaller (2.8×)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">N-gram params</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">—</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">51B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Flash-Next adds new axis</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Training cost</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">1×</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">~1/9×</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Flash-Next cheaper (vendor-reported)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">CoWorkBench</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">65.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">73.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Flash-Next wins (+8.8)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">JobBench</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">27.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">55.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Flash-Next wins (+28.1, ~2×)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">SWE-bench Pro</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">55.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">62.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Flash-Next wins (+6.7)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">GPQA Diamond</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">90.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">91.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Flash-Next wins (+1.4, near saturated)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">HLE</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">34.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">35.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Flash-Next wins (+1.2, near saturated)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">LiveCodeBench v6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">89.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">91.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Flash-Next wins (+2.3)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">DeepSWE 1.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">16.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">58.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Flash-Next wins (+42.2, ~3.6×)</td>
+            </tr>
+            </table>
+            <p>The DeepSWE 1.1 jump from 16.5 to 58.7 is the single most striking number on this table — it suggests that the architectural improvements compound particularly strongly on agentic-coding harnesses that require long-horizon tool use. JobBench doubling (27.6 → 55.7) is the second-most striking. The near-saturated deltas on GPQA, HLE, and LiveCodeBench v6 (all &lt;3 points) are real but small enough that they may be within run-to-run variance.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">6.3 Delta vs original Qwen3 and Qwen2.5</h2>
+            <p>Qwen3 (April–May 2025, tech report arXiv:2505.09388) used standard full attention throughout, no GDN, no QSA, no Gated Attention, standard residual stream, and AdamW throughout. Its 36T-token pretraining corpus was the basis for Qwen3-Next's 15T-token subset. Versus Flash-Next: hybrid GDN+QSA, Gated Residual, N-gram Embedding, Muon optimizer, refitted scaling law, no batch warmup — a wholesale architectural overhaul.</p>
+            <p>Qwen2.5 was a standard dense/MoE Transformer with none of the Next-line components. Versus Flash-Next the gap is even larger. The interesting historical note is that the Qwen3-Next release in September 2025 was the inflection point — that is when Qwen committed to the hybrid linear-attention + sparse-attention direction that Flash-Next now refines.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">6.4 Removed or redesigned components (summary)</h2>
+            <p>For the reader who wants a quick checklist of what was deleted or replaced in the move from Qwen3-Next to Flash-Next:</p>
+            <ul><li>Gated Attention (full) → removed. Replaced by QSA (sparse, micro-block level).</li></ul>
+            <ul><li>Standard residual stream → redesigned into 4-branch Gated Residual with FP8 state.</li></ul>
+            <ul><li>Standard input embedding only → augmented with N-gram Embedding at layer 2 (51B extra params offloadable to RAM).</li></ul>
+            <ul><li>AdamW-only optimizer → replaced by Muon + AdamW split with refitted scaling law.</li></ul>
+            <ul><li>Batch-size warmup → eliminated (start directly at target batch size).</li></ul>
+            <ul><li>Qwen3-Next's qwen3_next arch string → replaced by qwen4_exp in Flash-Next's config.json.</li></ul>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Figure 2 — Architectural delta: Qwen3-Next-80B-A3B → Qwen3.8-Flash-Next. Bars are normalized within each pair so all categories share a 0–100 axis; raw values are shown at bar ends.</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">Benchmarks: Where Flash-Next Wins, Ties, and Loses</h1>
+            <p>Every number in this section is vendor self-reported, taken from the official HuggingFace model card and the Ollama library page that mirrors it. Independent verification by third-party benchmarking hubs is still in progress — BenchLM classifies the Flash-Next profile as &quot;not yet verified&quot; at the time of writing. The model is one day old. Treat every number as provisional.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">7.1 Language and agentic benchmarks</h2>
+            <p>The benchmark suite Qwen chose to report is heavily weighted toward agentic coding and office tasks — areas where Flash-Next clearly wins. Less coverage is given to traditional language-understanding benchmarks (MMLU, MMLU-Pro, AIME, IFEval, BFCL), which the predecessor Qwen3-Next-80B-A3B reported but Flash-Next does not. That omission is itself a data point: Qwen is positioning Flash-Next as an agentic model, not a general-knowledge model.</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 11 — Language &amp; agentic benchmarks (self-reported)</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Benchmark</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Flash-Next</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Qwen3.8-27B</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Qwen3.7-Plus</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">DeepSeek-V4-Flash</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Claude Opus 4.6</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Total params</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">125B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">27B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">397B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">284B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Active params</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">6B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">27B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">17B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">13B</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Agentic coding</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">[Please fill in]</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">DeepSWE 1.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">58.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">42.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">16.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">54.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">SWE-bench Pro</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">62.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">61.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">55.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">56.0</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">53.4</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">SWE-bench Multilingual</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">81.0</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">73.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">75.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">—</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">77.5</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">NL2Repo-Bench</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">48.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">42.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">41.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">54.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">47.6</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Agentic tasks</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">CoWorkBench</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">73.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">70.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">65.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">45.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">68.2</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">JobBench</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">55.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">33.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">27.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">41.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">36.6</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Agents' Last Exam (Pass@1)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">24.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">20.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">13.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">25.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Agents' Last Exam (Score)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">51.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">42.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">33.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">—</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Toolathlon Verified (Pass@1)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">73.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">67.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">50.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">70.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">General</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">[Please fill in]</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">IFBench</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">81.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">79.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">79.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">79.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">62.5</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">GPQA Diamond</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">91.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">89.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">90.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">90.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">91.3</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">HLE</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">35.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">30.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">34.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">33.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">40.0</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">LiveCodeBench v6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">91.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">90.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">89.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">90.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">88.8</td>
+            </tr>
+            </table>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Figure 3 — Agentic coding, office tasks, and reasoning benchmarks. Flash-Next wins on agentic and office suites, ties on near-saturated ceilings (GPQA, LiveCodeBench v6), and loses on HLE and NL2Repo-Bench. Missing bars = no published score for that model/benchmark combination.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Wins worth calling out</h3>
+            <p>DeepSWE 1.1 at 58.7 is the headline win — that is +42.2 over Qwen3.7-Plus and +4.3 over DeepSeek-V4-Flash-0731, on a benchmark that requires real multi-step agentic coding with tool use. SWE-bench Pro at 62.5 beats Claude Opus 4.6 Max (53.4) by nearly 10 points, which is a notable upset for a model in this price tier. CoWorkBench 73.9 and JobBench 55.7 are both roughly 2× the Qwen3.7-Plus baseline. Toolathlon Verified 73.5 is a strong tool-use score.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Losses worth calling out</h3>
+            <p>NL2Repo-Bench 48.1 vs DeepSeek-V4-Flash-0731's 54.2 is a -6.1 regression on repo-level code generation — llm-stats calls this out explicitly: &quot;NL2Repo 48.1 vs 54.2 is the miss; say it out loud.&quot; HLE 35.9 vs Claude Opus 4.6 Max's 40.0 is the frontier-reasoning gap, and Agents' Last Exam Pass@1 24.3 vs DeepSeek's 25.2 is a wash but technically a loss. The near-saturated coding and math ceilings (GPQA Diamond 91.7 vs 90.8 / 91.3, LiveCodeBench v6 91.9 vs 90.6 / 88.8) are real but small enough that llm-stats calls them &quot;noise on a crowded ceiling.&quot;</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">7.2 Vision and multimodal benchmarks</h2>
+            <p>This is the area where the gaps between Flash-Next and its competitors are widest. On AndroidWorld, RealWorldQA, MathVision (with code interpreter), and CharXiv RQ (with code interpreter), Flash-Next is 10–20 points ahead of every alternative Qwen reports against. Claude Opus 4.6 Max trails particularly badly on embodied and document tasks.</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 12 — Vision &amp; multimodal benchmarks (self-reported)</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Benchmark</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Flash-Next</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Qwen3.8-27B</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Qwen3.7-Plus</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Claude Opus 4.6</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">ClawEval-MM (Pass@3)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">64.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">57.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">57.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">52.5</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">ClawEval-MM (Average)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">60.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">56.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">60.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">54.7</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">RecreationBench</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">49.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">47.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">30.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">AndroidWorld</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">84.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">81.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">81.0</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">62.0</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">OSWorld 2.0 (Binary)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">19.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">19.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">2.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">OSWorld 2.0 (Partial)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">52.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">48.0</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">21.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Vision2Web</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">64.0</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">62.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">42.1</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">ERQA (embodied)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">72.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">65.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">69.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">40.8</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">LVBench (long video)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">76.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">72.4</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">76.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">63.0</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">RealWorldQA</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">88.5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">85.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">86.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">73.9</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">MathVision (without CI)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">90.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">90.0</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">90.3</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">65.5</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">MathVision (with CI)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">95.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">94.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">88.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">—</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">CharXiv RQ (without CI)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">84.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">83.7</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">85.8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">66.0</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">CharXiv RQ (with CI)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">90.6</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">90.2</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">85.9</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">—</td>
+            </tr>
+            </table>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Figure 4 — Multimodal and embodied benchmarks. Flash-Next dominates AndroidWorld, MathVision (with CI), CharXiv RQ (with CI), RecreationBench, and ERQA. OSWorld 2.0 binary is the obvious weak spot (19.4%).</p>
+            <p>The OSWorld 2.0 binary score of 19.4 deserves explicit attention. &quot;Binary&quot; means the percentage of tasks where the model achieved full reward — partial credit is tracked separately (Flash-Next scores 52.3 on partial). 19.4% binary success on full computer-use is essentially a coin flip; the model can make progress on most tasks but rarely completes them perfectly. Claude Opus 4.6 Max does not publish a comparable number, but the absolute level is the honest framing: Flash-Next is not yet a drop-in computer-use agent.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">7.3 Base-model benchmarks</h2>
+            <p>Per the Alibaba Cloud blog, Flash-Next-Base (the pre-instruction-tuned checkpoint) with 6B activated tops 8 of 14 base-model benchmarks, including MMLU-Pro, SuperGPQA, BBH, GSM8K, EvalPlus, SWEBench-Pretrain, MGSM, and MMMLU. It remains close to Qwen3.7-Plus-Base on MMLU, MMLU-Redux, GPQA, MATH, and MultiPL-E. The blog does not enumerate the full 14-benchmark list publicly, so the 8-of-14 claim cannot be independently verified beyond those eight names — a transparency gap worth flagging.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">7.4 Speed, throughput, and cost</h2>
+            <p>The throughput story is what justifies the &quot;Flash&quot; branding. The QSA attention kernel is reported to deliver up to 7.6× prefill and 4.9× decode speedup versus full attention at 1M-token context (kernel-level micro-benchmark). In a high-cache-reuse online-serving scenario at 90% prefix-cache hit rate, Flash-Next is reported to hit 8.6× the prefill throughput of Qwen3.7-Plus at 1M context. The SGLang cookbook cites 10.2× end-to-end and the vLLM recipe cites 6.6× — but as noted in section 5.4, these measure different things and are not directly comparable.</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 13 — Speed, throughput, and cost (vendor-reported)</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Metric</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Value</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Source</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">QSA attention kernel prefill speedup @ 1M ctx</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">up to 7.6× vs full attn</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Alibaba blog</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">QSA attention kernel decode speedup @ 1M ctx</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">up to 4.9× vs full attn</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Alibaba blog</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Prefill throughput vs Qwen3.7-Plus @ 1M ctx</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">8.6× (at 90% cache hit)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Alibaba blog</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">SGLang cookbook speedup</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">10.2×</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">marktechpost</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">vLLM recipe speedup</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">6.6×</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">marktechpost</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">API input price (qwen3.8-flash)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">$0.16 / M tokens</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Qwen tweet</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">API output price</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">$0.47 / M tokens</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Qwen tweet</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Price gap vs Qwen3.8-Max ($2.00 / $6.00)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">~12× cheaper both axes</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">The Decoder</td>
+            </tr>
+            </table>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Figure 5 — Left: speedup claims, with the caveat that different bars use different baselines and workloads. Right: API pricing on a log scale — Flash-Next is roughly 12× cheaper than Qwen3.8-Max and 30–50× cheaper than Claude Opus 4.6 Max on output tokens.</p>
+            <p>The Decoder summarizes the strategic implication: &quot;Flash-Next performs just below the flagship but costs about one-twelfth as much, with a roughly 12× price gap on both input and output tokens.&quot; On a pure $/M basis, this is unmatched in the open-weight MoE market at the time of writing. On a $/task basis the comparison is messier, because DeepSeek-V4-Flash-0731 has a different active-param count and may be competitive on workloads where it is close to Flash-Next on quality (e.g., NL2Repo-Bench).</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">7.5 Independent rankings (limited)</h2>
+            <p>BenchLM ranks Flash-Next at #25 of 226 overall (67.5 / 100 composite). Category ranks (verified): Agentic #13 of 138 (91st percentile), Coding #32 of 144 (78th percentile), Instruction Following #10 of 42 (78th percentile). Knowledge, Math, Multilingual, and Multimodal categories have published rows but are &quot;not ranked&quot; due to insufficient coverage (24 source-displayable rows). OpenRouter, LiveBench, lmarena, and artificialanalysis.ai do not yet have Flash-Next-specific entries at the time of writing — the model is too new. The predecessor Qwen3-Next-80B-A3B-Instruct on OpenRouter shows a weighted average price of $0.097 / $1.079 per M tokens across providers, with throughput of 73 tok/s P50 and latency of 0.48s P50 — but those numbers are for the older model, not Flash-Next.</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">Training Recipe: Muon, Scaling-Law Refit, No Warmup</h1>
+            <p>The training-side changes are as architecturally significant as the model-side ones. Three things in particular deserve attention: the Muon + AdamW optimizer split, the refitted scaling law, and the elimination of batch-size warmup. Together they account for a large fraction of the claimed ~9× cost reduction versus Qwen3.7-Plus.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">8.1 The Muon + AdamW optimizer split</h2>
+            <p>Muon (Jordan et al., kellerjordan.github.io/posts/muon) is an optimizer designed specifically for parameters that &quot;genuinely act as two-dimensional linear maps&quot; — i.e., weight matrices that multiply a vector. It performs orthogonalization on the gradient update before applying it, which empirically gives roughly 2× FLOPs efficiency over AdamW on the parameters it applies to (per independent benchmarks). Flash-Next uses Muon for:</p>
+            <ul><li>Main weights in QSA (the new sparse attention)</li></ul>
+            <ul><li>Main weights in GDN (Gated DeltaNet)</li></ul>
+            <ul><li>Main weights in MoE experts</li></ul>
+            <p>AdamW is retained for the parameters that do not fit the 2D-linear-map assumption:</p>
+            <ul><li>Embeddings (including the 51B N-gram table)</li></ul>
+            <ul><li>MoE router</li></ul>
+            <ul><li>Low-rank parameters in Gated Residual (the bottleneck-rank-320 branches)</li></ul>
+            <p>For fused parameter matrices — QKV, SwiGLU, and the GDN projections — Qwen splits them along the independent linear transformations they represent, then performs Muon orthogonalization separately on each piece. This is a non-trivial implementation detail: a naive application of Muon to a fused QKV matrix would orthogonalize across all three sub-projections at once, which is mathematically wrong. Splitting first ensures each sub-projection gets its own correct orthogonalization.</p>
+            <p>Qwen reports three specific Muon refinements in Flash-Next: (1) orthogonalization accuracy improvements, (2) the parameter-assignment split above, and (3) the fused-parameter splitting. None of these are earth-shattering individually, but together they represent the first production-quality Muon deployment at this scale.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">8.2 Refitted scaling law</h2>
+            <p>Scaling laws are not universal — they depend on the architecture and the optimizer. When you change both (GDN + QSA + GR + N-gram + Muon is a substantial change from standard Transformer + AdamW), the old scaling law no longer predicts loss accurately. Qwen refit the scaling law for the new architecture. The result, per the blog, is that the model can stably use larger learning rates and batch sizes — improving both convergence efficiency and large-scale parallel training throughput. The exact functional form of the refitted law is not published, which is a transparency gap, but the empirical claim (stable training at larger LR and batch) is verifiable from the model's existence.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">8.3 Batch-size warmup eliminated</h2>
+            <p>This is the most surprising single claim in the training recipe. Batch-size warmup — gradually increasing from a small batch to the target batch over the first portion of training — is standard practice in large-model training, on the theory that it stabilizes early optimization. Qwen's finding inverts that:</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Direct quote
+&quot;We also find that Batch Size Warmup, a common practice in large-scale model training, is no longer necessary: gradually increasing from a small Batch to the target Batch does not improve the final result, but instead requires 18.8% more optimizer steps. In the final training Recipe, we therefore start directly with the target Batch Size.&quot; — Alibaba Cloud launch blog</th>
+            </tr>
+            </table>
+            <p>An 18.8% optimizer-step reduction is a significant cost saving on a training run of this size. The mechanism is not fully explained in the public artifacts — the most plausible hypothesis is that the Muon optimizer's orthogonalization step makes early-training stability less sensitive to batch size than AdamW does. If true, this would be a meaningful secondary benefit of Muon that has not been widely appreciated. Independent reproduction by other large-model training teams would settle the question.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">8.4 Pretraining data</h2>
+            <p>For Flash-Next specifically, Qwen does not publish an exact pretraining-token count in the public artifacts. For the predecessor Qwen3-Next-80B-A3B, the HF card states &quot;Pretraining (15T tokens)&quot; — a subset of Qwen3's 36-trillion-token pretraining corpus. Flash-Next's pretraining is presumably similar in spirit (a refitted-scaling-law-sized subset of the Qwen3.5 / Qwen3.7 / Qwen3.8 corpus) but the exact number is not in the public card. This is a transparency gap relative to the predecessor.</p>
+            <p>What is disclosed:</p>
+            <ul><li>The Muon + AdamW split applies to specific weight categories (see 8.1).</li></ul>
+            <ul><li>Training eliminates batch-size warmup and starts directly at target batch size (see 8.3).</li></ul>
+            <ul><li>Stability optimizations (zero-centered RMSNorm with weight decay, attention output gating, normalized MoE router init) are retained.</li></ul>
+            <ul><li>Global load balancing is used for the MoE — increasing total expert parameters while keeping activated experts fixed steadily reduces training loss.</li></ul>
+            <ul><li>Training cost is ~1/9 that of Qwen3.7-Plus (vendor-reported).</li></ul>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">8.5 Post-training</h2>
+            <p>Flash-Next is described in the card as a post-trained model with both thinking and instruct modes. Thinking is on by default; it can be disabled per request. Reasoning depth is tunable via the reasoning_effort parameter, which takes the values xhigh (default), medium, or low. The card also describes a preserve_thinking toggle that retains thinking content across conversation history — useful for agentic consistency.</p>
+            <p>For the predecessor Qwen3-Next-80B-A3B, post-training used GSPO (Group Sequence Policy Optimization) for the Thinking variant, specifically cited as solving the stability challenges of RL with hybrid attention + high-sparsity MoE. Flash-Next does not specify which RL algorithm is used in its post-training — GSPO is the Qwen house standard, so it is presumably reused or refined. This is another transparency gap.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">8.6 Tokenizer training data</h2>
+            <p>Not separately documented for Flash-Next. The Qwen3 tokenizer is BPE-based with ~151k base tokens (extended to a padded 248,320 in Flash-Next's config for alignment reasons that are not publicly explained). Qwen3 covers 100+ languages natively; Qwen3.5 expanded to 201 languages and dialects. Flash-Next inherits this coverage without documented changes.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">8.7 Stability optimizations (retained)</h2>
+            <p>Three techniques first introduced in Qwen3-Next are carried forward unchanged — see section 5.11 for the list. The fact that these are retained across a major architectural overhaul is meaningful evidence that they are doing real work, because the easier path would have been to drop them along with everything else that changed.</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">Deployment &amp; Engineering</h1>
+            <p>This section covers everything you need to actually run Flash-Next in production or locally: on-disk sizes, VRAM requirements, quantization options, supported frameworks, API endpoints, and recommended sampling parameters. The short version: FP8 wants a multi-GPU node, 4-bit GGUF is the local-friendly path on 128 GB-class unified memory, and day-0 ecosystem support is unusually broad.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">9.1 On-disk sizes</h2>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 14 — On-disk size by precision</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Precision</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Size</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Source / notes</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">BF16</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">335.28 GiB</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Official Qwen BF16 checkpoint</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">FP8</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">172.78 GiB</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Official Qwen FP8 checkpoint; production precision on Hopper / Blackwell</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">4-bit GGUF (Unsloth Dynamic)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">~82 GB (58 GB main + 24 GB n-gram)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Unsloth UD-Q4_K_XL</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Real-world 4-bit quants</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">80–90 GB range</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Reddit pmv143 estimate</td>
+            </tr>
+            </table>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">9.2 VRAM and hardware requirements</h2>
+            <p>The FP8 path is the production-grade one. The minimum validated configuration is TP2 on GB300, with TP4 recommended for throughput. On an 8×H200 node, you must use TEP8 — TP8 is incompatible with the checkpoint's 128-wide quantization blocks. This is a non-obvious gotcha that has bitten early adopters; if you naively launch with --tensor-parallel-size 8 on H200s, you will get a quantization-block-alignment error rather than a graceful fallback.</p>
+            <p>The 4-bit path is the local-friendly one. At ~82 GB total memory, Flash-Next fits on 128 GB-class unified-memory systems with the N-gram table offloaded to system RAM. Community-validated targets include Mac Studio 128 GB, DGX Spark, Strix Halo 128 GB, RTX 5090 + 96 GB DDR5, and RTX 3090 + 96 GB DDR5. The 51B N-gram table is the &quot;offload-friendly&quot; angle — it can sit in system RAM and be asynchronously prefetched (currently NVIDIA-only, per the marktechpost write-up). A user on r/LocalLLaMA reports running it on &quot;8 gig VRAM and 48 gig RAM&quot; — clearly heavily offloaded, and not a speed claim, but a sign that the offload path works at the extreme end.</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Deployment gotcha
+TP8 is incompatible with Flash-Next's 128-wide quantization blocks on 8×H200. Use TEP8 (tensor-expert parallel) instead. This is the most common deployment gotcha in the first 24 hours of release.</th>
+            </tr>
+            </table>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">9.3 Quantization options</h2>
+            <p>The quantization ecosystem is broad at launch, reflecting heavy day-0 collaboration with Unsloth and the broader open-source inference community:</p>
+            <ul><li>GGUF: unsloth/Qwen3.8-Flash-Next-GGUF — Unsloth Dynamic V3.0 quants including UD-Q4_K_XL. Runs in llama.cpp with a specific PR (issue #15940) for Qwen3-Next gated DeltaNet support.</li></ul>
+            <ul><li>NVFP4: Unsloth NVFP4 for Blackwell / RTX 50.</li></ul>
+            <ul><li>MLX: Apple Silicon via mlx-vlm.</li></ul>
+            <ul><li>FP8: Official Qwen FP8 checkpoint (172.78 GiB) — production precision on Hopper / Blackwell.</li></ul>
+            <ul><li>BF16: Official Qwen BF16 checkpoint (335.28 GiB) — for those who need full precision.</li></ul>
+            <ul><li>AWQ / GPTQ: Not yet widely available at research date. Unsloth and a few community quants exist; the HF Quantizations tab shows 63 quantized variants of the main model.</li></ul>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">9.4 Supported frameworks</h2>
+            <p>Day-0 framework support is unusually broad — most major inference stacks had Flash-Next support within hours of weight release:</p>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 15 — Framework support</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Framework</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Status</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Notes</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">HuggingFace Transformers</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Supported (main branch)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">arch string qwen4_exp; pip install git+https://github.com/huggingface/transformers.git@main</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">vLLM</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Supported</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">--tensor-parallel-size 4 --max-model-len 262144 --reasoning-parser qwen3 --enable-auto-tool-choice --tool-call-parser qwen3_coder</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">SGLang</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Supported</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">--tp-size 4 --context-length 262144 --reasoning-parser qwen3 --tool-call-parser qwen3_coder</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">TokenSpeed</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Supported</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Same flags as vLLM / SGLang; newer engine</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">llama.cpp</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Supported (with PR)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Specific PR needed for gated DeltaNet; Unsloth's bundled fork is the easiest path</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">MLX (Apple Silicon)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Supported via mlx-vlm</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Original checkpoints compatible</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Ollama</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Supported</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">ollama run qwen3.8-flash-next</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Unsloth</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Supported (Studio + GGUFs + NVFP4)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Day-0 support; Daniel Han confirmed</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">LM Studio</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Supported</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">GGUF format</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Docker Model Runner</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Supported</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">docker model run hf.co/Qwen/Qwen3.8-Flash-Next</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">KTransformers</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Mentioned in HF card</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">For high-throughput production</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Transformers serve CLI</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">Supported</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">transformers serve Qwen/Qwen3.8-Flash-Next --port 8000 --continuous-batching</td>
+            </tr>
+            </table>
+            <p>For comparison, Qwen3-Next (Sep 2025) needed sglang &gt;= 0.5.2 or vllm &gt;= 0.10.2. Flash-Next presumably needs newer versions — the recipe commands above are from the GitHub repo and reflect current main-branch behavior of each framework.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">9.5 API endpoints</h2>
+            <p>QwenCloud (production) serves Flash-Next under the SKU name qwen3.8-flash. Three regional endpoints:</p>
+            <ul><li>Beijing: https://dashscope.aliyuncs.com/compatible-mode/v1</li></ul>
+            <ul><li>Singapore: https://dashscope-intl.aliyuncs.com/compatible-mode/v1</li></ul>
+            <ul><li>US (Virginia): https://dashscope-us.aliyuncs.com/compatible-mode/v1</li></ul>
+            <p>The endpoints support OpenAI Chat Completions, OpenAI Responses API, and an Anthropic-compatible interface — which means it works with Claude Code directly. Pricing is $0.16 / $0.47 per M tokens. Context is 1M by default in the production API. Tool calling uses native built-in tools. Integration partners at launch include Claude Code (via Anthropic protocol), OpenAI Codex (via Responses protocol), Qoder CLI, Qwen Code, OpenClaw, and QwenWork (which powers the new &quot;Standard&quot; mode).</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">9.6 Recommended sampling parameters</h2>
+            <p>The HF card distinguishes two sampling regimes: thinking mode (default) and instruct (non-thinking) mode. Both use temperature = 1.0 and top_p = 0.95 as starting points, but they diverge on presence_penalty and reasoning_effort.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Thinking mode (default)</h3>
+            <p>temperature        = 1.0</p>
+            <p>top_p              = 0.95</p>
+            <p>top_k              = 20</p>
+            <p>min_p              = 0.0</p>
+            <p>presence_penalty   = 0.0</p>
+            <p>repetition_penalty = 1.0</p>
+            <p>reasoning_effort   = &quot;xhigh&quot;   # default; also: medium, low</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Instruct (non-thinking) mode</h3>
+            <p>temperature        = 1.0 -&gt; 0.7</p>
+            <p>top_p              = 0.95 -&gt; 0.80</p>
+            <p>top_k              = 20</p>
+            <p>min_p              = 0.0</p>
+            <p>presence_penalty   = 1.5</p>
+            <p>repetition_penalty = 1.0</p>
+            <p>enable_thinking    = False</p>
+            <p>Recommended max output: 262,144 tokens for reasoning content + 131,072 for final response, within the 1M context. The card also notes that presence_penalty between 0 and 2 reduces endless repetition, but high values can cause &quot;language mixing&quot; and a slight performance drop. For long-horizon agentic tasks: &quot;lower reasoning effort does not always reduce overall task completion time. Although it may produce faster per-turn responses, it can also lead to insufficient analysis, more failures, and repeated retries, which may increase total latency and token consumption.&quot;</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">Hands-on Code</h1>
+            <p>This section is a runnable reference. All snippets are taken from or patterned on the official HuggingFace model card, the Qwen3.8-Flash-Next GitHub repo, and the Unsloth documentation. Where a snippet has been adapted for clarity, that is noted.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">10.1 HuggingFace Transformers — multimodal inference</h2>
+            <p>The simplest path. The pipeline API handles the multimodal preprocessor for you:</p>
+            <p>from transformers import pipeline</p>
+            <p>pipe = pipeline(&quot;image-text-to-text&quot;, model=&quot;Qwen/Qwen3.8-Flash-Next&quot;)</p>
+            <p>messages = [</p>
+            <p>{</p>
+            <p>&quot;role&quot;: &quot;user&quot;,</p>
+            <p>&quot;content&quot;: [</p>
+            <p>{&quot;type&quot;: &quot;image&quot;,</p>
+            <p>&quot;url&quot;: &quot;https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/p-blog/candy.JPG&quot;},</p>
+            <p>{&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;What animal is on the candy?&quot;}</p>
+            <p>]</p>
+            <p>},</p>
+            <p>]</p>
+            <p>print(pipe(text=messages))</p>
+            <p>Direct load — gives you more control over generation:</p>
+            <p>from transformers import AutoProcessor, AutoModelForMultimodalLM</p>
+            <p>processor = AutoProcessor.from_pretrained(&quot;Qwen/Qwen3.8-Flash-Next&quot;)</p>
+            <p>model = AutoModelForMultimodalLM.from_pretrained(</p>
+            <p>&quot;Qwen/Qwen3.8-Flash-Next&quot;, device_map=&quot;auto&quot;</p>
+            <p>)</p>
+            <p>messages = [</p>
+            <p>{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: [</p>
+            <p>{&quot;type&quot;: &quot;image&quot;, &quot;url&quot;: &quot;https://huggingface.co/datasets/huggingface/documentation-images/resolve/main/p-blog/candy.JPG&quot;},</p>
+            <p>{&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: &quot;What animal is on the candy?&quot;}</p>
+            <p>]}</p>
+            <p>]</p>
+            <p>inputs = processor.apply_chat_template(</p>
+            <p>messages, add_generation_prompt=True, tokenize=True,</p>
+            <p>return_dict=True, return_tensors=&quot;pt&quot;,</p>
+            <p>).to(model.device)</p>
+            <p>outputs = model.generate(**inputs, max_new_tokens=40)</p>
+            <p>print(processor.decode(outputs[0][inputs[&quot;input_ids&quot;].shape[-1]:]))</p>
+            <p>Or use the new transformers serve CLI for an OpenAI-compatible server:</p>
+            <p>transformers serve Qwen/Qwen3.8-Flash-Next --port 8000 --continuous-batching</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">10.2 vLLM serving</h2>
+            <p>Production serving with vLLM. The flags below are the recommended baseline:</p>
+            <p>vllm serve Qwen/Qwen3.8-Flash-Next \</p>
+            <p>--port 8000 \</p>
+            <p>--tensor-parallel-size 4 \</p>
+            <p>--max-model-len 262144 \</p>
+            <p>--reasoning-parser qwen3 \</p>
+            <p>--enable-auto-tool-choice \</p>
+            <p>--tool-call-parser qwen3_coder</p>
+            <p>With MTP speculative decoding — the recommended config for latency-sensitive workloads:</p>
+            <p>vllm serve Qwen/Qwen3.8-Flash-Next \</p>
+            <p>--port 8000 \</p>
+            <p>--tensor-parallel-size 4 \</p>
+            <p>--max-model-len 262144 \</p>
+            <p>--reasoning-parser qwen3 \</p>
+            <p>--enable-auto-tool-choice \</p>
+            <p>--tool-call-parser qwen3_coder \</p>
+            <p>--speculative-config '{&quot;method&quot;:&quot;qwen3_next_mtp&quot;,&quot;num_speculative_tokens&quot;:2}'</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">10.3 SGLang serving</h2>
+            <p>SGLang is the recommended framework for the highest throughput numbers in the launch blog. Baseline:</p>
+            <p>sglang serve \</p>
+            <p>--model-path Qwen/Qwen3.8-Flash-Next \</p>
+            <p>--port 8000 \</p>
+            <p>--tp-size 4 \</p>
+            <p>--context-length 262144 \</p>
+            <p>--reasoning-parser qwen3 \</p>
+            <p>--tool-call-parser qwen3_coder</p>
+            <p>With MTP speculative decoding:</p>
+            <p>python -m sglang.launch_server \</p>
+            <p>--model-path Qwen/Qwen3.8-Flash-Next \</p>
+            <p>--port 30000 --tp-size 4 --context-length 262144 \</p>
+            <p>--reasoning-parser qwen3 --tool-call-parser qwen3_coder \</p>
+            <p>--speculative-algo NEXTN \</p>
+            <p>--speculative-num-steps 3 \</p>
+            <p>--speculative-eagle-topk 1 \</p>
+            <p>--speculative-num-draft-tokens 4</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">10.4 Tool / function calling (OpenAI-compatible)</h2>
+            <p>This snippet shows streaming with the reasoning_effort parameter and preserve_thinking toggle. It works against any OpenAI-compatible endpoint (vLLM, SGLang, QwenCloud):</p>
+            <p>from openai import OpenAI</p>
+            <p>client = OpenAI()  # OPENAI_BASE_URL and OPENAI_API_KEY set via env</p>
+            <p>messages = [</p>
+            <p>{&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: &quot;Write a Python function to merge two sorted linked lists.&quot;},</p>
+            <p>]</p>
+            <p>completion = client.chat.completions.create(</p>
+            <p>model=&quot;Qwen/Qwen3.8-Flash-Next&quot;,</p>
+            <p>messages=messages,</p>
+            <p>extra_body={</p>
+            <p>&quot;chat_template_kwargs&quot;: {</p>
+            <p>&quot;enable_thinking&quot;: True,     # on by default</p>
+            <p>&quot;preserve_thinking&quot;: True,   # on by default</p>
+            <p>},</p>
+            <p>},</p>
+            <p>reasoning_effort=&quot;xhigh&quot;,  # xhigh | medium | low</p>
+            <p>stream=True,</p>
+            <p>stream_options={&quot;include_usage&quot;: True},</p>
+            <p>)</p>
+            <p>reasoning_content = &quot;&quot;</p>
+            <p>answer_content = &quot;&quot;</p>
+            <p>is_answering = False</p>
+            <p>print(&quot;\n&quot; + &quot;=&quot; * 20 + &quot;Reasoning&quot; + &quot;=&quot; * 20 + &quot;\n&quot;)</p>
+            <p>for chunk in completion:</p>
+            <p>if not chunk.choices:</p>
+            <p>print(&quot;\nUsage:&quot;, chunk.usage)</p>
+            <p>continue</p>
+            <p>delta = chunk.choices[0].delta</p>
+            <p>if hasattr(delta, &quot;reasoning_content&quot;) and delta.reasoning_content is not None:</p>
+            <p>if not is_answering:</p>
+            <p>print(delta.reasoning_content, end=&quot;&quot;, flush=True)</p>
+            <p>reasoning_content += delta.reasoning_content</p>
+            <p>elif hasattr(delta, &quot;reasoning&quot;) and delta.reasoning is not None:</p>
+            <p>if not is_answering:</p>
+            <p>print(delta.reasoning, end=&quot;&quot;, flush=True)</p>
+            <p>reasoning_content += delta.reasoning</p>
+            <p>if hasattr(delta, &quot;content&quot;) and delta.content:</p>
+            <p>if not is_answering:</p>
+            <p>print(&quot;\n&quot; + &quot;=&quot; * 20 + &quot;Answer&quot; + &quot;=&quot; * 20 + &quot;\n&quot;)</p>
+            <p>is_answering = True</p>
+            <p>print(delta.content, end=&quot;&quot;, flush=True)</p>
+            <p>answer_content += delta.content</p>
+            <p>For richer agentic use, the predecessor's Qwen-Agent + MCP pattern carries over:</p>
+            <p>from qwen_agent.agents import Assistant</p>
+            <p>llm_cfg = {</p>
+            <p>'model': 'Qwen3.8-Flash-Next',</p>
+            <p>'model_type': 'qwen_dashscope',</p>
+            <p>}</p>
+            <p>tools = [</p>
+            <p>{'mcpServers': {</p>
+            <p>'time':  {'command': 'uvx', 'args': ['mcp-server-time',  '--local-timezone=Asia/Shanghai']},</p>
+            <p>'fetch': {'command': 'uvx', 'args': ['mcp-server-fetch']},</p>
+            <p>}},</p>
+            <p>'code_interpreter',</p>
+            <p>]</p>
+            <p>bot = Assistant(llm=llm_cfg, function_list=tools)</p>
+            <p>messages = [{'role': 'user', 'content': 'https://qwenlm.github.io/blog/ Introduce the latest developments of Qwen'}]</p>
+            <p>for responses in bot.run(messages=messages):</p>
+            <p>pass</p>
+            <p>print(responses)</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">10.5 Long-context — 1M tokens with YaRN</h2>
+            <p>Static YaRN can hurt short prompts, so only enable it when you actually need long context. For vLLM:</p>
+            <p>VLLM_ALLOW_LONG_MAX_MODEL_LEN=1 vllm serve Qwen/Qwen3.8-Flash-Next \</p>
+            <p>--hf-overrides '{&quot;text_config&quot;: {&quot;rope_parameters&quot;: {</p>
+            <p>&quot;mrope_interleaved&quot;: true,</p>
+            <p>&quot;mrope_section&quot;: [11, 11, 10],</p>
+            <p>&quot;rope_type&quot;: &quot;yarn&quot;,</p>
+            <p>&quot;rope_theta&quot;: 10000000,</p>
+            <p>&quot;partial_rotary_factor&quot;: 0.25,</p>
+            <p>&quot;factor&quot;: 4.0,</p>
+            <p>&quot;original_max_position_embeddings&quot;: 262144</p>
+            <p>}}}' \</p>
+            <p>--max-model-len 1000000</p>
+            <p>For SGLang:</p>
+            <p>SGLANG_ALLOW_OVERWRITE_LONGER_CONTEXT_LEN=1 python -m sglang.launch_server \</p>
+            <p>--model-path Qwen/Qwen3.8-Flash-Next \</p>
+            <p>--json-model-override-args '{&quot;text_config&quot;: {&quot;rope_parameters&quot;: {</p>
+            <p>&quot;mrope_interleaved&quot;: true, &quot;mrope_section&quot;: [11, 11, 10],</p>
+            <p>&quot;rope_type&quot;: &quot;yarn&quot;, &quot;rope_theta&quot;: 10000000,</p>
+            <p>&quot;partial_rotary_factor&quot;: 0.25, &quot;factor&quot;: 4.0,</p>
+            <p>&quot;original_max_position_embeddings&quot;: 262144</p>
+            <p>}}}' \</p>
+            <p>--context-length 1000000</p>
+            <p>Tip from the card: if typical context is around 524K, use factor: 2.0 instead of 4.0 — the smaller YaRN factor preserves short-prompt quality better.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">10.6 Fine-tuning with PEFT / LoRA</h2>
+            <p>The GitHub repo directs users to Unsloth, Swift, and LLaMA-Factory for SFT / DPO / GRPO fine-tuning. Qwen-Agent is the in-house agentic harness. A typical Unsloth dynamic 4-bit fine-tune looks like:</p>
+            <p>from unsloth import FastLanguageModel</p>
+            <p>model, tokenizer = FastLanguageModel.from_pretrained(</p>
+            <p>model_name = &quot;unsloth/Qwen3.8-Flash-Next&quot;,</p>
+            <p>max_seq_length = 262144,</p>
+            <p>dtype = None,       # auto</p>
+            <p>load_in_4bit = True,</p>
+            <p>)</p>
+            <p>model = FastLanguageModel.get_peft_adapter(</p>
+            <p>model,</p>
+            <p>r = 16,</p>
+            <p>target_modules = [&quot;q_proj&quot;, &quot;k_proj&quot;, &quot;v_proj&quot;, &quot;o_proj&quot;,</p>
+            <p>&quot;gate_proj&quot;, &quot;up_proj&quot;, &quot;down_proj&quot;],</p>
+            <p>lora_alpha = 16,</p>
+            <p>lora_dropout = 0,</p>
+            <p>bias = &quot;none&quot;,</p>
+            <p>use_gradient_checkpointing = &quot;unsloth&quot;,</p>
+            <p>random_state = 3407,</p>
+            <p>)</p>
+            <p># ... attach SFTTrainer / DPOTrainer / GRPOTrainer as usual</p>
+            <p>Note: the Unsloth team confirmed day-0 support, but the Flash-Next-specific fine-tune guide page is still being populated at research time. The snippet above is the standard Unsloth MoE pattern; expect minor adjustments for the GDN and QSA layers (which may need their own target_modules entries once the Unsloth team documents them).</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">10.7 Local: Ollama and llama.cpp</h2>
+            <p>Ollama:</p>
+            <p>ollama run qwen3.8-flash-next</p>
+            <p># or pull a specific Unsloth GGUF tag:</p>
+            <p>ollama run hf.co/unsloth/Qwen3.8-Flash-Next-GGUF:UD-Q4_K_XL</p>
+            <p>llama.cpp:</p>
+            <p># macOS / Linux install</p>
+            <p>curl -LsSf https://llama.app/install.sh | sh</p>
+            <p># Start a local OpenAI-compatible server with web UI:</p>
+            <p>llama serve -hf unsloth/Qwen3.8-Flash-Next-GGUF:UD-Q4_K_XL</p>
+            <p># Or run inference directly in the terminal:</p>
+            <p>llama cli -hf unsloth/Qwen3.8-Flash-Next-GGUF:UD-Q4_K_XL</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">llama.cpp caveat
+The gated DeltaNet linear-attention path required specific llama.cpp PRs (issue #15940) for Qwen3-Next. Flash-Next adds QSA on top — Unsloth's bundled llama.cpp fork is the easiest path to a working local install.</th>
+            </tr>
+            </table>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">10.8 Claude Code and OpenAI Codex via QwenCloud</h2>
+            <p>Because QwenCloud exposes both OpenAI Responses API and an Anthropic-compatible API, Flash-Next drops directly into existing agentic-coding tools. Claude Code:</p>
+            <p>npm install -g @anthropic-ai/claude-code</p>
+            <p>export ANTHROPIC_MODEL=&quot;qwen3.8-flash&quot;</p>
+            <p>export ANTHROPIC_SMALL_FAST_MODEL=&quot;qwen3.8-flash&quot;</p>
+            <p>export ANTHROPIC_BASE_URL=https://dashscope-intl.aliyuncs.com/apps/anthropic</p>
+            <p>export ANTHROPIC_AUTH_TOKEN=&lt;your_api_key&gt;</p>
+            <p>claude</p>
+            <p>OpenAI Codex (configure ~/.codex/model-catalog.local.json with a qwen3.8-flash entry, then ~/.codex/config.toml with model_provider = &quot;QwenCloud&quot; and wire_api = &quot;responses&quot;):</p>
+            <p>npm install -g @openai/codex</p>
+            <p>export OPENAI_API_KEY=&lt;your_api_key&gt;</p>
+            <p>codex</p>
+            <p>Both integrations are first-class — Qwen explicitly lists Claude Code, OpenAI Codex, Qoder CLI, Qwen Code, OpenClaw, and QwenWork as launch partners. For agentic-coding teams already on Claude Code, swapping the model to qwen3.8-flash is a single environment-variable change, and the cost delta versus Claude Opus 4.6 is roughly 30–50× on output tokens.</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">Balanced Analysis: Strengths, Weaknesses, and Honest Gaps</h1>
+            <p>This section is the part most vendor launch blogs omit. The goal is to give a technical reader an honest picture of where Flash-Next genuinely leads, where it merely keeps up, and where it still trails the frontier. Every claim here is sourced from either the official model card (with caveat that the numbers are self-reported) or from independent community / press coverage in the first 24 hours of release.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">11.1 Strengths</h2>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Cost efficiency vs capability</h3>
+            <p>$0.16 / $0.47 per M tokens is roughly 12× cheaper than Qwen3.8-Max on both axes, and substantially cheaper than DeepSeek-V4-Flash and Claude Opus 4.6 Max. The Decoder calls this &quot;ratcheting up the pressure on OpenAI and Anthropic.&quot; For agentic-coding workloads where Flash-Next is at or near the frontier on quality, the $/task economics are compelling — particularly for teams that have been running on Claude Opus 4.6 and can swap to qwen3.8-flash via the Anthropic-compatible API with a single env-var change.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Agentic coding performance</h3>
+            <p>DeepSWE 1.1 at 58.7 (vs 54.4 for DeepSeek-V4-Flash, 16.5 for Qwen3.7-Plus) is a notable jump. SWE-bench Pro at 62.5 beats Claude Opus 4.6 Max (53.4). The model is explicitly optimized for agentic-coding benchmarks per The Decoder, and the optimization shows. SWE-bench Multilingual at 81.0 is also strong — the multilingual coding extension is not an afterthought.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Office / cowork tasks</h3>
+            <p>CoWorkBench 73.9 (vs 45.1 for DeepSeek-V4-Flash, 65.1 for Qwen3.7-Plus); JobBench 55.7 nearly doubles Qwen3.7-Plus at 27.6. These are the benchmarks where Flash-Next's lead is largest in absolute terms, and they suggest the model is particularly well-suited to the kind of long-horizon office-task automation that has become a major enterprise use case.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Architecture as research contribution</h3>
+            <p>Gated Residual, N-gram Embedding, QSA, and the Muon application are real research contributions being given away as open weights. NVIDIA developer forum members were impressed by the architecture preview, particularly the &quot;memory cheap&quot; N-gram offload angle. Reddit user 0rand notes that &quot;the structure looks very similar to Ling 3.0 (Kimi K3 Flash)&quot; — which is a meaningful comparison, because Kimi K3 Flash is the other recent open-weight model exploring similar ideas. The fact that Qwen is shipping this as open weights under (close to) Apache-2.0 terms is a real service to the research community.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Local-friendliness of the architecture</h3>
+            <p>r/LocalLLaMA users were enthusiastic that the 51B N-gram table is sparsely accessed and an excellent candidate for system-RAM offload. A 4-bit quant in the 82 GB range makes it runnable on 128 GB Mac Studios, DGX Sparks, and Strix Halo. Sample community reactions: &quot;Finally — a use for my 3060 and 128 GB RAM!&quot; and &quot;Ohhh my. Absolutely gorgeous for my 3090 + 96 GB DDR5.&quot; This is the first open-weight model in this capability class that is plausibly local-runnable on enthusiast hardware.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Day-0 ecosystem support</h3>
+            <p>Unsloth (Daniel Han confirmed), vLLM, SGLang, TokenSpeed, llama.cpp (with PR), MLX, Ollama, LM Studio, Docker Model Runner, KTransformers — all supported at launch. This is unusually broad for a model with this many architectural novelties (GDN + QSA + GR + N-gram is not a small ask for inference frameworks). The fact that all of these shipped day-0 suggests Qwen did substantial pre-release collaboration work with the inference-stack community.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Hybrid thinking design</h3>
+            <p>Thinking on by default with reasoning_effort = xhigh / medium / low and the preserve_thinking toggle (which retains thinking content across conversation history) is praised as good for agentic consistency. The ability to dial reasoning effort per-request is a meaningful product feature — it lets teams trade latency for quality at the call site rather than via model selection.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">11.2 Known issues, complaints, and limitations</h2>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">NL2Repo-Bench regression</h3>
+            <p>Flash-Next scores 48.1 vs DeepSeek-V4-Flash-0731 at 54.2 — a -6.1 delta. llm-stats calls this out explicitly: &quot;NL2Repo 48.1 vs 54.2 is the miss; say it out loud.&quot; This is a repo-level code generation benchmark, suggesting DeepSeek's model may be better at whole-repo synthesis. For teams whose primary use case is repo-level code generation rather than agentic coding, this is the benchmark to weight most heavily.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">HLE gap</h3>
+            <p>Humanity's Last Exam — Claude Opus 4.6 (Max) wins at 40.0 vs Flash-Next's 35.9. llm-stats: &quot;Frontier reasoning remains the gap.&quot; This is the benchmark that most directly measures hard-reasoning depth, and it is the one where the gap to the true frontier is largest in relative terms.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">OSWorld 2.0 binary is low</h3>
+            <p>19.4% binary success on OSWorld 2.0 — tied with Qwen3.8-27B, still essentially a coin flip on full task success on computer-use. Partial score 52.3 is better but still well below the frontier. If your use case is fully-autonomous computer-use agents, Flash-Next is not yet the right model.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Agents' Last Exam Pass@1</h3>
+            <p>24.3 — slightly behind DeepSeek-V4-Flash-0731 at 25.2. llm-stats calls this a wash, but technically a loss.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Near-saturated ceilings on coding and math</h3>
+            <p>LiveCodeBench v6 91.9 vs 90.6 (DeepSeek) and 88.8 (Claude Opus 4.6); GPQA Diamond 91.7 vs 90.8 and 91.3. llm-stats: &quot;the deltas are noise on a crowded ceiling.&quot; These benchmarks have become saturated to the point where single-point deltas are within run-to-run variance — they are no longer discriminating between frontier models.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Self-reported only</h3>
+            <p>BenchLM notes &quot;24 published rows leave some tracked benchmark slots empty. No comparable first-party API token rate is published.&quot; Categories like Reasoning, Math, Multilingual, and Multimodal have published rows but are &quot;not ranked&quot; due to insufficient coverage. Treat every number as vendor-reported until independent measurement exists. The model is one day old at research time.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">License is NOT Apache 2.0</h3>
+            <p>The Qwen3.8 main GitHub repo claims Apache-2.0 in its LICENSE file, but the Flash-Next checkpoint specifically ships under qwen-community-1.0. The Unsloth GGUF card and the Ollama page both list qwen-community-1.0. marktechpost explicitly warns: &quot;Licensed under qwen-community-1.0, not Apache-2.0 — verify terms before commercial use.&quot; This is a recurring Qwen pattern — the Qwen Community License has had commercial-use restrictions for entities above 100M MAU in prior versions. For any commercial deployment, read the actual license text before committing.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Hardware reality check</h3>
+            <p>The Decoder's &quot;it just spat out a fully developed single-file HTML cloth simulator with perfect physics, no local model ever did this before on my single Mac Studio&quot; quote is from the Qwen3.8-27B release, not Flash-Next. For Flash-Next, the more honest community sentiment is &quot;80 GB is a lot more manageable than a 1.2 TB+ frontier model&quot; (Reddit FabricationLife), but you still need 128 GB-class unified memory. Users with 64 GB RAM report regret: &quot;regret building only 64 GB RAM instead of 128 GB now, but at the same time I'm $$$ constrained&quot; (Reddit SensitiveVariety). The architecture is local-friendly; the absolute size is not.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">VRAM quirk — TP8 incompatible</h3>
+            <p>TP8 is incompatible with the checkpoint's 128-wide quantization blocks on 8×H200 — users must use TEP8 instead. This is a non-obvious gotcha that has already bitten early adopters. If you have an 8×H200 node, do not assume --tensor-parallel-size 8 will work.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Multimodal + local GGUF complexity</h3>
+            <p>A community user on r/LocalLLaMA noted: &quot;Which will be tricky for multimodal checkpoint&quot; (re: grafting dspark for it). Multimodal local inference is possible but the toolchain is still settling.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">No first-party hosted price on HF</h3>
+            <p>As of research date, the Flash-Next open-weights checkpoint has no hosted $/M listing; the QwenCloud SKU qwen3.8-flash is a separate product with its own pricing. llm-stats: &quot;If you came here for a list price, there is not one yet.&quot;</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">N-gram offload is NVIDIA-only</h3>
+            <p>The 51B N-gram table offload to host RAM is NVIDIA-only for now, per marktechpost. Mac and AMD users cannot fully exploit the offload-friendly design yet — this is a meaningful limitation for the local-LLM community that Qwen is courting.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Size confusion pre-release</h3>
+            <p>There was significant community confusion before launch about whether Flash-Next was 125B-A6B or 35B-A3B (the Japanese note.com article documents this in detail — some developers expected a smaller &quot;Flash&quot; based on the historical Qwen3.5-Flash = 35B-A3B pattern). The HF card settled it as 125B-A6B + 51B N-gram. The pre-release confusion is a transparency issue but is now resolved.</p>
+            <h3 style="font-size:1.15em;margin:25px 0 10px;color:#374151;">Thinking verbosity at default xhigh</h3>
+            <p>From the Qwen3.8-27B review (which shares much of the architecture and tuning): &quot;The most common complaint in the first week wasn't quality, it was verbosity. At default xhigh the thing meanders.&quot; The same default-xhigh reasoning behavior carries to Flash-Next. For latency-sensitive use cases, dial reasoning_effort down to medium or low.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">11.3 Where it lags competitors</h2>
+            <p style="font-style:italic;color:#6b7280;font-size:0.9em;">Table 16 — Where Flash-Next lags</p>
+            <table style="width:100%;border-collapse:collapse;margin:20px 0;font-size:0.9em;">
+            <tr>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Competitor</th>
+            <th style="padding:10px;border:1px solid #e5e7eb;background:#1e40af;color:white;font-weight:600;">Where Flash-Next lags</th>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Claude Opus 4.6 (Max)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">HLE (35.9 vs 40.0); OSWorld; overall frontier reasoning depth</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">DeepSeek-V4-Flash-0731</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">NL2Repo-Bench (48.1 vs 54.2); Agents' Last Exam Pass@1 (24.3 vs 25.2)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Qwen3.8-Max (own flagship)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Frontier capability across the board (CoWorkBench 73.9 vs 74.8; Agents' Last Exam 51.2 vs 52.4; AndroidWorld 84.5 vs 85.3) — Flash-Next is deliberately a tier below</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">GPT-5.6 Sol (per BenchLM)</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;background:#f9fafb;">DeepSWE 58.7 vs 72.7 (best verified)</td>
+            </tr>
+            <tr>
+            <td style="padding:10px;border:1px solid #e5e7eb;">Claude Opus 5 / Mythos 5</td>
+            <td style="padding:10px;border:1px solid #e5e7eb;">SWE-bench Pro 62.5 vs 80.3 (best verified per BenchLM)</td>
+            </tr>
+            </table>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">11.4 Hallucination, safety, and context window reality check</h2>
+            <p>No specific hallucination studies have been published yet for Flash-Next. The card does not document refusal rates or safety red-teaming in the publicly available portions retrieved for this analysis. Sampling guidance: use presence_penalty between 0 and 2 to reduce endless repetition, but high values can cause &quot;language mixing&quot; and a slight performance drop.</p>
+            <p>For long-horizon agentic tasks, the card offers a non-obvious warning: &quot;lower reasoning effort does not always reduce overall task completion time. Although it may produce faster per-turn responses, it can also lead to insufficient analysis, more failures, and repeated retries, which may increase total latency and token consumption.&quot; This is worth internalizing — naive reasoning_effort = low will not always be cheaper.</p>
+            <p>On context window: native 262K; YaRN-extended to 1M. The card explicitly warns: &quot;All the notable open-source frameworks implement static YaRN, which means the scaling factor remains constant regardless of input length, potentially impacting performance on shorter texts.&quot; For high-cache-reuse online serving at 1M context with 90% prefix-cache hit rate, Qwen reports 8.6× prefill throughput vs Qwen3.7-Plus — but no independent end-to-end long-context quality evaluation (e.g., RULER, LongBench, Needle-in-Haystack) is published in the available artifacts. The predecessor Qwen3-Next-80B-A3B was validated up to 1M tokens on long-context tasks; Flash-Next presumably inherits this with QSA giving better latency, but independent validation is pending.</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">The Bottom Line</h1>
+            <p>Flash-Next is the most architecturally ambitious open-weight MoE since DeepSeek-V3, and possibly the most cost-efficient open-weight model currently in production. The combination of Gated DeltaNet for history compression, Qwen Sparse Attention for targeted retrieval, Gated Residual for a wider and more stable residual stream, N-gram Embedding for compute-free knowledge capacity, and Muon for optimizer efficiency is a coherent answer to the question &quot;how do you keep driving down cost-per-token without giving up capability?&quot; The benchmark numbers — particularly on agentic coding and office tasks — bear that out, with the appropriate caveat that they are vendor self-reported and the model is one day old.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">Who should use Flash-Next today</h2>
+            <p>Agentic-coding teams already on Claude Code or OpenAI Codex. The Anthropic-compatible and OpenAI Responses API endpoints make the swap a single environment-variable change, and the cost delta versus Claude Opus 4.6 is roughly 30–50× on output tokens. For workloads where Flash-Next is at or near the frontier on quality (DeepSWE, SWE-bench Pro, CoWorkBench, JobBench), this is one of the highest-leverage cost reductions available in the API market right now.</p>
+            <p>Cost-sensitive production deployments that need 1M-token context. The QSA kernel's reported 7.6× / 4.9× prefill/decode speedup versus full attention at 1M context, combined with the $0.16 / $0.47 pricing, makes Flash-Next a strong candidate for long-context workloads that would be prohibitively expensive on frontier-model APIs.</p>
+            <p>Local-LLM enthusiasts with 128 GB-class unified memory. Mac Studio 128 GB, DGX Spark, Strix Halo 128 GB, RTX 5090 + 96 GB DDR5 — these are the configs that can actually run a 4-bit quant of Flash-Next with the N-gram table in system RAM. The architecture is unusually well-suited to this kind of split memory layout.</p>
+            <p>Qwen4 architecture watchers. If you want to understand where the Qwen4 mainline family is going, Flash-Next is the canonical reference. The GDN + QSA + GR + N-gram + Muon combo will almost certainly appear in Qwen4 with refinements; understanding it now is a head start on understanding Qwen4 when it ships.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">Who should wait</h2>
+            <p>Those needing frontier reasoning depth. HLE 35.9 vs Claude Opus 4.6's 40.0 is the gap. For tasks where maximum reasoning depth is the binding constraint — hard math, novel problem-solving, frontier research questions — the gap to Opus 4.6 / Qwen3.8-Max is real and the cost savings may not be worth the quality regression.</p>
+            <p>Apache-2.0-only shops. The qwen-community-1.0 license is not Apache-2.0, and the historical Qwen Community License has had commercial-use restrictions for entities above 100M MAU. Read the actual license text before committing to a commercial deployment. If Apache-2.0 is a hard requirement, Qwen3-Next-80B-A3B (Sep 2025) is the most recent &quot;Next&quot; model that ships under Apache-2.0.</p>
+            <p>Anyone needing independent benchmark verification. The model is one day old. BenchLM, LiveBench, lmarena, and artificialanalysis.ai do not yet have Flash-Next-specific entries. Every benchmark number in this post is vendor self-reported. If your procurement process requires independent verification, wait for the third-party benchmarking hubs to catch up — likely 2–4 weeks.</p>
+            <p>Those whose primary use case is repo-level code generation. NL2Repo-Bench 48.1 vs DeepSeek-V4-Flash-0731's 54.2 is the explicit regression. If your workload is dominated by whole-repo synthesis rather than agentic coding, DeepSeek-V4-Flash-0731 may be the better choice in this price tier.</p>
+            <h2 style="font-size:1.4em;margin:35px 0 12px;color:#1e40af;">Strategic significance</h2>
+            <p>Qwen is using the &quot;Next&quot; line to ship research as production weights, on a one-year cadence, before committing it to a mainline family. The original Qwen3-Next (Sep 2025) introduced GDN + Gated Attention and that design then powered every Qwen release for the next year. Flash-Next (Aug 2026) introduces GDN + QSA + Gated Residual + N-gram Embedding + Muon, and that design is intended to underpin Qwen4. By the time Qwen4 ships, the community will have stress-tested these components at scale for months — through fine-tunes, alternative inference stacks, deployment edge cases, and adversarial probing. That is a fundamentally different release philosophy from the &quot;paper ships months after weights&quot; pattern that still dominates most labs, and it is one of the reasons Qwen has been able to maintain this release cadence without the quality regressions that typically accompany speed.</p>
+            <p>The GDN + QSA + GR + N-gram + Muon combo is also the most credible open-weight answer yet to the question of how you build a sub-10B-active model that punches like a 100B+ dense one. The 51B N-gram table is the architectural move that makes this work — it adds enormous knowledge capacity at near-zero compute cost, by exploiting the fact that deterministic lookups do not require GPU FLOPs. Whether this becomes the dominant pattern for cost-tier models in 2027 depends on how well it survives independent scrutiny, but the early evidence — particularly the agentic-coding and office-task benchmark leads — is strong.</p>
+            <p>If Flash-Next holds up under independent benchmarking, the implications for the API market are significant. A model that is within single-digit points of the frontier on agentic coding, at 30–50× lower cost than the frontier Anthropic model, changes the unit economics of every product built on top of LLMs. That is the bet Qwen is making. The next 30 days — as independent benchmarks arrive — will tell us whether the bet pays off.</p>
+            <h1 style="font-size:1.8em;margin:40px 0 15px;color:#1e40af;border-bottom:2px solid #3b82f6;padding-bottom:8px;">References &amp; Sources</h1>
+            <p>Primary sources (Qwen / Alibaba official):</p>
+            <ul><li>HuggingFace model card — https://huggingface.co/Qwen/Qwen3.8-Flash-Next</li></ul>
+            <ul><li>GitHub repo (with tech_report.pdf) — https://github.com/QwenLM/Qwen3.8-Flash-Next</li></ul>
+            <ul><li>Alibaba Cloud blog post — https://www.alibabacloud.com/blog/qwen3-8-flash-next-a-new-architecture-towards-ultimate-cost-efficiency_603501</li></ul>
+            <ul><li>Qwen blog post — https://qwen.ai/blog?id=qwen3.8-flash-next</li></ul>
+            <ul><li>Qwen on X (launch tweet) — https://x.com/Alibaba_Qwen/status/2092591393424515114</li></ul>
+            <ul><li>ModelScope countdown — https://modelscope.cn/models/Qwen/Qwen3.8-Flash-Next</li></ul>
+            <ul><li>Ollama library page — https://ollama.com/library/qwen3.8-flash-next</li></ul>
+            <ul><li>Unsloth GGUF card — https://huggingface.co/unsloth/Qwen3.8-Flash-Next-GGUF</li></ul>
+            <ul><li>Unsloth docs — https://unsloth.ai/docs/models/qwen3.8</li></ul>
+            <p>Predecessor (Qwen3-Next-80B-A3B, Sep 2025):</p>
+            <ul><li>HF card (Thinking) — https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Thinking</li></ul>
+            <ul><li>HF card (Instruct) — https://huggingface.co/Qwen/Qwen3-Next-80B-A3B-Instruct</li></ul>
+            <ul><li>Alibaba Cloud blog (Sep 12, 2025) — https://www.alibabacloud.com/blog/qwen3-next-a-new-generation-of-ultra-efficient-model-architecture-unveiled_602536</li></ul>
+            <ul><li>OpenRouter page (Qwen3-Next-80B-A3B-Instruct pricing/benchmarks) — https://openrouter.ai/qwen/qwen3-next-80b-a3b-instruct</li></ul>
+            <ul><li>GitHub Qwen3.8 (parent repo) — https://github.com/QwenLM/Qwen3.8</li></ul>
+            <p>Secondary analysis / news:</p>
+            <ul><li>The Decoder — https://the-decoder.com/alibaba-releases-qwen3-8-flash-next-targeting-ultimate-cost-efficiency</li></ul>
+            <ul><li>MarkTechPost — https://www.marktechpost.com/2026/08/26/alibabas-qwen-team-releases-qwen3-8-flash-next-a-125b-multimodal-moe-with-6b-active-parameters-previewing-the-qwen4-architecture</li></ul>
+            <ul><li>llm-stats — https://llm-stats.com/blog/research/qwen3.8-flash-next-launch</li></ul>
+            <ul><li>BenchLM — https://benchlm.ai/models/qwen3-8-flash-next</li></ul>
+            <ul><li>Kaitchup substack — https://kaitchup.substack.com/p/qwen38-flash-next-review-benchmarks</li></ul>
+            <ul><li>NVIDIA Developer Forums (DGX Spark / GB10 thread) — https://forums.developer.nvidia.com/t/qwen3-8-flash-next/381228</li></ul>
+            <ul><li>Japanese note.com analysis (size-debate documentation) — https://note.com/ai_driven/n/n7a7c2fe2fbad</li></ul>
+            <ul><li>Reddit r/LocalLLaMA (architecture local-friendliness thread) — https://www.reddit.com/r/LocalLLaMA/comments/1vy6smx/qwen38flashnext_this_architecture_could_be</li></ul>
+            <ul><li>Reddit r/LocalLLaMA (Are you disappointed? thread) — https://www.reddit.com/r/LocalLLaMA/comments/1vz9cv5/are_you_disappointed_about_qwen38_flash_next</li></ul>
+            <ul><li>Investing.com — https://www.investing.com/news/stock-market-news/alibaba-releases-qwen38flash-ai-model-to-cut-costs-93CH-4877431</li></ul>
+            <ul><li>Quartz (Qwen3.8-Max context) — https://qz.com/alibaba-qwen38-max-ai-model-launch-080326</li></ul>
+            <ul><li>llama.cpp issue #15940 (Qwen3-Next gated DeltaNet support) — https://github.com/ggml-org/llama.cpp/issues/15940</li></ul>
+            <p>Academic references:</p>
+            <ul><li>Muon optimizer reference (Keller Jordan) — https://kellerjordan.github.io/posts/muon</li></ul>
+            <ul><li>Muon paper on arXiv — https://arxiv.org/html/2509.23106v2</li></ul>
+            <ul><li>Qwen3 Technical Report (arXiv:2505.09388) — https://arxiv.org/abs/2505.09388</li></ul>
+            <ul><li>Gated Delta Networks (arXiv:2502.05246) — https://arxiv.org/abs/2502.05246</li></ul>
+            <ul><li>Gated Attention for LLMs (arXiv:2502.05711) — https://arxiv.org/abs/2502.05711</li></ul>
+            <ul><li>Hyper-Connections (arXiv:2409.19606) — https://arxiv.org/abs/2409.19606</li></ul>
+            <ul><li>A Unified View of Attention and Residual Sinks / GatedNorm (arXiv:2504.16086) — https://arxiv.org/abs/2504.16086</li></ul>
+            <ul><li>Conditional Memory via Scalable Lookup / Engram (arXiv:2507.13028) — https://arxiv.org/abs/2507.13028</li></ul>
+            <ul><li>Demons in the Detail: On Implementing Load Balancing Loss for Training Specialized MoE Models (arXiv:2501.11873) — https://arxiv.org/abs/2501.11873</li></ul>
+
+            <div class="article-section">
+                
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                                        <a href="deepseek-v4-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">DeepSeek V4 Flash</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Deep-dive into DeepSeek's 284B/13B active MoE with MLA attention, 1M context, and $0.14/$0.28 per M tokens.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="ox-alpha-stealth-model-comprehensive-analysis.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">OX Alpha (GLM-5.3-Flash)</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Comprehensive analysis of the anonymous model that topped OpenRouter — revealed as GLM-5.3-Flash.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="glm-5-3-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">GLM-5.3-Flash Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Technical deep-dive into Z.ai's 320B/18B active MoE with hybrid KDA+MLA attention and 1M context.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                </div>
+            </div>
+
+<h2 class="section-title">About the Author</h2>
+                <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
+                
+                <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+                
+                <p style="margin-top: 30px;"><em>Last Updated: August 27, 2026 | Version 1.0</em></p>
+            </div>
+        </div>
+    </article>
+
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>

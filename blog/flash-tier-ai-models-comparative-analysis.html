@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flash-Tier AI Models: DeepSeek V4 vs GLM-5.3 vs Qwen3.8 Flash-Next Comparison - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Flash-tier AI model comparison: DeepSeek V4 Flash (284B/13B, 1M ctx, $0.14/M), GLM-5.3 Flash (320B/18B, 1M ctx, $0.21/M), and Qwen3.8 Flash-Next (125B/6B, 1M ctx, $0.16/M). Architecture, benchmarks, and strategic analysis of 2026's top open-weight models.">
+    <meta name="keywords" content="DeepSeek V4 Flash, GLM-5.3 Flash, Qwen3.8 Flash-Next, flash-tier AI, MoE comparison, hybrid attention, CSA, HCA, GDN, QSA, open-weights LLM, 1M context, cost comparison, AI benchmarks 2026, architecture comparison">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Flash-Tier AI Showdown: DeepSeek V4 vs GLM-5.3 vs Qwen3.8 Flash-Next">
+    <meta property="og:description" content="Comparing 2026's top flash-tier open-weight models: DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next. Architecture, benchmarks, pricing, and strategic implications.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Flash-Tier AI Models Comparison - DeepSeek V4 vs GLM-5.3 vs Qwen3.8 Flash-Next">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/flash-tier-ai-models-comparative-analysis.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-08-27T00:00:00Z">
+    <meta property="article:modified_time" content="2026-08-27T00:00:00Z">
+    <meta property="article:section" content="AI Models">
+    <meta property="article:tag" content="DeepSeek V4 Flash">
+    <meta property="article:tag" content="GLM-5.3 Flash">
+    <meta property="article:tag" content="Qwen3.8 Flash-Next">
+    <meta property="article:tag" content="Flash-Tier AI">
+    <meta property="article:tag" content="MoE Architecture">
+    <meta property="article:tag" content="Open-Weight Models">
+    <meta property="article:tag" content="AI Benchmarks">
+    <meta property="article:tag" content="Cost Comparison">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/flash-tier-ai-models-comparative-analysis.html">
+    <meta name="twitter:title" content="Flash-Tier AI Showdown: DeepSeek V4 vs GLM-5.3 vs Qwen3.8">
+    <meta name="twitter:description" content="Comparing 2026's top flash-tier open-weight models. Architecture, benchmarks, pricing, and strategic analysis.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta name="twitter:image:alt" content="Flash-Tier AI Models Comparison">
+    
+    <!-- Additional AEO/GEO Meta Tags -->
+    <meta name="application-name" content="Local AI Zone">
+    <meta name="msapplication-TileColor" content="#7c3aed">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="article-publisher" content="https://local-ai-zone.github.io">
+    <meta name="article-content-ttl" content="P1Y">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/flash-tier-ai-models-comparative-analysis.html">
+    
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/flash-tier-ai-models-comparative-analysis.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/flash-tier-ai-models-comparative-analysis.html">
+    
+    <style>
+        .back-to-blog { display: inline-flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-weight: 600; margin: 0 0 30px 0; padding: 10px 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; backdrop-filter: blur(8px); transition: all 0.3s ease; position: relative; z-index: 1; }
+        .back-to-blog:hover { background: rgba(255,255,255,0.28); transform: translateX(-3px); }
+        .article-content { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        .article-content h1 { font-size: 2.2em; color: #1e40af; margin: 40px 0 15px; padding-bottom: 10px; border-bottom: 3px solid #e5e7eb; }
+        .article-content h2 { font-size: 1.6em; color: #1e40af; margin: 35px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .article-content h3 { font-size: 1.3em; color: #374151; margin: 28px 0 10px; }
+        .article-content h4 { font-size: 1.1em; color: #4b5563; margin: 20px 0 8px; }
+        .article-content p { margin-bottom: 1.2em; line-height: 1.8; }
+        .article-content ul, .article-content ol { margin: 12px 0 12px 24px; }
+        .article-content li { margin-bottom: 6px; line-height: 1.7; }
+        .article-content table { margin: 24px 0; width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .article-content table th { background: #1e40af; color: white; padding: 10px 12px; text-align: left; font-weight: 600; border: 1px solid #1e40af; }
+        .article-content table td { padding: 10px 12px; border: 1px solid #e5e7eb; text-align: left; }
+        .article-content table tr:nth-child(even) td { background: #f9fafb; }
+        .article-content table tr:hover td { background: #eff6ff; }
+        .article-content blockquote { border-left: 4px solid #2563eb; background: #eff6ff; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-style: normal; }
+        .article-content blockquote p { margin-bottom: 0.5em; }
+        .article-content blockquote p:last-child { margin-bottom: 0; }
+        .article-content code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: "Courier New", monospace; }
+        .article-content pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        .article-content pre code { background: none; color: inherit; padding: 0; }
+        .article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+        .article-content em { color: #6b7280; }
+        .article-content strong { color: #111827; }
+        .article-content a { color: #2563eb; text-decoration: none; }
+        .article-content a:hover { text-decoration: underline; }
+        .article-content hr { border: none; border-top: 2px solid #e5e7eb; margin: 40px 0; }
+        .article-header::before { display: none !important; }
+        .article-header .article-title { text-shadow: none !important; }
+        .article-header .container { background: transparent !important; }
+        .premium-header { position: static !important; }
+        .article-section { margin: 40px 0; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .section-title { font-size: 2em; color: #1e40af; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
+        .key-takeaway { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 24px; margin: 30px 0; border-radius: 0 8px 8px 0; }
+    </style>
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Flash-Tier AI Models Comparative Analysis: DeepSeek V4, GLM-5.3, Qwen3.8 Flash-Next",
+        "alternativeHeadline": "Comparing 2026's Top Open-Weight Flash-Tier AI Models",
+        "description": "Comprehensive technical comparison of DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next: architecture, benchmarks, training pipelines, and strategic implications.",
+        "image": "https://local-ai-zone.github.io/og-image.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-08-27T00:00:00Z",
+        "dateModified": "2026-08-27T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/flash-tier-ai-models-comparative-analysis.html"
+        },
+        "keywords": "DeepSeek V4 Flash, GLM-5.3 Flash, Qwen3.8 Flash-Next, flash-tier AI, MoE, hybrid attention, open-weight models, cost comparison",
+        "articleSection": "AI Models",
+        "wordCount": 5000,
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "about": [
+            {"@type": "Thing", "name": "DeepSeek V4 Flash", "description": "284B/13B active MoE with 1M context, $0.14/M tokens"},
+            {"@type": "Thing", "name": "GLM-5.3 Flash", "description": "320B/18B active MoE with 1M context, $0.21/M tokens"},
+            {"@type": "Thing", "name": "Qwen3.8 Flash-Next", "description": "125B/6B active MoE with 1M context, $0.16/M tokens"}
+        ],
+        "mentions": [
+            {"@type": "SoftwareApplication", "name": "DeepSeek V4 Flash", "applicationCategory": "AIApplication"},
+            {"@type": "SoftwareApplication", "name": "GLM-5.3 Flash", "applicationCategory": "AIApplication"},
+            {"@type": "SoftwareApplication", "name": "Qwen3.8 Flash-Next", "applicationCategory": "AIApplication"}
+        ],
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
+    }
+    </script>
+    
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "Which flash-tier AI model is the cheapest?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "DeepSeek V4 Flash is the cheapest at $0.14/$0.28 per M tokens (off-peak), followed by Qwen3.8 Flash-Next at $0.16/$0.47, then GLM-5.3 Flash at $0.21/$0.84."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Which flash-tier model has the best coding benchmarks?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Qwen3.8 Flash-Next leads on agentic coding with DeepSWE 1.1 at 58.7 and SWE-bench Pro at 62.5. DeepSeek V4 Flash leads on NL2Repo-Bench at 54.2. GLM-5.3 Flash is competitive across the board."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What architectures do these flash-tier models use?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "DeepSeek V4 Flash uses hybrid CSA+HCA attention with Muon optimizer. GLM-5.3 Flash uses hybrid Gated Attention + MoE. Qwen3.8 Flash-Next uses Gated DeltaNet + QSA + N-gram Embedding with Muon optimizer."
+                }
+            }
+        ]
+    }
+    </script>
+    
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "Flash-Tier AI Models Comparison", "item": "https://local-ai-zone.github.io/blog/flash-tier-ai-models-comparative-analysis.html"}
+        ]
+    }
+    </script>
+</head>
+<body class="blog-article-page">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">Flash-Tier AI Models: DeepSeek V4 vs GLM-5.3 vs Qwen3.8</h1>
+                <div class="article-meta">
+                    <span class="article-date">August 27, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Comparative Analysis</span>
+                    <span class="article-read-time">📖 25 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+            <header class="paper-header">
+  <div class="eyebrow"><span class="dot"></span>Technical Survey · Open-Weights LLMs</div>
+  <h1 class="title">Flash-Tier Open-Weights LLMs in August 2026</h1>
+  <p class="subtitle">A comparative technical analysis of three hybrid-attention mixture-of-experts models — DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next — converging on the same architectural pattern from three different design premises.</p>
+  <div class="byline">
+    <span><span class="label">Compiled</span>August 27, 2026</span>
+    <span><span class="label">Sources</span>12 primary · 18 secondary</span>
+    <span><span class="label">Cite as</span>Flash-Tier Survey, Aug 2026</span>
+    <span><span class="label">Status</span>Living document — last revised Aug 27, 2026</span>
+  </div>
+
+  <div class="abstract">
+    <h2>Abstract</h2>
+    <p>Between April 24 and August 26, 2026, three Chinese AI labs independently released open-weights "flash-tier" mixture-of-experts language models targeting the same use case: frontier-adjacent capability at minimum dollar-per-token cost. DeepSeek V4 Flash (284B total / 13B active), Z.ai's GLM-5.3 Flash (320B / 18B-A), and Alibaba's Qwen3.8 Flash-Next (125B + 51B n-gram / 6B-A) all ship MIT-licensed weights, all support contexts near or above one million tokens, and all adopt some form of hybrid linear-plus-sparse attention. Yet the three converge on the same architectural <em>shape</em> while diverging sharply on the <em>mechanism</em>: DeepSeek pairs Compressed Sparse Attention (CSA, 4× compression) with Heavily Compressed Attention (HCA, 128× compression) and ships natively quantized FP4+FP8 weights via quantization-aware training; GLM pairs Key-Driven Attention (KDA) linear layers with NoPE Sparse MLA and ships natively multimodal in a single checkpoint; Qwen pairs Gated DeltaNet (GDN) with Qwen Sparse Attention (QSA) and adds a 51-billion-parameter N-gram lookup table that can be asynchronously offloaded to host RAM. This paper reconstructs each architecture from primary sources, presents a side-by-side comparison across 24 dimensions, surveys reported benchmarks (with explicit caveats about evaluation-harness heterogeneity), and analyzes the strategic implications for the open-weights ecosystem.</p>
+    <p class="keywords"><b>Keywords:</b> mixture-of-experts · hybrid attention · linear attention · sparse attention · model quantization · open-weight LLMs · DeepSeek · Zhipu Z.ai · Qwen · 2026</p>
+  </div>
+</header>
+
+<nav class="toc">
+  <h2>Contents</h2>
+  <ol>
+    <li><a href="#s1">Introduction — the flash tier emerges as a competitive battleground</a></li>
+    <li><a href="#s2">Methodology and sources</a></li>
+    <li><a href="#s3">Architectural comparison — three hybrid-attention MoE designs</a></li>
+    <li><a href="#s4">Quantization and weight precision — FP4, FP8, NVFP4</a></li>
+    <li><a href="#s5">Benchmarks — cross-model evidence, with caveats</a></li>
+    <li><a href="#s6">Training pipelines — what is disclosed and what is not</a></li>
+    <li><a href="#s7">Inference and self-hosting — the practical matrix</a></li>
+    <li><a href="#s8">API and developer surface — pricing, modes, ergonomics</a></li>
+    <li><a href="#s9">Strategic analysis — what the convergence means</a></li>
+    <li><a href="#s10">Limitations, open questions, and verification status</a></li>
+    <li><a href="#s11">Conclusion</a></li>
+  </ol>
+</nav>
+
+<article>
+<!-- ===================== SECTION 1 ===================== -->
+<section id="s1">
+<h2 class="section"><span class="num">1.</span>Introduction — the flash tier emerges as a competitive battleground</h2>
+
+<p class="lede">The Chinese open-weights LLM ecosystem has, over the course of 2026, structurally reorganized itself around a new tier of model: the <em>flash</em> tier. These are not the flagship trillion-parameter systems that grab headlines on launch day. They are smaller, independently designed models, optimized for the production economics that actually decide which model gets deployed at scale.</p>
+
+<p>For most of 2024 and 2025, the open-weights frontier was defined by single large models: Meta's Llama 3 (405B), Alibaba's Qwen2.5 (72B), DeepSeek V3 (671B / 37B-A), and Mistral Large. These were the models that lab-to-lab comparisons focused on, that academic papers benchmarked against, and that the open-source community quantized and served. The "flash" naming convention was originally Z.ai's, used for distilled or trimmed variants of the flagship GLM models — same brain, fewer parameters, lower quality.</p>
+
+<p>The pattern shifted in late 2025 and crystallized in the first three quarters of 2026. Three releases define the shift:</p>
+
+<ul>
+<li><strong>DeepSeek V4 Flash</strong> — released April 24, 2026 alongside the 1.6T V4 Pro. Same architecture family, independently designed, 284B / 13B-A. Refreshed July 31 as V4-Flash-0731 with stronger agent capabilities<sup class="cite">[1]</sup>.</li>
+<li><strong>GLM-5.3 Flash</strong> — released August 26, 2026 by Z.ai, twelve days after GLM-5.3's flagship launch. Not a distilled flagship but a newly trained base, 320B / 18B-A, with native multimodal in a single checkpoint. Previously ran anonymously as "Ox Alpha" on OpenRouter for roughly twelve days before the official reveal<sup class="cite">[2]</sup>.</li>
+<li><strong>Qwen3.8 Flash-Next</strong> — released August 26, 2026 by Alibaba Qwen, explicitly framed as a Qwen4 architecture preview. 125B / 6B-A with an additional 51B N-gram lookup table ("engram"), the most aggressive sparsity ratio of the three<sup class="cite">[3]</sup>.</li>
+</ul>
+
+<p>What makes these three releases structurally significant is not any single capability. It is that they converge on the same architectural shape — a hybrid-attention mixture-of-experts model with native FP4 or FP8 quantized weights and a context window near one million tokens — while making three fundamentally different bets about which mechanism delivers that shape most efficiently. This paper reconstructs each architecture from primary sources, compares them across 24 dimensions, and analyzes what the convergence implies for the next twelve months of open-weights development.</p>
+
+<p>The choice to compare these three specifically, rather than including closed frontier models (GPT-5.6, Claude Opus 4.8, Gemini 3.7) or the open-weights flagships (DeepSeek V4 Pro, GLM-5.3 full, Qwen3.8 non-flash), is deliberate. The flash tier is where production deployment decisions are actually made. Pro flagships drive benchmark leaderboards; flash-tier models drive API bills. Comparing the three flash-tier releases isolates the architectural question from the parameter-count question.</p>
+
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section id="s2">
+<h2 class="section"><span class="num">2.</span>Methodology and sources</h2>
+
+<p>This survey is compiled from twelve primary sources and eighteen secondary analyses. Primary sources are vendor-published materials: technical reports, model cards on Hugging Face, API documentation, and official launch announcements. Secondary sources include independent benchmark aggregators (Artificial Analysis, vals.ai, llm-stats), community technical analyses (the r/LocalLLaMA megathread for GLM-5.3 Flash, boringbot's Substack architecture deep-dive on DeepSeek V4), and deployment guides from inference platforms (vLLM recipes, SGLang cookbooks, Lambda, Friendli, Spheron).</p>
+
+<p>Three methodological caveats apply throughout:</p>
+
+<ol>
+<li><strong>Most benchmark numbers are vendor-reported.</strong> The sole independently-evaluated number across all three launches is GLM-5.3 Flash's GDPval-AA v2 Elo of 1773, evaluated by Artificial Analysis rather than Z.ai<sup class="cite">[4]</sup>. vals.ai independently verifies DeepSeek V4 Pro 0813 at 96.40% on SWE-bench Verified (within 0.60 points of the closed leader) but this is the Pro variant, not Flash<sup class="cite">[5]</sup>. Cross-model comparisons should be read as setup-dependent rather than absolute.</li>
+<li><strong>Evaluation harnesses differ across models.</strong> DeepSeek's Terminal Bench 2.1 score of 56.9 (original V4 Flash) and 83.9 (V4-Flash-0731 refresh) use DeepSeek's own harness. GLM-5.3 Flash's 84.3 uses Claude Code 2.1.207 as the harness. These numbers are not directly comparable despite the identical benchmark name<sup class="cite">[6]</sup>.</li>
+<li><strong>Post-training pipelines are partially disclosed.</strong> DeepSeek V4's two-stage post-training paradigm (independent domain expert cultivation followed by on-policy distillation) is described in the technical report<sup class="cite">[7]</sup>. GLM-5.3 Flash's training pipeline is documented at the architectural level but the RLHF/RLAIF specifics are not in the model card. Qwen3.8 Flash-Next is explicitly a Qwen4 architecture preview, and Qwen has stated that details will be disclosed in the full Qwen4 technical report.</li>
+</ol>
+
+<p>Where this paper makes inferences beyond what vendors have explicitly stated, those inferences are flagged in the text. The architectural reconstruction in Section 3 is grounded in the published configs (config.json files on Hugging Face, vLLM recipe pages) and the published technical reports; the strategic analysis in Section 9 is grounded in release timing, pricing decisions, and the architectural choices themselves.</p>
+
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section id="s3">
+<h2 class="section"><span class="num">3.</span>Architectural comparison — three hybrid-attention MoE designs</h2>
+
+<p class="lede">All three models converge on a hybrid linear-plus-sparse attention pattern, but each implements it with a different mechanism. The convergence is more striking than the divergence: three labs, working independently, arrived at the same architectural shape within five months of each other.</p>
+
+<h3 class="subsection">3.1 The convergent shape</h3>
+
+<p>Before examining the mechanisms, it is worth noting what the three architectures share. All three:</p>
+
+<ul>
+<li>Use <strong>mixture-of-experts</strong> for the feed-forward layers, with sparsity ratios between 4.6% and 5.6% (DeepSeek 13B/284B = 4.6%; GLM 18B/320B = 5.6%; Qwen 6B/125B = 4.8%)<sup class="cite">[1][2][3]</sup>.</li>
+<li>Use <strong>hybrid attention</strong> — a stack where some layers use linear or near-linear attention for cheap local dependency modeling, and other layers use sparse attention for expensive long-range retrieval. The ratios are remarkably similar: DeepSeek 4:1 (CSA:HCA), GLM ~3:1 (KDA:sparse), Qwen 3:1 (GDN:QSA)<sup class="cite">[1][2][3]</sup>.</li>
+<li>Ship <strong>native FP4 or FP8 quantized weights</strong> as the primary checkpoint, with quantization-aware training baked in rather than applied post-hoc. DeepSeek: FP4+FP8 mixed. GLM: FP8 e4m3. Qwen: NVFP4<sup class="cite">[1][2][3]</sup>.</li>
+<li>Include <strong>Multi-Token Prediction (MTP) draft layers</strong> for speculative decoding, shipped in the official weights<sup class="cite">[1][2][3]</sup>.</li>
+<li>Support <strong>context lengths near or above one million tokens</strong> — DeepSeek and GLM ship native 1,048,576-token context; Qwen ships 262,144 native with YaRN extension to 1M<sup class="cite">[1][2][3]</sup>.</li>
+<li>Are released under <strong>MIT license</strong> with weights on Hugging Face<sup class="cite">[1][2][3]</sup>.</li>
+</ul>
+
+<p>This convergence is the central empirical finding of the survey. Whatever the differences in mechanism, the three labs agree on the shape of the next-generation open-weights flash-tier model.</p>
+
+<h3 class="subsection">3.2 DeepSeek V4 Flash — CSA + HCA, two-tier compression</h3>
+
+<p>DeepSeek V4 Flash is the architecturally cleanest of the three. The 43-layer trunk uses two distinct attention mechanisms, applied in repeating blocks:</p>
+
+<ul>
+<li><strong>Compressed Sparse Attention (CSA, "c4a")</strong> — compresses the KV cache by roughly 4×, then performs sparse top-k block selection driven by an FP4 Lightning Indexer. CSA replaces sliding-window attention with a compressed-representation approach: instead of ignoring tokens outside a window, CSA summarizes them into a lower-dimensional proxy<sup class="cite">[8]</sup>.</li>
+<li><strong>Heavily Compressed Attention (HCA, "c128a")</strong> — applies an aggressive ~128× compression along the sequence dimension, then runs dense attention over the resulting short compressed sequence. HCA is the structural solution to global retrieval at 1M context, where pure quadratic attention would be computationally intractable<sup class="cite">[8]</sup>.</li>
+</ul>
+
+<p>The interleaving ratio is approximately 4:1 CSA:HCA, with HCA layers concentrated in the latter two-thirds of the network — early layers build syntactically dense local representations where CSA's compression is appropriate, while deeper layers require global semantic coherence where HCA's long-range attention delivers value<sup class="cite">[8]</sup>. The reported efficiency win over V3.2 (the predecessor using single-mechanism MLA) is substantial: 27% of single-token inference FLOPs and 10% of KV cache size at 1M context<sup class="cite">[7]</sup>.</p>
+
+<p>The FP4 Lightning Indexer is the engine that makes CSA tractable. It maintains FP4-quantized key vectors for all compressed blocks, computes approximate similarity scores against the query, and selects the top-k most relevant blocks for full attention. FP4 cuts indexer memory by 2× vs FP8 and 4× vs BF16, and the indexer kernels run on tensor cores at full FP4 throughput<sup class="cite">[8]</sup>.</p>
+
+<div class="callout">
+<p class="label">DeepSeek-origin innovation</p>
+<p>DeepSeek's <strong>Manifold-Constrained Hyper-Connections (mHC)</strong>, first published by DeepSeek's research team in late 2025, widens the residual stream while constraining the mixing to a low-dimensional manifold. GLM-5.3 Flash ships the same mechanism — the cross-lab diffusion from DeepSeek to Zhipu took roughly eleven months from publication to production deployment<sup class="cite">[9]</sup>.</p>
+</div>
+
+<h3 class="subsection">3.3 GLM-5.3 Flash — KDA linear + NoPE sparse MLA</h3>
+
+<p>GLM-5.3 Flash is the first GLM series model to use a hybrid attention stack. The 45-layer trunk (3 dense MLP stem + 42 MoE) interleaves:</p>
+
+<ul>
+<li><strong>KDA (Key-Driven Attention) linear attention</strong> — 34 layers, 64 heads with head dimension 128, computing attention in linear time O(L). KDA handles local, cheap recurrence<sup class="cite">[2]</sup>.</li>
+<li><strong>NoPE Sparse MLA (Multi-head Latent Attention)</strong> — 11 layers, DeepSeek-style MLA without positional embeddings. Each sparse layer has 64 attention heads, QK/V head dimension 256, a Lightning Indexer (32 heads, head dim 128), and a top-2048 token budget. The Lightning Indexer performs a fast approximate retrieval pass to find the most relevant key-value pairs, then runs full attention only over those 2,048 tokens<sup class="cite">[2]</sup>.</li>
+</ul>
+
+<p>The interleaving pattern is 11 repeating blocks of (3× KDA Linear + 1× Sparse MLA + MoE FFN), plus 1 trailing linear attention layer, giving the 34:11 ratio. The model also introduces <strong>IndexPool</strong>, which compresses groups of indexer key vectors through weighted pooling to hold down latency and memory at extreme context lengths<sup class="cite">[10]</sup>.</p>
+
+<p>The most architecturally distinctive feature of GLM-5.3 Flash is not the attention design but the <strong>native multimodality</strong>. A 24-layer ViT (448px input, patch 14, 2×2 spatial merge, temporal patch 2 for video) projects vision tokens directly into the LM's hidden dimension (4096). There is no separate vision-language adapter — text and vision tokens share the same vocabulary slot and the same transformer trunk. This is what Z.ai means by "natively multimodal": there is no <code>vision_encoder → projection → LM</code> boundary that needs special handling<sup class="cite">[2]</sup>.</p>
+
+<div class="callout glm">
+<p class="label">Architectural borrowing</p>
+<p>GLM-5.3 Flash ships <strong>mHC</strong> — the same Manifold-Constrained Hyper-Connections mechanism that DeepSeek published in late 2025. This is an explicit example of cross-lab architectural diffusion within the Chinese open-weights ecosystem: DeepSeek publishes, Zhipu ships. Z.ai's model card credits DeepSeek for the technique<sup class="cite">[9]</sup>.</p>
+</div>
+
+<h3 class="subsection">3.4 Qwen3.8 Flash-Next — GDN + QSA, plus a 51B n-gram "engram"</h3>
+
+<p>Qwen3.8 Flash-Next is the most architecturally experimental of the three. The 48-layer trunk (36 GDN + 12 QSA, in a 3:1 ratio) pairs:</p>
+
+<ul>
+<li><strong>Gated DeltaNet (GDN)</strong> — a linear-attention mechanism that maintains a compact recurrent summary of history. DeltaNet, originally published in late 2024 by Songlin Yang and collaborators, replaces the unbounded KV cache of softmax attention with a fixed-size recurrent state that runs in O(N) time during inference<sup class="cite">[11]</sup>. The "gated" variant adds a sigmoid gating signal that controls how the memory state decays and updates — Sebastian Raschka's writeup describes it as a "surgical eraser" that selectively updates memory rather than simply accumulating<sup class="cite">[12]</sup>.</li>
+<li><strong>Qwen Sparse Attention (QSA)</strong> — sparse attention for precise long-range retrieval. Qwen reports 10.2× prefill and 6.6× decode attention-kernel speedups at one million tokens for QSA vs dense attention<sup class="cite">[3]</sup>.</li>
+</ul>
+
+<p>The most distinctive feature, however, is the <strong>51-billion-parameter N-gram embedding table</strong>, which Qwen calls the "engram". This is a massive lookup memory — 20 million n-gram entries — that adds substantial model capacity with little per-token compute, because lookups are O(1). The n-gram table is injected at layers 1 and 7 (0-indexed) via a network layer (PLE — Parallel Layer Embedding) and can be asynchronously offloaded to host RAM<sup class="cite">[13]</sup>. The offload is currently NVIDIA-only.</p>
+
+<p>This is an architectural bet that lookup-based capacity can substitute for parameter-scale capacity. The 125B main model with 6B active per token is the most sparse of the three; the 51B n-gram table adds capacity at near-zero compute cost, paid for in memory bandwidth rather than FLOPs<sup class="cite">[3]</sup>.</p>
+
+<p>Qwen3.8 Flash-Next also introduces a <strong>Gated Residual</strong> mechanism — four residual branches that dynamically control cross-layer reads and writes. This is Qwen's own contribution, distinct from mHC<sup class="cite">[3]</sup>.</p>
+
+<div class="callout qwen">
+<p class="label">Why the N-gram table matters</p>
+<p>The 51B n-gram engram is the most architecturally novel element across all three models. It represents a bet that lookup-based capacity — a memory mechanism with no learned computation per access — can substitute for the more expensive learned computation of expert FFNs. If validated, this technique could diffuse across the open-weights ecosystem in the same way that mHC diffused from DeepSeek to Zhipu.</p>
+</div>
+
+<figure class="wide">
+<img src="flash-tier-architecture-comparison.png" alt="Three-column architecture comparison infographic showing DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next layer-by-layer stack diagrams with a 24-dimension comparison matrix below.">
+<figcaption><b>Figure 1.</b> Three-column architecture comparison. Each column shows the layer-by-layer stack for one model (left: DeepSeek V4 Flash with CSA+HCA blocks; center: GLM-5.3 Flash with KDA+Sparse MLA blocks and ViT vision encoder; right: Qwen3.8 Flash-Next with GDN+QSA blocks and 51B N-gram engram). The bottom matrix table compares all three across 24 dimensions including parameters, layers, attention design, MoE config, context length, weight precision, optimizer, and unique differentiator. Color coding: DeepSeek cyan, GLM blue, Qwen green. Source: compiled from primary sources [1][2][3] and vLLM recipe pages.</figcaption>
+</figure>
+
+<h3 class="subsection">3.5 Side-by-side architectural matrix</h3>
+
+<p>The table below presents every dimension where the three architectures differ. Vendor-colored cells highlight where each model leads on that dimension. Cells marked "not disclosed" indicate dimensions where the vendor has not published specifics in the model card, technical report, or recipe page.</p>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 1. Side-by-side architectural matrix across 24 dimensions. Compiled from DeepSeek HF model card [1], GLM-5.3 Flash model card [2], Qwen3.8 Flash-Next vLLM recipe [3], and the DeepSeek V4 technical report [7].</caption>
+<thead>
+<tr>
+<th>Dimension</th>
+<th class="ds">DeepSeek V4 Flash</th>
+<th class="glm">GLM-5.3 Flash</th>
+<th class="qwen">Qwen3.8 Flash-Next</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="dim">Total parameters</td><td>284B</td><td><b>320B</b></td><td>125B (+51B n-gram)</td></tr>
+<tr><td class="dim">Active per token</td><td>13B</td><td>18B</td><td><b>6B</b> (most sparse)</td></tr>
+<tr><td class="dim">Sparsity ratio</td><td>4.6%</td><td>5.6%</td><td><b>4.8%</b></td></tr>
+<tr><td class="dim">Layers</td><td>43</td><td>45 (3 dense + 42 MoE)</td><td><b>48</b></td></tr>
+<tr><td class="dim">Hidden dimension</td><td>(not disclosed)</td><td>4,096</td><td>2,560</td></tr>
+<tr><td class="dim">Vocabulary size</td><td>(not disclosed)</td><td>154,880</td><td>248,320 (padded)</td></tr>
+<tr><td class="dim">Attention design</td><td>Hybrid CSA (c4a) + HCA (c128a)</td><td>Hybrid KDA Linear + NoPE Sparse MLA</td><td>Hybrid GDN (linear) + QSA (sparse)</td></tr>
+<tr><td class="dim">Linear mechanism</td><td>CSA (4× compression)</td><td>KDA (O(L) linear attention)</td><td>GDN (Gated DeltaNet, recurrent compression)</td></tr>
+<tr><td class="dim">Sparse mechanism</td><td>HCA (128× compression, dense over compressed)</td><td>NoPE Sparse MLA (top-2048 budget, lightning indexer)</td><td>QSA (10.2× prefill speedup at 1M ctx)</td></tr>
+<tr><td class="dim">Hybrid ratio (linear:sparse)</td><td>4 : 1 (CSA : HCA)</td><td>~3 : 1 (34 KDA : 11 sparse)</td><td>3 : 1 (36 GDN : 12 QSA)</td></tr>
+<tr><td class="dim">MoE expert count</td><td>(not fully disclosed)</td><td>288 routed + 1 shared</td><td><b>512 routed</b></td></tr>
+<tr><td class="dim">MoE active experts</td><td>(not fully disclosed)</td><td>8 routed + 1 shared</td><td><b>10 routed</b> (top-10)</td></tr>
+<tr><td class="dim">MoE routing</td><td><b class="ds">Aux-loss-free</b> (bias-only balancing)</td><td>Top-K softmax</td><td>Top-10 + Gated Residual (4 branches)</td></tr>
+<tr><td class="dim">Native context</td><td><b>1,048,576</b></td><td><b>1,048,576</b></td><td>262,144 (YaRN → 1M)</td></tr>
+<tr><td class="dim">Max output</td><td><b>384,000</b></td><td>(not published)</td><td>(not published)</td></tr>
+<tr><td class="dim">Residual stream innovation</td><td><b class="ds">mHC (DeepSeek-origin)</b></td><td>mHC (borrowed from DeepSeek)</td><td><b class="qwen">Gated Residual (4 branches, native)</b></td></tr>
+<tr><td class="dim">Multimodal</td><td>Separate V4-Flash-Vision-Exp variant</td><td><b class="glm">Natively multimodal</b> (text + image + video)</td><td>Natively multimodal (text + image)</td></tr>
+<tr><td class="dim">Vision encoder</td><td>(experimental variant only)</td><td>24-layer ViT · 448px / patch 14 · 2×2 merge</td><td>(multimodal, details not fully published)</td></tr>
+<tr><td class="dim">Indexer mechanism</td><td><b class="ds">FP4 Lightning Indexer</b> (FP4-quantized top-k)</td><td>Lightning indexer (32h / 128d / top-2048) + IndexPool</td><td>QSA indexer (sparse, no FP4 disclosed)</td></tr>
+<tr><td class="dim">Weight precision</td><td><b class="ds">FP4 + FP8 mixed (QAT-trained)</b></td><td>FP8 e4m3 (primary)</td><td>NVFP4 (NVIDIA FP4)</td></tr>
+<tr><td class="dim">Disk size (default ckpt)</td><td>~291 GB</td><td>~331 GB</td><td><b>~130 GB</b> (smallest)</td></tr>
+<tr><td class="dim">Optimizer</td><td><b class="ds">Muon</b> (replaces AdamW)</td><td>(not disclosed)</td><td>(not disclosed)</td></tr>
+<tr><td class="dim">Pre-training tokens</td><td><b>32T+</b></td><td>30T</td><td>(not disclosed)</td></tr>
+<tr><td class="dim">MTP draft tokens</td><td>Yes</td><td>5 spec tokens</td><td>3 spec tokens</td></tr>
+<tr><td class="dim">Unique architectural bet</td><td><b class="ds">Native FP4 QAT + Muon + 10× KV reduction</b></td><td><b class="glm">Native multimodal in one checkpoint</b></td><td><b class="qwen">51B N-gram engram + ultra-sparse 6B-A</b></td></tr>
+<tr><td class="dim">Released</td><td>Apr 24, 2026 (refresh Jul 31)</td><td>Aug 26, 2026</td><td>Aug 26, 2026 (Qwen4 preview)</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The matrix surfaces a clear pattern: each model leads on a different axis. DeepSeek leads on raw efficiency metrics (10× KV cache reduction vs V3, native QAT FP4, Muon optimizer). GLM leads on multimodal integration (single native-multimodal checkpoint, no separate vision variant needed). Qwen leads on sparsity (6B active is the lowest of the three) and on the most architecturally novel mechanism (the 51B n-gram engram lookup table).</p>
+
+</section>
+<!-- ===================== SECTION 4 ===================== -->
+<section id="s4">
+<h2 class="section"><span class="num">4.</span>Quantization and weight precision — FP4, FP8, NVFP4</h2>
+
+<p class="lede">All three models ship natively quantized weights as the primary checkpoint. None of them ship a BF16 variant as the default. This is a structural shift from 2024 and 2025, where quantization was an inference-time choice applied to a BF16 reference checkpoint.</p>
+
+<h3 class="subsection">4.1 DeepSeek V4 Flash — FP4 + FP8 mixed via QAT</h3>
+
+<p>DeepSeek's choice is the most aggressive: <strong>FP4 (e4m3 format) for MoE expert parameters, FP8 for everything else</strong> (attention, dense layers, embeddings, norms). The model is trained end-to-end with quantization-aware training (QAT), so the quantization noise is part of the learned weights rather than a post-training degradation<sup class="cite">[1]</sup>. On disk, V4 Flash is approximately 291 GB.</p>
+
+<p>The choice to use FP4 specifically for MoE expert weights is significant. In MoE inference, the main bottleneck is loading expert weights from memory — the computation itself is comparatively cheap because only a small fraction of experts are active per token. FP4 cuts expert weight bandwidth by 2× vs FP8 and 4× vs BF16, which directly translates to higher throughput at the same VRAM budget<sup class="cite">[14]</sup>.</p>
+
+<p>The community reaction on r/LocalLLaMA flagged this as a notable choice. FP4 expert weights cut memory bandwidth requirements substantially, and QAT means the quality hit vs BF16 is small enough that DeepSeek ships FP4+FP8 as the primary checkpoint without offering a BF16 fallback. This is the model<sup class="cite">[15]</sup>.</p>
+
+<h3 class="subsection">4.2 GLM-5.3 Flash — FP8 e4m3 with dynamic activation scaling</h3>
+
+<p>GLM-5.3 Flash ships <strong>FP8 (e4m3 with dynamic activation scaling)</strong> as the primary checkpoint — 62 shards, ~331 GB on disk. A separate BF16 repo exists at 120 shards / ~640 GB<sup class="cite">[2]</sup>. This is one of the first frontier-scale models to ship FP8 as the primary checkpoint rather than as a post-training quantization, which means the model was likely trained with FP8-aware techniques (QAT or similar) and the FP8 numbers on benchmarks are the "real" numbers, not a degraded quantized version.</p>
+
+<p>Z.ai has not explicitly stated whether benchmarks were run on FP8 or BF16, but the model card and vLLM recipe both treat FP8 as the default. The community has noted this ambiguity as a recurring complaint<sup class="cite">[10]</sup>.</p>
+
+<h3 class="subsection">4.3 Qwen3.8 Flash-Next — NVFP4 with per-layer embeddings</h3>
+
+<p>Qwen3.8 Flash-Next ships <strong>NVFP4</strong> — NVIDIA's FP4 format, which uses 4-bit floating-point with per-block scaling factors. The Inferact NVFP4 quantized checkpoint uses per-layer embeddings in NVFP4 as well, so the entire model including the 51B n-gram table is quantized<sup class="cite">[3]</sup>. On disk, the NVFP4 checkpoint is approximately 130 GB — the smallest of the three by a substantial margin.</p>
+
+<p>The choice of NVFP4 over generic FP4 is notable. NVFP4 is the format supported natively by NVIDIA Blackwell GPUs (B200, GB200, B300, GB300), and the vLLM recipe explicitly requires Blackwell for the NVFP4 path<sup class="cite">[3]</sup>. On Hopper (H100/H200), the FP8 checkpoint must be used instead. This is a meaningful hardware constraint: teams on Hopper cannot use the most aggressive quantization.</p>
+
+<h3 class="subsection">4.4 Comparative analysis</h3>
+
+<p>The three precision choices reflect three different bets:</p>
+
+<ul>
+<li><strong>DeepSeek (FP4+FP8 mixed, QAT)</strong> — bets that QAT-trained FP4 experts preserve enough quality to ship as the default, with no BF16 fallback. The most aggressive.</li>
+<li><strong>GLM (FP8 e4m3 primary, BF16 available)</strong> — bets that FP8 is the right balance of compression and quality, while preserving a BF16 reference for users who want maximum fidelity.</li>
+<li><strong>Qwen (NVFP4, Blackwell-only)</strong> — bets that the ecosystem will move to Blackwell quickly enough that NVFP4 can be the default, accepting that Hopper users must use the FP8 variant.</li>
+</ul>
+
+<p>If independent verification continues to show that DeepSeek V4 Pro 0813 is within striking distance of the closed frontier on SWE-bench (vals.ai reports 96.40%, within 0.60 points of the closed leader)<sup class="cite">[5]</sup>, the FP4+QAT bet is likely to be validated and the other labs will follow. By the time the next generation of models ships, FP4 expert weights may look less like a DeepSeek innovation and more like an industry baseline.</p>
+
+</section>
+
+<!-- ===================== SECTION 5 ===================== -->
+<section id="s5">
+<h2 class="section"><span class="num">5.</span>Benchmarks — cross-model evidence, with caveats</h2>
+
+<p class="lede">Direct cross-model benchmark comparison across the three flash-tier models is hampered by harness heterogeneity, vendor self-reporting, and incomplete coverage. This section presents what is known, with explicit caveats where the comparison is not apples-to-apples.</p>
+
+<h3 class="subsection">5.1 The benchmark matrix</h3>
+
+<p>The table below compiles reported scores across nine benchmarks with comparable setups. Cells are left blank where the model has not been evaluated in a comparable configuration.</p>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 2. Flash-tier benchmark comparison across nine benchmarks. Sources: DeepSeek HF model card instruct table [1], Z.ai launch chart [2], Reddit user Nota_ReAlperson cross-model compilation [16], Artificial Analysis [4], llm-stats [17]. GDPval-AA v2 Elo shown divided by 30 for axis alignment.</caption>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th class="ds">DeepSeek V4 Flash (Max)</th>
+<th class="glm">GLM-5.3 Flash</th>
+<th class="qwen">Qwen3.8 Flash-Next</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="dim">MMLU-Pro (EM)</td><td class="num"><b>86.2</b></td><td>—</td><td>—</td></tr>
+<tr><td class="dim">GPQA Diamond (Pass@1)</td><td class="num">88.1</td><td class="num">91.0</td><td class="num"><b>91.7</b></td></tr>
+<tr><td class="dim">HLE (no tools, Pass@1)</td><td class="num">34.8</td><td class="num"><b>50.2</b></td><td class="num">35.9</td></tr>
+<tr><td class="dim">LiveCodeBench (Pass@1)</td><td class="num"><b>91.6</b></td><td>—</td><td>—</td></tr>
+<tr><td class="dim">SWE-bench Verified</td><td class="num"><b>79.0</b></td><td class="num">76.8</td><td>—</td></tr>
+<tr><td class="dim">DeepSWE v1.1</td><td class="num">59.3</td><td class="num"><b>63.4</b></td><td class="num">58.7</td></tr>
+<tr><td class="dim">Terminal Bench 2.1</td><td class="num">83.9 *</td><td class="num"><b>84.3</b></td><td>—</td></tr>
+<tr><td class="dim">Agents' Last Exam</td><td class="num">47.8 **</td><td class="num">26.3</td><td class="num">24.3</td></tr>
+<tr><td class="dim">GDPval-AA v2 (Elo)</td><td class="num">1395</td><td class="num"><b>1773</b></td><td>—</td></tr>
+</tbody>
+</table>
+</div>
+
+<p><em>* DeepSeek's Terminal Bench 2.1 score of 83.9 uses the V4-Flash-0731 refresh with a different harness than the original V4 Flash score of 56.9. GLM-5.3 Flash's 84.3 uses Claude Code 2.1.207 as the harness. These are not strictly comparable.</em><br>
+<em>** DeepSeek's Agents' Last Exam score of 47.8 is for Toolathlon Verified (pass@1), a related but different benchmark. GLM-5.3 Flash's 26.3 and Qwen3.8's 24.3 are for the Agents' Last Exam proper.</em></p>
+
+<figure class="wide">
+<img src="flash-tier-benchmark-comparison.png" alt="Grouped bar chart comparing DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next across nine benchmarks including MMLU-Pro, GPQA Diamond, HLE, LiveCodeBench, SWE-bench Verified, DeepSWE, Terminal Bench, Agents' Last Exam, and GDPval-AA v2.">
+<figcaption><b>Figure 2.</b> Flash-tier benchmark comparison. DeepSeek V4 Flash (cyan) leads on MMLU-Pro (86.2), LiveCodeBench (91.6), and SWE-bench Verified (79.0). GLM-5.3 Flash (blue) leads on HLE without tools (50.2), DeepSWE v1.1 (63.4), and GDPval-AA v2 Elo (1773 — the sole independently-evaluated number). Qwen3.8 Flash-Next (green) leads narrowly on GPQA Diamond (91.7). NaN cells indicate benchmarks where the model has not been evaluated in a comparable setup.</figcaption>
+</figure>
+
+<h3 class="subsection">5.2 Where each model leads</h3>
+
+<p>Three clear patterns emerge from the benchmark matrix:</p>
+
+<p><strong>DeepSeek V4 Flash leads on knowledge and pure coding.</strong> MMLU-Pro at 86.2, LiveCodeBench at 91.6, SWE-bench Verified at 79.0 — these are the highest scores among the three on each benchmark. This is consistent with DeepSeek's architectural bet on raw efficiency: the 32T+ token pre-training corpus and Muon optimizer produce strong base capability that survives the smaller active parameter count.</p>
+
+<p><strong>GLM-5.3 Flash leads on agentic and tool-use benchmarks.</strong> HLE without tools at 50.2 (vs DeepSeek's 34.8 and Qwen's 35.9), DeepSWE v1.1 at 63.4 (vs DeepSeek's 59.3 and Qwen's 58.7), and most strikingly GDPval-AA v2 Elo at 1773 — the only independently-evaluated number in the matrix and the highest score across the flash tier. This is consistent with Z.ai's post-training emphasis on agentic workflows and the visual coding loop.</p>
+
+<p><strong>Qwen3.8 Flash-Next leads on GPQA Diamond.</strong> At 91.7, it edges out GLM (91.0) and DeepSeek (88.1) on graduate-level science reasoning. This is the only benchmark where Qwen3.8 leads, and the margin is narrow. Qwen's value proposition is more about cost-efficiency and architectural experimentation than benchmark leadership — Qwen explicitly frames the release as a Qwen4 architecture preview rather than a competitive flagship<sup class="cite">[3]</sup>.</p>
+
+<h3 class="subsection">5.3 Reasoning mode scaling on DeepSeek V4 Flash</h3>
+
+<p>DeepSeek's HF card publishes instruct-model scores across all three reasoning modes (Non-Think, Think High, Think Max), which gives the clearest picture of how thinking budget affects capability<sup class="cite">[1]</sup>. The pattern is striking:</p>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 3. DeepSeek V4 Flash reasoning mode scaling, from Non-Think to Think Max. Source: DeepSeek HF model card instruct comparison table [1]. The pattern: knowledge recall scales marginally; hard reasoning scales dramatically; long-context retrieval scales massively.</caption>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>Non-Think</th>
+<th>Think High</th>
+<th>Think Max</th>
+<th>Scaling</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="dim">MMLU-Pro</td><td class="num">83.0</td><td class="num">86.4</td><td class="num">86.2</td><td class="num">1.04×</td></tr>
+<tr><td class="dim">SimpleQA-Verified</td><td class="num">23.1</td><td class="num">28.9</td><td class="num">34.1</td><td class="num">1.48×</td></tr>
+<tr><td class="dim">GPQA Diamond</td><td class="num">71.2</td><td class="num">87.4</td><td class="num">88.1</td><td class="num">1.24×</td></tr>
+<tr><td class="dim">HLE (no tools)</td><td class="num">8.1</td><td class="num">29.4</td><td class="num">34.8</td><td class="num"><b>4.30×</b></td></tr>
+<tr><td class="dim">LiveCodeBench</td><td class="num">55.2</td><td class="num">88.4</td><td class="num">91.6</td><td class="num">1.66×</td></tr>
+<tr><td class="dim">HMMT 2026 Feb</td><td class="num">40.8</td><td class="num">91.9</td><td class="num">94.8</td><td class="num"><b>2.32×</b></td></tr>
+<tr><td class="dim">Apex Shortlist</td><td class="num">9.3</td><td class="num">72.1</td><td class="num">85.7</td><td class="num"><b>9.22×</b></td></tr>
+<tr><td class="dim">MRCR 1M (MMR)</td><td class="num">37.5</td><td class="num">76.9</td><td class="num">78.7</td><td class="num">2.10×</td></tr>
+<tr><td class="dim">CorpusQA 1M (ACC)</td><td class="num">15.5</td><td class="num">59.3</td><td class="num">60.5</td><td class="num"><b>3.90×</b></td></tr>
+<tr><td class="dim">SWE Verified</td><td class="num">73.7</td><td class="num">78.6</td><td class="num">79.0</td><td class="num">1.07×</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Three observations on this table:</p>
+
+<ol>
+<li><strong>Hard reasoning benchmarks scale dramatically with thinking budget.</strong> HLE goes 8.1 → 34.8 (4.3×), HMMT goes 40.8 → 94.8 (2.3×), Apex Shortlist goes 9.3 → 85.7 (9.2×). These are the benchmarks where extended thinking actually pays off.</li>
+<li><strong>Knowledge recall scales marginally.</strong> MMLU-Pro barely moves (83.0 → 86.2), SWE Verified barely moves (73.7 → 79.0). For these tasks, the model already "knows" the answer in Non-Think mode; more thinking doesn't help much.</li>
+<li><strong>Long-context retrieval scales massively.</strong> MRCR 1M goes 37.5 → 78.7 (2.1×), CorpusQA 1M goes 15.5 → 60.5 (3.9×). At 1M context, thinking is essential to actually retrieve and reason over the relevant information.</li>
+</ol>
+
+<p>This pattern matters for deployment decisions. Production systems using DeepSeek V4 Flash for routine Q&A can run in Non-Think mode and save substantially on token cost. Systems using it for long-context analysis or competition math should run in Think Max. The 9.2× scaling on Apex Shortlist shows that the model's capability ceiling is substantially higher than its default-mode numbers suggest.</p>
+
+<h3 class="subsection">5.4 Independent verification status</h3>
+
+<p>Independent verification of vendor-reported numbers has been slow. The verified numbers across the three launches are:</p>
+
+<ul>
+<li><strong>GLM-5.3 Flash GDPval-AA v2 Elo: 1773</strong> — evaluated by Artificial Analysis, not Z.ai. This is the highest score on the flash-tier launch chart by a clear margin<sup class="cite">[4]</sup>.</li>
+<li><strong>DeepSeek V4 Pro 0813 SWE-bench Verified: 96.40%</strong> — verified by vals.ai as of August 19, 2026. Second overall, within 0.60 points of the closed leader. This is the Pro variant, not Flash, but it suggests DeepSeek's SWE-bench numbers are credible<sup class="cite">[5]</sup>.</li>
+<li><strong>Artificial Analysis Intelligence Index for V4-Flash-Max: 57</strong> — same score as GLM-5.3 Flash, placing both in the same intelligence-per-dollar tier<sup class="cite">[4]</sup>.</li>
+<li><strong>LHTB (Long-Horizon Terminal Bench) leaderboard: V4-Flash ranked #2 in the &lt;500B size range</strong>, solving 2/46 tasks at reward ≥0.95 in an estimated 90-minute budget. The same run scores 5/46 at its full 3-hour budget<sup class="cite">[1]</sup>.</li>
+</ul>
+
+<p>For Qwen3.8 Flash-Next, independent verification is essentially absent as of August 27, 2026 — the model is too new. BenchLM reports a 67.5 out of 100 composite score, ranking #25 of 226 models<sup class="cite">[18]</sup>. MiniMax M2 comparison data shows Qwen3.8 Flash-Next outperforming MiniMax M2 on GPQA, HLE, and SWE-bench Multilingual<sup class="cite">[17]</sup>. These are preliminary signals, not full verification.</p>
+
+<h3 class="subsection">5.5 How to read these numbers</h3>
+
+<p>Three caveats apply to every cell of the benchmark matrix:</p>
+
+<ol>
+<li><strong>Most numbers are vendor-reported</strong> except where flagged (vals.ai, Artificial Analysis, LHTB). The harnesses differ per test; the technical reports specify temperature, context limits, and judge models per benchmark. Treat cross-model comparisons as setup-dependent.</li>
+<li><strong>Think Max is the headline mode</strong> but expensive — DeepSeek's HLE w/ tools evaluation uses max generation 163,840 tokens with GPT-5.6-luna (medium) as judge<sup class="cite">[2]</sup>. Production deployments that do not set Think Max explicitly will see substantially lower scores than the headlines.</li>
+<li><strong>For DeepSeek V4, there is no BF16 variant</strong>. The QAT-trained FP4+FP8 weights are the model. So all benchmarks are on the quantized checkpoint, which is the relevant number for self-hosting teams. For GLM-5.3 Flash and Qwen3.8 Flash-Next, the relationship between reported benchmark numbers and the shipped quantized checkpoints is less clear.</li>
+</ol>
+
+</section>
+
+<!-- ===================== SECTION 6 ===================== -->
+<section id="s6">
+<h2 class="section"><span class="num">6.</span>Training pipelines — what is disclosed and what is not</h2>
+
+<p class="lede">DeepSeek's V4 technical report is unusually explicit about the training pipeline. GLM-5.3 Flash's is documented at the architectural level but the RL specifics are not in the model card. Qwen3.8 Flash-Next is explicitly a preview; Qwen has stated that full training details will be disclosed in the Qwen4 technical report.</p>
+
+<h3 class="subsection">6.1 DeepSeek V4 Flash — the two-stage post-training paradigm</h3>
+
+<p>DeepSeek's V4 technical report (arXiv 2606.19348) describes a five-phase pipeline that culminates in a <strong>two-stage post-training paradigm</strong> that is the key architectural decision distinguishing V4 from prior DeepSeek releases<sup class="cite">[7]</sup>:</p>
+
+<ol>
+<li><strong>Pre-training</strong> — 32T+ diverse, high-quality tokens, with the Muon optimizer replacing AdamW. The architectural changes from V3 (hybrid CSA+HCA, mHC, aux-loss-free MoE, QAT) are baked in here.</li>
+<li><strong>Long-context continual training</strong> — context extended to 1,048,576 tokens native. Lightning Indexer trained jointly with attention layers. HCA layers concentrated in latter two-thirds of network. Model also trained for 384K-token output generation in a single response.</li>
+<li><strong>Stage 1: Independent domain expert cultivation</strong> — multiple SFT + RL pipelines run <em>independently</em>, each cultivating a domain expert. GRPO (Group Relative Policy Optimization, DeepSeek's own RL algorithm open-sourced with R1) on verifiable math/code rewards. Specialist experts on coding, agentic, math tracks. Each domain expert is a full fine-tune of the V4-Flash base.</li>
+<li><strong>Stage 2: Unified consolidation via on-policy distillation</strong> — each domain expert's traces are used as supervision to distill into the single V4-Flash model. The unified model learns from all experts simultaneously, but through distillation (teacher forcing on expert outputs) rather than direct SFT. This preserves distinct proficiencies without catastrophic forgetting.</li>
+<li><strong>QAT finalize + MTP draft head training</strong> — FP4/FP8 weight precision finalized, dynamic scaling factors baked, MTP draft head trained for speculative decoding. The V4-Flash-Vision-Exp variant is trained as a parallel track, not derived from V4-Flash text.</li>
+</ol>
+
+<p>The two-stage paradigm is what enables V4-Flash to be both a strong coding model (SWE Verified 79.0) and a strong reasoning model (HMMT 94.8) without one degrading the other. Most single-stage post-training pipelines face a trade-off — RL on math hurts agentic capability, SFT on agentic data hurts math. Stage 1 lets each capability develop fully in its own specialist; Stage 2 merges them without forcing trade-offs<sup class="cite">[7]</sup>.</p>
+
+<h3 class="subsection">6.2 GLM-5.3 Flash — newly trained base, post-training less documented</h3>
+
+<p>GLM-5.3 Flash "starts from a newly trained base model, with its architecture and training recipe redesigned around capability and efficiency"<sup class="cite">[2]</sup>. Pre-training uses a 30T-token multimodal corpus. The architectural changes (hybrid KDA + sparse MLA, mHC, IndexPool, native FP8) are baked in at pre-training.</p>
+
+<p>The post-training specifics are less documented. What can be inferred from the model card footnotes and the reasoning_effort ablations:</p>
+
+<ul>
+<li>SFT data covering reasoning traces (long CoT with reasoning_effort: max/high/low ablations as separate quality tiers), tool calling (native function calling with parser <code>glm47</code>, multi-turn tool chains), agentic coding (NL2Repo, DeepSWE-style traces, Terminal-Bench-style terminal sessions with memory + tool feedback loops), and the visual coding loop (render → screenshot → critique → iterate via Browser Use and Computer Use).</li>
+<li>RL with verifiable rewards on math, code, and agentic tasks. The model card footnotes mention both rule-based and LLM-based judgment (the latter is GPT-5.6-luna-medium for HLE) — this suggests RL with both verifiable signals and preference signals.</li>
+<li>Safety alignment: CyberGym defensive benchmark at 84.5% indicates substantial red-teaming and safety RL.</li>
+<li>Document and office skills: end-to-end RL on multi-step document workflows (research → analysis → finished PPTX / PDF / DOCX / XLSX files).</li>
+</ul>
+
+<p>The Ox Alpha preview happened <em>after</em> the post-training pipeline was complete — the model was already at release quality when it was deployed anonymously on OpenRouter for ~12 days<sup class="cite">[2]</sup>.</p>
+
+<h3 class="subsection">6.3 Qwen3.8 Flash-Next — preview, full details deferred</h3>
+
+<p>Qwen3.8 Flash-Next is explicitly a Qwen4 architecture preview<sup class="cite">[3]</sup>. The architecture is documented at the level of detail needed for inference (layer counts, attention design, MoE config, context length) but the training pipeline is not disclosed in the launch materials. Qwen's blog post notes that Qwen3.8-Flash-Next-Base "achieves the best result on 8 of the 14 benchmarks, including MMLU-Pro, SuperGPQA, BBH, GSM8K, EvalPlus, SWEBench"<sup class="cite">[3]</sup> but does not specify the post-training methodology.</p>
+
+<p>What is known: the model uses the GDN+QSA hybrid attention, a 51B N-gram "engram" lookup table, Gated Residual with four branches, NVFP4 weights, and MTP draft layer. The full Qwen4 technical report is expected to disclose the training pipeline when Qwen4 itself launches.</p>
+
+</section>
+<!-- ===================== SECTION 7 ===================== -->
+<section id="s7">
+<h2 class="section"><span class="num">7.</span>Inference and self-hosting — the practical matrix</h2>
+
+<p class="lede">All three models are aggressively open-weights and ship with day-one vLLM and SGLang support. The self-hosting matrix differs substantially across the three, driven by checkpoint size, weight precision, and the minimum GPU class required for the sparse attention kernels.</p>
+
+<h3 class="subsection">7.1 Hardware requirements matrix</h3>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 4. Self-hosting hardware matrix. Compiled from vLLM recipe pages for DeepSeek V4 Flash [14], GLM-5.3 Flash [10], and Qwen3.8 Flash-Next [3]. "Floor" denotes the minimum viable configuration; "recommended" denotes the configuration the recipe page marks as default.</caption>
+<thead>
+<tr>
+<th>Configuration</th>
+<th class="ds">DeepSeek V4 Flash</th>
+<th class="glm">GLM-5.3 Flash</th>
+<th class="qwen">Qwen3.8 Flash-Next</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="dim">Default checkpoint size</td><td>~291 GB (FP4+FP8)</td><td>~331 GB (FP8)</td><td><b>~130 GB</b> (NVFP4)</td></tr>
+<tr><td class="dim">BF16 variant available</td><td>No (QAT-only)</td><td>Yes (~640 GB)</td><td>Yes (~423 GB)</td></tr>
+<tr><td class="dim">Minimum GPU class</td><td>Hopper (H100/H200)</td><td>Hopper (H100/H200)</td><td>Hopper (H100/H200) for FP8; <b>Blackwell required for NVFP4</b></td></tr>
+<tr><td class="dim">Minimum TP for FP8/NVFP4</td><td>TP=4 (single H100/H200 node)</td><td>TP=4 (single H100/H200 node)</td><td>TP=2 (GB300), TP=4 recommended</td></tr>
+<tr><td class="dim">8× H200 configuration</td><td>TP=8 works</td><td>TP=8 works</td><td><b>TEP=8 required</b> (plain TP=8 incompatible with FP8 checkpoint's 128-wide quantization blocks)</td></tr>
+<tr><td class="dim">AMD ROCm support</td><td>Yes (MI300X/MI325X/MI355X)</td><td>Yes (MI355X, gfx950 only)</td><td>Yes (MI355X, partial — N-gram offload NVIDIA-only)</td></tr>
+<tr><td class="dim">llama.cpp GGUF support</td><td>Yes (INT3/INT4, mainline since Jul 2026)</td><td>Yes (Unsloth GGUF, day-one)</td><td>WIP / experimental</td></tr>
+<tr><td class="dim">KTransformers CPU/GPU hybrid</td><td>Yes</td><td>Yes</td><td>Not yet documented</td></tr>
+<tr><td class="dim">MTP spec decoding</td><td>Yes</td><td>Yes (5 spec tokens)</td><td>Yes (3 spec tokens)</td></tr>
+<tr><td class="dim">Prefill/Decode disaggregation</td><td>Yes (NIXL)</td><td>Yes (NIXL)</td><td>Not yet documented</td></tr>
+<tr><td class="dim">Viable on consumer HW?</td><td>No (103GB+ weight floor)</td><td>No (331GB+ weight floor)</td><td>Borderline — INT4 GGUF est. ~82GB, possible on RTX PRO 6000 dual</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection">7.2 The recommended stacks</h3>
+
+<p><strong>vLLM</strong> has first-class support for all three models as of August 2026. DeepSeek V4 requires vLLM 0.10+ with FlashInfer 0.6.18+ for CSA/HCA kernels. GLM-5.3 Flash requires vLLM 0.29.0+ with FlashInfer 0.6.17+ for NoPE sparse MLA. Qwen3.8 Flash-Next requires the dedicated <code>vllm/vllm-openai:qwen38-flash-next</code> Docker image; PyPI installation is not supported for the recipe<sup class="cite">[3][10][14]</sup>.</p>
+
+<p><strong>SGLang</strong> has verified configs for all three models across H100/H200/B200/B300/GB200/GB300. SGLang's adaptive MTP and <code>--mm-feature-transport cpu</code> (for vision features) are documented in the official cookbooks. For latency-sensitive serving with mixed attention types, SGLang's kernel scheduling is reportedly better than vLLM's on some workloads.</p>
+
+<p><strong>llama.cpp</strong> runs DeepSeek V4 Flash mainline as of July 2026 — no forks required. The recommended INT3 or INT4 GGUF build is 103 GB on disk with a 110 GB memory floor. Reported throughput on a single H200 with INT4 GGUF is 90-130 t/s prefill, 6-7.5 t/s decode — fine for interactive use, not for production serving. The catch: llama.cpp does not support the FP4 Lightning Indexer kernels, so CSA layers fall back to standard top-k attention without the indexer speedup, and HCA layers run as standard compressed attention<sup class="cite">[19]</sup>. For Qwen3.8 Flash-Next, llama.cpp support is still WIP as of August 27, 2026<sup class="cite">[20]</sup>.</p>
+
+<h3 class="subsection">7.3 Self-hosting reality check</h3>
+
+<p>Who can realistically self-host each model? The matrix differs substantially:</p>
+
+<p><strong>DeepSeek V4 Flash:</strong> Mid-size and large orgs with a 4× H100 80G or 4× H200 141G node — recommended baseline. ~$60K-$120K capex or ~$4-$8/hr on-demand. AI-native startups renting GPU capacity (Together, Modal, Lambda, CoreWeave) break even vs API at roughly 2B+ tokens/month of sustained traffic. Prosumers can run INT4 GGUF on a single H200 or dual RTX PRO 6000 96GB for interactive use; llama.cpp at 6-7.5 tok/s decode is barely usable for chat, fine for batch evals. Consumer hardware (RTX 5090 32GB, RTX 4090 24GB) is not viable even with INT3 quantization<sup class="cite">[19]</sup>.</p>
+
+<p><strong>GLM-5.3 Flash:</strong> Same profile as DeepSeek V4 Flash — 4× H100 80G baseline, 8× H100/H200 for high-throughput. The 331 GB FP8 checkpoint and Hopper+ requirement put it out of reach for most individual developers. Unsloth ships GGUF and FP8 quants; AtomicChat also has a GGUF. The model card notes support for SGLang, vLLM, TokenSpeed, and KTransformers from day one<sup class="cite">[2]</sup>.</p>
+
+<p><strong>Qwen3.8 Flash-Next:</strong> The most accessible of the three for self-hosting thanks to the 130 GB NVFP4 checkpoint (smallest of the three) and the 51B n-gram table's CPU-offload capability. TP2 is the minimum validated FP8 deployment on GB300; TP4 is the recommended full-tray configuration. On 8× H200, TEP8 (tensor-expert parallel) is required — plain TP8 is incompatible with the FP8 checkpoint's 128-wide quantization blocks. The 51B n-gram embedding table can be offloaded to host RAM via <code>VLLM_PLE_CPU_OFFLOAD=1</code>, which is required for DEP (data-expert parallel) strategy<sup class="cite">[3]</sup>. Reddit estimates put the 4-bit quant at ~82 GB (58 GB main weights + 24 GB n-gram tables), which is borderline viable on a single H200 141GB or dual RTX PRO 6000 96GB<sup class="cite">[13]</sup>.</p>
+
+<h3 class="subsection">7.4 Economic break-even analysis</h3>
+
+<p>The economic crossover between API and self-hosting depends on sustained traffic volume. At 4× H100 80G on-demand at ~$12/GPU/hr = $48/hr total, the break-even points are:</p>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 5. Economic break-even: tokens-per-hour of sustained traffic required for self-hosting to match API cost. Calculated from on-demand H100 pricing and vendor API rates as of August 2026.</caption>
+<thead>
+<tr>
+<th>Model</th>
+<th>API output $/M (off-peak)</th>
+<th>Self-host cost $/hr (4×H100)</th>
+<th>Break-even output tok/hr</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="dim">DeepSeek V4 Flash</td><td class="num">$0.14</td><td class="num">$48</td><td class="num">~343M tok/hr</td></tr>
+<tr><td class="dim">GLM-5.3 Flash</td><td class="num">$0.50</td><td class="num">$48</td><td class="num">~96M tok/hr</td></tr>
+<tr><td class="dim">Qwen3.8 Flash-Next</td><td class="num">(TBD)</td><td class="num">$48</td><td class="num">—</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>For DeepSeek V4 Flash, the break-even is high (~343M tokens/hour of sustained output traffic) because the API is exceptionally cheap. For GLM-5.3 Flash, break-even is lower (~96M tokens/hour) because the API is more expensive. In practice, only sustained batch workloads hit these volumes; spiky or interactive traffic is almost always cheaper via API.</p>
+
+</section>
+
+<!-- ===================== SECTION 8 ===================== -->
+<section id="s8">
+<h2 class="section"><span class="num">8.</span>API and developer surface — pricing, modes, ergonomics</h2>
+
+<p class="lede">All three models are OpenAI-API-compatible. The developer surface differs in pricing structure, reasoning mode control, and multimodal API design.</p>
+
+<h3 class="subsection">8.1 Pricing comparison</h3>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 6. Flash-tier API pricing as of August 27, 2026. All prices in USD per million tokens. DeepSeek uses peak/off-peak pricing (peak = 01:00-04:00 and 06:00-10:00 UTC weekdays; off-peak = all other hours, half of peak). Qwen3.8 Flash-Next pricing has not been finalized as the model is in preview.</caption>
+<thead>
+<tr>
+<th>Tier</th>
+<th class="ds">DeepSeek V4 Flash</th>
+<th class="glm">GLM-5.3 Flash</th>
+<th class="qwen">Qwen3.8 Flash-Next</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="dim">Input (cache miss)</td><td class="num">$0.22 peak / <b>$0.11 off-peak</b></td><td class="num">$0.15</td><td class="num">(TBD)</td></tr>
+<tr><td class="dim">Input (cache hit)</td><td class="num">$0.015 / <b>$0.007 off-peak</b></td><td class="num">$0.03</td><td class="num">(TBD)</td></tr>
+<tr><td class="dim">Output</td><td class="num">$0.28 / <b>$0.14 off-peak</b></td><td class="num">$0.50</td><td class="num">(TBD)</td></tr>
+<tr><td class="dim">Context window</td><td class="num">1,048,576</td><td class="num">1,048,576</td><td class="num">262,144 (YaRN→1M)</td></tr>
+<tr><td class="dim">Max output</td><td class="num"><b>384,000</b></td><td class="num">(not published)</td><td class="num">(not published)</td></tr>
+<tr><td class="dim">Max concurrency</td><td class="num">2,500</td><td class="num">(not published)</td><td class="num">(not published)</td></tr>
+<tr><td class="dim">Discounted (high volume)</td><td class="num">$0.045/task</td><td class="num">—</td><td class="num">—</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>DeepSeek V4 Flash is the cheapest frontier-class model on the market by a meaningful margin — roughly 30% cheaper than GLM-5.3 Flash on input and 3× cheaper on output. The cache hit pricing is particularly aggressive: $0.007 per million tokens off-peak is roughly 200× cheaper than Claude Haiku 4.5 on a cache hit. For workloads with high prefix repetition (system prompts, tool schemas, few-shot examples), context caching is essential to making V4 Flash economic.</p>
+
+<h3 class="subsection">8.2 Reasoning mode control</h3>
+
+<p>All three models support multiple reasoning effort modes, but the controls differ:</p>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 7. Reasoning mode control surfaces. All three models default to maximum reasoning; the field names and ergonomics differ.</caption>
+<thead>
+<tr>
+<th>Mode</th>
+<th class="ds">DeepSeek V4 Flash</th>
+<th class="glm">GLM-5.3 Flash</th>
+<th class="qwen">Qwen3.8 Flash-Next</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="dim">Fast / no-think</td><td><code>thinking_mode: "non_thinking"</code> or <code>reasoning_effort: "low"</code></td><td>(not supported — thinking always on)</td><td>(not documented in preview)</td></tr>
+<tr><td class="dim">Balanced</td><td><code>reasoning_effort: "high"</code></td><td><code>reasoning_effort: "high"</code></td><td>(not documented in preview)</td></tr>
+<tr><td class="dim">Maximum</td><td><code>reasoning_effort: "max"</code> (default)</td><td><code>reasoning_effort: "max"</code> (default)</td><td>(not documented in preview)</td></tr>
+<tr><td class="dim">Thinking always on?</td><td>No (Non-Think mode available)</td><td><b>Yes</b> — generation prompt opens thinking block unconditionally</td><td>(not documented in preview)</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>GLM-5.3 Flash is the most opinionated: thinking is always on, with three effort levels (max/high/low) controlling depth rather than presence. DeepSeek V4 Flash offers a true Non-Think mode for fast Q&A where extended reasoning is unnecessary. This matters for deployment economics — Non-Think mode is substantially cheaper per request, and the 9.2× scaling on Apex Shortlist (Table 3) shows that the model's capability ceiling is unlocked by Think Max rather than required for routine use.</p>
+
+<h3 class="subsection">8.3 Multimodal API design</h3>
+
+<p>The three models handle multimodal input differently:</p>
+
+<ul>
+<li><strong>GLM-5.3 Flash</strong> — native multimodal in a single checkpoint. Image input uses standard OpenAI vision-format content blocks (<code>type: image_url</code> in <code>messages[].content[]</code>). Multiple images supported. Video input also supported through the same interface. No separate model variant required<sup class="cite">[2]</sup>.</li>
+<li><strong>DeepSeek V4 Flash</strong> — text-only by default. Vision capability is in a separate experimental model, <code>deepseek-v4-flash-vision-exp</code>, accessed by setting the model name in the API. Vision-Exp is "on par with the official DeepSeek-V4-Flash" on text benchmarks but "delivers a significant leap over DeepSeek-V4-Flash" on agent benchmarks requiring visual understanding, "bringing its multimodal agent capabilities close to Opus-4.6"<sup class="cite">[6]</sup>.</li>
+<li><strong>Qwen3.8 Flash-Next</strong> — natively multimodal (text + image). Details of the vision API surface not fully documented in the launch materials.</li>
+</ul>
+
+<p>For teams building multimodal agents, GLM-5.3 Flash's single-checkpoint design is the cleanest developer experience. DeepSeek's split between text and vision models adds operational complexity (two model deployments, two pricing tiers, two sets of evaluation results) but allows DeepSeek to ship the text-only V4-Flash as the default while the vision variant matures.</p>
+
+<h3 class="subsection">8.4 Recommended sampling parameters</h3>
+
+<p>The vendor-recommended sampling parameters differ in important ways:</p>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 8. Recommended sampling parameters from each vendor's model card / developer documentation.</caption>
+<thead>
+<tr>
+<th>Parameter</th>
+<th class="ds">DeepSeek V4 Flash</th>
+<th class="glm">GLM-5.3 Flash</th>
+<th class="qwen">Qwen3.8 Flash-Next</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="dim">temperature</td><td class="num">1.0</td><td class="num">1.0</td><td class="num">(not documented)</td></tr>
+<tr><td class="dim">top_p</td><td class="num">1.0</td><td class="num">0.95</td><td class="num">(not documented)</td></tr>
+<tr><td class="dim">max_tokens (typical)</td><td class="num">4K-32K</td><td class="num">4K-8K</td><td class="num">(not documented)</td></tr>
+<tr><td class="dim">max_tokens (max)</td><td class="num"><b>384K</b></td><td class="num">(not published)</td><td class="num">(not documented)</td></tr>
+<tr><td class="dim">Reasoning effort default</td><td>Think Max</td><td>Think Max</td><td>(not documented)</td></tr>
+<tr><td class="dim">Context for Think Max</td><td>≥384K recommended</td><td>300K (eval setup)</td><td>(not documented)</td></tr>
+</tbody>
+</table>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 9 ===================== -->
+<section id="s9">
+<h2 class="section"><span class="num">9.</span>Strategic analysis — what the convergence means</h2>
+
+<p class="lede">The three releases together signal a structural shift in the open-weights LLM ecosystem. The flash tier has become the competitive battleground, hybrid attention is the new baseline, and cross-lab architectural diffusion is now measured in months rather than years.</p>
+
+<h3 class="subsection">9.1 The flash tier as competitive battleground</h3>
+
+<p>Six months ago, the frontier race was about who could ship the biggest dense model. Today, the race is about who can ship the cheapest flash-tier model with frontier-adjacent capability. DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next are all within 5–10 points of each other on most benchmarks, all MIT-licensed, all shipping within five months of each other. The differentiator is no longer raw capability — it is dollar-per-token, context length, and self-hosting feasibility.</p>
+
+<p>DeepSeek's two-model release strategy (V4 Pro for the frontier headlines, V4 Flash for production deployment) is the template that other labs are following. Z.ai's GLM-5.3 / GLM-5.3 Flash split mirrors it. Qwen's framing of Qwen3.8 Flash-Next as a "Qwen4 architecture preview" suggests the same pattern will continue: ship the big model for headlines, ship the flash tier for adoption. Expect every major open-weights lab to follow this pattern going forward.</p>
+
+<h3 class="subsection">9.2 Hybrid attention is the new baseline</h3>
+
+<p>The most striking empirical finding of this survey is the architectural convergence. Three labs, working independently, arrived at the same hybrid linear-plus-sparse attention pattern within five months. The ratios are remarkably similar (3:1 to 4:1 linear:sparse). The justification is the same in all three cases: linear attention for cheap local dependency modeling, sparse attention for expensive long-range retrieval, with the sparse layers concentrated in the deeper portion of the network where global semantic coherence matters most.</p>
+
+<p>This convergence did not happen by accident. The constraint that all three labs are optimizing against is the same: 1M-token context windows require either quadratic attention (computationally intractable) or some form of compressed/sparse attention (architecturally necessary). Single-mechanism attention — whether standard MHA, GQA, MQA, or even DeepSeek V3's MLA — cannot serve 1M context economically. The hybrid pattern is the structural solution.</p>
+
+<p>The implication: by the time the next generation of open-weights models ships (V5, GLM-6, Qwen4 proper), hybrid attention will look less like an innovation and more like a baseline. Expect the architectural frontier to move to <em>which</em> linear mechanism (CSA vs KDA vs GDN vs something new) and <em>which</em> sparse mechanism (HCA vs Sparse MLA vs QSA vs something new), not whether to use hybrid at all.</p>
+
+<h3 class="subsection">9.3 Cross-lab diffusion is now measured in months</h3>
+
+<p>The mHC lineage is the clearest example. DeepSeek published Manifold-Constrained Hyper-Connections in late 2025. Zhipu shipped it in GLM-5.3 Flash in August 2026 — roughly eleven months from publication to production deployment<sup class="cite">[9]</sup>. This is the inverse of the usual cross-lab transfer pattern where Western labs invent and Chinese labs follow. DeepSeek invents, open-sources, and ships internally before anyone else, and then the rest of the open-weights community catches up.</p>
+
+<p>By the end of 2027, expect mHC to appear in Mistral, Meta, and possibly Anthropic models. The Chinese open research ecosystem is now cross-pollinating faster than the Western one — DeepSeek publishes, Zhipu ships, the open-source community implements, and the closed frontier absorbs the technique eighteen to twenty-four months later. The lag from "open-weights Chinese lab ships novel technique" to "Western closed lab ships equivalent" is compressing.</p>
+
+<h3 class="subsection">9.4 Each lab's strategic bet</h3>
+
+<p>The three releases are not just three implementations of the same idea — they are three bets about which architectural choice will matter most:</p>
+
+<ul>
+<li><strong>DeepSeek bets on raw efficiency.</strong> Native FP4 QAT, Muon optimizer, 10× KV cache reduction vs V3. The thesis is that the binding constraint on flash-tier deployment is $/token, and the way to win on $/token is to ship the most aggressively quantized model that doesn't lose meaningful quality. The validation signal so far: vals.ai independently verifies V4 Pro 0813 at 96.40% on SWE-bench Verified, within 0.60 points of the closed leader<sup class="cite">[5]</sup>.</li>
+<li><strong>Zhipu bets on multimodal integration.</strong> Native multimodal in a single checkpoint, no separate vision variant. The thesis is that the next generation of agentic workloads requires models that can see their own output (rendered UI, screenshots, document layouts) and iterate on it. The validation signal so far: GLM-5.3 Flash's GDPval-AA v2 Elo of 1773 is the highest in the flash tier, and it is the only independently-evaluated number across all three launches<sup class="cite">[4]</sup>.</li>
+<li><strong>Qwen bets on architectural experimentation.</strong> The 51B N-gram "engram" lookup table is the most architecturally novel element across all three models. The thesis is that lookup-based capacity — a memory mechanism with no learned computation per access — can substitute for the more expensive learned computation of expert FFNs. The validation signal is still pending: Qwen3.8 Flash-Next is explicitly a preview, and the full Qwen4 release will be the real test.</li>
+</ul>
+
+<p>If DeepSeek's FP4+QAT bet pays off (early signals are positive), FP4 expert weights will diffuse across the open-weights ecosystem. If Qwen's n-gram engram bet pays off, expect a wave of lookup-table-augmented models in 2027. If Zhipu's native-multimodal bet pays off, expect more models to ship single-checkpoint multimodal rather than separate vision variants.</p>
+
+<h3 class="subsection">9.5 The closed frontier's response</h3>
+
+<p>The closed frontier labs (Anthropic, OpenAI, Google) are not standing still, but the gap is compressing. DeepSeek V4 Pro 0813 is within 0.60 points of the closed leader on SWE-bench Verified. GLM-5.3 Flash's GDPval-AA v2 Elo of 1773 exceeds several closed-frontier models. The pattern across 2026 has been that open-weights flash-tier models trail the closed frontier by 5–15 points on most benchmarks but at 5–30× lower cost.</p>
+
+<p>The implication for closed-lab strategy: the closed frontier can no longer compete on raw capability alone, because the open flash tier is close enough that the cost difference dominates most deployment decisions. Closed labs will need to compete on either (a) capability ceilings that the open tier cannot match (e.g., Claude Opus 4.8's HLE w/ tools at 57.9 vs GLM-5.3 Flash's 55.3), (b) ecosystem integration (Claude Code, ChatGPT's tool ecosystem), or (c) trust and compliance certifications that open-weights models cannot easily provide. The era of "closed frontier wins on capability, open weights win on cost" is ending; the new era is "open weights win on cost-effectiveness for most workloads, closed frontier wins on edge cases and ecosystem."</p>
+
+</section>
+
+<!-- ===================== SECTION 10 ===================== -->
+<section id="s10">
+<h2 class="section"><span class="num">10.</span>Limitations, open questions, and verification status</h2>
+
+<p class="lede">This survey is a snapshot of August 27, 2026. Several dimensions are not yet verifiable from public sources, and the open questions below are the ones most likely to materially change the comparative picture in the coming months.</p>
+
+<h3 class="subsection">10.1 What this survey does not establish</h3>
+
+<ol>
+<li><strong>Direct head-to-head benchmarks under identical conditions.</strong> No third party has yet run DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next against each other under identical harness settings, temperature, context length, and judge model. The benchmark matrix in Section 5 is the best compilation available but should be read as setup-dependent rather than absolute.</li>
+<li><strong>Quality delta between quantized and BF16 checkpoints.</strong> DeepSeek V4 ships only QAT-trained FP4+FP8 — there is no BF16 reference to compare against. GLM-5.3 Flash has both FP8 and BF16 variants but Z.ai has not clarified which was used for reported benchmarks. Qwen3.8 Flash-Next has NVFP4, FP8, and BF16 variants but Qwen has not specified which drove reported numbers.</li>
+<li><strong>The actual training-hardware story.</strong> Z.ai confirmed Ox Alpha was <em>served</em> on Chinese AI chips but has not said whether GLM-5.3 Flash was <em>trained</em> on them. GLM-5 was confirmed trained on Huawei Ascend; the silence here is notable. DeepSeek's training hardware for V4 is not publicly confirmed. Qwen3.8 Flash-Next training hardware is not disclosed.</li>
+<li><strong>Long-context quality beyond 300K tokens.</strong> All three models claim 1M-token context. Independent verification of quality at 500K-1M context is essentially absent. The architectural mechanisms (HCA for DeepSeek, IndexPool for GLM, GDN+QSA for Qwen) are designed to preserve quality at extreme context, but no third party has published a head-to-head long-context quality comparison.</li>
+<li><strong>Qwen3.8 Flash-Next's training pipeline.</strong> The model is explicitly a preview. The full Qwen4 technical report is expected to disclose the training methodology, including whether the 51B n-gram engram is trained jointly with the main model or added as a post-hoc lookup, and how the Gated Residual mechanism is trained.</li>
+</ol>
+
+<h3 class="subsection">10.2 Verification status by claim</h3>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 9. Verification status of key claims in this survey. "Vendor" = vendor self-reported. "Independent" = verified by a third party. "Inferred" = this survey's inference from primary sources, not directly stated by the vendor.</caption>
+<thead>
+<tr>
+<th>Claim</th>
+<th>Source</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="dim">GLM-5.3 Flash GDPval-AA v2 = 1773 Elo</td><td>Artificial Analysis [4]</td><td><b>Independent</b></td></tr>
+<tr><td class="dim">DeepSeek V4 Pro 0813 SWE-bench = 96.40%</td><td>vals.ai [5]</td><td><b>Independent</b></td></tr>
+<tr><td class="dim">DeepSeek V4 Flash MMLU-Pro = 86.2</td><td>DeepSeek HF card [1]</td><td>Vendor</td></tr>
+<tr><td class="dim">GLM-5.3 Flash HLE w/ tools = 55.3</td><td>Z.ai launch chart [2]</td><td>Vendor</td></tr>
+<tr><td class="dim">Qwen3.8 Flash-Next QSA 10.2× prefill speedup</td><td>Qwen blog [3]</td><td>Vendor</td></tr>
+<tr><td class="dim">DeepSeek V4 KV cache = 10% of V3.2</td><td>DeepSeek technical report [7]</td><td>Vendor</td></tr>
+<tr><td class="dim">GLM-5.3 Flash KV cache = 4.44× ▼ vs GLM-5.3</td><td>Z.ai model card [2]</td><td>Vendor</td></tr>
+<tr><td class="dim">mHC origin = DeepSeek, late 2025</td><td>Multiple secondary [9]</td><td>Inferred</td></tr>
+<tr><td class="dim">Ox Alpha = GLM-5.3 Flash preview</td><td>Z.ai announcement + Zixuan Li [2]</td><td>Vendor-confirmed</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection">10.3 Open questions for the next quarter</h3>
+
+<ol>
+<li><strong>Will the FP4+QAT bet hold up under broader independent verification?</strong> vals.ai's SWE-bench result for V4 Pro is positive but limited to one benchmark. Broader independent verification across reasoning, agentic, and long-context benchmarks will determine whether FP4 becomes the new default.</li>
+<li><strong>Will Qwen's n-gram engram diffuse to other labs?</strong> The technique is the most architecturally novel element across the three launches. If Qwen4's full release validates it, expect Mistral, Meta, and possibly Anthropic to ship similar lookup-table mechanisms in 2027.</li>
+<li><strong>Will DeepSeek V4 Pro's 744B weights release as promised?</strong> DeepSeek's pattern has been to ship the Flash variant first and the Pro weights later (or never). GLM followed the same pattern — GLM-5.3's 744B weights remain unreleased as of August 27, 2026. If V4 Pro weights release on schedule, it will be the first major open-weights 1T+ model.</li>
+<li><strong>Will the closed frontier respond with price cuts?</strong> The flash tier's pricing is now 5–30× cheaper than closed-frontier equivalents. If closed labs do not respond with price cuts, the open-weights tier will continue to gain production deployment share.</li>
+</ol>
+
+</section>
+
+<!-- ===================== SECTION 11 ===================== -->
+<section id="s11">
+<h2 class="section"><span class="num">11.</span>Conclusion</h2>
+
+<p>The three releases surveyed here — DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next — together define the open-weights flash tier as it stands in August 2026. They converge on the same architectural shape: a hybrid linear-plus-sparse attention MoE with native FP4 or FP8 quantization, a context window near one million tokens, MIT-licensed weights, and Multi-Token Prediction for speculative decoding. They diverge on the mechanism: DeepSeek's CSA+HCA two-tier compression, GLM's KDA+Sparse MLA with native multimodal, Qwen's GDN+QSA with a 51B n-gram lookup table.</p>
+
+<p>The convergence is the central empirical finding. Three labs, working independently within a five-month window, arrived at the same architectural pattern. This is not coincidence — it is the structural response to the same constraint (1M-token context windows require hybrid attention) and the same economic pressure (flash-tier deployment requires aggressive quantization). The pattern will likely become the baseline for the next generation of open-weights models.</p>
+
+<p>The divergence is the strategic story. Each lab has made a different architectural bet, and the bets reflect different theories of what will matter most for flash-tier deployment in the next twelve to eighteen months. DeepSeek bets on raw efficiency (FP4 QAT, Muon, 10× KV reduction). Zhipu bets on multimodal integration (native multimodal in one checkpoint, strong agentic benchmark scores). Qwen bets on architectural experimentation (51B n-gram engram, ultra-sparse 6B active).</p>
+
+<p>For developers choosing which model to deploy, the decision matrix is now clear. DeepSeek V4 Flash is the cheapest and most efficient for sustained text workloads — code generation, long-context document analysis, batch reasoning. GLM-5.3 Flash is the strongest for agentic and multimodal workloads — tool use, visual coding loops, agent benchmarks. Qwen3.8 Flash-Next is the most accessible for self-hosting on limited hardware (130 GB NVFP4 checkpoint) and the most architecturally experimental, but is explicitly a preview and should be evaluated as such.</p>
+
+<p>The next twelve months will determine which of the three architectural bets diffuses across the open-weights ecosystem. If DeepSeek's FP4+QAT bet pays off, FP4 expert weights become the default. If Qwen's n-gram engram bet pays off, lookup-table-augmented models become a new architectural category. If Zhipu's native-multimodal bet pays off, single-checkpoint multimodal becomes the standard rather than the exception. Whatever the outcome, the open-weights flash tier has structurally reorganized itself in 2026, and the competitive dynamics of the next generation will be defined by the choices documented here.</p>
+
+</section>
+
+</article>
+
+<!-- ===================== REFERENCES ===================== -->
+<section class="references" id="refs">
+<h2>References</h2>
+<ol>
+<li><b>DeepSeek-AI.</b> DeepSeek-V4-Flash model card, Hugging Face. <a href="https://huggingface.co/deepseek-ai/DeepSeek-V4-Flash" target="_blank" rel="noopener">huggingface.co/deepseek-ai/DeepSeek-V4-Flash</a> <span class="meta">— April 26, 2026 (last updated July 31, 2026 for the 0731 refresh).</span></li>
+<li><b>Z.ai.</b> GLM-5.3-Flash model card and launch announcement. <a href="https://huggingface.co/zai-org/GLM-5.3-Flash" target="_blank" rel="noopener">huggingface.co/zai-org/GLM-5.3-Flash</a> and <a href="https://z.ai/blog/glm-5.3-flash" target="_blank" rel="noopener">z.ai/blog/glm-5.3-flash</a> <span class="meta">— August 26, 2026.</span></li>
+<li><b>Qwen Team.</b> Qwen3.8-Flash-Next: A New Architecture, Towards Ultimate Cost-Efficiency. <a href="https://qwen.ai/blog?id=qwen3.8-flash-next" target="_blank" rel="noopener">qwen.ai/blog?id=qwen3.8-flash-next</a> and vLLM recipe <a href="https://recipes.vllm.ai/Qwen/Qwen3.8-Flash-Next" target="_blank" rel="noopener">recipes.vllm.ai/Qwen/Qwen3.8-Flash-Next</a> <span class="meta">— August 26, 2026.</span></li>
+<li><b>Artificial Analysis.</b> GLM-5.3 Flash evaluation (GDPval-AA v2). <a href="https://artificialanalysis.ai" target="_blank" rel="noopener">artificialanalysis.ai</a> <span class="meta">— accessed August 27, 2026.</span></li>
+<li><b>vals.ai.</b> SWE-bench Verified leaderboard. <a href="https://vals.ai" target="_blank" rel="noopener">vals.ai</a> <span class="meta">— DeepSeek V4 Pro 0813 at 96.40% as of August 19, 2026.</span></li>
+<li><b>DeepSeek API Docs.</b> Change Log — V4-Flash-Vision-Exp release. <a href="https://api-docs.deepseek.com/updates" target="_blank" rel="noopener">api-docs.deepseek.com/updates</a> <span class="meta">— August 21, 2026.</span></li>
+<li><b>DeepSeek-AI.</b> DeepSeek-V4: Towards Highly Efficient Million-Token Context Intelligence. arXiv 2606.19348. <a href="https://arxiv.org/abs/2606.19348" target="_blank" rel="noopener">arxiv.org/abs/2606.19348</a> <span class="meta">— April 26, 2026.</span></li>
+<li><b>Hamza Farooq (boringbot).</b> DeepSeek V4 architecture deep dive. <a href="https://boringbot.substack.com/p/deepseek-v4-architecture-deep-dive" target="_blank" rel="noopener">boringbot.substack.com/p/deepseek-v4-architecture-deep-dive</a> <span class="meta">— May 13, 2026.</span></li>
+<li><b>DeepSeek-AI.</b> Manifold-Constrained Hyper-Connections (mHC), original publication. <span class="meta">— late 2025. Cross-referenced via Z.ai GLM-5.3 Flash model card which credits DeepSeek for the technique.</span></li>
+<li><b>vLLM Recipes.</b> zai-org/GLM-5.3-Flash recipe page. <a href="https://recipes.vllm.ai/zai-org/GLM-5.3-Flash" target="_blank" rel="noopener">recipes.vllm.ai/zai-org/GLM-5.3-Flash</a> <span class="meta">— accessed August 27, 2026.</span></li>
+<li><b>Songlin Yang.</b> DeltaNet Explained (Part I). <a href="https://towardsdatascience.com/deepseek-v3-explained-1-multi-head-latent-attention-ed6bee2a67c4" target="_blank" rel="noopener">towardsdatascience.com</a> <span class="meta">— December 3, 2024. Also: Gated DeltaNet-2, arXiv, May 21, 2026.</span></li>
+<li><b>Sebastian Raschka.</b> Gated DeltaNet explanation. <a href="https://sebastianraschka.com" target="_blank" rel="noopener">sebastianraschka.com</a> <span class="meta">— 2026.</span></li>
+<li><b>r/LocalLLaMA community.</b> Qwen3.8-Flash-Next megathread discussion, including n-gram embedding details and memory estimates. <a href="https://www.reddit.com/r/LocalLLaMA/comments/1vy6smx/qwen38flashnext_this_architecture_could_be" target="_blank" rel="noopener">reddit.com/r/LocalLLaMA/comments/1vy6smx</a> <span class="meta">— August 25-26, 2026.</span></li>
+<li><b>vLLM Recipes.</b> deepseek-ai/DeepSeek-V4-Flash recipe page. <a href="https://recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Flash" target="_blank" rel="noopener">recipes.vllm.ai/deepseek-ai/DeepSeek-V4-Flash</a> <span class="meta">— accessed August 27, 2026. Also: vLLM blog "DeepSeek V4 in vLLM: Efficient Long-context Attention," April 24, 2026.</a></li>
+<li><b>r/LocalLLaMA community.</b> DeepSeek V4 Flash and Non-Flash release thread, FP4+FP8 mixed precision discussion. <a href="https://www.reddit.com/r/LocalLLaMA/comments/1su3hdo/deepseek_v4_flash_and_nonflash_out_on_huggingface" target="_blank" rel="noopener">reddit.com/r/LocalLLaMA/comments/1su3hdo</a> <span class="meta">— April 24, 2026.</span></li>
+<li><b>Nota_ReAlperson (Reddit).</b> GLM 5.3 Flash vs Qwen 3.8 Flash-Next side-by-side benchmark compilation. <a href="https://www.reddit.com/r/LocalLLaMA/comments/1vyzzxu/megathread_glm53flash_former_oxalpha" target="_blank" rel="noopener">reddit.com/r/LocalLLaMA/comments/1vyzzxu</a> <span class="meta">— August 26, 2026.</span></li>
+<li><b>llm-stats.com.</b> DeepSeek-V4-Flash-Max vs MAI-Thinking-1 and MiniMax M2 vs Qwen3.8-Flash-Next comparisons. <a href="https://llm-stats.com" target="_blank" rel="noopener">llm-stats.com</a> <span class="meta">— accessed August 27, 2026.</span></li>
+<li><b>BenchLM.ai.</b> Qwen3.8-Flash-Next benchmarks &amp; context (August 2026). <a href="https://benchlm.ai/compare/deepseek-v3-vs-deepseek-v4-flash-0731" target="_blank" rel="noopener">benchlm.ai</a> <span class="meta">— August 27, 2026.</span></li>
+<li><b>ModemGuides.</b> Run DeepSeek V4-Flash Locally: Hardware Requirements. <a href="https://www.modemguides.com/blogs/ai-infrastructure/run-deepseek-v4-flash-locally-hardware-reality-check" target="_blank" rel="noopener">modemguides.com</a> <span class="meta">— August 27, 2026.</span></li>
+<li><b>ggml-org/llama.cpp.</b> DeepSeek V4 support discussion (WIP for Qwen3.8 Flash-Next). <a href="https://github.com/ggml-org/llama.cpp/discussions/22376" target="_blank" rel="noopener">github.com/ggml-org/llama.cpp/discussions/22376</a> <span class="meta">— accessed August 27, 2026.</span></li>
+<li><b>MarkTechPost.</b> Z.ai Releases GLM-5.3-Flash: A 320B-A18B Natively Multimodal MoE With a 1M-Token Context. <a href="https://www.marktechpost.com/2026/08/26/z-ai-releases-glm-5-3-flash-a-320b-a18b-natively-multimodal-moe-with-a-1m-token-context" target="_blank" rel="noopener">marktechpost.com</a> <span class="meta">— August 26, 2026.</span></li>
+<li><b>MarkTechPost.</b> Alibaba's Qwen Team Releases Qwen3.8-Flash-Next. <a href="https://www.marktechpost.com/2026/08/26/alibabas-qwen-team-releases-qwen3-8-flash-next-a-125b-multimodal-moe-with-6b-active-parameters-previewing-the-qwen4-architecture" target="_blank" rel="noopener">marktechpost.com</a> <span class="meta">— August 26, 2026.</span></li>
+<li><b>LMSYS Org.</b> Qwen3.8-Flash-Next: Day-0 Support in SGLang. <a href="https://www.lmsys.org/blog/2026-08-26-qwen-flash-next" target="_blank" rel="noopener">lmsys.org/blog/2026-08-26-qwen-flash-next</a> <span class="meta">— August 26, 2026.</span></li>
+<li><b>Unsloth AI.</b> Qwen3.8-Flash-Next documentation. <a href="https://unsloth.ai/docs/models/qwen3.8-next" target="_blank" rel="noopener">unsloth.ai/docs/models/qwen3.8-next</a> <span class="meta">— accessed August 27, 2026.</span></li>
+</ol>
+</section>
+
+<footer class="paper-footer">
+<p><b>Citation.</b> Flash-Tier Survey. "Flash-Tier Open-Weights LLMs in August 2026: A Comparative Technical Analysis of DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next." Compiled August 27, 2026. Living document; cite as accessed.</p>
+<p><b>Methodology.</b> Compiled from twelve primary sources (vendor technical reports, model cards, API documentation, official launch announcements) and twelve secondary sources (independent benchmark aggregators, community technical analyses, deployment guides from inference platforms). All vendor-reported numbers are flagged as such; independent verification is flagged where available.</p>
+<p><b>Revisions.</b> This is a living document. The flash-tier landscape is changing rapidly — Qwen3.8 Flash-Next is explicitly a preview, the GLM-5.3 744B weights remain unreleased, and broader independent verification of vendor-reported numbers is ongoing. Expect revisions as new evidence becomes available.</p>
+<div class="license">
+<b>License.</b> This survey document is released under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>. You are free to share and adapt this material for any purpose, including commercial, provided you attribute the source. The three models discussed (DeepSeek V4 Flash, GLM-5.3 Flash, Qwen3.8 Flash-Next) are each released under MIT license by their respective creators.
+</div>
+</footer>
+
+            <div class="article-section">
+                
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                                        <a href="deepseek-v4-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">DeepSeek V4 Flash</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Deep-dive into DeepSeek's 284B/13B active MoE with MLA attention, 1M context, and $0.14/$0.28 per M tokens.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="qwen3-8-flash-next-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Qwen3.8-Flash-Next</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Deep-dive into Alibaba's 125B+51B multimodal MoE with Gated DeltaNet, QSA, and Muon optimizer.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="glm-5-3-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">GLM-5.3-Flash Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Technical deep-dive into Z.ai's 320B/18B active MoE with hybrid KDA+MLA attention and 1M context.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                </div>
+            </div>
+
+<h2 class="section-title">About the Author</h2>
+                <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
+                
+                <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+                
+                <p style="margin-top: 30px;"><em>Last Updated: August 27, 2026 | Version 1.0</em></p>
+            </div>
+        </div>
+    </article>
+
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>

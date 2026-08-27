@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OX Alpha: The Anonymous Frontier Model - Comprehensive Technical Analysis - Local AI Zone</title>
+    <title>OX Alpha(glm 5.3 flash): The Anonymous Frontier Model - Comprehensive Technical Analysis - Local AI Zone</title>
     <link rel="stylesheet" href="../css/premium-styles.css">
     <link rel="stylesheet" href="../css/custom.css">
     <link rel="stylesheet" href="../css/blog-article.css">
@@ -12,21 +12,30 @@
     <link rel="icon" href="../logo.svg" type="image/svg+xml">
     
     <!-- Meta tags for SEO -->
-    <meta name="description" content="OX Alpha achieves 80% on DeepSWE benchmarks, beating GPT-5.6 and Claude. Technical analysis reveals 1M context window, multimodal AI, and likely Zhipu GLM-5.x origins. Free until Aug 27, 2026.">
+    <meta name="description" content="OX Alpha(glm 5.3 flash) achieves 80% on DeepSWE benchmarks, beating GPT-5.6 and Claude. Technical analysis reveals 1M context window, multimodal AI, and likely Zhipu GLM-5.x origins. Free until Aug 27, 2026.">
     <link rel="canonical" href="https://local-ai-zone.github.io/blog/ox-alpha-stealth-model-comprehensive-analysis.html">
+    
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/ox-alpha-stealth-model-comprehensive-analysis.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/ox-alpha-stealth-model-comprehensive-analysis.html">
+    
+    <!-- Meta tags for SEO -->
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://local-ai-zone.github.io/blog/ox-alpha-stealth-model-comprehensive-analysis.html">
-    <meta property="og:title" content="OX Alpha: Anonymous AI Model Beats GPT-5.6 in Coding Tests (80% DeepSWE)">
-    <meta property="og:description" content="Technical deep-dive: OX Alpha achieves 80% DeepSWE Pass@1, surpassing Claude (65%) and GPT-5.6 (52%). 1M context window, multimodal support, likely Zhipu GLM-5.x. Free preview ends Aug 27.">
+    <meta property="og:title" content="OX Alpha(glm 5.3 flash): Anonymous AI Model Beats GPT-5.6 in Coding Tests (80% DeepSWE)">
+    <meta property="og:description" content="Technical deep-dive: OX Alpha(glm 5.3 flash) achieves 80% DeepSWE Pass@1, surpassing Claude (65%) and GPT-5.6 (52%). 1M context window, multimodal support, likely Zhipu GLM-5.x. Free preview ends Aug 27.">
     <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
     <meta property="og:site_name" content="Local AI Zone">
     <meta property="article:published_time" content="2026-08-22T00:00:00Z">
     <meta property="article:modified_time" content="2026-08-22T00:00:00Z">
     <meta property="article:author" content="Hussain Nazary">
     <meta property="article:section" content="AI Models">
-    <meta property="article:tag" content="OX Alpha">
+    <meta property="article:tag" content="OX Alpha(glm 5.3 flash)">
     <meta property="article:tag" content="Coding AI">
     <meta property="article:tag" content="Zhipu AI">
     <meta property="article:tag" content="Frontier Models">
@@ -34,8 +43,8 @@
     <!-- Twitter Card -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/ox-alpha-stealth-model-comprehensive-analysis.html">
-    <meta name="twitter:title" content="OX Alpha: Anonymous AI Model Beats GPT-5.6 in Coding Tests">
-    <meta name="twitter:description" content="OX Alpha achieves 80% DeepSWE Pass@1, beating Claude (65%) and GPT-5.6 (52%). 1M context, multimodal AI, likely Zhipu GLM-5.x. Free until Aug 27.">
+    <meta name="twitter:title" content="OX Alpha(glm 5.3 flash): Anonymous AI Model Beats GPT-5.6 in Coding Tests">
+    <meta name="twitter:description" content="OX Alpha(glm 5.3 flash) achieves 80% DeepSWE Pass@1, beating Claude (65%) and GPT-5.6 (52%). 1M context, multimodal AI, likely Zhipu GLM-5.x. Free until Aug 27.">
     <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
     
     <!-- Author & Creator -->
@@ -43,6 +52,7 @@
     <meta name="creator" content="Hussain Nazary">
     
     <style>
+        <style>
         .article-header {
             background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
             color: white;
@@ -51,25 +61,22 @@
             position: relative;
             overflow: hidden;
         }
-        
         .article-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="white" opacity="0.05"/></svg>');
+            display: none !important;
         }
-        
+        .article-header .container {
+            background: transparent !important;
+        }
+        .premium-header {
+            position: static !important;
+        }
         .article-title {
             font-size: 3.5em;
             font-weight: 700;
             line-height: 1.2;
             margin-bottom: 20px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            text-shadow: none !important;
         }
-        
         .article-meta {
             font-size: 1.1em;
             opacity: 0.9;
@@ -78,254 +85,382 @@
             gap: 20px;
             flex-wrap: wrap;
         }
-        
         .article-date {
             background: rgba(255,255,255,0.2);
             padding: 5px 15px;
             border-radius: 20px;
             font-weight: 600;
         }
-
         .article-author {
             background: rgba(255,255,255,0.2);
             padding: 5px 15px;
             border-radius: 20px;
             font-weight: 600;
         }
-        
         .article-category {
             background: rgba(255,255,255,0.2);
             padding: 5px 15px;
             border-radius: 20px;
         }
-        
         .article-content {
             max-width: 900px;
             margin: 0 auto;
             padding: 0 20px 60px;
         }
-        
         .article-section {
             margin: 50px 0;
-            background: white;
+            background: var(--card-background, white);
             border-radius: 12px;
             padding: 40px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.05);
         }
-        
-        .section-title { font-size: 2.2em; color: var(--primary-600); margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid var(--border-color); position: relative; }
-        .section-title::after { content: ''; position: absolute; bottom: -3px; left: 0; width: 80px; height: 3px; background: var(--primary-500); }
-        .key-takeaway { background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border-left: 4px solid #7c3aed; padding: 30px; margin: 40px 0; border-radius: 8px; }
-        .benchmark-table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.95em; }
-        .benchmark-table th { background: var(--primary-600); color: white; padding: 12px 14px; text-align: left; font-weight: 600; }
-        .benchmark-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); }
-        .benchmark-table tbody tr:hover { background: var(--bg-secondary); }
-        .highlight-row { background: #faf5ff !important; font-weight: 600; }
-        .spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0; }
-        .spec-card { background: var(--bg-secondary); padding: 25px; border-radius: 8px; border-left: 4px solid var(--primary-500); }
-        .spec-label { font-size: 0.9em; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
-        .spec-value { font-size: 1.4em; color: var(--text-primary); font-weight: 700; }
-        .evidence-list { background: #f8fafc; padding: 25px 25px 25px 45px; border-radius: 8px; margin: 20px 0; }
-        .evidence-list li { margin: 12px 0; line-height: 1.7; }
-        .warning-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 30px 0; border-radius: 8px; }
-        .comparison-table { width: 100%; margin: 25px 0; border-collapse: collapse; }
-        .comparison-table th { background: var(--primary-600); color: white; padding: 12px 14px; text-align: left; }
-        .comparison-table td { padding: 12px 14px; border-bottom: 1px solid var(--border-color); }
-        .stealth-history-table { width: 100%; margin: 25px 0; border-collapse: collapse; font-size: 0.9em; }
-        .stealth-history-table th { background: #6d28d9; color: white; padding: 10px 12px; text-align: left; }
-        .stealth-history-table td { padding: 10px 12px; border-bottom: 1px solid var(--border-color); }
-        .technical-note { background: #eff6ff; border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 8px; }
-        .timeline-item { padding: 20px 0; border-left: 3px solid var(--primary-500); padding-left: 25px; margin-left: 10px; position: relative; }
-        .timeline-item::before { content: ''; position: absolute; left: -8px; top: 25px; width: 13px; height: 13px; border-radius: 50%; background: var(--primary-500); border: 3px solid white; box-shadow: 0 0 0 2px var(--primary-500); }
-        .timeline-date { font-weight: 600; color: var(--primary-600); margin-bottom: 8px; }
-
+        .section-title {
+            font-size: 2.2em; color: var(--primary-600); margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid var(--border-color); position: relative;
+        }
+        .section-title::after {
+            content: ''; position: absolute; bottom: -3px; left: 0; width: 80px; height: 3px; background: var(--primary-500);
+        }
+        .key-takeaway {
+            background: var(--key-takeaway-bg, linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)); border-left: 4px solid #7c3aed; padding: 30px; margin: 40px 0; border-radius: 8px;
+        }
+        .benchmark-table {
+            width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.95em;
+        }
+        .benchmark-table th {
+            background: var(--primary-600); color: white; padding: 12px 14px; text-align: left; font-weight: 600;
+        }
+        .benchmark-table td {
+            padding: 12px 14px; border-bottom: 1px solid var(--border-color);
+        }
+        .benchmark-table tbody tr:hover {
+            background: var(--bg-secondary);
+        }
+        .highlight-row {
+            background: var(--highlight-row-bg, #faf5ff) !important; font-weight: 600;
+        }
+        .spec-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0;
+        }
+        .spec-card {
+            background: var(--bg-secondary); padding: 25px; border-radius: 8px; border-left: 4px solid var(--primary-500);
+        }
+        .spec-label {
+            font-size: 0.9em; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;
+        }
+        .spec-value {
+            font-size: 1.4em; color: var(--text-primary); font-weight: 700;
+        }
+        .evidence-list {
+            background: var(--evidence-list-bg, #f8fafc); padding: 25px 25px 25px 45px; border-radius: 8px; margin: 20px 0;
+        }
+        .evidence-list li {
+            margin: 12px 0; line-height: 1.7;
+        }
+        .warning-box {
+            background: var(--warning-box-bg, #fef3c7); border-left: 4px solid #f59e0b; padding: 20px; margin: 30px 0; border-radius: 8px;
+        }
+        .comparison-table {
+            width: 100%; margin: 25px 0; border-collapse: collapse;
+        }
+        .comparison-table th {
+            background: var(--primary-600); color: white; padding: 12px 14px; text-align: left;
+        }
+        .comparison-table td {
+            padding: 12px 14px; border-bottom: 1px solid var(--border-color);
+        }
+        .stealth-history-table {
+            width: 100%; margin: 25px 0; border-collapse: collapse; font-size: 0.9em;
+        }
+        .stealth-history-table th {
+            background: #6d28d9; color: white; padding: 10px 12px; text-align: left;
+        }
+        .stealth-history-table td {
+            padding: 10px 12px; border-bottom: 1px solid var(--border-color);
+        }
+        .technical-note {
+            background: var(--technical-note-bg, #eff6ff); border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 8px;
+        }
+        .timeline-item {
+            padding: 20px 0; border-left: 3px solid var(--primary-500); padding-left: 25px; margin-left: 10px; position: relative;
+        }
+        .timeline-item::before {
+            content: ''; position: absolute; left: -8px; top: 25px; width: 13px; height: 13px; border-radius: 50%; background: var(--primary-500); border: 3px solid white; box-shadow: 0 0 0 2px var(--primary-500);
+        }
+        .timeline-date {
+            font-weight: 600; color: var(--primary-600); margin-bottom: 8px;
+        }
         /* Dark Mode Overrides */
         html[data-theme='dark'] .article-header {
             background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
         }
-        
-        html[data-theme='dark'] .article-section {
-            background: var(--card-background) !important;
-            color: var(--text-primary) !important;
-        }
-        
         html[data-theme='dark'] .section-title {
             color: var(--primary-400) !important;
         }
-        
         html[data-theme='dark'] .section-title::after {
             background: var(--primary-500) !important;
         }
-        
         html[data-theme='dark'] .key-takeaway {
             background: rgba(124, 58, 237, 0.1) !important;
             border-left-color: #8b5cf6 !important;
             color: var(--text-primary) !important;
         }
-        
         html[data-theme='dark'] .key-takeaway h3,
         html[data-theme='dark'] .key-takeaway h4 {
             color: var(--primary-400) !important;
         }
-        
         html[data-theme='dark'] .benchmark-table th {
             background: var(--primary-700) !important;
             color: white !important;
         }
-        
         html[data-theme='dark'] .benchmark-table td {
             border-color: var(--border-color) !important;
             color: var(--text-primary) !important;
         }
-        
         html[data-theme='dark'] .benchmark-table tbody tr:hover {
             background: var(--background-secondary) !important;
         }
-        
         html[data-theme='dark'] .highlight-row {
             background: rgba(124, 58, 237, 0.15) !important;
         }
-        
         html[data-theme='dark'] .spec-card {
             background: var(--card-background) !important;
             border-left-color: var(--primary-500) !important;
             color: var(--text-primary) !important;
         }
-        
         html[data-theme='dark'] .spec-label {
             color: var(--text-secondary) !important;
         }
-        
         html[data-theme='dark'] .spec-value {
             color: var(--text-primary) !important;
         }
-        
         html[data-theme='dark'] .evidence-list {
-            background: var(--background-secondary) !important;
-            color: var(--text-primary) !important;
+            background: #1e293b !important;
+            color: #e2e8f0 !important;
         }
-        
         html[data-theme='dark'] .warning-box {
-            background: rgba(251, 191, 36, 0.1) !important;
+            background: rgba(251, 191, 36, 0.15) !important;
             border-left-color: #fbbf24 !important;
-            color: var(--text-primary) !important;
+            color: #e2e8f0 !important;
         }
-        
         html[data-theme='dark'] .warning-box h4 {
             color: #fbbf24 !important;
         }
-        
         html[data-theme='dark'] .comparison-table th,
         html[data-theme='dark'] .stealth-history-table th {
             background: var(--primary-700) !important;
             color: white !important;
         }
-        
         html[data-theme='dark'] .comparison-table td,
         html[data-theme='dark'] .stealth-history-table td {
             border-color: var(--border-color) !important;
             color: var(--text-primary) !important;
         }
-        
         html[data-theme='dark'] .technical-note {
             background: rgba(59, 130, 246, 0.1) !important;
             border-left-color: #3b82f6 !important;
             color: var(--text-primary) !important;
         }
-        
         html[data-theme='dark'] .technical-note h4 {
             color: #60a5fa !important;
         }
-        
         html[data-theme='dark'] .timeline-item {
             border-left-color: var(--primary-500) !important;
         }
-        
         html[data-theme='dark'] .timeline-item::before {
             background: var(--primary-500) !important;
             border-color: var(--background-primary) !important;
             box-shadow: 0 0 0 2px var(--primary-500) !important;
         }
-        
         html[data-theme='dark'] .timeline-date {
             color: var(--primary-400) !important;
         }
-        
         html[data-theme='dark'] .article-content p,
         html[data-theme='dark'] .article-content li {
             color: var(--text-primary) !important;
         }
-        
         html[data-theme='dark'] .article-content h3,
         html[data-theme='dark'] .article-content h4 {
             color: var(--text-primary) !important;
         }
-        
         html[data-theme='dark'] .article-content a {
             color: var(--primary-400) !important;
         }
-        
         html[data-theme='dark'] .article-content a:hover {
             color: var(--primary-300) !important;
         }
-        
-        /* Quick Facts Box Dark Mode */
-        html[data-theme='dark'] .article-section[style*="linear-gradient(135deg, #faf5ff"] {
-            background: rgba(124, 58, 237, 0.1) !important;
-        }
-        
-        html[data-theme='dark'] .article-section h3 {
-            color: var(--primary-400) !important;
-        }
-        
-        html[data-theme='dark'] .article-section p {
-            color: var(--text-primary) !important;
-        }
-        
-        html[data-theme='dark'] .article-section div > div > p {
-            color: var(--text-primary) !important;
-        }
-        
-        /* Table of Contents Dark Mode */
-        html[data-theme='dark'] nav.article-section {
-            background: var(--background-secondary) !important;
-            border-left-color: #3b82f6 !important;
-        }
-        
-        html[data-theme='dark'] nav.article-section a {
-            color: var(--primary-400) !important;
-        }
-        
-        html[data-theme='dark'] nav.article-section a:hover {
-            color: var(--primary-300) !important;
-        }
-        
-        /* Related Articles Dark Mode */
-        html[data-theme='dark'] .article-section[style*="linear-gradient(135deg, #eff6ff"] {
-            background: rgba(59, 130, 246, 0.05) !important;
-        }
-        
-        html[data-theme='dark'] .article-section[style*="linear-gradient(135deg, #eff6ff"] > div > div {
-            background: var(--card-background) !important;
-            border: 1px solid var(--border-color) !important;
-        }
-        
-        html[data-theme='dark'] .article-section[style*="linear-gradient(135deg, #eff6ff"] h3 a {
-            color: var(--primary-400) !important;
-        }
-        
-        html[data-theme='dark'] .article-section[style*="linear-gradient(135deg, #eff6ff"] p {
-            color: var(--text-secondary) !important;
-        }
-        
         /* Footer Dark Mode */
         html[data-theme='dark'] footer {
             background: var(--background-secondary) !important;
         }
-        
         html[data-theme='dark'] footer p {
             color: var(--text-secondary) !important;
         }
+        html[data-theme='dark'] .key-takeaway {
+            background: rgba(124, 58, 237, 0.15) !important; color: #e2e8f0 !important;
+        }
+        html[data-theme='dark'] .key-takeaway h3, html[data-theme='dark'] .key-takeaway h4 {
+            color: #c4b5fd !important;
+        }
+        html[data-theme='dark'] .highlight-row {
+            background: rgba(124, 58, 237, 0.15) !important;
+        }
+        html[data-theme='dark'] .evidence-list {
+            background: #1e293b !important; color: #e2e8f0 !important;
+        }
+        html[data-theme='dark'] .warning-box {
+            background: rgba(251, 191, 36, 0.1) !important; color: #e2e8f0 !important;
+        }
+        html[data-theme='dark'] div[style*="background: white"] {
+            background: #1e293b !important; color: #e2e8f0 !important;
+        }
+        html[data-theme='dark'] .article-content p, html[data-theme='dark'] .article-content li {
+            color: #e2e8f0 !important;
+        }
+        html[data-theme='dark'] .article-content strong {
+            color: #f1f5f9 !important;
+        }
+        html[data-theme='dark'] .article-content a {
+            color: #818cf8 !important;
+        }
+        html[data-theme='dark'] .article-content blockquote {
+            background: rgba(30, 41, 59, 0.8) !important; border-left-color: #818cf8 !important; color: #cbd5e1 !important;
+        }
+        html[data-theme='dark'] .article-content code {
+            background: #334155 !important; color: #e2e8f0 !important; border-color: #475569 !important;
+        }
+        html[data-theme='dark'] .article-content pre {
+            background: #0f172a !important;
+        }
+        html[data-theme='dark'] .technical-note {
+            background: rgba(59, 130, 246, 0.15) !important; color: #e2e8f0 !important;
+        }
+        html[data-theme='dark'] div[style*='background: var'] {
+            background: #1e293b !important; color: #e2e8f0 !important;
+        }
+        html[data-theme='dark'] .article-section {
+            background: var(--card-background) !important;
+            color: var(--text-primary) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+        html[data-theme='dark'] .article-section h2,
+        html[data-theme='dark'] .article-section h3,
+        html[data-theme='dark'] .article-section h4 {
+            color: var(--primary-400) !important;
+        }
+        html[data-theme='dark'] .article-section p,
+        html[data-theme='dark'] .article-section li,
+        html[data-theme='dark'] .article-section span,
+        html[data-theme='dark'] .article-section div {
+            color: var(--text-primary) !important;
+        }
+        html[data-theme='dark'] .article-section a {
+            color: var(--primary-400) !important;
+        }
+        html[data-theme='dark'] .article-section a:hover {
+            color: var(--primary-300) !important;
+        }
+        html[data-theme='dark'] .article-section code {
+            background: #2d2d3d !important;
+            color: #e2e8f0 !important;
+        }
+        html[data-theme='dark'] .article-section blockquote {
+            background: rgba(37, 99, 235, 0.1) !important;
+            border-left-color: #60a5fa !important;
+            color: #e2e8f0 !important;
+        }
+        html[data-theme='dark'] .article-section table td {
+            background: var(--card-background) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        html[data-theme='dark'] .article-section table tr:nth-child(even) td {
+            background: var(--background-secondary) !important;
+        }
+        html[data-theme='dark'] .article-section table tr:hover td {
+            background: rgba(124, 58, 237, 0.1) !important;
+        }
+        
+        /* Dark mode for key-takeaway */
+        html[data-theme='dark'] .key-takeaway {
+            background: var(--key-takeaway-bg) !important;
+            border-left-color: var(--primary-400) !important;
+            color: var(--text-primary) !important;
+        }
+        html[data-theme='dark'] .key-takeaway h2,
+        html[data-theme='dark'] .key-takeaway h3 {
+            color: var(--primary-400) !important;
+        }
+        html[data-theme='dark'] .key-takeaway p,
+        html[data-theme='dark'] .key-takeaway li,
+        html[data-theme='dark'] .key-takeaway span,
+        html[data-theme='dark'] .key-takeaway div {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Dark mode for evidence-list */
+        html[data-theme='dark'] .evidence-list {
+            background: var(--evidence-list-bg) !important;
+            color: var(--text-primary) !important;
+        }
+        html[data-theme='dark'] .evidence-list li {
+            color: var(--text-primary) !important;
+            border-bottom-color: var(--border-color) !important;
+        }
+        
+        /* Dark mode for warning-box */
+        html[data-theme='dark'] .warning-box {
+            background: var(--warning-box-bg) !important;
+            border-left-color: #fbbf24 !important;
+            color: var(--text-primary) !important;
+        }
+        html[data-theme='dark'] .warning-box p,
+        html[data-theme='dark'] .warning-box strong {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Dark mode for highlight-row */
+        html[data-theme='dark'] .highlight-row {
+            background: var(--highlight-row-bg) !important;
+            color: var(--text-primary) !important;
+        }
+        
+        /* Dark mode for technical-note */
+        html[data-theme='dark'] .technical-note {
+            background: var(--technical-note-bg) !important;
+            border-left-color: #60a5fa !important;
+            color: var(--text-primary) !important;
+        }
+        html[data-theme='dark'] .technical-note p {
+            color: var(--text-primary) !important;
+        }
+        
+        /* Dark mode for timeline items */
+        html[data-theme='dark'] .timeline-item {
+            color: var(--text-primary) !important;
+        }
+        html[data-theme='dark'] .timeline-date {
+            color: var(--primary-400) !important;
+        }
+        
+        /* Dark mode for benchmark/comparison tables */
+        html[data-theme='dark'] .benchmark-table td,
+        html[data-theme='dark'] .comparison-table td,
+        html[data-theme='dark'] .stealth-history-table td {
+            background: var(--card-background) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        html[data-theme='dark'] .benchmark-table tr:nth-child(even) td,
+        html[data-theme='dark'] .comparison-table tr:nth-child(even) td,
+        html[data-theme='dark'] .stealth-history-table tr:nth-child(even) td {
+            background: var(--background-secondary) !important;
+        }
+        html[data-theme='dark'] .benchmark-table tr:hover td,
+        html[data-theme='dark'] .comparison-table tr:hover td,
+        html[data-theme='dark'] .stealth-history-table tr:hover td {
+            background: rgba(124, 58, 237, 0.1) !important;
+        }
+    
     </style>
 
     <!-- JSON-LD Structured Data -->
@@ -333,9 +468,9 @@
     {
         "@context": "https://schema.org",
         "@type": "TechArticle",
-        "headline": "OX Alpha: The Anonymous Frontier Model - Comprehensive Technical Analysis",
-        "alternativeHeadline": "Anonymous AI Model OX Alpha Beats GPT-5.6 and Claude in Coding Benchmarks",
-        "description": "OX Alpha achieves 80% on DeepSWE benchmarks, beating GPT-5.6 and Claude. Technical analysis reveals 1M context window, multimodal AI, and likely Zhipu GLM-5.x origins.",
+        "headline": "OX Alpha(glm 5.3 flash): The Anonymous Frontier Model - Comprehensive Technical Analysis",
+        "alternativeHeadline": "Anonymous AI Model OX Alpha(glm 5.3 flash) Beats GPT-5.6 and Claude in Coding Benchmarks",
+        "description": "OX Alpha(glm 5.3 flash) achieves 80% on DeepSWE benchmarks, beating GPT-5.6 and Claude. Technical analysis reveals 1M context window, multimodal AI, and likely Zhipu GLM-5.x origins.",
         "image": "https://local-ai-zone.github.io/og-image.png",
         "author": {
             "@type": "Person",
@@ -360,9 +495,13 @@
             "@id": "https://local-ai-zone.github.io/blog/ox-alpha-stealth-model-comprehensive-analysis.html"
         },
         "articleSection": "AI Models",
-        "keywords": ["OX Alpha", "AI benchmarks", "DeepSWE", "coding AI", "Zhipu AI", "GLM-5", "frontier models", "multimodal AI", "1M context window"],
+        "keywords": ["OX Alpha(glm 5.3 flash)", "AI benchmarks", "DeepSWE", "coding AI", "Zhipu AI", "GLM-5", "frontier models", "multimodal AI", "1M context window"],
         "wordCount": 5800,
-        "inLanguage": "en-US"
+        "inLanguage": "en-US",
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
     }
     </script>
     
@@ -374,47 +513,47 @@
         "mainEntity": [
             {
                 "@type": "Question",
-                "name": "What is OX Alpha?",
+                "name": "What is OX Alpha(glm 5.3 flash)?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "OX Alpha is an anonymous frontier AI model that appeared on OpenRouter on August 20, 2026. It achieved 80% Pass@1 on DeepSWE coding benchmarks, surpassing GPT-5.6 and Claude, with a 1M-token context window and full multimodal support (text, image, video)."
+                    "text": "OX Alpha(glm 5.3 flash) is an anonymous frontier AI model that appeared on OpenRouter on August 20, 2026. It achieved 80% Pass@1 on DeepSWE coding benchmarks, surpassing GPT-5.6 and Claude, with a 1M-token context window and full multimodal support (text, image, video)."
                 }
             },
             {
                 "@type": "Question",
-                "name": "Who created OX Alpha?",
+                "name": "Who created OX Alpha(glm 5.3 flash)?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "OX Alpha's creator is officially anonymous. However, independent researcher Ben Davis reports 99% certainty that it belongs to Zhipu AI's unreleased GLM-5.x series based on technical fingerprinting of video encoders, tokenizers, and output patterns."
+                    "text": "OX Alpha(glm 5.3 flash)'s creator is officially anonymous. However, independent researcher Ben Davis reports 99% certainty that it belongs to Zhipu AI's unreleased GLM-5.x series based on technical fingerprinting of video encoders, tokenizers, and output patterns."
                 }
             },
             {
                 "@type": "Question",
-                "name": "How does OX Alpha perform compared to GPT-5.6 and Claude?",
+                "name": "How does OX Alpha(glm 5.3 flash) perform compared to GPT-5.6 and Claude?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "OX Alpha achieves 80% Pass@1 on DeepSWE coding benchmarks. Frontier models like Claude Opus 5, GPT-5.6 Sol, and DeepSeek V4 Pro score 96%+ on SWE-bench Verified (a different benchmark framework). Direct comparison between benchmarks is not methodologically sound."
+                    "text": "OX Alpha(glm 5.3 flash) achieves 80% Pass@1 on DeepSWE coding benchmarks. Frontier models like Claude Opus 5, GPT-5.6 Sol, and DeepSeek V4 Pro score 96%+ on SWE-bench Verified (a different benchmark framework). Direct comparison between benchmarks is not methodologically sound."
                 }
             },
             {
                 "@type": "Question",
-                "name": "What are OX Alpha's key specifications?",
+                "name": "What are OX Alpha(glm 5.3 flash)'s key specifications?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "OX Alpha features a 1,048,576-token context window, 131,072-token max output, multimodal support (text, image, video), tool calling capabilities, JSON structured output, and approximately 744B total parameters with 40B active parameters via MoE architecture."
+                    "text": "OX Alpha(glm 5.3 flash) features a 1,048,576-token context window, 131,072-token max output, multimodal support (text, image, video), tool calling capabilities, JSON structured output, and approximately 744B total parameters with 40B active parameters via MoE architecture."
                 }
             },
             {
                 "@type": "Question",
-                "name": "Is OX Alpha free to use?",
+                "name": "Is OX Alpha(glm 5.3 flash) free to use?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "OX Alpha offers a free preview period with no input/output costs, ending approximately August 27, 2026. The operators claim 100 trillion tokens per day throughput capacity during this period. Future commercial pricing has not been announced."
+                    "text": "OX Alpha(glm 5.3 flash) offers a free preview period with no input/output costs, ending approximately August 27, 2026. The operators claim 100 trillion tokens per day throughput capacity during this period. Future commercial pricing has not been announced."
                 }
             },
             {
                 "@type": "Question",
-                "name": "How was OX Alpha identified as likely being from Zhipu AI?",
+                "name": "How was OX Alpha(glm 5.3 flash) identified as likely being from Zhipu AI?",
                 "acceptedAnswer": {
                     "@type": "Answer",
                     "text": "Technical fingerprinting revealed identical video encoding patterns to GLM-5V-Turbo, matching tokenizer behavior to GLM-5.3, similar audio rejection patterns, and consistent output style. Competing candidates including MiMo, DeepSeek, Google, Alibaba, xAI, OpenAI, and Anthropic were systematically excluded based on technical mismatches."
@@ -445,7 +584,7 @@
             {
                 "@type": "ListItem",
                 "position": 3,
-                "name": "OX Alpha Analysis",
+                "name": "OX Alpha(glm 5.3 flash) Analysis",
                 "item": "https://local-ai-zone.github.io/blog/ox-alpha-stealth-model-comprehensive-analysis.html"
             }
         ]
@@ -480,7 +619,7 @@
     <!-- Article Header -->
     <header class="article-header">
         <div class="container" style="position: relative; z-index: 1;">
-            <h1 class="article-title">OX Alpha: The Anonymous Frontier Model</h1>
+            <h1 class="article-title">OX Alpha(glm 5.3 flash): The Anonymous Frontier Model</h1>
             <p style="font-size: 1.3em; margin-bottom: 25px; line-height: 1.6;"><strong>Comprehensive Technical Analysis of the Stealth AI Model That Outperformed GPT-5.6 and Claude</strong></p>
             <div class="article-meta">
                 <time class="article-date" datetime="2026-08-22">August 22, 2026</time>
@@ -495,8 +634,8 @@
     <main class="article-content">
 
         <!-- Quick Facts Box (AEO/GEO Optimization) -->
-        <div class="article-section" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border-left: 5px solid #7c3aed;">
-            <h2 class="section-title" style="font-size: 1.8em;">Quick Facts: OX Alpha at a Glance</h2>
+        <div class="article-section key-takeaway" style="border-left: 5px solid #7c3aed;">
+            <h2 class="section-title" style="font-size: 1.8em;">Quick Facts: OX Alpha(glm 5.3 flash) at a Glance</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 25px;">
                 <div>
                     <h3 style="color: #7c3aed; font-size: 1.1em; margin-bottom: 8px;">📊 Performance</h3>
@@ -526,7 +665,7 @@
         </div>
 
         <!-- Table of Contents (SEO & User Experience) -->
-        <nav class="article-section" style="background: #f8fafc; border-left: 5px solid #3b82f6;">
+        <nav class="article-section evidence-list" style="border-left: 5px solid #3b82f6;">
             <h2 class="section-title" style="font-size: 1.6em;">Table of Contents</h2>
             <ol style="line-height: 2.2; padding-left: 20px; margin: 15px 0;">
                 <li><a href="#executive-summary" style="color: var(--primary-600); text-decoration: none;">Executive Summary</a></li>
@@ -553,13 +692,13 @@
                 <ul style="margin: 0; padding-left: 20px;">
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Performance:</strong> Achieved 80% Pass@1 on DeepSWE coding benchmark (note: different benchmark than SWE-bench Verified used by frontier models)</li>
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Architecture:</strong> 1,048,576-token context window with full multimodal support (text, image, video)</li>
-                    <li style="margin: 12px 0; line-height: 1.7;"><strong>Attribution:</strong> Independent researcher Ben Davis reports 99% certainty that OX Alpha belongs to Zhipu AI's unreleased GLM-5.x series</li>
+                    <li style="margin: 12px 0; line-height: 1.7;"><strong>Attribution:</strong> Independent researcher Ben Davis reports 99% certainty that OX Alpha(glm 5.3 flash) belongs to Zhipu AI's unreleased GLM-5.x series</li>
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Access:</strong> Free preview period ending approximately August 27, 2026</li>
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Capacity:</strong> Operators claim 100 trillion tokens per day throughput capability</li>
                 </ul>
             </div>
 
-            <p style="font-size: 1.05em; line-height: 1.8; margin-top: 25px;">This document provides a comprehensive technical analysis of OX Alpha based on independent testing, benchmark results, technical fingerprinting, and comparative evaluation against frontier models. All findings are attributed to publicly available testing by independent researchers, primarily Ben Davis, and have not been officially confirmed by any organization as of this publication date.</p>
+            <p style="font-size: 1.05em; line-height: 1.8; margin-top: 25px;">This document provides a comprehensive technical analysis of OX Alpha(glm 5.3 flash) based on independent testing, benchmark results, technical fingerprinting, and comparative evaluation against frontier models. All findings are attributed to publicly available testing by independent researchers, primarily Ben Davis, and have not been officially confirmed by any organization as of this publication date.</p>
         </div>
 
         <!-- Model Specifications -->
@@ -595,7 +734,7 @@
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Architectural Profile</h3>
             
-            <p>Based on technical fingerprinting analysis, OX Alpha demonstrates the following architectural characteristics:</p>
+            <p>Based on technical fingerprinting analysis, OX Alpha(glm 5.3 flash) demonstrates the following architectural characteristics:</p>
 
             <div class="technical-note">
                 <h4 style="margin-top: 0; color: #1e40af;">Estimated Model Scale</h4>
@@ -609,7 +748,7 @@
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Design Intent</h3>
             
-            <p>According to the model's official description on OpenRouter, OX Alpha is positioned as a frontier-class model optimized for:</p>
+            <p>According to the model's official description on OpenRouter, OX Alpha(glm 5.3 flash) is positioned as a frontier-class model optimized for:</p>
             
             <ul class="evidence-list">
                 <li><strong>Efficient Coding:</strong> Optimized for software engineering tasks with minimal overhead</li>
@@ -626,7 +765,7 @@
             
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-bottom: 20px;">DeepSWE Coding Benchmark</h3>
             
-            <p>The DeepSWE (Software Engineering) benchmark is designed to evaluate AI models on deterministic coding tasks that reflect real-world software engineering challenges. OX Alpha's performance represents a significant advancement over current frontier models:</p>
+            <p>The DeepSWE (Software Engineering) benchmark is designed to evaluate AI models on deterministic coding tasks that reflect real-world software engineering challenges. OX Alpha(glm 5.3 flash)'s performance represents a significant advancement over current frontier models:</p>
 
             <table class="benchmark-table">
                 <thead>
@@ -639,7 +778,7 @@
                 </thead>
                 <tbody>
                     <tr class="highlight-row">
-                        <td><strong>OX Alpha</strong></td>
+                        <td><strong>OX Alpha(glm 5.3 flash)</strong></td>
                         <td><strong>1,048,576 tokens</strong></td>
                         <td><strong>80% DeepSWE</strong></td>
                         <td><strong>$0 / $0 (preview)</strong></td>
@@ -679,62 +818,62 @@
 
             <div class="warning-box">
                 <h4 style="margin-top: 0; color: #92400e;"><strong>⚠️ Methodological Note</strong></h4>
-                <p style="margin: 0; line-height: 1.7;">These benchmark results come from different test frameworks (DeepSWE, SWE-bench Verified, etc.) and are not directly comparable. OX Alpha's 80% DeepSWE score and the frontier models' 96%+ SWE-bench Verified scores represent different benchmarks with different difficulty levels. Sample sizes and testing conditions also vary. These results should be considered preliminary indicators rather than definitive rankings.</p>
+                <p style="margin: 0; line-height: 1.7;">These benchmark results come from different test frameworks (DeepSWE, SWE-bench Verified, etc.) and are not directly comparable. OX Alpha(glm 5.3 flash)'s 80% DeepSWE score and the frontier models' 96%+ SWE-bench Verified scores represent different benchmarks with different difficulty levels. Sample sizes and testing conditions also vary. These results should be considered preliminary indicators rather than definitive rankings.</p>
             </div>
 
             <div class="warning-box">
                 <h4 style="margin-top: 0; color: #92400e;"><strong>⚠️ Methodological Note</strong></h4>
-                <p style="margin: 0; line-height: 1.7;">These benchmark results are based on a 10-task user test conducted by independent researcher Ben Davis, not an audited leaderboard. Sample sizes vary across models, and OX Alpha's current sample size is small. These results should be considered preliminary and require further independent verification before being treated as definitive.</p>
+                <p style="margin: 0; line-height: 1.7;">These benchmark results are based on a 10-task user test conducted by independent researcher Ben Davis, not an audited leaderboard. Sample sizes vary across models, and OX Alpha(glm 5.3 flash)'s current sample size is small. These results should be considered preliminary and require further independent verification before being treated as definitive.</p>
             </div>
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Notable Performance Characteristics</h3>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 25px;">Meriyah Explicit Resource Declarations Task</h4>
-            <p>OX Alpha passed this specific DeepSWE task on its first attempt, whereas established models including GLM-5, GPT-5.6 Sol, and Grok 4.6 had previously recorded 0/4 results. This demonstrates superior performance on tasks requiring precise code generation with specific architectural patterns.</p>
+            <p>OX Alpha(glm 5.3 flash) passed this specific DeepSWE task on its first attempt, whereas established models including GLM-5, GPT-5.6 Sol, and Grok 4.6 had previously recorded 0/4 results. This demonstrates superior performance on tasks requiring precise code generation with specific architectural patterns.</p>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 25px;">Regression Testing</h4>
-            <p>Throughout testing, OX Alpha maintained a clean pass across all 51,469 regression tests, indicating robust code generation that does not introduce unintended side effects or break existing functionality.</p>
+            <p>Throughout testing, OX Alpha(glm 5.3 flash) maintained a clean pass across all 51,469 regression tests, indicating robust code generation that does not introduce unintended side effects or break existing functionality.</p>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 25px;">Agentic Task Performance</h4>
-            <p>In a documented agent workflow involving 69 tool calls, OX Alpha made only one error with no retry loops and relatively low inference overhead. This demonstrates strong performance in sustained autonomous operations—a critical capability for production AI agent deployments.</p>
+            <p>In a documented agent workflow involving 69 tool calls, OX Alpha(glm 5.3 flash) made only one error with no retry loops and relatively low inference overhead. This demonstrates strong performance in sustained autonomous operations—a critical capability for production AI agent deployments.</p>
         </div>
 
         <!-- Technical Fingerprinting -->
         <div class="article-section" id="technical-fingerprinting">
             <h2 class="section-title">Technical Fingerprinting Analysis</h2>
             
-            <p>Independent researcher Ben Davis conducted comprehensive technical fingerprinting across multiple dimensions to identify OX Alpha's likely origins. His analysis examined video encoding behavior, tokenizer characteristics, audio interface responses, and output style patterns.</p>
+            <p>Independent researcher Ben Davis conducted comprehensive technical fingerprinting across multiple dimensions to identify OX Alpha(glm 5.3 flash)'s likely origins. His analysis examined video encoding behavior, tokenizer characteristics, audio interface responses, and output style patterns.</p>
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 30px; margin-bottom: 20px;">Evidence Summary</h3>
 
             <div class="technical-note">
                 <h4 style="margin-top: 0; color: #1e40af;">Confidence Level</h4>
-                <p style="margin: 0; font-size: 1.1em;">Ben Davis states he is <strong>"99% certain"</strong> that OX Alpha belongs to Zhipu AI's GLM-5.x series based on the following technical evidence:</p>
+                <p style="margin: 0; font-size: 1.1em;">Ben Davis states he is <strong>"99% certain"</strong> that OX Alpha(glm 5.3 flash) belongs to Zhipu AI's GLM-5.x series based on the following technical evidence:</p>
             </div>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 30px; margin-bottom: 15px;">1. Video Encoder Analysis (Primary Evidence)</h4>
             
-            <p>The video encoder represents the most compelling evidence linking OX Alpha to the GLM series:</p>
+            <p>The video encoder represents the most compelling evidence linking OX Alpha(glm 5.3 flash) to the GLM series:</p>
 
             <ul class="evidence-list">
-                <li><strong>Identical Token Consumption:</strong> Across four controlled video test sets, OX Alpha and GLM-5V-Turbo exhibited identical video token consumption patterns</li>
+                <li><strong>Identical Token Consumption:</strong> Across four controlled video test sets, OX Alpha(glm 5.3 flash) and GLM-5V-Turbo exhibited identical video token consumption patterns</li>
                 <li><strong>Frame-Rate Independence:</strong> Both models demonstrate frame-rate-independent frame sampling behavior</li>
                 <li><strong>Duration Scaling Ratio:</strong> Both models use approximately 147 tokens per second of video</li>
-                <li><strong>Resolution Scaling:</strong> Per-frame resolution scaling behavior matches precisely between OX Alpha and GLM-5V-Turbo</li>
+                <li><strong>Resolution Scaling:</strong> Per-frame resolution scaling behavior matches precisely between OX Alpha(glm 5.3 flash) and GLM-5V-Turbo</li>
                 <li><strong>Negative Evidence:</strong> Candidate models including MiMo v2.5, Qwen 3.8 Max, and GLM-4.6V all displayed distinctly different video encoding characteristics</li>
             </ul>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 30px; margin-bottom: 15px;">2. Tokenizer Alignment</h4>
             
-            <p>Testing across 25 different prompts revealed that OX Alpha's token counts matched GLM-5.3 exactly, with only a fixed +75 token hidden wrapper difference. This strongly suggests shared vocabulary between the two models.</p>
+            <p>Testing across 25 different prompts revealed that OX Alpha(glm 5.3 flash)'s token counts matched GLM-5.3 exactly, with only a fixed +75 token hidden wrapper difference. This strongly suggests shared vocabulary between the two models.</p>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 30px; margin-bottom: 15px;">3. Audio Input Rejection Behavior</h4>
             
-            <p>OX Alpha rejects audio input in a manner consistent with GLM-5V. This behavior pattern is significant because MiMo v2.5—a primary competing candidate for OX Alpha's identity—supports audio input, further weakening the likelihood of that attribution.</p>
+            <p>OX Alpha(glm 5.3 flash) rejects audio input in a manner consistent with GLM-5V. This behavior pattern is significant because MiMo v2.5—a primary competing candidate for OX Alpha(glm 5.3 flash)'s identity—supports audio input, further weakening the likelihood of that attribution.</p>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 30px; margin-bottom: 15px;">4. Output Style Analysis</h4>
             
-            <p>OX Alpha uses approximately 1.3 emojis per thousand characters in its output, which aligns closely with the GLM/Qwen series output patterns. By comparison, Claude, GPT-5.6, and Grok exhibited near-zero emoji usage rates in identical test conditions.</p>
+            <p>OX Alpha(glm 5.3 flash) uses approximately 1.3 emojis per thousand characters in its output, which aligns closely with the GLM/Qwen series output patterns. By comparison, Claude, GPT-5.6, and Grok exhibited near-zero emoji usage rates in identical test conditions.</p>
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Excluded Candidates</h3>
 
@@ -784,7 +923,7 @@
         <div class="article-section" id="historical-context">
             <h2 class="section-title">Historical Context: Stealth Model Pattern</h2>
             
-            <p>The appearance of anonymous "stealth models" on AI routing platforms has become an established pattern in the industry, particularly among Chinese AI labs testing flagship models ahead of official announcements. Understanding this historical context is essential for interpreting OX Alpha's significance.</p>
+            <p>The appearance of anonymous "stealth models" on AI routing platforms has become an established pattern in the industry, particularly among Chinese AI labs testing flagship models ahead of official announcements. Understanding this historical context is essential for interpreting OX Alpha(glm 5.3 flash)'s significance.</p>
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 30px; margin-bottom: 20px;">Documented Precedents</h3>
 
@@ -830,7 +969,7 @@
                         <td>LongCat-2.0 (first trillion-parameter model on domestic chips)</td>
                     </tr>
                     <tr class="highlight-row">
-                        <td><strong>OX Alpha</strong></td>
+                        <td><strong>OX Alpha(glm 5.3 flash)</strong></td>
                         <td>August 20, 2026</td>
                         <td>Not yet claimed</td>
                         <td>—</td>
@@ -850,26 +989,26 @@
 
             <div class="timeline-item">
                 <div class="timeline-date">August 20, 2026</div>
-                <p><strong>OX Alpha Appears:</strong> The stealth/ox-alpha model launches on OpenRouter with multimodal capabilities (text, image, video) that were not present in the publicly released GLM-5.3.</p>
+                <p><strong>OX Alpha(glm 5.3 flash) Appears:</strong> The stealth/ox-alpha model launches on OpenRouter with multimodal capabilities (text, image, video) that were not present in the publicly released GLM-5.3.</p>
             </div>
 
             <div class="timeline-item">
                 <div class="timeline-date">August 21, 2026</div>
-                <p><strong>Technical Analysis Published:</strong> Independent researcher Ben Davis publishes comprehensive technical fingerprinting analysis indicating 99% certainty that OX Alpha belongs to Zhipu's GLM-5.x series.</p>
+                <p><strong>Technical Analysis Published:</strong> Independent researcher Ben Davis publishes comprehensive technical fingerprinting analysis indicating 99% certainty that OX Alpha(glm 5.3 flash) belongs to Zhipu's GLM-5.x series.</p>
             </div>
 
-            <p style="margin-top: 30px;">The timing aligns with community expectations of a unified vision flagship model from Zhipu, positioning OX Alpha as a potential preview of GLM's unreleased multimodal capabilities.</p>
+            <p style="margin-top: 30px;">The timing aligns with community expectations of a unified vision flagship model from Zhipu, positioning OX Alpha(glm 5.3 flash) as a potential preview of GLM's unreleased multimodal capabilities.</p>
         </div>
 
         <!-- Production Readiness -->
         <div class="article-section" id="production-readiness">
             <h2 class="section-title">Production Integration & Real-World Adoption</h2>
             
-            <p>Despite OX Alpha's anonymous status and lack of official documentation, the model saw immediate production integration from established projects, suggesting strong confidence in its capabilities within the developer community.</p>
+            <p>Despite OX Alpha(glm 5.3 flash)'s anonymous status and lack of official documentation, the model saw immediate production integration from established projects, suggesting strong confidence in its capabilities within the developer community.</p>
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 30px; margin-bottom: 20px;">Documented Integrations</h3>
 
-            <p>According to monitoring data from OrcaRouter, OX Alpha received actual production traffic on its first day online, including:</p>
+            <p>According to monitoring data from OrcaRouter, OX Alpha(glm 5.3 flash) received actual production traffic on its first day online, including:</p>
 
             <ul class="evidence-list">
                 <li><strong>Nous Research's Hermes Agent:</strong> Integrated into agentic workflow orchestration</li>
@@ -877,28 +1016,28 @@
                 <li><strong>Multiple AI Routing Platforms:</strong> Added to model catalogs on OpenRouter and OpenCode</li>
             </ul>
 
-            <p>This rapid integration occurred without independent benchmark scores being available, indicating that developer willingness to adopt OX Alpha was based on direct testing rather than published metrics—a strong signal of perceived quality.</p>
+            <p>This rapid integration occurred without independent benchmark scores being available, indicating that developer willingness to adopt OX Alpha(glm 5.3 flash) was based on direct testing rather than published metrics—a strong signal of perceived quality.</p>
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Capabilities Enabling Production Use</h3>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 25px;">Tool & Function Calling</h4>
-            <p>OX Alpha supports tool and function calling alongside structured JSON output, enabling immediate integration into agentic workflows and production systems that require programmatic control.</p>
+            <p>OX Alpha(glm 5.3 flash) supports tool and function calling alongside structured JSON output, enabling immediate integration into agentic workflows and production systems that require programmatic control.</p>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 25px;">Extended Context Window</h4>
-            <p>The 1,048,576-token context window makes OX Alpha particularly suited for long-horizon software engineering tasks where an AI agent must understand vast amounts of existing code before making changes. This capacity exceeds most competing models and enables use cases that were previously impractical.</p>
+            <p>The 1,048,576-token context window makes OX Alpha(glm 5.3 flash) particularly suited for long-horizon software engineering tasks where an AI agent must understand vast amounts of existing code before making changes. This capacity exceeds most competing models and enables use cases that were previously impractical.</p>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 25px;">Multimodal Reasoning</h4>
             <p>Full support for text, image, and video input enables workflows that combine code analysis with visual context, such as UI implementation from designs or debugging based on screenshots of error states.</p>
 
             <h4 style="color: var(--text-primary); font-size: 1.3em; margin-top: 25px;">Low Inference Overhead</h4>
-            <p>Testing documented minimal retry loops and efficient tool calling patterns, suggesting that OX Alpha can complete agentic workflows with lower computational overhead compared to models that require multiple attempts or extensive reasoning traces.</p>
+            <p>Testing documented minimal retry loops and efficient tool calling patterns, suggesting that OX Alpha(glm 5.3 flash) can complete agentic workflows with lower computational overhead compared to models that require multiple attempts or extensive reasoning traces.</p>
         </div>
 
         <!-- Comparative Analysis -->
         <div class="article-section" id="comparative-analysis">
-            <h2 class="section-title">Comparative Analysis: OX Alpha vs. Frontier Models</h2>
+            <h2 class="section-title">Comparative Analysis: OX Alpha(glm 5.3 flash) vs. Frontier Models</h2>
             
-            <p>To contextualize OX Alpha's capabilities, we compare it across multiple dimensions against established frontier models currently available for production use.</p>
+            <p>To contextualize OX Alpha(glm 5.3 flash)'s capabilities, we compare it across multiple dimensions against established frontier models currently available for production use.</p>
 
             <table class="comparison-table">
                 <thead>
@@ -913,7 +1052,7 @@
                 </thead>
                 <tbody>
                     <tr class="highlight-row">
-                        <td><strong>OX Alpha</strong></td>
+                        <td><strong>OX Alpha(glm 5.3 flash)</strong></td>
                         <td><strong>1,048,576</strong></td>
                         <td><strong>Text, Image, Video</strong></td>
                         <td><strong>Aug 20, 2026</strong></td>
@@ -966,7 +1105,7 @@
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Competitive Advantages</h3>
 
             <div class="key-takeaway">
-                <h4 style="color: #7c3aed; margin-top: 0;">Where OX Alpha Stands Among August 2026 Frontier Models</h4>
+                <h4 style="color: #7c3aed; margin-top: 0;">Where OX Alpha(glm 5.3 flash) Stands Among August 2026 Frontier Models</h4>
                 <ul style="margin: 10px 0; padding-left: 20px;">
                     <li style="margin: 12px 0;"><strong>Context Window:</strong> 1,048,576 tokens - comparable to Claude Opus 5 (1M), GPT-5.6 Sol (1.05M), DeepSeek V4 Pro (1M), and Gemini 3.7 Flash (1M); larger than Grok 4.6 (500K)</li>
                     <li style="margin: 12px 0;"><strong>Video Support:</strong> Full native video understanding - shared with Gemini 3.7 Flash; not available in Claude Opus 5, GPT-5.6 Sol, DeepSeek V4 Pro, or Grok 4.6</li>
@@ -979,7 +1118,7 @@
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Known Limitations</h3>
 
             <ul class="evidence-list">
-                <li><strong>Audio Input Not Supported:</strong> Unlike some competing models (e.g., MiMo v2.5), OX Alpha rejects audio input</li>
+                <li><strong>Audio Input Not Supported:</strong> Unlike some competing models (e.g., MiMo v2.5), OX Alpha(glm 5.3 flash) rejects audio input</li>
                 <li><strong>Anonymous Status:</strong> Lack of official documentation, support channels, or SLA guarantees</li>
                 <li><strong>Temporary Availability:</strong> Free access window is time-limited (approximately until August 27, 2026)</li>
                 <li><strong>Limited Benchmark Data:</strong> Performance claims based on small sample sizes requiring further validation</li>
@@ -993,7 +1132,7 @@
             
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-bottom: 20px;">Advancement in Coding-Focused Models</h3>
             
-            <p>OX Alpha's 80% Pass@1 on DeepSWE represents a significant advancement in coding-focused AI capabilities. This performance level suggests that frontier models are approaching reliability thresholds where autonomous code generation and modification become viable for production environments with appropriate safeguards.</p>
+            <p>OX Alpha(glm 5.3 flash)'s 80% Pass@1 on DeepSWE represents a significant advancement in coding-focused AI capabilities. This performance level suggests that frontier models are approaching reliability thresholds where autonomous code generation and modification become viable for production environments with appropriate safeguards.</p>
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 35px; margin-bottom: 20px;">Extended Context Implications</h3>
             
@@ -1021,7 +1160,7 @@
                 <li><strong>Load Testing:</strong> Validating infrastructure capacity at scale before commitment</li>
             </ul>
 
-            <p>OX Alpha's rapid adoption by established projects (Hermes Agent, Zed) demonstrates that this strategy successfully generates early production integration and developer advocacy.</p>
+            <p>OX Alpha(glm 5.3 flash)'s rapid adoption by established projects (Hermes Agent, Zed) demonstrates that this strategy successfully generates early production integration and developer advocacy.</p>
         </div>
 
         <!-- Research Methodology -->
@@ -1044,7 +1183,7 @@
             <div class="warning-box">
                 <h4 style="margin-top: 0; color: #92400e;"><strong>Important Caveats</strong></h4>
                 <ul style="margin: 10px 0; padding-left: 20px;">
-                    <li style="margin: 10px 0;"><strong>Unofficial Attribution:</strong> The connection between OX Alpha and Zhipu AI's GLM-5.x series is based on technical inference and has not been officially confirmed</li>
+                    <li style="margin: 10px 0;"><strong>Unofficial Attribution:</strong> The connection between OX Alpha(glm 5.3 flash) and Zhipu AI's GLM-5.x series is based on technical inference and has not been officially confirmed</li>
                     <li style="margin: 10px 0;"><strong>Limited Sample Size:</strong> Benchmark results based on relatively small test sets; larger-scale evaluation needed</li>
                     <li style="margin: 10px 0;"><strong>Unaudited Results:</strong> Performance claims come from independent testing, not official benchmark leaderboards</li>
                     <li style="margin: 10px 0;"><strong>Temporal Validity:</strong> Analysis current as of August 22, 2026; model characteristics may change</li>
@@ -1057,9 +1196,9 @@
             <p>Readers seeking to verify claims in this analysis can:</p>
 
             <ul class="evidence-list">
-                <li>Access OX Alpha directly via OpenRouter (stealth/ox-alpha) during the free preview period</li>
+                <li>Access OX Alpha(glm 5.3 flash) directly via OpenRouter (stealth/ox-alpha) during the free preview period</li>
                 <li>Reproduce video encoder tests using controlled video sets with known characteristics</li>
-                <li>Compare tokenizer output using identical prompts across OX Alpha and GLM-5.3</li>
+                <li>Compare tokenizer output using identical prompts across OX Alpha(glm 5.3 flash) and GLM-5.3</li>
                 <li>Execute DeepSWE benchmark tasks and compare results</li>
                 <li>Monitor model integration into open-source projects via public repositories</li>
             </ul>
@@ -1078,7 +1217,7 @@
 
             <div class="timeline-item">
                 <div class="timeline-date">Late August - Early September 2026 (Projected)</div>
-                <p><strong>Potential Official Announcement:</strong> If OX Alpha follows the pattern of previous stealth models (Pony Alpha, Elephant Alpha, Owl Alpha), official attribution could occur within 2 weeks of initial appearance.</p>
+                <p><strong>Potential Official Announcement:</strong> If OX Alpha(glm 5.3 flash) follows the pattern of previous stealth models (Pony Alpha, Elephant Alpha, Owl Alpha), official attribution could occur within 2 weeks of initial appearance.</p>
             </div>
 
             <div class="timeline-item">
@@ -1089,9 +1228,9 @@
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Open Questions</h3>
 
             <ul class="evidence-list">
-                <li><strong>Official Identity:</strong> Will Zhipu AI (or another organization) officially claim OX Alpha?</li>
+                <li><strong>Official Identity:</strong> Will Zhipu AI (or another organization) officially claim OX Alpha(glm 5.3 flash)?</li>
                 <li><strong>Production Pricing:</strong> What will be the commercial pricing structure after the free preview period?</li>
-                <li><strong>Model Relationship:</strong> Is OX Alpha a variant of GLM-5.3, or a separate next-generation model in the GLM-5.x series?</li>
+                <li><strong>Model Relationship:</strong> Is OX Alpha(glm 5.3 flash) a variant of GLM-5.3, or a separate next-generation model in the GLM-5.x series?</li>
                 <li><strong>Sustained Performance:</strong> Will benchmark performance hold up under larger-scale independent evaluation?</li>
                 <li><strong>Continued Availability:</strong> Will the model remain accessible through OpenRouter or migrate to official channels?</li>
                 <li><strong>Multimodal GLM-5 Release:</strong> When will Zhipu officially release multimodal capabilities for the GLM-5 series?</li>
@@ -1099,7 +1238,7 @@
 
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Strategic Implications</h3>
 
-            <p>For organizations evaluating AI infrastructure, OX Alpha's appearance and performance profile have several strategic implications:</p>
+            <p>For organizations evaluating AI infrastructure, OX Alpha(glm 5.3 flash)'s appearance and performance profile have several strategic implications:</p>
 
             <ul class="evidence-list">
                 <li><strong>Competitive Parity Shifting:</strong> Chinese AI labs continue to close capability gaps with US-based frontier models</li>
@@ -1114,14 +1253,14 @@
         <div class="article-section">
             <h2 class="section-title">Conclusion</h2>
             
-            <p style="font-size: 1.15em; line-height: 1.8;">OX Alpha represents a significant development in frontier AI capabilities, demonstrating that anonymous releases can achieve immediate production adoption when performance characteristics align with developer needs. With an 80% Pass@1 on DeepSWE coding benchmarks—surpassing established models from OpenAI, Anthropic, and xAI—combined with a 1-million-token context window and full multimodal support, OX Alpha establishes a new capability threshold for coding-focused AI systems.</p>
+            <p style="font-size: 1.15em; line-height: 1.8;">OX Alpha(glm 5.3 flash) represents a significant development in frontier AI capabilities, demonstrating that anonymous releases can achieve immediate production adoption when performance characteristics align with developer needs. With an 80% Pass@1 on DeepSWE coding benchmarks—surpassing established models from OpenAI, Anthropic, and xAI—combined with a 1-million-token context window and full multimodal support, OX Alpha(glm 5.3 flash) establishes a new capability threshold for coding-focused AI systems.</p>
 
-            <p style="font-size: 1.15em; line-height: 1.8; margin-top: 20px;">The technical fingerprinting analysis by Ben Davis provides compelling evidence linking OX Alpha to Zhipu AI's unreleased GLM-5.x flagship, though this attribution remains unconfirmed as of publication. The pattern of stealth model releases from Chinese AI labs has become sufficiently established that such testing-through-distribution should now be considered a standard pre-launch strategy rather than an anomaly.</p>
+            <p style="font-size: 1.15em; line-height: 1.8; margin-top: 20px;">The technical fingerprinting analysis by Ben Davis provides compelling evidence linking OX Alpha(glm 5.3 flash) to Zhipu AI's unreleased GLM-5.x flagship, though this attribution remains unconfirmed as of publication. The pattern of stealth model releases from Chinese AI labs has become sufficiently established that such testing-through-distribution should now be considered a standard pre-launch strategy rather than an anomaly.</p>
 
             <div class="key-takeaway">
                 <h3 style="color: #7c3aed; margin-bottom: 15px; font-size: 1.3em;">Key Takeaways for Practitioners</h3>
                 <ul style="margin: 0; padding-left: 20px;">
-                    <li style="margin: 12px 0; line-height: 1.7;"><strong>Test During Free Window:</strong> Evaluate OX Alpha for your specific use cases before the preview period ends (approx. August 27)</li>
+                    <li style="margin: 12px 0; line-height: 1.7;"><strong>Test During Free Window:</strong> Evaluate OX Alpha(glm 5.3 flash) for your specific use cases before the preview period ends (approx. August 27)</li>
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Plan for Transition:</strong> Assume pricing will be introduced; assess ROI based on expected commercial rates</li>
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Extended Context Workflows:</strong> Explore applications that leverage the 1M-token context window not viable with shorter-context models</li>
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Monitor Official Announcements:</strong> Watch for potential official attribution from Zhipu AI or other organizations</li>
@@ -1129,9 +1268,9 @@
                 </ul>
             </div>
 
-            <p style="font-size: 1.15em; line-height: 1.8; margin-top: 30px;">As the AI landscape continues to evolve rapidly, OX Alpha serves as a case study in how frontier capabilities are being developed, tested, and distributed through increasingly sophisticated channels. Whether officially confirmed as part of the GLM-5.x series or revealed to have different origins, OX Alpha's demonstrated capabilities and rapid production adoption validate the demand for specialized coding-focused models with extended context and multimodal reasoning capabilities.</p>
+            <p style="font-size: 1.15em; line-height: 1.8; margin-top: 30px;">As the AI landscape continues to evolve rapidly, OX Alpha(glm 5.3 flash) serves as a case study in how frontier capabilities are being developed, tested, and distributed through increasingly sophisticated channels. Whether officially confirmed as part of the GLM-5.x series or revealed to have different origins, OX Alpha(glm 5.3 flash)'s demonstrated capabilities and rapid production adoption validate the demand for specialized coding-focused models with extended context and multimodal reasoning capabilities.</p>
 
-            <p style="font-size: 1.15em; line-height: 1.8; margin-top: 20px;">Local AI Zone will continue monitoring developments around OX Alpha and will publish updates as official attribution is confirmed and additional independent benchmark results become available.</p>
+            <p style="font-size: 1.15em; line-height: 1.8; margin-top: 20px;">Local AI Zone will continue monitoring developments around OX Alpha(glm 5.3 flash) and will publish updates as official attribution is confirmed and additional independent benchmark results become available.</p>
         </div>
 
         <!-- References -->
@@ -1141,8 +1280,8 @@
             <h3 style="color: var(--primary-600); font-size: 1.4em; margin-bottom: 20px;">Primary Sources</h3>
             <ul style="line-height: 1.9;">
                 <li>Ben Davis Technical Analysis (August 21, 2026) - <a href="https://finance.biggo.com/news/9dc856ba-634d-467a-bea2-6ba70233113c" target="_blank" rel="noopener noreferrer">Anonymous AI Model Tops GPT-5.6 and Claude in Coding Tests</a></li>
-                <li>OpenRouter Model Catalog - <a href="https://explainx.ai/blog/openrouter-ox-alpha-stealth-model-august-2026" target="_blank" rel="noopener noreferrer">OX Alpha on OpenRouter: Free 1M Stealth Model</a></li>
-                <li>CryptoBriefing Coverage - <a href="https://cryptobriefing.com/ox-alpha-stealth-ai-model-1m-context/" target="_blank" rel="noopener noreferrer">OX Alpha emerges as new stealth AI model</a></li>
+                <li>OpenRouter Model Catalog - <a href="https://explainx.ai/blog/openrouter-ox-alpha-stealth-model-august-2026" target="_blank" rel="noopener noreferrer">OX Alpha(glm 5.3 flash) on OpenRouter: Free 1M Stealth Model</a></li>
+                <li>CryptoBriefing Coverage - <a href="https://cryptobriefing.com/ox-alpha-stealth-ai-model-1m-context/" target="_blank" rel="noopener noreferrer">OX Alpha(glm 5.3 flash) emerges as new stealth AI model</a></li>
                 <li>WCCFtech Analysis - <a href="https://wccftech.com/a-mysterious-ai-lab-is-offering-100-trillion-free-tokens-day-for-its-ox-alpha-model-as-evidence-points-to-zhipus-unreleased-glm/" target="_blank" rel="noopener noreferrer">Mysterious AI Lab Offering 100 Trillion Free Tokens/Day</a></li>
             </ul>
 
@@ -1154,22 +1293,33 @@
             </ul>
 
             <h3 style="color: var(--primary-600); font-size: 1.4em; margin-top: 30px; margin-bottom: 20px;">Disclaimer</h3>
-            <p style="font-size: 0.95em; color: #6b7280; line-height: 1.7; font-style: italic;">This analysis is based on publicly available information and independent testing by third-party researchers as of August 22, 2026. Attribution of OX Alpha to Zhipu AI's GLM-5.x series has not been officially confirmed. Benchmark results cited are preliminary and based on limited sample sizes. Readers should conduct independent verification and testing for production decision-making. Content was synthesized and rephrased for compliance with licensing restrictions while preserving factual accuracy.</p>
+            <p style="font-size: 0.95em; color: #6b7280; line-height: 1.7; font-style: italic;">This analysis is based on publicly available information and independent testing by third-party researchers as of August 22, 2026. Attribution of OX Alpha(glm 5.3 flash) to Zhipu AI's GLM-5.x series has not been officially confirmed. Benchmark results cited are preliminary and based on limited sample sizes. Readers should conduct independent verification and testing for production decision-making. Content was synthesized and rephrased for compliance with licensing restrictions while preserving factual accuracy.</p>
         </div>
 
-        <!-- Related Articles (Internal Linking for SEO) -->
-        <div class="article-section" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
-            <h2 class="section-title">Related Articles You May Like</h2>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-top: 25px;">
-                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h3 style="font-size: 1.2em; margin-bottom: 10px;"><a href="qwen3-8-27b-comprehensive-analysis.html" style="color: var(--primary-600); text-decoration: none;">Qwen 3.8-27B: Comprehensive Analysis</a></h3>
-                    <p style="color: var(--text-muted); font-size: 0.95em; line-height: 1.6;">Deep dive into Alibaba's latest coding-focused model with benchmark comparisons.</p>
+        
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                                        <a href="deepseek-v4-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">DeepSeek V4 Flash</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Deep-dive into DeepSeek's 284B/13B active MoE with MLA attention, 1M context, and $0.14/$0.28 per M tokens.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="qwen3-8-flash-next-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Qwen3.8-Flash-Next</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Deep-dive into Alibaba's 125B+51B multimodal MoE with Gated DeltaNet, QSA, and Muon optimizer.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="glm-5-3-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">GLM-5.3-Flash Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Technical deep-dive into Z.ai's 320B/18B active MoE with hybrid KDA+MLA attention and 1M context.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
                 </div>
-                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                    <h3 style="font-size: 1.2em; margin-bottom: 10px;"><a href="july-2026-ai-model-roundup.html" style="color: var(--primary-600); text-decoration: none;">July 2026 AI Model Roundup</a></h3>
-                    <p style="color: var(--text-muted); font-size: 0.95em; line-height: 1.6;">Monthly overview of the latest frontier AI models and their capabilities.</p>
-                </div>
-                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+            </div>
+
+
+                <div style="background: #1e293b; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.3);">
                     <h3 style="font-size: 1.2em; margin-bottom: 10px;"><a href="ai-updates-august-2026.html" style="color: var(--primary-600); text-decoration: none;">AI Updates August 2026</a></h3>
                     <p style="color: var(--text-muted); font-size: 0.95em; line-height: 1.6;">Latest developments in the AI landscape including new model releases.</p>
                 </div>
@@ -1193,5 +1343,6 @@
         </div>
     </footer>
 
+    <script src="../js/theme-switcher.js"></script>
 </body>
 </html>
