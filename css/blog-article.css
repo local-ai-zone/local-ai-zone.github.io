@@ -163,6 +163,53 @@ html[data-theme='dark'] .blog-article-page .article-content a {
     color: var(--primary-400);
 }
 
+/* Dark mode table overrides */
+html[data-theme='dark'] .article-content table th,
+html[data-theme='dark'] .article-content table td {
+    background: var(--card-background, #1e1e1e);
+    color: var(--text-primary, #e0e0e0);
+    border-color: var(--border-color, #343a40);
+}
+
+html[data-theme='dark'] .article-content table th {
+    background: #2d1b69;
+    color: #e2e8f0;
+}
+
+html[data-theme='dark'] .article-content table tr:nth-child(even) td {
+    background: #252535;
+}
+
+html[data-theme='dark'] .article-content table tr:nth-child(odd) td {
+    background: #1e1e2e;
+}
+
+html[data-theme='dark'] .article-content table tr:hover td {
+    background: rgba(124, 58, 237, 0.1) !important;
+}
+
+html[data-theme='dark'] .article-content blockquote {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--text-primary, #e0e0e0);
+    border-left-color: #60a5fa;
+}
+
+html[data-theme='dark'] .article-content code {
+    background: #2d2d3d;
+    color: #e2e8f0;
+    border-color: #374151;
+}
+
+html[data-theme='dark'] .article-content strong {
+    color: #f3f4f6;
+}
+
+html[data-theme='dark'] .article-content h2,
+html[data-theme='dark'] .article-content h3,
+html[data-theme='dark'] .article-content h4 {
+    color: var(--text-primary, #e0e0e0);
+}
+
 /* Skip Link for Accessibility */
 .skip-link {
     position: absolute;
