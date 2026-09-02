@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPU & CPU Inference Troubleshooting - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Complete GPU and CPU inference troubleshooting guide for 2026 — diagnose slow inference, OOM errors, low token speed, KV cache pressure, CPU offload bottlenecks, and optimize your local AI stack.">
+    <meta name="keywords" content="inference troubleshooting, GPU bottleneck, CPU offload, VRAM OOM, vLLM tuning, llama.cpp optimization, KV cache, flash attention, 2026">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="GPU & CPU Inference Troubleshooting">
+    <meta property="og:description" content="Complete GPU and CPU inference troubleshooting guide for 2026 — diagnose slow inference, OOM errors, low token speed, KV cache pressure, CPU offload bottlenecks, and optimize your local AI stack.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="GPU & CPU Inference Troubleshooting">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/gpu-cpu-inference-troubleshooting.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-08-28T00:00:00Z">
+    <meta property="article:modified_time" content="2026-08-28T00:00:00Z">
+    <meta property="article:section" content="Engineering">
+    <meta property="article:tag" content="inference troubleshooting">
+    <meta property="article:tag" content="GPU bottleneck">
+    <meta property="article:tag" content="CPU offload">
+    <meta property="article:tag" content="llama.cpp">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/gpu-cpu-inference-troubleshooting.html">
+    <meta name="twitter:title" content="GPU & CPU Inference Troubleshooting">
+    <meta name="twitter:description" content="Complete GPU and CPU inference troubleshooting guide for 2026 — diagnose slow inference, OOM errors, low token speed, KV cache pressure, CPU offload bottlenecks, and optimize your local AI stack.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta name="twitter:image:alt" content="GPU & CPU Inference Troubleshooting">
+
+    <!-- Additional AEO/GEO Meta Tags -->
+    <meta name="application-name" content="Local AI Zone">
+    <meta name="msapplication-TileColor" content="#7c3aed">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="article-publisher" content="https://local-ai-zone.github.io">
+    <meta name="article-content-ttl" content="P1Y">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/gpu-cpu-inference-troubleshooting.html">
+
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/gpu-cpu-inference-troubleshooting.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/gpu-cpu-inference-troubleshooting.html">
+
+    <style>
+        .back-to-blog { display: inline-flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-weight: 600; margin: 0 0 30px 0; padding: 10px 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; backdrop-filter: blur(8px); transition: all 0.3s ease; position: relative; z-index: 1; }
+        .back-to-blog:hover { background: rgba(255,255,255,0.28); transform: translateX(-3px); }
+        .article-content { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        .article-content h1 { font-size: 2.2em; color: #1e40af; margin: 40px 0 15px; padding-bottom: 10px; border-bottom: 3px solid #e5e7eb; }
+        .article-content h2 { font-size: 1.6em; color: #1e40af; margin: 35px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .article-content h3 { font-size: 1.3em; color: #374151; margin: 28px 0 10px; }
+        .article-content h4 { font-size: 1.1em; color: #4b5563; margin: 20px 0 8px; }
+        .article-content p { margin-bottom: 1.2em; line-height: 1.8; }
+        .article-content ul, .article-content ol { margin: 12px 0 12px 24px; }
+        .article-content li { margin-bottom: 6px; line-height: 1.7; }
+        .article-content table { margin: 24px 0; width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .article-content table th { background: #1e40af; color: white; padding: 10px 12px; text-align: left; font-weight: 600; border: 1px solid #1e40af; }
+        .article-content table td { padding: 10px 12px; border: 1px solid #e5e7eb; text-align: left; }
+        .article-content table tr:nth-child(even) td { background: #f9fafb; }
+        .article-content table tr:hover td { background: #eff6ff; }
+        .article-content blockquote { border-left: 4px solid #2563eb; background: #eff6ff; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-style: normal; }
+        .article-content blockquote p { margin-bottom: 0.5em; }
+        .article-content blockquote p:last-child { margin-bottom: 0; }
+        .article-content code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: "Courier New", monospace; }
+        .article-content pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        .article-content pre code { background: none; color: inherit; padding: 0; }
+        .article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+        .article-content em { color: #6b7280; }
+        .article-content strong { color: #111827; }
+        .article-content a { color: #2563eb; text-decoration: none; }
+        .article-content a:hover { text-decoration: underline; }
+        .article-content hr { border: none; border-top: 2px solid #e5e7eb; margin: 40px 0; }
+        .article-header::before { display: none !important; }
+        .article-header .article-title { text-shadow: none !important; }
+        .article-header .container { background: transparent !important; }
+        .premium-header { position: static !important; }
+        .article-section { margin: 40px 0; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .section-title { font-size: 2em; color: #1e40af; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
+        .key-takeaway { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 24px; margin: 30px 0; border-radius: 0 8px 8px 0; }
+
+        /* Dark mode table overrides */
+        html[data-theme='dark'] table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table td { background: #1e1e2e !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table tr:nth-child(even) td { background: #252535 !important; }
+        html[data-theme='dark'] table tr:nth-child(odd) td { background: #1e1e2e !important; }
+        html[data-theme='dark'] table tr:hover td { background: rgba(124, 58, 237, 0.1) !important; }
+        html[data-theme='dark'] table { border-color: #374151 !important; }
+:root {
+    --ink: #18181b; --ink-soft: #3f3f46; --muted: #71717a;
+    --line: #e4e4e7; --line-strong: #d4d4d8;
+    --bg: #ffffff; --bg-soft: #fafafa; --bg-quote: #f4f4f5;
+    --accent: #DC2626; --accent-soft: #FEF2F2;
+    --link: #DC2626; --link-hover: #991B1B;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --ink: #f4f4f5; --ink-soft: #d4d4d8; --muted: #a1a1aa;
+      --line: #27272a; --line-strong: #3f3f46; --bg: #0a0a0a; --bg-soft: #18181b;
+      --bg-quote: #1c1c1f; --accent: #F87171; --accent-soft: #450A0A;
+      --link: #F87171; --link-hover: #FCA5A5; }
+  }
+  * { box-sizing: border-box; } html { scroll-behavior: smooth; }
+  body { font-family: 'Charter', 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
+    color: var(--ink); background: var(--bg); line-height: 1.75;
+    max-width: 860px; margin: 0 auto; padding: 0 28px 80px 28px; font-size: 17px;
+    -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+  .paper-header { padding: 56px 0 32px 0; border-bottom: 1px solid var(--line); margin-bottom: 36px; }
+  .eyebrow { font-family: 'Inter', system-ui, sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin-bottom: 14px; }
+  .eyebrow .dot { display: inline-block; width: 6px; height: 6px; background: var(--accent);
+    border-radius: 50%; margin-right: 8px; vertical-align: middle; }
+  h1.title { font-family: 'Inter', system-ui, sans-serif; font-size: 36px; line-height: 1.15;
+    font-weight: 700; letter-spacing: -0.7px; margin: 0 0 16px 0; color: var(--ink); }
+  .subtitle { font-family: 'Inter', system-ui, sans-serif; font-size: 18px; line-height: 1.45;
+    color: var(--ink-soft); font-weight: 400; margin: 0 0 28px 0; }
+  .byline { font-family: 'Inter', system-ui, sans-serif; font-size: 13px; color: var(--muted);
+    display: flex; gap: 18px; flex-wrap: wrap; }
+  .byline .label { text-transform: uppercase; letter-spacing: 0.6px; font-weight: 600;
+    color: var(--ink-soft); margin-right: 6px; }
+  .lead { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; line-height: 1.6;
+    color: var(--ink-soft); font-weight: 400; margin: 32px 0 40px 0; padding: 22px 26px;
+    background: var(--accent-soft); border-radius: 8px; border-left: 3px solid var(--accent); }
+  .toc { background: var(--bg-soft); border: 1px solid var(--line); border-radius: 8px;
+    padding: 22px 28px; margin: 28px 0 56px 0; }
+  .toc h2 { font-family: 'Inter', system-ui, sans-serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 0 0 14px 0; }
+  .toc ol { list-style: none; counter-reset: toc; padding: 0; margin: 0;
+    font-family: 'Inter', system-ui, sans-serif; font-size: 14px; }
+  .toc ol > li { counter-increment: toc; padding: 4px 0; display: flex; align-items: baseline; }
+  .toc ol > li::before { content: counter(toc) "."; color: var(--muted); font-weight: 600;
+    width: 32px; flex-shrink: 0; }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .toc a:hover { color: var(--accent); text-decoration: underline; }
+  article section { margin-top: 56px; scroll-margin-top: 24px; }
+  article section:first-of-type { margin-top: 0; }
+  h2.section { font-family: 'Inter', system-ui, sans-serif; font-size: 26px; font-weight: 700;
+    letter-spacing: -0.4px; margin: 0 0 6px 0; color: var(--ink); padding-bottom: 12px;
+    border-bottom: 1px solid var(--line); display: flex; align-items: center; gap: 14px; }
+  h2.section .num { color: var(--accent); font-weight: 600; font-variant-numeric: tabular-nums; font-size: 24px; }
+  h2.section .emoji { font-size: 24px; }
+  h3.subsection { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700;
+    margin: 32px 0 12px 0; color: var(--ink); }
+  p { margin: 0 0 16px 0; }
+  p.lede { font-family: 'Inter', system-ui, sans-serif; font-size: 18.5px; line-height: 1.55;
+    color: var(--ink-soft); font-weight: 400; margin: 18px 0 24px 0; }
+  a { color: var(--link); text-decoration: none; border-bottom: 1px solid transparent; }
+  a:hover { color: var(--link-hover); border-bottom-color: var(--link-hover); }
+  strong, b { color: var(--ink); font-weight: 600; }
+  code { font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace; font-size: 13px;
+    background: var(--bg-quote); padding: 1.5px 5px; border-radius: 3px; color: var(--ink); }
+  pre { font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace; font-size: 13px;
+    background: #1e293b; color: #e2e8f0; padding: 16px 20px; border-radius: 8px;
+    overflow-x: auto; line-height: 1.6; border: 1px solid var(--line); margin: 18px 0; }
+  pre code { background: none; padding: 0; color: #e2e8f0; }
+  .table-wrap { margin: 24px 0; overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+  table.data { width: 100%; border-collapse: collapse; font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12.5px; background: var(--bg); }
+  table.data th, table.data td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line);
+    vertical-align: top; line-height: 1.5; }
+  table.data th { background: var(--bg-soft); color: var(--muted); font-weight: 600; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.5px; }
+  table.data td.term { font-weight: 600; color: var(--ink); background: var(--bg-soft); }
+  table.data td b { color: var(--ink); }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data .score { display: inline-block; padding: 2px 8px; border-radius: 3px; font-weight: 700;
+    font-size: 11px; min-width: 30px; text-align: center; }
+  table.data .score.s { background: #DCFCE7; color: #166534; }
+  table.data .score.a { background: #DBEAFE; color: #1E40AF; }
+  table.data .score.b { background: #FEF3C7; color: #92400E; }
+  table.data .score.c { background: #FEE2E2; color: #991B1B; }
+  figure { margin: 32px 0; text-align: center; }
+  figure img { max-width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px;
+    display: block; margin: 0 auto; }
+  figure.wide img { width: 100%; }
+  figcaption { margin-top: 12px; font-family: 'Inter', system-ui, sans-serif; font-size: 13px;
+    color: var(--muted); line-height: 1.55; text-align: left; }
+  figcaption b { color: var(--ink-soft); font-weight: 600; }
+  .issue-card { margin: 24px 0; padding: 20px 24px; background: var(--bg-soft);
+    border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 0 8px 8px 0; }
+  .issue-card .issue-num { font-family: 'Inter', system-ui, sans-serif; font-size: 11px;
+    text-transform: uppercase; letter-spacing: 0.8px; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+  .issue-card h3 { font-family: 'Inter', system-ui, sans-serif; font-size: 19px; font-weight: 700;
+    margin: 0 0 12px 0; color: var(--ink); }
+  .issue-card .symptom { font-family: 'Inter', system-ui, sans-serif; font-size: 13px;
+    color: var(--ink-soft); margin-bottom: 12px; padding: 8px 12px; background: #FEF2F2;
+    border-radius: 4px; border-left: 2px solid #EF4444; }
+  .issue-card .symptom b { color: #991B1B; }
+  .issue-card .fix { font-family: 'Inter', system-ui, sans-serif; font-size: 13.5px;
+    color: var(--ink-soft); margin-bottom: 8px; padding: 8px 12px; background: #F0FDF4;
+    border-radius: 4px; border-left: 2px solid #10B981; }
+  .issue-card .fix b { color: #065F46; }
+  .issue-card .fix code { font-size: 12px; }
+  .takeaway { background: linear-gradient(135deg, var(--accent-soft) 0%, var(--bg-soft) 100%);
+    border: 1px solid var(--line); border-radius: 8px; padding: 14px 22px; margin: 24px 0;
+    font-family: 'Inter', system-ui, sans-serif; font-size: 14px; line-height: 1.6; }
+  .takeaway .label { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+  .takeaway p { margin: 0 0 6px 0; }
+  .takeaway p:last-child { margin: 0; }
+  .paper-footer { margin-top: 72px; padding-top: 28px; border-top: 1px solid var(--line);
+    font-family: 'Inter', system-ui, sans-serif; font-size: 12.5px; color: var(--muted); line-height: 1.6; }
+  .paper-footer .license { margin-top: 14px; padding: 12px 16px; background: var(--bg-soft);
+    border: 1px solid var(--line); border-radius: 4px; font-size: 12px; }
+  @media (max-width: 640px) { body { padding: 0 18px 60px 18px; font-size: 16px; }
+    h1.title { font-size: 28px; } h2.section { font-size: 22px; } .byline { flex-direction: column; gap: 6px; } }
+    </style>
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "GPU & CPU Inference Troubleshooting",
+        "alternativeHeadline": "Diagnosing and fixing every common inference performance problem in 2026",
+        "description": "Complete GPU and CPU inference troubleshooting guide for 2026 — diagnose slow inference, OOM errors, low token speed, KV cache pressure, CPU offload bottlenecks, and optimize your local AI stack.",
+        "image": "https://local-ai-zone.github.io/og-image.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-08-28T00:00:00Z",
+        "dateModified": "2026-08-28T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/gpu-cpu-inference-troubleshooting.html"
+        },
+        "keywords": "inference troubleshooting, GPU bottleneck, CPU offload, VRAM OOM, vLLM tuning, llama.cpp optimization, KV cache, flash attention, 2026",
+        "articleSection": "Engineering",
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "GPU & CPU Inference Troubleshooting", "item": "https://local-ai-zone.github.io/blog/gpu-cpu-inference-troubleshooting.html"}
+        ]
+    }
+    </script>
+</head>
+<body class="blog-article-page">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">GPU & CPU Inference Troubleshooting</h1>
+                <div class="article-meta">
+                    <span class="article-date">August 28, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Engineering</span>
+                    <span class="article-read-time">📖 25 min read</span>
+                </div>
+            </div>
+        </header>
+        <div class="article-content">
+<header class="paper-header">
+  <div class="eyebrow"><span class="dot"></span>Inference Troubleshooting Guide · Complete</div>
+  <h1 class="title">GPU &amp; CPU Inference Troubleshooting</h1>
+  <p class="subtitle">A complete guide to diagnosing and fixing every common inference performance problem — OOM errors, slow token generation, CPU offload bottlenecks, KV cache pressure, low GPU utilization, and runtime/format mismatches. Covers NVIDIA, AMD, Apple Silicon, and CPU-only setups.</p>
+  <div class="byline">
+    <span><span class="label">Published</span>August 28, 2026</span>
+    <span><span class="label">Issues covered</span>10 common problems</span>
+    <span><span class="label">Platforms</span>NVIDIA · AMD · Apple · CPU</span>
+    <span><span class="label">Reading time</span>~25 minutes</span>
+  </div>
+</header>
+
+<div class="lead">
+Your model loads but inference is slow. Or it won't load at all. Or tok/s drops when you extend context. This guide covers every common inference performance problem in 2026 — from OOM crashes to CPU offload bottlenecks to KV cache pressure — with specific diagnostic commands and fixes for each.
+</div>
+
+<nav class="toc">
+  <h2>What we'll cover</h2>
+  <ol>
+    <li><a href="#s1">The diagnosis flowchart — start here</a></li>
+    <li><a href="#s2">Issue #1: Out of Memory (OOM) — model won't load</a></li>
+    <li><a href="#s3">Issue #2: Low token speed with CPU offload</a></li>
+    <li><a href="#s4">Issue #3: Speed drops with longer context (KV cache)</a></li>
+    <li><a href="#s5">Issue #4: Low GPU utilization (&lt;50%)</a></li>
+    <li><a href="#s6">Issue #5: vLLM slower than expected</a></li>
+    <li><a href="#s7">Issue #6: AMD ROCm performance issues</a></li>
+    <li><a href="#s8">Issue #7: Apple Silicon (MLX) slow inference</a></li>
+    <li><a href="#s9">Issue #8: CPU-only inference optimization</a></li>
+    <li><a href="#s10">Issue #9: Multi-GPU slower than single GPU</a></li>
+    <li><a href="#s11">Issue #10: Format/runtime mismatch</a></li>
+    <li><a href="#s12">The optimization waterfall — cumulative impact</a></li>
+    <li><a href="#s13">Quick-reference diagnostic commands</a></li>
+  </ol>
+</nav>
+
+<article>
+
+<!-- ===================== SECTION 1 ===================== -->
+<section id="s1">
+<h2 class="section"><span class="num">1.</span><span class="emoji">🔬</span>The diagnosis flowchart — start here</h2>
+
+<p class="lede">Before applying any fix, diagnose the problem. The flowchart below walks you through the four critical checks: does the model load, what's GPU utilization, what's token speed, and what's the likely bottleneck.</p>
+
+<figure class="wide">
+<img src="inference-bottleneck-flowchart.png" alt="6-step diagnostic flowchart showing how to identify inference bottlenecks: model loading, GPU utilization, token speed, CPU offload, KV cache, and format/runtime mismatch.">
+<figcaption><b>Figure 1.</b> Inference bottleneck diagnosis flowchart. Start at Step 1 (does the model load?) and follow through GPU utilization, token speed, and the three most common bottleneck types: CPU offload, KV cache, and format/runtime mismatch.</figcaption>
+</figure>
+
+<div class="takeaway">
+<div class="label">The three most common bottlenecks</div>
+<p>In 2026, the three most common inference performance problems are: <strong>(1) CPU offload</strong> — using GGUF with insufficient VRAM, causing CPU-bound layers to bottleneck speed; <strong>(2) KV cache pressure</strong> — long context consuming VRAM that should go to model weights; <strong>(3) Format/runtime mismatch</strong> — using GGUF when EXL2 would fit, or using AWQ when GGUF is needed for CPU offload. Diagnose which one you have before applying fixes.</p>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section id="s2">
+<h2 class="section"><span class="num">2.</span><span class="emoji">💥</span>Issue #1: Out of Memory (OOM) — model won't load</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #1 — OOM / Model won't load</div>
+<h3>The model fails to load with "CUDA out of memory" or similar error</h3>
+<div class="symptom">
+<b>Symptoms:</b> <code>CUDA out of memory</code> error · <code>RuntimeError: CUDA error: out of memory</code> · Model loads partially then crashes · <code>nvidia-smi</code> shows VRAM at 100% before inference starts<br>
+<b>Root cause:</b> The model + KV cache + runtime overhead exceeds available VRAM. EXL2/AWQ/GPTQ require the entire model in VRAM — no overflow allowed.
+</div>
+<div class="fix">
+<b>Fix 1 — Use GGUF with CPU offload (recommended):</b><br>
+<code>llama-cli -m model-q4_k_m.gguf -ngl 20</code> (put 20 layers on GPU, rest on CPU)<br>
+The model will run slower (CPU-bound layers) but it will <em>load and work</em>.
+</div>
+<div class="fix">
+<b>Fix 2 — Lower quantization level:</b><br>
+Switch from Q4_K_M (~40GB for 70B) to Q3_K_M (~34GB) or Q2_K (~28GB)<br>
+<code>ollama pull model:33b-q3_K_M</code>
+</div>
+<div class="fix">
+<b>Fix 3 — Reduce context length:</b><br>
+<code>--max-model-len 4096</code> (default is often 32K+) — reduces KV cache VRAM usage
+</div>
+<div class="fix">
+<b>Fix 4 — Enable KV cache FP8 (vLLM):</b><br>
+<code>--kv-cache-dtype fp8</code> — halves KV cache VRAM usage (Blackwell only)
+</div>
+<div class="fix">
+<b>Fix 5 — Use a smaller model:</b><br>
+If 70B won't fit, use Qwen3.8 27B (~18GB at Q4) — fits on 24GB GPUs
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 3 ===================== -->
+<section id="s3">
+<h2 class="section"><span class="num">3.</span><span class="emoji">🐌</span>Issue #2: Low token speed with CPU offload</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #2 — CPU offload bottleneck</div>
+<h3>Token generation is slow (under 10 tok/s) when using GGUF with partial CPU offload</h3>
+<div class="symptom">
+<b>Symptoms:</b> 5–10 tok/s for a 70B model that should be faster · <code>htop</code> shows CPU at 100% during inference · Speed doesn't improve with Flash Attention · GPU utilization is low (&lt;50%)<br>
+<b>Root cause:</b> CPU-processed layers are 10–20× slower than GPU-processed layers. The CPU becomes the bottleneck for any layers not offloaded to GPU.
+</div>
+<div class="fix">
+<b>Fix 1 — Increase GPU layers (if VRAM allows):</b><br>
+<code>llama-cli -m model.gguf -ngl 40</code> (increase from 20 to 40 layers on GPU)<br>
+Each additional layer on GPU removes a CPU bottleneck. Check <code>nvidia-smi</code> to see how much VRAM you have left.
+</div>
+<div class="fix">
+<b>Fix 2 — Set thread count to physical cores (not logical):</b><br>
+<code>llama-cli -m model.gguf -t 8</code> (for an 8-physical-core CPU)<br>
+Using logical cores (hyperthreading) can actually <em>slow down</em> inference. Set <code>-t</code> to your CPU's physical core count.
+</div>
+<div class="fix">
+<b>Fix 3 — Enable Flash Attention:</b><br>
+<code>llama-cli -m model.gguf -ngl 20 -fa -t 8</code><br>
+Flash Attention reduces memory operations during attention computation. Requires compilation with <code>LLAMA_FA=1</code>.
+</div>
+<div class="fix">
+<b>Fix 4 — Lower quantization level (if VRAM-constrained):</b><br>
+Switch from Q4_K_M (~42GB) to Q3_K_M (~34GB) — fits more layers on GPU<br>
+The quality loss (~4% vs ~2%) is worth the speed gain from more GPU layers.
+</div>
+<div class="fix">
+<b>Fix 5 — Check CPU instruction set support:</b><br>
+<code>lscpu | grep -i avx</code> — look for AVX-512 or AVX2<br>
+llama.cpp is 2–3× faster with AVX-512. Without it, CPU inference is severely limited.
+</div>
+<div class="fix">
+<b>Fix 6 — Upgrade to DDR5 RAM (if still on DDR4):</b><br>
+CPU inference is memory-bandwidth-bound. DDR5 (6400+ MT/s) is ~2× faster than DDR4 (3200 MT/s), directly translating to ~2× faster CPU inference.
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 4 ===================== -->
+<section id="s4">
+<h2 class="section"><span class="num">4.</span><span class="emoji">📉</span>Issue #3: Speed drops with longer context (KV cache)</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #3 — KV cache bottleneck</div>
+<h3>Token speed drops significantly when context window grows (32K+ tokens)</h3>
+<div class="symptom">
+<b>Symptoms:</b> Model runs at 50 tok/s with 4K context but drops to 15 tok/s at 32K context · VRAM fills up as conversation grows · <code>nvidia-smi</code> shows VRAM climbing during conversation<br>
+<b>Root cause:</b> The KV cache (stored attention key-value pairs) grows linearly with context length. At 32K context for a 70B model, KV cache can consume 10–20GB of VRAM — competing with model weights for limited VRAM.
+</div>
+<div class="fix">
+<b>Fix 1 — Enable KV cache FP8 quantization:</b><br>
+<code>--kv-cache-dtype fp8</code> (vLLM) or <code>--cache-type-k q4_0 --cache-type-v q4_0</code> (llama.cpp)<br>
+Halves KV cache VRAM usage with minimal quality impact. <strong>Best single optimization for long context.</strong>
+</div>
+<div class="fix">
+<b>Fix 2 — Reduce max context length:</b><br>
+<code>--max-model-len 8192</code> (reduce from 32K or 128K default)<br>
+Most use cases don't need 32K context. Set to the actual needed length.
+</div>
+<div class="fix">
+<b>Fix 3 — Enable Flash Attention (llama.cpp):</b><br>
+<code>llama-cli -m model.gguf -fa</code><br>
+Flash Attention reduces the memory footprint of attention computation, freeing VRAM for larger KV cache or more model layers.
+</div>
+<div class="fix">
+<b>Fix 4 — Use PagedAttention (vLLM default):</b><br>
+vLLM's PagedAttention manages KV cache memory in pages, reducing fragmentation. If you're not using vLLM, switching to it for production serving automatically gets this.
+</div>
+<div class="fix">
+<b>Fix 5 — Offload KV cache to CPU (llama.cpp):</b><br>
+<code>llama-cli -m model.gguf --kv-offload</code> (or <code>-nkvo</code>)<br>
+Moves KV cache to system RAM. Slower but allows much larger context windows without VRAM pressure. Community reports: "KV cache offload to RAM gives me 23 tps at 65K context."
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 5 ===================== -->
+<section id="s5">
+<h2 class="section"><span class="num">5.</span><span class="emoji">🔋</span>Issue #4: Low GPU utilization (&lt;50%)</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #4 — GPU underutilized</div>
+<h3>nvidia-smi shows GPU utilization below 50% during inference</h3>
+<div class="symptom">
+<b>Symptoms:</b> <code>nvidia-smi</code> shows GPU util at 20–40% during inference · Token speed is lower than expected · GPU VRAM is not full<br>
+<b>Root cause:</b> The GPU is waiting for data — either from CPU (data loading bottleneck), from system RAM (CPU offload), or from insufficient batch size (single-request underutilizes GPU parallelism).
+</div>
+<div class="fix">
+<b>Fix 1 — Increase batch size (vLLM):</b><br>
+<code>--max-num-seqs 256</code> (increase from default)<br>
+Single-user inference underutilizes GPU. Multiple concurrent requests fill GPU compute pipelines.
+</div>
+<div class="fix">
+<b>Fix 2 — Check for CPU offload (llama.cpp):</b><br>
+If using GGUF with <code>-ngl</code> set to partial, the GPU waits for CPU to finish its layers.<br>
+<code>nvidia-smi</code> shows GPU util oscillating between 0% and 100% — it's waiting for CPU.<br>
+<b>Fix:</b> Increase <code>-ngl</code> or upgrade VRAM so all layers fit on GPU.
+</div>
+<div class="fix">
+<b>Fix 3 — Increase <code>--max-num-batched-tokens</code> (vLLM):</b><br>
+<code>--max-num-batched-tokens 16384</code> (increase from default 8192)<br>
+Controls how many tokens are processed per batch. Higher = more GPU utilization but more latency.
+</div>
+<div class="fix">
+<b>Fix 4 — Check PCIe bandwidth:</b><br>
+<code>nvidia-smi topo -m</code> — check if GPU is on PCIe 4.0 or 5.0<br>
+PCIe 3.0 limits data transfer between CPU and GPU. PCIe 4.0/5.0 is needed for full-speed multi-GPU.
+</div>
+<div class="fix">
+<b>Fix 5 — Use NVIDIA MPS (Multi-Process Service) for multiple models:</b><br>
+<code>nvidia-cuda-mps-control -d</code><br>
+Allows multiple model instances to share GPU more efficiently — 50% cost reduction for multi-model serving.
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 6 ===================== -->
+<section id="s6">
+<h2 class="section"><span class="num">6.</span><span class="emoji">⚙️</span>Issue #5: vLLM slower than expected</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #5 — vLLM performance issues</div>
+<h3>vLLM is slower than llama.cpp or produces worse throughput than expected</h3>
+<div class="symptom">
+<b>Symptoms:</b> vLLM is 30× slower than llama.cpp for single-user inference · Throughput doesn't scale with more concurrent requests · High latency (TTFT) despite fast token generation<br>
+<b>Root cause:</b> vLLM is optimized for <strong>throughput</strong> (many concurrent requests), not <strong>latency</strong> (single user). For single-user use, llama.cpp or ExLlamaV2 is often faster.
+</div>
+<div class="fix">
+<b>Fix 1 — Tune <code>--max-num-seqs</code> and <code>--max-num-batched-tokens</code>:</b><br>
+<code>vllm serve model --max-num-seqs 256 --max-num-batched-tokens 8192</code><br>
+Sweet spot: 256 sequences, 8192 batched tokens. Lower for latency, higher for throughput.
+</div>
+<div class="fix">
+<b>Fix 2 — Set <code>--gpu-memory-utilization</code> correctly:</b><br>
+<code>--gpu-memory-utilization 0.90</code> (90% of VRAM for KV cache)<br>
+Default is 0.90. If you have other GPU processes, lower to 0.85. If VRAM is tight, raise to 0.95 (risky).
+</div>
+<div class="fix">
+<b>Fix 3 — Enable speculative decoding (MTP):</b><br>
+<code>--speculative-config '{"method":"mtp","num_speculative_tokens":5}'</code><br>
+2–3× speedup for models with MTP support (GLM-5.3 Flash, DeepSeek V4 Flash).
+</div>
+<div class="fix">
+<b>Fix 4 — For single-user, switch to ExLlamaV2/TabbyAPI:</b><br>
+vLLM is built for production multi-user serving. For single-user, ExLlamaV2 via TabbyAPI is 2–3× faster.<br>
+<code>python -m exllamav2.server --model model.exl2</code>
+</div>
+<div class="fix">
+<b>Fix 5 — Enable prefix caching:</b><br>
+<code>--enable-prefix-caching</code><br>
+Caches repeated prefixes (system prompts, tool schemas). 50–90% speedup for workloads with repeated prefixes.
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 7 ===================== -->
+<section id="s7">
+<h2 class="section"><span class="num">7.</span><span class="emoji">🔴</span>Issue #6: AMD ROCm performance issues</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #6 — AMD GPU underperforming</div>
+<h3>AMD GPU inference is slow or unstable compared to NVIDIA</h3>
+<div class="symptom">
+<b>Symptoms:</b> AMD RX 7900 XTX performs worse than expected · ROCm crashes or produces errors · Inference is 2–3× slower than equivalent NVIDIA GPU<br>
+<b>Root cause:</b> ROCm (AMD's CUDA equivalent) is less mature than CUDA. Many inference engines optimize for CUDA first, with ROCm as a secondary path.
+</div>
+<div class="fix">
+<b>Fix 1 — Set ROCm environment variables:</b><br>
+<code>export HSA_OVERRIDE_GFX_VERSION=11.0.0</code> (for RDNA3 GPUs like 7900 XTX)<br>
+<code>export VLLM_ROCM_USE_AITER=1</code> (enables AMD-optimized attention)<br>
+These are critical — without them, ROCm falls back to slow paths.
+</div>
+<div class="fix">
+<b>Fix 2 — Use GGUF (llama.cpp) instead of vLLM:</b><br>
+llama.cpp has better ROCm support than vLLM. If vLLM is slow on AMD, try llama.cpp with <code>HIPBLAS=1</code>.
+</div>
+<div class="fix">
+<b>Fix 3 — Check HIP SDK version:</b><br>
+<code>hipconfig --version</code> — needs 6.0+ for good LLM inference<br>
+Older ROCm versions have significant performance regressions.
+</div>
+<div class="fix">
+<b>Fix 4 — For consumer AMD GPUs, try the "skip ROCm" approach:</b><br>
+Some community projects bypass ROCm entirely for consumer AMD GPUs, achieving 4× speedup. Look for HIPDirect or Vulkan-based inference engines.
+</div>
+<div class="fix">
+<b>Fix 5 — Accept the NVIDIA premium:</b><br>
+If AMD performance is unacceptable for your use case, NVIDIA GPUs (even older ones like RTX 3090) often outperform newer AMD GPUs for LLM inference due to CUDA ecosystem maturity.
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 8 ===================== -->
+<section id="s8">
+<h2 class="section"><span class="num">8.</span><span class="emoji">🍏</span>Issue #7: Apple Silicon (MLX) slow inference</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #7 — Apple Silicon performance</div>
+<h3>Mac M-series GPU performance is lower than expected for LLM inference</h3>
+<div class="symptom">
+<b>Symptoms:</b> M3/M4/M5 Max or Ultra runs LLMs slower than equivalent-cost NVIDIA GPU · Token speed doesn't scale with more GPU cores · MLX inference is slower than expected<br>
+<b>Root cause:</b> Apple Silicon's GPU architecture is optimized for graphics, not LLM compute. Memory bandwidth (819 GB/s on M3 Ultra, 1.2 TB/s on M5 Ultra) is lower than NVIDIA data-center GPUs (3.35+ TB/s on H100).
+</div>
+<div class="fix">
+<b>Fix 1 — Use MLX instead of llama.cpp Metal:</b><br>
+MLX is Apple's native ML framework, optimized for unified memory architecture. Often 1.5–2× faster than llama.cpp Metal backend on Apple Silicon.
+</div>
+<div class="fix">
+<b>Fix 2 — Ensure model fits entirely in unified memory:</b><br>
+Apple Silicon's advantage is unified memory — no VRAM/RAM split needed. But if the model + KV cache exceeds available memory, macOS swaps to SSD, causing 10–100× slowdown.<br>
+Check: <code>vm_stat</code> — if "swapins" are non-zero, you're swapping.
+</div>
+<div class="fix">
+<b>Fix 3 — Set thread count for MLX:</b><br>
+<code>export MLX_NUM_THREADS=8</code> (set to performance cores, not efficiency cores)<br>
+Apple Silicon has mixed P-cores and E-cores. Default may use E-cores, which are much slower.
+</div>
+<div class="fix">
+<b>Fix 4 — Use GGUF Q4_K_M via Ollama (simplest):</b><br>
+<code>ollama run llama3.3:70b-q4_K_M</code><br>
+Ollama automatically handles Metal acceleration and thread management. If manual tuning doesn't help, Ollama is the reliable fallback.
+</div>
+<div class="fix">
+<b>Fix 5 — Accept the bandwidth limitation:</b><br>
+Apple Silicon trades GPU compute for unified memory capacity. A Mac Studio M5 Ultra with 512GB unified memory runs models that no NVIDIA consumer GPU can — just slower per token. The tradeoff is capacity vs speed.
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 9 ===================== -->
+<section id="s9">
+<h2 class="section"><span class="num">9.</span><span class="emoji">🖥️</span>Issue #8: CPU-only inference optimization</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #8 — CPU-only inference</div>
+<h3>Running LLM inference on CPU only (no GPU)</h3>
+<div class="symptom">
+<b>Symptoms:</b> 2–5 tok/s for a 7B model on CPU · 0.5–2 tok/s for a 70B model · CPU at 100% across all cores<br>
+<b>Root cause:</b> CPU inference is memory-bandwidth-bound. The CPU must read all model weights from RAM for every token generated. Speed is limited by RAM bandwidth (not CPU clock speed).
+</div>
+<div class="fix">
+<b>Fix 1 — Set thread count to physical cores:</b><br>
+<code>llama-cli -m model.gguf -t 8 -ngl 0</code> (8 physical cores, 0 GPU layers)<br>
+Using logical cores (hyperthreading) can reduce performance by 20–30%.
+</div>
+<div class="fix">
+<b>Fix 2 — Check CPU instruction set:</b><br>
+<code>lscpu | grep -i avx</code> — AVX-512 is 2–3× faster than AVX2<br>
+Without AVX-512 or AVX2, CPU inference is impractically slow. Check before buying a CPU for LLM inference.
+</div>
+<div class="fix">
+<b>Fix 3 — Use Q4_K_M or lower quantization:</b><br>
+Lower quant = smaller model = less data to read from RAM per token = faster<br>
+Q4_K_M is the sweet spot. Q2_K is faster but with noticeable quality loss.
+</div>
+<div class="fix">
+<b>Fix 4 — Use DDR5 RAM (critical for CPU inference):</b><br>
+DDR5-6400 provides ~100 GB/s bandwidth vs DDR4-3200's ~50 GB/s<br>
+CPU inference speed scales directly with RAM bandwidth. DDR5 is ~2× faster than DDR4 for LLM inference.
+</div>
+<div class="fix">
+<b>Fix 5 — Enable NUMA awareness (multi-socket systems):</b><br>
+<code>llama-cli -m model.gguf -t 32 --numa</code><br>
+On dual-socket systems, NUMA ensures memory access stays local to each CPU, avoiding cross-socket latency.
+</div>
+<div class="fix">
+<b>Fix 6 — Consider KTransformers for hybrid CPU+GPU:</b><br>
+KTransformers uses CPU for MoE expert layers and GPU for attention layers — best of both worlds for MoE models like DeepSeek V4.
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 10 ===================== -->
+<section id="s10">
+<h2 class="section"><span class="num">10.</span><span class="emoji">🔗</span>Issue #9: Multi-GPU slower than single GPU</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #9 — Multi-GPU regression</div>
+<h3>Using 2+ GPUs is slower than 1 GPU for the same model</h3>
+<div class="symptom">
+<b>Symptoms:</b> Adding a second GPU doesn't improve speed · Multi-GPU is actually slower than single-GPU · High latency between GPUs<br>
+<b>Root cause:</b> Inter-GPU communication (over PCIe or NVLink) becomes the bottleneck. If GPUs can't share data fast enough, they spend time waiting instead of computing.
+</div>
+<div class="fix">
+<b>Fix 1 — Check GPU interconnect:</b><br>
+<code>nvidia-smi topo -m</code> — look for "NVLink" (fast) vs "PCIe" (slow)<br>
+Without NVLink, multi-GPU is limited by PCIe bandwidth. PCIe 4.0 x16 = ~64 GB/s; NVLink = ~300+ GB/s.
+</div>
+<div class="fix">
+<b>Fix 2 — Use tensor parallelism (not pipeline parallelism):</b><br>
+<code>--tensor-parallel-size 2</code> (vLLM) — splits each layer across GPUs<br>
+Pipeline parallelism (splitting layers across GPUs) has higher latency. Tensor parallelism is faster but requires NVLink.
+</div>
+<div class="fix">
+<b>Fix 3 — Try layer split before tensor split (llama.cpp):</b><br>
+<code>llama-cli -m model.gguf -ngl 999 -sm row</code><br>
+llama.cpp's <code>-sm row</code> splits layers across GPUs. Simpler than tensor parallelism.
+</div>
+<div class="fix">
+<b>Fix 4 — Check if NCCL is available (vLLM):</b><br>
+<code>python -c "import torch.distributed; print(torch.distributed.is_nccl_available())"</code><br>
+NCCL (NVIDIA Collective Communications Library) is critical for multi-GPU performance. If not available, vLLM falls back to slower communication.
+</div>
+<div class="fix">
+<b>Fix 5 — Accept single-GPU for models that fit:</b><br>
+If the model fits on one GPU, single-GPU is always faster. Multi-GPU only helps when the model <em>doesn't fit</em> on one GPU.
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 11 ===================== -->
+<section id="s11">
+<h2 class="section"><span class="num">11.</span><span class="emoji">🔄</span>Issue #10: Format/runtime mismatch</h2>
+
+<div class="issue-card">
+<div class="issue-num">Issue #10 — Wrong format or runtime</div>
+<h3>Using a quantization format or runtime that doesn't match your hardware</h3>
+<div class="symptom">
+<b>Symptoms:</b> Using GGUF on NVIDIA with full VRAM fit (leaving speed on the table) · Using AWQ on CPU (doesn't work) · Using GPTQ in 2026 (legacy) · Using vLLM for single-user (wrong tool for the job)
+</div>
+<div class="fix">
+<b>Fix 1 — If model fits entirely in VRAM on NVIDIA → use EXL2:</b><br>
+EXL2 is 2–3× faster than GGUF on NVIDIA when the model fits entirely in VRAM.<br>
+<code>python -m exllamav2.server --model model.exl2</code>
+</div>
+<div class="fix">
+<b>Fix 2 — If model DOESN'T fit in VRAM → use GGUF:</b><br>
+GGUF is the only format that offloads to CPU. All others (EXL2, AWQ, GPTQ) require full VRAM fit.
+</div>
+<div class="fix">
+<b>Fix 3 — If using GPTQ → switch to AWQ:</b><br>
+AWQ provides better quality at the same 4-bit width and is better supported in vLLM. GPTQ is legacy.
+</div>
+<div class="fix">
+<b>Fix 4 — If single-user on NVIDIA → consider TabbyAPI/ExLlamaV2 over vLLM:</b><br>
+vLLM is optimized for multi-user throughput. For single-user, ExLlamaV2 via TabbyAPI is 2–3× faster.
+</div>
+<div class="fix">
+<b>Fix 5 — If on AMD → use GGUF (llama.cpp with HIPBLAS):</b><br>
+EXL2 doesn't support AMD. AWQ has limited ROCm support. GGUF via llama.cpp is the most reliable AMD path.
+</div>
+<div class="fix">
+<b>Fix 6 — If on Apple Silicon → use GGUF via Ollama or MLX:</b><br>
+Neither EXL2 nor AWQ support Apple Silicon. GGUF via Ollama is the simplest path; MLX is faster for some models.
+</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 12 ===================== -->
+<section id="s12">
+<h2 class="section"><span class="num">12.</span><span class="emoji">📈</span>The optimization waterfall — cumulative impact</h2>
+
+<p class="lede">Here's what happens when you apply optimizations cumulatively. Each builds on the previous one. The total improvement can be 5× or more.</p>
+
+<figure class="wide">
+<img src="inference-optimization-waterfall.png" alt="Waterfall chart showing cumulative token speed improvement from 7 optimizations: Flash Attention, thread tuning, quantization, KV cache FP8, MTP, context reduction, and EXL2 switch.">
+<figcaption><b>Figure 2.</b> Cumulative optimization impact for a 70B model on RTX 5090 (32GB). Starting at 12 tok/s (baseline, no optimization), each fix adds speed. The biggest wins: quantization (Q8→Q4, +56%), MTP speculative decoding (+31%), and switching from GGUF to EXL2 (+35%). Total improvement: 12 → 65 tok/s (442%).</figcaption>
+</figure>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 1. Optimization priority — which fixes give the most impact, ranked by speed improvement.</caption>
+<thead>
+<tr>
+<th>Priority</th>
+<th>Optimization</th>
+<th>Typical speedup</th>
+<th>Difficulty</th>
+<th>When to apply</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="num">1</td><td class="term">Quantize to Q4 (from Q8 or BF16)</td><td class="num"><span class="score s">+56%</span></td><td>Easy</td><td>Always — Q4 is the standard</td></tr>
+<tr><td class="num">2</td><td class="term">Switch GGUF → EXL2 (if fits in VRAM)</td><td class="num"><span class="score s">+35%</span></td><td>Medium</td><td>NVIDIA GPU with sufficient VRAM</td></tr>
+<tr><td class="num">3</td><td class="term">Enable MTP speculative decoding</td><td class="num"><span class="score a">+31%</span></td><td>Easy</td><td>Model has MTP draft layer</td></tr>
+<tr><td class="num">4</td><td class="term">Enable Flash Attention</td><td class="num"><span class="score a">+25%</span></td><td>Easy</td><td>Always — no downside</td></tr>
+<tr><td class="num">5</td><td class="term">Reduce context to actual needed</td><td class="num"><span class="score a">+17%</span></td><td>Easy</td><td>When using long context unnecessarily</td></tr>
+<tr><td class="num">6</td><td class="term">Set --threads to physical cores</td><td class="num"><span class="score b">+15%</span></td><td>Easy</td><td>When using CPU offload</td></tr>
+<tr><td class="num">7</td><td class="term">Enable KV cache FP8</td><td class="num"><span class="score b">+12%</span></td><td>Easy</td><td>Long context (16K+) on Blackwell</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="takeaway">
+<div class="label">The 80/20 of inference optimization</div>
+<p>Three optimizations give 80% of the total improvement: <strong>(1) quantize to Q4</strong> (biggest single win), <strong>(2) switch from GGUF to EXL2 if the model fits in VRAM</strong> (2–3× speedup on NVIDIA), and <strong>(3) enable MTP speculative decoding</strong> (2–3× speedup for compatible models). Apply these three first, then fine-tune with the others.</p>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 13 ===================== -->
+<section id="s13">
+<h2 class="section"><span class="num">13.</span><span class="emoji">🔧</span>Quick-reference diagnostic commands</h2>
+
+<p class="lede">Copy-paste these commands to diagnose any inference performance issue.</p>
+
+<pre><code># ====== NVIDIA GPU DIAGNOSTICS ======
+
+# Check GPU utilization (refresh every 1 second)
+nvidia-smi -l 1
+
+# Check VRAM usage
+nvidia-smi --query-gpu=memory.used,memory.total --format=csv
+
+# Check GPU topology (NVLink vs PCIe for multi-GPU)
+nvidia-smi topo -m
+
+# Check GPU temperature (thermal throttling?)
+nvidia-smi --query-gpu=temperature.gpu --format=csv -l 1
+
+# ====== CPU DIAGNOSTICS ======
+
+# Check CPU utilization during inference
+htop  # or: top
+
+# Check CPU instruction set support (AVX-512 critical for CPU inference)
+lscpu | grep -i avx
+
+# Check RAM type and speed
+dmidecode -t memory | grep -i speed
+
+# Check NUMA topology (multi-socket systems)
+numactl --hardware
+
+# ====== LLAMA.CPP BENCHMARKING ======
+
+# Benchmark model performance
+llama-bench -m model.gguf -ngl 0    # CPU only
+llama-bench -m model.gguf -ngl -1   # Full GPU offload
+llama-bench -m model.gguf -ngl 20   # Partial offload (20 layers)
+
+# Run with Flash Attention
+llama-cli -m model.gguf -ngl -1 -fa -t 8 -p "Hello"
+
+# Run with KV cache offload to RAM
+llama-cli -m model.gguf -ngl 20 -nkvo -t 8
+
+# Run with KV cache FP8 quantization
+llama-cli -m model.gguf -ngl -1 --cache-type-k q4_0 --cache-type-v q4_0
+
+# ====== VLLM DIAGNOSTICS ======
+
+# Start vLLM with full diagnostics
+vllm serve model \
+  --tensor-parallel-size 1 \
+  --max-num-seqs 256 \
+  --max-num-batched-tokens 8192 \
+  --gpu-memory-utilization 0.90 \
+  --enable-prefix-caching
+
+# Benchmark vLLM throughput
+vllm bench serve \
+  --backend vllm \
+  --model model \
+  --dataset-name random \
+  --random-input-len 8192 \
+  --random-output-len 1024 \
+  --max-concurrency 16
+
+# ====== AMD ROCM DIAGNOSTICS ======
+
+# Set AMD environment variables
+export HSA_OVERRIDE_GFX_VERSION=11.0.0  # RDNA3 (7900 XTX)
+export VLLM_ROCM_USE_AITER=1             # AMD-optimized attention
+
+# Check ROCm version
+hipconfig --version
+
+# Check AMD GPU utilization
+rocm-smi  # AMD equivalent of nvidia-smi
+
+# ====== APPLE SILICON DIAGNOSTICS ======
+
+# Check unified memory usage
+vm_stat  # Look for swapins (should be 0)
+
+# Check if swapping (SSD fallback = 100x slowdown)
+sysctl vm.swapusage  # swap_used should be 0
+
+# Set MLX thread count
+export MLX_NUM_THREADS=8  # Set to performance cores
+
+# ====== QUICK HEALTH CHECK SCRIPT ======
+# Run this to get a full system snapshot:
+echo "=== GPU ===" && nvidia-smi --query-gpu=name,memory.total,memory.used,utilization.gpu --format=csv
+echo "=== CPU ===" && lscpu | grep -E "Model name|AVX|Core" 
+echo "=== RAM ===" && free -h
+echo "=== Model size ===" && ls -lh model.gguf
+echo "=== Expected VRAM needed ===" && echo "Q4_K_M: ~0.6 * model_size_in_GB"</code></pre>
+
+</section>
+
+</article>
+
+<footer class="paper-footer">
+<p><b>What you've learned.</b> The three most common inference bottlenecks in 2026 are CPU offload (GGUF with insufficient VRAM), KV cache pressure (long context without FP8 KV), and format/runtime mismatch (GGUF when EXL2 would fit). The three highest-impact optimizations are: quantize to Q4 (+56%), switch GGUF→EXL2 (+35%), and enable MTP speculative decoding (+31%). Start with the diagnostic flowchart (Figure 1), identify your bottleneck, apply the specific fix from the issue cards, then apply the optimization waterfall (Figure 2) for cumulative speedup.</p>
+
+<p><b>Sources.</b> "Why Your LLM Inference Is Slow (And How to Fix It)" (Spheron, Mar 2026) · "How to fix vLLM OOM: the complete 2026 checklist" (Apr 2026) · "The 5 llama.cpp Parameters That Actually Matter" (Medium, May 2026) · "Why Your Local LLM Is Slow — llama.cpp Config Guide" (OmniForge, Apr 2026) · "Local LLM Inference Optimization: The Complete Guide" (Jun 2026) · "Practical strategies for vLLM performance tuning" (Mar 2026) · "Resolving AMD GPU Performance Issues with Local AI" (r/LocalLLaMA) · "A Practical Guide to Running LLMs on AMD Radeon GPUs" (Jun 2026) · "Best CPU for LLMs in 2026: What Actually Matters" (Jun 2026) · llama.cpp documentation · vLLM optimization guide.</p>
+
+<div class="license">
+<b>License.</b> This guide is released under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>. Code examples are released under MIT license.
+</div>
+</footer>
+
+
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <a href="ai-inference-hardware-2026.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">AI Inference Hardware 2026</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Complete 2026 catalog of AI inference hardware across NVIDIA, AMD, Apple Silicon, and CPU options with pricing and VRAM guidance.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="low-resource-ai-agents-research-paper.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Maximum Capability from Minimum Silicon</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">A research paper on maximizing 8 GB GPU + 32 GB RAM workstations for AI agent workloads.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="top-20-inference-providers-2026.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Top 20 GPU Rental Providers 2026</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Compare per-hour GPU rental pricing for H100, A100, B200 across 20 providers.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                </div>
+            </div>
+
+            <h2 class="section-title">About the Author</h2>
+                <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
+
+                <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+
+                <p style="margin-top: 30px;"><em>Last Updated: August 28, 2026 | Version 1.0</em></p>
+            </div>
+        </div>
+    </article>
+
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>

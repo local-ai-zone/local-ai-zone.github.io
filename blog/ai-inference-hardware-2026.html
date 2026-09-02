@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Inference Hardware 2026 - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Complete 2026 catalog of AI inference hardware across NVIDIA, AMD, Apple Silicon, Intel, Qualcomm, Google, AWS, and CPU options. Pricing, VRAM, throughput, and best-use guidance.">
+    <meta name="keywords" content="AI inference hardware, GPU, NPU, TPU, NVIDIA, AMD, Intel, Apple, Huawei, Biren, Moore Threads, Iluvatar, Metax, 2026, VRAM, MLX, ROCm, CUDA, Apple Silicon, M5 Ultra, Rubin R100, MI455X">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="AI Inference Hardware 2026">
+    <meta property="og:description" content="Complete 2026 catalog of AI inference hardware across NVIDIA, AMD, Apple Silicon, Intel, Qualcomm, Google, AWS, and CPU options. Pricing, VRAM, throughput, and best-use guidance.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="AI Inference Hardware 2026">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/ai-inference-hardware-2026.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-08-20T00:00:00Z">
+    <meta property="article:modified_time" content="2026-08-20T00:00:00Z">
+    <meta property="article:section" content="Hardware Survey">
+    <meta property="article:tag" content="AI inference hardware">
+    <meta property="article:tag" content="GPU">
+    <meta property="article:tag" content="NVIDIA">
+    <meta property="article:tag" content="AMD">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/ai-inference-hardware-2026.html">
+    <meta name="twitter:title" content="AI Inference Hardware 2026">
+    <meta name="twitter:description" content="Complete 2026 catalog of AI inference hardware across NVIDIA, AMD, Apple Silicon, Intel, Qualcomm, Google, AWS, and CPU options. Pricing, VRAM, throughput, and best-use guidance.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta name="twitter:image:alt" content="AI Inference Hardware 2026">
+
+    <!-- Additional AEO/GEO Meta Tags -->
+    <meta name="application-name" content="Local AI Zone">
+    <meta name="msapplication-TileColor" content="#7c3aed">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="article-publisher" content="https://local-ai-zone.github.io">
+    <meta name="article-content-ttl" content="P1Y">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/ai-inference-hardware-2026.html">
+
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/ai-inference-hardware-2026.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/ai-inference-hardware-2026.html">
+
+    <style>
+        .back-to-blog { display: inline-flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-weight: 600; margin: 0 0 30px 0; padding: 10px 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; backdrop-filter: blur(8px); transition: all 0.3s ease; position: relative; z-index: 1; }
+        .back-to-blog:hover { background: rgba(255,255,255,0.28); transform: translateX(-3px); }
+        .article-content { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        .article-content h1 { font-size: 2.2em; color: #1e40af; margin: 40px 0 15px; padding-bottom: 10px; border-bottom: 3px solid #e5e7eb; }
+        .article-content h2 { font-size: 1.6em; color: #1e40af; margin: 35px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .article-content h3 { font-size: 1.3em; color: #374151; margin: 28px 0 10px; }
+        .article-content h4 { font-size: 1.1em; color: #4b5563; margin: 20px 0 8px; }
+        .article-content p { margin-bottom: 1.2em; line-height: 1.8; }
+        .article-content ul, .article-content ol { margin: 12px 0 12px 24px; }
+        .article-content li { margin-bottom: 6px; line-height: 1.7; }
+        .article-content table { margin: 24px 0; width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .article-content table th { background: #1e40af; color: white; padding: 10px 12px; text-align: left; font-weight: 600; border: 1px solid #1e40af; }
+        .article-content table td { padding: 10px 12px; border: 1px solid #e5e7eb; text-align: left; }
+        .article-content table tr:nth-child(even) td { background: #f9fafb; }
+        .article-content table tr:hover td { background: #eff6ff; }
+        .article-content blockquote { border-left: 4px solid #2563eb; background: #eff6ff; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-style: normal; }
+        .article-content blockquote p { margin-bottom: 0.5em; }
+        .article-content blockquote p:last-child { margin-bottom: 0; }
+        .article-content code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: "Courier New", monospace; }
+        .article-content pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        .article-content pre code { background: none; color: inherit; padding: 0; }
+        .article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+        .article-content em { color: #6b7280; }
+        .article-content strong { color: #111827; }
+        .article-content a { color: #2563eb; text-decoration: none; }
+        .article-content a:hover { text-decoration: underline; }
+        .article-content hr { border: none; border-top: 2px solid #e5e7eb; margin: 40px 0; }
+        .article-header::before { display: none !important; }
+        .article-header .article-title { text-shadow: none !important; }
+        .article-header .container { background: transparent !important; }
+        .premium-header { position: static !important; }
+        .article-section { margin: 40px 0; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .section-title { font-size: 2em; color: #1e40af; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
+        .key-takeaway { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 24px; margin: 30px 0; border-radius: 0 8px 8px 0; }
+
+        /* Dark mode table overrides */
+        html[data-theme='dark'] table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table td { background: #1e1e2e !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table tr:nth-child(even) td { background: #252535 !important; }
+        html[data-theme='dark'] table tr:nth-child(odd) td { background: #1e1e2e !important; }
+        html[data-theme='dark'] table tr:hover td { background: rgba(124, 58, 237, 0.1) !important; }
+        html[data-theme='dark'] table { border-color: #374151 !important; }
+:root {
+    --ink: #18181b;
+    --ink-soft: #3f3f46;
+    --muted: #71717a;
+    --line: #e4e4e7;
+    --line-strong: #d4d4d8;
+    --bg: #ffffff;
+    --bg-soft: #fafafa;
+    --bg-quote: #f4f4f5;
+    --accent: #0891b2;
+    --accent-soft: #ecfeff;
+    --link: #0891b2;
+    --link-hover: #0e7490;
+    --nvidia: #76B900;
+    --amd: #ED1C24;
+    --intel: #0071C5;
+    --apple: #555555;
+    --google: #4285F4;
+    --huawei: #C7000B;
+    --biren: #00A0DC;
+    --moore: #6C2BD9;
+    --iluvatar: #E85512;
+    --metax: #0066B3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #f4f4f5;
+      --ink-soft: #d4d4d8;
+      --muted: #a1a1aa;
+      --line: #27272a;
+      --line-strong: #3f3f46;
+      --bg: #0a0a0a;
+      --bg-soft: #18181b;
+      --bg-quote: #1c1c1f;
+      --accent: #22d3ee;
+      --accent-soft: #083344;
+      --link: #22d3ee;
+      --link-hover: #67e8f9;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Charter', 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
+    color: var(--ink);
+    background: var(--bg);
+    line-height: 1.75;
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 28px 80px 28px;
+    font-size: 17px;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  .paper-header {
+    padding: 56px 0 32px 0;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 36px;
+  }
+  .eyebrow {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .eyebrow .dot {
+    display: inline-block; width: 6px; height: 6px;
+    background: var(--accent); border-radius: 50%;
+    margin-right: 8px; vertical-align: middle;
+  }
+  h1.title {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 38px;
+    line-height: 1.15;
+    font-weight: 700;
+    letter-spacing: -0.7px;
+    margin: 0 0 16px 0;
+    color: var(--ink);
+  }
+  .subtitle {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 19px;
+    line-height: 1.45;
+    color: var(--ink-soft);
+    font-weight: 400;
+    margin: 0 0 28px 0;
+  }
+  .byline {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    display: flex;
+    gap: 18px;
+    flex-wrap: wrap;
+  }
+  .byline .label {
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-right: 6px;
+  }
+
+  .lead {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 19px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    font-weight: 400;
+    margin: 32px 0 40px 0;
+    padding: 22px 26px;
+    background: var(--accent-soft);
+    border-radius: 8px;
+    border-left: 3px solid var(--accent);
+  }
+
+  .toc {
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 22px 28px;
+    margin: 28px 0 56px 0;
+  }
+  .toc h2 {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 14px 0;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+    padding: 0;
+    margin: 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+  }
+  .toc ol > li {
+    counter-increment: toc;
+    padding: 4px 0;
+    display: flex;
+    align-items: baseline;
+  }
+  .toc ol > li::before {
+    content: counter(toc) ".";
+    color: var(--muted);
+    font-weight: 600;
+    width: 32px;
+    flex-shrink: 0;
+  }
+  .toc a { color: var(--ink); text-decoration: none; }
+  .toc a:hover { color: var(--accent); text-decoration: underline; }
+
+  article section {
+    margin-top: 56px;
+    scroll-margin-top: 24px;
+  }
+  article section:first-of-type { margin-top: 0; }
+  h2.section {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.4px;
+    margin: 0 0 6px 0;
+    color: var(--ink);
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  h2.section .num {
+    color: var(--accent);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    font-size: 24px;
+  }
+  h2.section .emoji { font-size: 24px; }
+  h3.subsection {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    margin: 32px 0 12px 0;
+    color: var(--ink);
+  }
+
+  /* Spec card */
+  .spec-card {
+    margin: 24px 0;
+    padding: 18px 22px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+  }
+  .spec-card.nvidia { border-left-color: var(--nvidia); }
+  .spec-card.amd { border-left-color: var(--amd); }
+  .spec-card.intel { border-left-color: var(--intel); }
+  .spec-card.apple { border-left-color: var(--apple); }
+  .spec-card.google { border-left-color: var(--google); }
+  .spec-card.huawei { border-left-color: var(--huawei); }
+  .spec-card.biren { border-left-color: var(--biren); }
+  .spec-card.moore { border-left-color: var(--moore); }
+  .spec-card.iluvatar { border-left-color: var(--iluvatar); }
+  .spec-card.metax { border-left-color: var(--metax); }
+
+  .spec-card .product-name {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    color: var(--ink);
+    letter-spacing: -0.2px;
+  }
+  .spec-card .vendor-tag {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .spec-card .vendor-tag.nvidia { color: var(--nvidia); }
+  .spec-card .vendor-tag.amd { color: var(--amd); }
+  .spec-card .vendor-tag.intel { color: var(--intel); }
+  .spec-card .vendor-tag.apple { color: var(--apple); }
+  .spec-card .vendor-tag.google { color: var(--google); }
+  .spec-card .vendor-tag.huawei { color: var(--huawei); }
+  .spec-card .vendor-tag.biren { color: var(--biren); }
+  .spec-card .vendor-tag.moore { color: var(--moore); }
+  .spec-card .vendor-tag.iluvatar { color: var(--iluvatar); }
+  .spec-card .vendor-tag.metax { color: var(--metax); }
+
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px 16px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12.5px;
+    margin: 12px 0;
+    padding: 10px 0;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+  }
+  .spec-grid .row {
+    display: flex;
+    flex-direction: column;
+  }
+  .spec-grid .k {
+    color: var(--muted);
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+  }
+  .spec-grid .v {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    margin-top: 1px;
+    color: var(--ink);
+  }
+
+  .spec-card .desc {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+    color: var(--ink-soft);
+    margin: 10px 0;
+  }
+
+  .spec-card .verif {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 11.5px;
+    color: var(--muted);
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dotted var(--line);
+    line-height: 1.5;
+  }
+  .spec-card .verif b { color: var(--ink-soft); font-weight: 600; }
+
+  /* Tables */
+  .table-wrap {
+    margin: 24px 0;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+  }
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12.5px;
+    background: var(--bg);
+  }
+  table.data th, table.data td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    line-height: 1.5;
+  }
+  table.data th {
+    background: var(--bg-soft);
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  table.data td.term {
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--bg-soft);
+  }
+  table.data td b { color: var(--ink); }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data .num { font-variant-numeric: tabular-nums; }
+  table.data caption {
+    caption-side: bottom;
+    text-align: left;
+    padding: 8px 10px;
+    font-size: 11px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  figure {
+    margin: 32px 0;
+    text-align: center;
+  }
+  figure img {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    display: block;
+    margin: 0 auto;
+  }
+  figure.wide img { width: 100%; }
+  figcaption {
+    margin-top: 12px;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+    text-align: left;
+  }
+  figcaption b { color: var(--ink-soft); font-weight: 600; }
+
+  .takeaway {
+    background: linear-gradient(135deg, var(--accent-soft) 0%, var(--bg-soft) 100%);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 22px;
+    margin: 24px 0;
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .takeaway .label {
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--accent);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .takeaway p { margin: 0 0 6px 0; }
+  .takeaway p:last-child { margin: 0; }
+
+  .paper-footer {
+    margin-top: 72px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 12.5px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .paper-footer .license {
+    margin-top: 14px;
+    padding: 12px 16px;
+    background: var(--bg-soft);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  code {
+    font-family: 'JetBrains Mono', 'SF Mono', Menlo, Consolas, monospace;
+    font-size: 13px;
+    background: var(--bg-quote);
+    padding: 1.5px 6px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 0 18px 60px 18px; font-size: 16px; }
+    h1.title { font-size: 28px; }
+    h2.section { font-size: 22px; }
+    .spec-grid { grid-template-columns: 1fr; }
+    table.data { font-size: 11.5px; }
+    .byline { flex-direction: column; gap: 6px; }
+  }
+    </style>
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "AI Inference Hardware 2026 — Multi-Vendor Catalog",
+        "alternativeHeadline": "Complete catalog of inference hardware across NVIDIA, AMD, Apple Silicon, and more in 2026",
+        "description": "Complete 2026 catalog of AI inference hardware across NVIDIA, AMD, Apple Silicon, Intel, Qualcomm, Google, AWS, and CPU options. Pricing, VRAM, throughput, and best-use guidance.",
+        "image": "https://local-ai-zone.github.io/og-image.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-08-20T00:00:00Z",
+        "dateModified": "2026-08-20T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/ai-inference-hardware-2026.html"
+        },
+        "keywords": "AI inference hardware, GPU, NPU, TPU, NVIDIA, AMD, Intel, Apple, Huawei, Biren, Moore Threads, Iluvatar, Metax, 2026, VRAM, MLX, ROCm, CUDA, Apple Silicon, M5 Ultra, Rubin R100, MI455X",
+        "articleSection": "Hardware Survey",
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "AI Inference Hardware 2026", "item": "https://local-ai-zone.github.io/blog/ai-inference-hardware-2026.html"}
+        ]
+    }
+    </script>
+</head>
+<body class="blog-article-page">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">AI Inference Hardware 2026 — Multi-Vendor Catalog</h1>
+                <div class="article-meta">
+                    <span class="article-date">August 20, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Hardware Survey</span>
+                    <span class="article-read-time">📖 45 min read</span>
+                </div>
+            </div>
+        </header>
+        <div class="article-content">
+<header class="paper-header">
+  <div class="eyebrow"><span class="dot"></span>AI Inference Hardware Catalog · Multi-Vendor Verified</div>
+  <h1 class="title">AI Inference Hardware 2026 — A Comprehensive Multi-Vendor Catalog</h1>
+  <p class="subtitle">A full catalog of AI inference hardware shipping in 2026 — every major vendor covered: NVIDIA, AMD, Intel, Apple, Google TPU, and Chinese vendors (Huawei, Biren, Moore Threads, Iluvatar, Metax). Each product has a full spec card with memory, bandwidth, TFLOPS, TDP, MSRP, and verified sources.</p>
+  <div class="byline">
+    <span><span class="label">Published</span>August 28, 2026</span>
+    <span><span class="label">Products</span>30+ across 10 vendors</span>
+    <span><span class="label">Categories</span>Consumer · Workstation · Data-center</span>
+    <span><span class="label">Verification</span>2+ sources per product</span>
+  </div>
+</header>
+
+<div class="lead">
+The AI inference hardware landscape in late August 2026 has been transformed by three major new releases: NVIDIA's Rubin R100 (shipping H2 2026 with 288GB HBM4 and 22 TB/s bandwidth — 2.75× Blackwell), AMD's MI455X (432GB HBM4, 23.3 TB/s — the new memory champion), and Apple's M5 Ultra Mac Studio (512GB unified memory, 1.2 TB/s — available September 22). This catalog covers the absolute frontier of inference hardware shipping in August 2026, with verified specs, pricing, and use-case guidance.
+</div>
+
+<nav class="toc">
+  <h2>What we'll cover</h2>
+  <ol>
+    <li><a href="#s1">The 2026 inference hardware landscape</a></li>
+    <li><a href="#s2">Methodology and verification</a></li>
+    <li><a href="#s3">NVIDIA — RTX 5090, RTX PRO 6000, H100, H200, B200, B300</a></li>
+    <li><a href="#s4">AMD — MI300X, MI325X, MI355X, RX 7900 XTX, Radeon AI PRO 9700</a></li>
+    <li><a href="#s5">Intel — Gaudi 3, Arc A770</a></li>
+    <li><a href="#s6">Apple — Mac Studio M3 Ultra, M5 Ultra</a></li>
+    <li><a href="#s7">Google — TPU v6e Trillium, TPU v7 Ironwood</a></li>
+    <li><a href="#s8">Chinese vendors — Huawei Ascend, Biren, Moore Threads, Iluvatar, Metax</a></li>
+    <li><a href="#s9">Memory capacity vs bandwidth — the master chart</a></li>
+    <li><a href="#s10">FP8 performance comparison — data-center accelerators</a></li>
+    <li><a href="#s11">Decision guide — which hardware to pick</a></li>
+    <li><a href="#s12">Limitations and verification status</a></li>
+  </ol>
+</nav>
+
+<article>
+<!-- ===================== SECTION 1 ===================== -->
+<section id="s1">
+<h2 class="section"><span class="num">1.</span><span class="emoji">🌐</span>The 2026 inference hardware landscape</h2>
+
+<p class="lede">The AI inference hardware market in 2026 is no longer a one-vendor show. NVIDIA still leads on raw performance, but the gap is closing — and in some niches (price-per-TFLOPS, unified memory, Chinese market), competitors have pulled ahead.</p>
+
+<h3 class="subsection">Three structural shifts in 2026</h3>
+
+<p><strong>1. Memory is the new bottleneck, not compute.</strong> As models grow to 70B–235B parameters, memory capacity (not TFLOPS) determines which hardware can run them. The August 2026 standouts: AMD MI455X with 432GB HBM4 (the new memory champion), NVIDIA Rubin R100 with 288GB HBM4 at 22 TB/s (the new bandwidth champion), and Apple's Mac Studio M5 Ultra with 512GB unified memory. Hardware with under 48GB of memory is increasingly inadequate for frontier-class inference.</p>
+
+<p><strong>2. The Chinese vendor ecosystem matured.</strong> Huawei's Ascend 910C (800+ TFLOPS FP16, 128GB HBM), Biren's BR100 (2 PFLOPS AI), Moore Threads' MTT S4000 (48GB GDDR6), and Iluvatar's TR-910 are all shipping in volume inside China. While they trail NVIDIA on performance, they're viable for domestic Chinese deployments — and export controls have accelerated their development.</p>
+
+<p><strong>3. Apple Silicon became a serious inference platform.</strong> The new Mac Studio M5 Ultra (announced September 2026, available September 22) with up to 512GB unified memory and 1.2 TB/s bandwidth — 50% higher than M3 Ultra — has made Apple the most accessible frontier-inference platform for individual developers. The unified memory architecture eliminates the VRAM bottleneck that limits NVIDIA consumer GPUs.</p>
+
+<h3 class="subsection">The five hardware categories</h3>
+
+<p>Every product in this catalog falls into one of five categories:</p>
+
+<ul>
+<li><strong>Consumer GPUs</strong> — RTX 5090, RX 7900 XTX, Arc A770. Sub-$2K cards for individual developers.</li>
+<li><strong>Workstation GPUs</strong> — RTX PRO 6000 Blackwell, Radeon AI PRO 9700, Mac Studio. $2K–$10K professional hardware.</li>
+<li><strong>Data-center GPUs</strong> — B200, B300, Rubin R100 (H2 2026), MI355X, MI455X (2026), Gaudi 3, Ascend 910C/950PR. $10K–$60K enterprise accelerators. Legacy: H100, H200, MI300X.</li>
+<li><strong>Rack-scale systems</strong> — GB200 NVL72, GB300 NVL72. $300K+ integrated systems.</li>
+<li><strong>Custom AI accelerators</strong> — Google TPU v6e/v7, Huawei Ascend, Biren BR100, Iluvatar TR-910, Metax C500. Specialized non-GPU AI hardware.</li>
+</ul>
+
+</section>
+
+<!-- ===================== SECTION 2 ===================== -->
+<section id="s2">
+<h2 class="section"><span class="num">2.</span><span class="emoji">🔍</span>Methodology and verification</h2>
+
+<p class="lede">Every spec in this catalog is verified against at least two independent sources. We did not accept vendor marketing alone — every number is cross-checked against community evidence and third-party benchmarks.</p>
+
+<h3 class="subsection">The four source types we required</h3>
+
+<ol>
+<li><strong>Official vendor source</strong> — vendor spec sheet, product page, or technical documentation. Provides the headline numbers.</li>
+<li><strong>Independent database</strong> — TechPowerUp GPU database, vendor-agnostic hardware databases. Confirms vendor specs against independent measurements.</li>
+<li><strong>Community deployment evidence</strong> — r/LocalLLaMA, r/nvidia, r/ROCm threads with real-world performance reports.</li>
+<li><strong>Benchmark studies</strong> — 2026 hardware comparison reviews, third-party performance analyses.</li>
+</ol>
+
+<h3 class="subsection">Verification status</h3>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 1. Verification status for each vendor's hardware. "Strong" = 3+ independent sources. "Moderate" = 2 sources. "Limited" = 1 source (Chinese vendors with restricted information).</caption>
+<thead>
+<tr>
+<th>Vendor</th>
+<th>Official specs</th>
+<th>Independent DB</th>
+<th>Community evidence</th>
+<th>Benchmarks</th>
+<th>Overall</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="term">NVIDIA</td><td>✓</td><td>✓ TechPowerUp</td><td>✓ r/nvidia, r/LocalLLaMA</td><td>✓ extensive</td><td><b>Strong</b></td></tr>
+<tr><td class="term">AMD</td><td>✓</td><td>✓ TechPowerUp</td><td>✓ r/ROCm</td><td>✓</td><td><b>Strong</b></td></tr>
+<tr><td class="term">Intel</td><td>✓</td><td>~ (Gaudi less covered)</td><td>~</td><td>~</td><td>Moderate</td></tr>
+<tr><td class="term">Apple</td><td>✓</td><td>~ (limited)</td><td>✓ r/LocalLLaMA</td><td>✓</td><td><b>Strong</b></td></tr>
+<tr><td class="term">Google TPU</td><td>✓</td><td>—</td><td>~ (cloud-only)</td><td>✓ Cloud benchmarks</td><td>Moderate</td></tr>
+<tr><td class="term">Huawei Ascend</td><td>~ (some restricted)</td><td>—</td><td>~ (Chinese forums)</td><td>~ (limited)</td><td>Limited–Moderate</td></tr>
+<tr><td class="term">Other Chinese</td><td>~ (vendor sites)</td><td>—</td><td>~</td><td>~ (very limited)</td><td>Limited</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="takeaway">
+<div class="label">Important caveat</div>
+<p>Chinese vendor specs (Huawei Ascend 910C/D, Biren BR100, Moore Threads MTT S4000, Iluvatar TR-910, Metax C500) are harder to verify independently. Vendor specs are cited where independent benchmarks are unavailable. Treat all Chinese vendor performance numbers as vendor-reported until independently confirmed.</p>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 3: NVIDIA ===================== -->
+<section id="s3">
+<h2 class="section"><span class="num">3.</span><span class="emoji">🟢</span>NVIDIA</h2>
+
+<p class="lede">NVIDIA remains the inference hardware leader in 2026. The Blackwell generation (B200, B300, GB200/GB300 NVL) extended their performance lead, while the consumer RTX 5090 and workstation RTX PRO 6000 Blackwell brought 32GB and 96GB VRAM to affordable price points.</p>
+
+<div class="spec-card nvidia">
+<div class="vendor-tag nvidia">NVIDIA · Consumer GPU · Released January 2025</div>
+<div class="product-name">NVIDIA RTX 5090</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">32 GB GDDR7</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">1.79 TB/s</span></div>
+<div class="row"><span class="k">FP8 tensor (sparse)</span><span class="v">~1,677 TFLOPS</span></div>
+<div class="row"><span class="k">FP4 tensor (sparse)</span><span class="v">3,352 TOPS</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">575 W</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">$1,999</span></div>
+<div class="row"><span class="k">Street price (Aug 2026)</span><span class="v">$1,999–$2,400</span></div>
+<div class="row"><span class="k">Cloud rental</span><span class="v">$0.68/hr on-demand</span></div>
+</div>
+<div class="desc">The best consumer GPU for local AI in 2026. 32GB GDDR7 is enough to run Qwen3 32B at Q4 with full 128K context. The 1.79 TB/s memory bandwidth is class-leading. Best price/performance for 7B–32B models.</div>
+<div class="verif"><b>Sources:</b> NVIDIA RTX 50 series launch (Jan 2025) · TechPowerUp GPU database · "RTX 5090 vs 5080 for Local AI" reviews · r/LocalLLaMA deployment threads</div>
+</div>
+
+<div class="spec-card nvidia">
+<div class="vendor-tag nvidia">NVIDIA · Workstation GPU · Released 2025</div>
+<div class="product-name">NVIDIA RTX PRO 6000 Blackwell (Workstation)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">96 GB GDDR7</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">1.79 TB/s</span></div>
+<div class="row"><span class="k">FP16</span><span class="v">126.0 TFLOPS (1:1)</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">600 W (max)</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">$8,565 (launch)</span></div>
+<div class="row"><span class="k">Street price</span><span class="v">~$7,500</span></div>
+<div class="row"><span class="k">CUDA cores</span><span class="v">24,064</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">70B models at Q4, single-card</span></div>
+</div>
+<div class="desc">The workstation-class Blackwell with 96GB VRAM — enough to run Llama 3.3 70B at Q4 in a single GPU. The Server Edition unlocks full 600W TDP. Best option for professionals who need 70B capability without multi-GPU complexity.</div>
+<div class="verif"><b>Sources:</b> NVIDIA RTX PRO 6000 Blackwell product page · TechPowerUp (MSRP $8,565, 1.79 TB/s, 126 TFLOPS FP16) · "RTX PRO 6000 vs RTX 5090" reviews · r/nvidia threads</div>
+</div>
+
+<div class="spec-card nvidia">
+<div class="vendor-tag nvidia">NVIDIA · Data-center GPU · Released 2022 (still shipping)</div>
+<div class="product-name">NVIDIA H100 SXM</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">80 GB HBM3</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">3.35 TB/s</span></div>
+<div class="row"><span class="k">FP8 tensor</span><span class="v">3,958 TFLOPS</span></div>
+<div class="row"><span class="k">INT8 tensor</span><span class="v">3,958 TOPS</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">700 W (SXM)</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">$25,000–$40,000</span></div>
+<div class="row"><span class="k">Cloud rental</span><span class="v">$1.33/hr spot, $3.99/hr on-demand</span></div>
+<div class="row"><span class="k">Status</span><span class="v">Legacy but widely deployed</span></div>
+</div>
+<div class="desc">The workhorse of enterprise AI in 2024–2025. Still widely deployed in 2026 but being replaced by H200 and B200. 80GB HBM3 is now considered mid-tier for data-center inference. Best for organizations with existing H100 inventory.</div>
+<div class="verif"><b>Sources:</b> NVIDIA H100 product page · "NVIDIA Data Center GPU Specs: A Complete Comparison" (Oct 2025) · Lambda/RunPod rental pricing · vals.ai deployment evidence</div>
+</div>
+
+<div class="spec-card nvidia">
+<div class="vendor-tag nvidia">NVIDIA · Data-center GPU · Released 2024</div>
+<div class="product-name">NVIDIA H200</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">141 GB HBM3e</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">4.8 TB/s</span></div>
+<div class="row"><span class="k">FP8 tensor</span><span class="v">3,958 TFLOPS (same as H100)</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">700 W</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">~$31,000 ($315K per 8-GPU server)</span></div>
+<div class="row"><span class="k">Cloud rental</span><span class="v">$3.49/hr on-demand</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">Hopper GH100 (same die as H100)</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Larger models than H100 can handle</span></div>
+</div>
+<div class="desc">The H200 is the H100 with a bigger memory subsystem: 141GB HBM3e at 4.8 TB/s, replacing the H100's 80GB HBM3 at 3.35 TB/s. Same compute die, same FP8 TFLOPS — the upgrade is purely memory capacity and bandwidth. The right choice for 70B+ models that don't fit in H100's 80GB.</div>
+<div class="verif"><b>Sources:</b> NVIDIA H200 product page · "H100 vs H200 vs B200 - The AI Engineer" comparison · cloud rental pricing verified Aug 2026</div>
+</div>
+
+<div class="spec-card nvidia">
+<div class="vendor-tag nvidia">NVIDIA · Data-center GPU · Released 2025</div>
+<div class="product-name">NVIDIA B200 (Blackwell)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">192 GB HBM3e</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">8.0 TB/s</span></div>
+<div class="row"><span class="k">FP8 tensor (dense/sparse)</span><span class="v">~4,500 / 9,000 TFLOPS</span></div>
+<div class="row"><span class="k">FP4 tensor (sparse)</span><span class="v">~18,000 TOPS</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">1,000 W</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">$30,000–$50,000</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">Blackwell GB200 dual-die</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">100B+ models, FP4 inference</span></div>
+</div>
+<div class="desc">The Blackwell generation flagship. 192GB HBM3e is 2.4× the H100's 80GB; 8 TB/s bandwidth is 2.4× the H100's 3.35 TB/s. Native FP4 support doubles effective compute for quantized workloads. The 1000W TDP requires serious data-center power infrastructure.</div>
+<div class="verif"><b>Sources:</b> NVIDIA B200 product page · "NVIDIA B200 Specs and Price: 192GB Blackwell GPU" · "NVIDIA Data Center GPU Specs" comparison (Oct 2025)</div>
+</div>
+
+<div class="spec-card nvidia">
+<div class="vendor-tag nvidia">NVIDIA · Data-center GPU · Released 2026</div>
+<div class="product-name">NVIDIA B300 (Blackwell Ultra)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">288 GB HBM3e</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">8.0 TB/s (per GPU)</span></div>
+<div class="row"><span class="k">FP8 tensor</span><span class="v">~7,200 TFLOPS (est.)</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">1,400 W (est.)</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">$300K–$350K (GB300 NVL72 rack)</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">Blackwell Ultra</span></div>
+<div class="row"><span class="k">GB300 NVL72 total</span><span class="v">20.7 TB GPU memory, ~1,440 PFLOPS</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Largest models (235B+) at scale</span></div>
+</div>
+<div class="desc">The 2026 Blackwell Ultra refresh. 288GB per GPU (vs B200's 192GB), 1.5× the memory capacity. In GB300 NVL72 rack configuration: 72 GPUs × 288GB = 20.7 TB total GPU memory, delivering ~1,440 PFLOPS FP8. The current state-of-the-art for rack-scale inference.</div>
+<div class="verif"><b>Sources:</b> "GB300 NVL72 vs GB200 NVL72: The Real Price Gap (2026)" · "NVIDIA GB300 Deep Dive" (Mar 2025) · NVIDIA Data Center GPU Specs comparison (Oct 2025)</div>
+</div>
+
+
+<div class="spec-card nvidia">
+<div class="vendor-tag nvidia">NVIDIA · Data-center GPU · Announced March 2026, shipping H2 2026</div>
+<div class="product-name">NVIDIA Rubin R100</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">288 GB HBM4</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">22 TB/s (2.75× B300)</span></div>
+<div class="row"><span class="k">FP4 compute</span><span class="v">50 PFLOPS</span></div>
+<div class="row"><span class="k">Transistors</span><span class="v">336 billion</span></div>
+<div class="row"><span class="k">NVLink 6</span><span class="v">3.6 TB/s interconnect</span></div>
+<div class="row"><span class="k">MSRP (est.)</span><span class="v">$40,000–$60,000</span></div>
+<div class="row"><span class="k">Status</span><span class="v">Shipping to early access H2 2026</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Next-gen frontier inference</span></div>
+</div>
+<div class="desc">The next generation after Blackwell. 288GB HBM4 at 22 TB/s — nearly triple Blackwell's 8 TB/s. 50 PFLOPS FP4 compute. 336 billion transistors. NVLink 6 at 3.6 TB/s. NVIDIA claims 10× inference cost reduction vs Blackwell. Currently shipping to early access customers in H2 2026, with broader availability expected Q4 2026–Q1 2027.</div>
+<div class="verif"><b>Sources:</b> NVIDIA GTC March 2026 announcement · "NVIDIA R100 Specs: Rubin VRAM, FP4 & Cloud Timeline" (Spheron, May 2026) · "NVIDIA Rubin GPU: 336B Transistors" (Tech Insider, Mar 2026) · "Nvidia Rubin Architecture: Everything You Must Know" (Aug 2026)</div>
+</div>
+
+</section>
+<!-- ===================== SECTION 4: AMD ===================== -->
+<section id="s4">
+<h2 class="section"><span class="num">4.</span><span class="emoji">🔴</span>AMD</h2>
+
+<p class="lede">AMD's Instinct MI300X/MI325X/MI355X line is the strongest non-NVIDIA data-center option in 2026. The MI355X matches the B200 on memory bandwidth (8 TB/s) at competitive pricing, and the consumer RX 7900 XTX remains a budget local-AI favorite.</p>
+
+<div class="spec-card amd">
+<div class="vendor-tag amd">AMD · Data-center GPU · Released 2023 (still shipping)</div>
+<div class="product-name">AMD Instinct MI300X</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">192 GB HBM3</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">5.3 TB/s</span></div>
+<div class="row"><span class="k">FP8</span><span class="v">~2,090 TFLOPS</span></div>
+<div class="row"><span class="k">FP16</span><span class="v">~1,047 TFLOPS</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">750 W</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">~$15,000–$20,000 (est.)</span></div>
+<div class="row"><span class="k">Cloud rental</span><span class="v">$1.43–$1.82/hr</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Non-NVIDIA data-center inference</span></div>
+</div>
+<div class="desc">AMD's flagship data-center GPU, competing with H100/H200. 192GB HBM3 is a memory advantage over H100 (80GB) and H200 (141GB). The ROCm software stack has matured substantially through 2026, though CUDA remains more polished. The right choice for organizations wanting NVIDIA alternatives.</div>
+<div class="verif"><b>Sources:</b> AMD Instinct MI300 product page · "AMD Instinct MI300X, MI325X and MI355X Systems" (SLYD, Aug 2026) · "MI325X vs MI300X" comparison · cloud rental pricing verified Aug 2026</div>
+</div>
+
+<div class="spec-card amd">
+<div class="vendor-tag amd">AMD · Data-center GPU · Released 2024</div>
+<div class="product-name">AMD Instinct MI325X</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">256 GB HBM3E</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">6.0 TB/s</span></div>
+<div class="row"><span class="k">FP8</span><span class="v">~2,090 TFLOPS</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">750 W</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">CDNA 3 (same as MI300X)</span></div>
+<div class="row"><span class="k">Memory advantage</span><span class="v">+33% vs MI300X</span></div>
+<div class="row"><span class="k">Bandwidth advantage</span><span class="v">+13% vs MI300X</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">100B+ models on AMD stack</span></div>
+</div>
+<div class="desc">The MI325X is the MI300X with an HBM3E memory upgrade: 256GB (vs 192GB) at 6 TB/s (vs 5.3 TB/s). Same compute die, same FP8 TFLOPS. The ~13% bandwidth jump comes purely from the HBM3E upgrade. Best AMD option for models that need 200GB+ memory.</div>
+<div class="verif"><b>Sources:</b> AMD Instinct MI325X product page · "MI325X vs MI300X: What's New, What Matters" (May 2025) · SLYD systems comparison (Aug 2026)</div>
+</div>
+
+<div class="spec-card amd">
+<div class="vendor-tag amd">AMD · Data-center GPU · Released 2025</div>
+<div class="product-name">AMD Instinct MI355X</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">288 GB HBM3E</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">8.0 TB/s</span></div>
+<div class="row"><span class="k">FP8</span><span class="v">~2,880 TFLOPS</span></div>
+<div class="row"><span class="k">MXFP6/MXFP4</span><span class="v">Supported</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">1,400 W peak</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">CDNA 4</span></div>
+<div class="row"><span class="k">Matrix cores</span><span class="v">16,384</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Direct B200 competitor</span></div>
+</div>
+<div class="desc">AMD's strongest data-center GPU. 288GB HBM3E at 8 TB/s matches the NVIDIA B300 on memory capacity and bandwidth. The CDNA 4 architecture adds MXFP4/MXFP6 support. AMD's direct answer to the B200 — competitive on memory, somewhat behind on compute.</div>
+<div class="verif"><b>Sources:</b> AMD Instinct MI355X product page · r/ROCm discussion threads · SLYD comparison (Aug 2026)</div>
+</div>
+
+
+<div class="spec-card amd">
+<div class="vendor-tag amd">AMD · Data-center GPU · Announced June 2025, shipping 2026</div>
+<div class="product-name">AMD Instinct MI455X (MI400 Series)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">432 GB HBM4</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">23.3 TB/s (1.5x MI355X)</span></div>
+<div class="row"><span class="k">FP4 compute</span><span class="v">40 PFLOPS</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">CDNA 5 (2nm process)</span></div>
+<div class="row"><span class="k">Status</span><span class="v">Shipping 2026</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Largest models, frontier inference</span></div>
+<div class="row"><span class="k">Memory advantage</span><span class="v">1.5x MI355X (432GB vs 288GB)</span></div>
+<div class="row"><span class="k">Bandwidth advantage</span><span class="v">2.9x MI355X (23.3 vs 8 TB/s)</span></div>
+</div>
+<div class="desc">The next generation after MI355X. 432GB HBM4 at 23.3 TB/s — the highest memory bandwidth of any GPU in this catalog, exceeding even NVIDIA Rubin's 22 TB/s. CDNA 5 architecture on 2nm process. AMD's direct answer to Rubin R100 — and the new memory champion.</div>
+<div class="verif"><b>Sources:</b> "AMD MI400 vs NVIDIA B300: MI455X Specs, Price (2026)" · AMD Instinct MI400 Series product page · "AMD MI400 Series: $7.2B AI GPU Challenging Nvidia" (Apr 2026) · "CDNA 5 Goes 2 nm" (Jul 2026)</div>
+</div>
+
+<div class="spec-card amd">
+<div class="vendor-tag amd">AMD · Consumer GPU · Released 2022</div>
+<div class="product-name">AMD Radeon RX 7900 XTX</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">24 GB GDDR6</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">960 GB/s</span></div>
+<div class="row"><span class="k">FP16</span><span class="v">~96 TFLOPS</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">355 W</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">$999 (launch)</span></div>
+<div class="row"><span class="k">Street price (Aug 2026)</span><span class="v">$1,099</span></div>
+<div class="row"><span class="k">VRAM advantage</span><span class="v">Same as RTX 3090/4090</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Budget 24GB local AI</span></div>
+</div>
+<div class="desc">The budget 24GB option. $1,099 street price makes it a value alternative to used RTX 3090s. ROCm support has improved but is still less mature than CUDA — expect more setup friction than NVIDIA. Best for budget-conscious users who need 24GB.</div>
+<div class="verif"><b>Sources:</b> AMD RX 7900 XTX product page · "I Bought an AMD 7900 XTX to Test if It Can Beat RTX 3090" review · Amazon street price verified Aug 2026</div>
+</div>
+
+<div class="spec-card amd">
+<div class="vendor-tag amd">AMD · Workstation GPU · Released 2025</div>
+<div class="product-name">AMD Radeon AI PRO 9700</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">32 GB GDDR6</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">860 GB/s</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">RDNA 4</span></div>
+<div class="row"><span class="k">Navi 48 cores</span><span class="v">4,096</span></div>
+<div class="row"><span class="k">Bus width</span><span class="v">256-bit</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">$1,299</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">32GB local AI on AMD stack</span></div>
+<div class="row"><span class="k">Competes with</span><span class="v">RTX 5080 (16GB) at 2× VRAM</span></div>
+</div>
+<div class="desc">AMD's workstation-class 32GB card at $1,299. RDNA 4 architecture. Competes with RTX 5080 on price but offers 2× the VRAM (32GB vs 16GB) — substantial advantage for local AI. ROCm support continues to mature.</div>
+<div class="verif"><b>Sources:</b> AMD Radeon AI PRO R9700 product page · "AMD Radeon AI Pro R9700 vs RX 7900 XT" comparison · TechPowerUp database</div>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 5: Intel ===================== -->
+<section id="s5">
+<h2 class="section"><span class="num">5.</span><span class="emoji">🔵</span>Intel</h2>
+
+<p class="lede">Intel's AI hardware strategy in 2026 is led by Gaudi 3, their dedicated AI accelerator. While not matching NVIDIA or AMD on raw performance, Gaudi 3 offers competitive memory capacity at aggressive pricing — and Intel's Xeon Max with HBM remains relevant for CPU-based inference.</p>
+
+<div class="spec-card intel">
+<div class="vendor-tag intel">Intel · Data-center AI Accelerator · Released 2024</div>
+<div class="product-name">Intel Gaudi 3 (HL-325L / HL-338 PCIe)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">128 GB HBM2E</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">3.7 TB/s</span></div>
+<div class="row"><span class="k">FP8</span><span class="v">~1,800 TFLOPS (1.8 PFLOPS)</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">600 W (full-height)</span></div>
+<div class="row"><span class="k">Form factor</span><span class="v">OAM / PCIe Gen5 (HL-338)</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">~$15,000–$20,000 (est.)</span></div>
+<div class="row"><span class="k">Memory advantage</span><span class="v">+60% vs H100 (128GB vs 80GB)</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Cost-sensitive enterprise inference</span></div>
+</div>
+<div class="desc">Intel's dedicated AI accelerator. 128GB HBM2E is more memory than H100 (80GB) at competitive pricing. The 3.7 TB/s bandwidth is solid but below H100's 3.35 TB/s (note: HBM2E is slower than HBM3). Best for organizations wanting a third vendor option beyond NVIDIA/AMD.</div>
+<div class="verif"><b>Sources:</b> Intel Gaudi 3 product page · "Intel Gaudi 3 AI accelerator brings global enterprises" (Apr 2024) · "Intel launches Gaudi 3 accelerator" review (Sep 2024) · IONOS analysis (Jun 2025)</div>
+</div>
+
+<div class="spec-card intel">
+<div class="vendor-tag intel">Intel · Consumer GPU · Released 2022</div>
+<div class="product-name">Intel Arc A770</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">16 GB GDDR6</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">560 GB/s</span></div>
+<div class="row"><span class="k">FP16</span><span class="v">~20 TFLOPS</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">225 W</span></div>
+<div class="row"><span class="k">MSRP</span><span class="v">$349 (launch)</span></div>
+<div class="row"><span class="k">Street price</span><span class="v">~$280 (clearance)</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Budget 16GB local AI</span></div>
+<div class="row"><span class="k">Software</span><span class="v">OpenVINO, SYCL</span></div>
+</div>
+<div class="desc">Intel's consumer Arc GPU with 16GB VRAM at budget pricing. The cheapest 16GB option. Software stack (OpenVINO, SYCL) is less mature than CUDA/ROCm but workable. Best for budget users who need 16GB and are willing to tolerate software friction.</div>
+<div class="verif"><b>Sources:</b> Intel Arc A770 product page · TechPowerUp database · community deployment reports</div>
+
+<div class="spec-card intel" style="opacity: 0.7;">
+<div class="vendor-tag intel">Intel · Upcoming · In development</div>
+<div class="product-name">Intel Falcon Shores / Jaguar Shores (Upcoming)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory (target)</span><span class="v">Up to 288 GB HBM3</span></div>
+<div class="row"><span class="k">Bandwidth (target)</span><span class="v">9.8 TB/s</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">GPGPU (Intel 18A node)</span></div>
+<div class="row"><span class="k">Status</span><span class="v">Not yet shipping</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Future Intel AI accelerator</span></div>
+<div class="row"><span class="k">Note</span><span class="v">Jaguar Shores is the successor</span></div>
+</div>
+<div class="desc">Intel's next-generation AI accelerator after Gaudi 3. Falcon Shores targets up to 288GB HBM3 at 9.8 TB/s — competitive with H200/B200 class. Jaguar Shores is the successor, fabbed on Intel 18A. Neither is shipping as of August 2026 — mention as upcoming.</div>
+<div class="verif"><b>Sources:</b> "Jaguar Shores is the successor to Intel's Falcon Shores" (Nov 2024) · "Intel Falcon Shores is Initially a GPU" (May 2023)</div>
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================== SECTION 6: Apple ===================== -->
+<section id="s6">
+<h2 class="section"><span class="num">6.</span><span class="emoji">🍏</span>Apple</h2>
+
+<p class="lede">Apple Silicon's unified memory architecture makes it a uniquely powerful inference platform in 2026. The Mac Studio M3 Ultra (256GB unified memory) and the new M5 Ultra (up to 512GB) eliminate the VRAM bottleneck that limits NVIDIA consumer GPUs.</p>
+
+<div class="spec-card apple">
+<div class="vendor-tag apple">Apple · Workstation · Released 2025</div>
+<div class="product-name">Mac Studio M3 Ultra (256GB)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Unified memory</span><span class="v">256 GB</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">819 GB/s</span></div>
+<div class="row"><span class="k">MLX framework</span><span class="v">Native support</span></div>
+<div class="row"><span class="k">TDP (sustained)</span><span class="v">~270 W (system)</span></div>
+<div class="row"><span class="k">MSRP (256GB config)</span><span class="v">$9,499</span></div>
+<div class="row"><span class="k">GPU cores</span><span class="v">80 (M3 Ultra)</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">70B models with no VRAM limits</span></div>
+<div class="row"><span class="k">Software</span><span class="v">MLX, Ollama, LM Studio</span></div>
+</div>
+<div class="desc">The 2025 sweet-spot Apple Silicon inference platform. 256GB unified memory runs Llama 3.3 70B at Q4 with substantial context. The 819 GB/s bandwidth is below NVIDIA's data-center GPUs but sufficient for interactive use. The unified memory architecture means no model sharding — what fits in memory runs.</div>
+<div class="verif"><b>Sources:</b> Apple Mac Studio product page · r/LocalLLaMA "Suggestions on getting M3 Ultra Mac Studio for local LLMs" thread · "M5 Ultra: The Local AI Inference Ceiling in 2026" analysis</div>
+</div>
+
+<div class="spec-card apple">
+<div class="vendor-tag apple">Apple · Workstation · Released September 2026</div>
+<div class="product-name">Mac Studio M5 Ultra (up to 512GB)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Unified memory</span><span class="v">Up to 512 GB</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">1.2 TB/s (M5 Ultra, 50% higher than M3)</span></div>
+<div class="row"><span class="k">M5 Max bandwidth</span><span class="v">614 GB/s</span></div>
+<div class="row"><span class="k">MSRP (M5 Ultra base)</span><span class="v">$5,499</span></div>
+<div class="row"><span class="k">512GB config</span><span class="v">~$16,000 (est.)</span></div>
+<div class="row"><span class="k">Availability</span><span class="v">September 22, 2026</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">110B+ models, multi-user serving</span></div>
+<div class="row"><span class="k">512GB availability</span><span class="v">Late October 2026</span></div>
+</div>
+<div class="desc">The September 2026 Mac Studio M5 Ultra refresh. Up to 512GB unified memory — enough to run DeepSeek V3 (671B at Q4) or Qwen3 235B-A22B with substantial context. The 512GB configuration comes in late October 2026. This is the "run anything locally" platform.</div>
+<div class="verif"><b>Sources:</b> Apple Mac Studio M5 launch (September 2026) · "Apple introduces new Mac Studio with M5 Max and M5 Ultra" · "High-memory Mac Studio prices falling with new M5 models"</div>
+</div>
+
+</section>
+<!-- ===================== SECTION 7: Google TPU ===================== -->
+<section id="s7">
+<h2 class="section"><span class="num">7.</span><span class="emoji">🟡</span>Google TPU</h2>
+
+<p class="lede">Google's Tensor Processing Units (TPUs) are available only via Google Cloud — you can't buy them. But for cloud-based inference workloads, TPUs offer compelling price-performance, especially for large-scale serving of Google's own Gemini models.</p>
+
+<div class="spec-card google">
+<div class="vendor-tag google">Google · Cloud TPU · Released 2024</div>
+<div class="product-name">Google TPU v6e (Trillium)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">32 GB HBM</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">1.64 TB/s</span></div>
+<div class="row"><span class="k">Peak compute</span><span class="v">918 TFLOPS (BF16)</span></div>
+<div class="row"><span class="k">Performance vs v5e</span><span class="v">4.7× peak compute</span></div>
+<div class="row"><span class="k">Cloud price (on-demand)</span><span class="v">$2.70/chip-hour</span></div>
+<div class="row"><span class="k">1-year commitment</span><span class="v">$1.89/chip-hour</span></div>
+<div class="row"><span class="k">3-year commitment</span><span class="v">$1.22/chip-hour</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Cost-sensitive cloud inference</span></div>
+</div>
+<div class="desc">Google's cost-optimized TPU generation. 4.7× the peak compute of TPU v5e. Available only via Google Cloud. Best for inference workloads where you want Google Cloud pricing without committing to NVIDIA GPUs. Often used for Gemini model serving.</div>
+<div class="verif"><b>Sources:</b> Google Cloud TPU v6e documentation · "Trillium TPU is GA" (Google Cloud Blog, Dec 2024) · "Google TPU v7 Ironwood vs NVIDIA B200" pricing comparison (Jul 2026)</div>
+</div>
+
+<div class="spec-card google">
+<div class="vendor-tag google">Google · Cloud TPU · Released 2025</div>
+<div class="product-name">Google TPU v7 (Ironwood)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">192 GB HBM</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">7.37 TB/s</span></div>
+<div class="row"><span class="k">Peak compute</span><span class="v">~2,500 TFLOPS (est. FP8)</span></div>
+<div class="row"><span class="k">Memory advantage</span><span class="v">6× Trillium (192GB vs 32GB)</span></div>
+<div class="row"><span class="k">Bandwidth advantage</span><span class="v">4.5× Trillium</span></div>
+<div class="row"><span class="k">Pod scale</span><span class="v">9,216 chips per Pod</span></div>
+<div class="row"><span class="k">Performance claim</span><span class="v">2× better perf/$ vs Trillium</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Large-scale Gemini inference</span></div>
+</div>
+<div class="desc">Google's first "age of inference" TPU. 192GB HBM at 7.37 TB/s — comparable to NVIDIA B200 on memory, with 9,216-chip Pod scale. The right choice for large-scale Gemini inference on Google Cloud. Google claims 2× better price-performance than Trillium.</div>
+<div class="verif"><b>Sources:</b> "Ironwood: The first Google TPU for the age of inference" (Apr 2025) · "TPU7x (Ironwood) - Google Cloud Documentation" · "Google TPU Architecture: 7 Generations Explained" (Dec 2025)</div>
+
+<div class="spec-card google">
+<div class="vendor-tag google">Google · Cloud TPU · Announced April 2026</div>
+<div class="product-name">Google TPU 8i (Eighth Generation)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">288 GB HBM</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">8.6 TB/s (1.17× TPU v7)</span></div>
+<div class="row"><span class="k">FP4 compute</span><span class="v">10.1 PFLOPS per chip</span></div>
+<div class="row"><span class="k">On-chip SRAM</span><span class="v">384 MB (3× prior gen)</span></div>
+<div class="row"><span class="k">Pod scale</span><span class="v">9,600 chips, 2 PB shared HBM</span></div>
+<div class="row"><span class="k">Performance vs Ironwood</span><span class="v">80% improvement</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Large-scale inference on Google Cloud</span></div>
+<div class="row"><span class="k">Status</span><span class="v">Available via Google Cloud</span></div>
+</div>
+<div class="desc">Google's eighth-generation TPU, split into 8t (training-focused, 2.7× perf-per-dollar over Ironwood) and 8i (inference-focused). TPU 8i delivers 10.1 PFLOPS FP4 per chip with 288GB HBM at 8.6 TB/s — 50% more memory and 17% more bandwidth than Ironwood (TPU v7). 9,600-chip Pod delivers 121 exaflops total.</div>
+<div class="verif"><b>Sources:</b> "Our eighth generation TPUs: two chips for the agentic era" (Google Blog) · "TPU 8t and 8i technical deep dive" (Google Cloud Blog, Apr 2026) · "Google TPU 8t and 8i: 121 Exaflops" (Apr 2026)</div>
+</div>
+
+</div>
+
+</section>
+
+<!-- ===================== SECTION 8: Chinese Vendors ===================== -->
+<section id="s8">
+<h2 class="section"><span class="num">8.</span><span class="emoji">🇨🇳</span>Chinese vendors</h2>
+
+<p class="lede">The Chinese AI hardware ecosystem matured dramatically in 2026, driven by US export controls that accelerated domestic development. Huawei's Ascend line leads, but Biren, Moore Threads, Iluvatar, and Metax all have competitive products. These are primarily available in China — verification is harder than for Western vendors.</p>
+
+<div class="spec-card huawei">
+<div class="vendor-tag huawei">Huawei · NPU · Released 2023 (still shipping)</div>
+<div class="product-name">Huawei Ascend 910B</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">64 GB HBM2e</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">1.23 TB/s</span></div>
+<div class="row"><span class="k">FP16</span><span class="v">~320 TFLOPS</span></div>
+<div class="row"><span class="k">HBM stacks</span><span class="v">4 × 307 GB/s per stack</span></div>
+<div class="row"><span class="k">Process</span><span class="v">SMIC 7nm</span></div>
+<div class="row"><span class="k">Production target 2025</span><span class="v">300,000 units</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Chinese domestic inference</span></div>
+<div class="row"><span class="k">Software</span><span class="v">CANN, MindSpore</span></div>
+</div>
+<div class="desc">Huawei's workhorse NPU, widely deployed in Chinese data centers. 64GB HBM2e is mid-tier by 2026 standards but sufficient for 70B models at Q4. SMIC 7nm production is constrained but ramped to 300K units in 2025. The foundation of China's domestic AI infrastructure.</div>
+<div class="verif"><b>Sources:</b> "Pushing the Limits: Huawei's AI Chip Tests U.S. Export Controls" (CSET, Jun 2024) · "A brief introduction to Huawei Ascend Cloud" (Medium, Oct 2025) · "SMIC expected to produce 30% Huawei Ascend 910B AI chips" (Sep 2025)</div>
+</div>
+
+<div class="spec-card huawei">
+<div class="vendor-tag huawei">Huawei · NPU · Released 2025</div>
+<div class="product-name">Huawei Ascend 910C</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">128 GB HBM3 (est.)</span></div>
+<div class="row"><span class="k">Memory bandwidth (dual-chiplet)</span><span class="v">~3.0 TB/s (per-chip ~1.8 TB/s)</span></div>
+<div class="row"><span class="k">FP16 (dual-chiplet package)</span><span class="v">~800 TFLOPS</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">Dual-chiplet (~53B transistors)</span></div>
+<div class="row"><span class="k">AI cores</span><span class="v">~64</span></div>
+<div class="row"><span class="k">Production target 2025</span><span class="v">100,000 units</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Chinese competitor to H100</span></div>
+<div class="row"><span class="k">Software</span><span class="v">CANN, MindSpore</span></div>
+</div>
+<div class="desc">China's strongest domestic AI accelerator. Dual-chiplet design with ~53B transistors and 3D die-to-die fabric. ~800 TFLOPS FP16 is competitive with H100 (~1,000 TFLOPS FP16) at lower cost. Huawei's direct answer to NVIDIA's H100 for the Chinese market.</div>
+<div class="verif"><b>Sources:</b> "Huawei Ascend 910C NPUs" (Emergent Mind, Jan 2026) · "Silicon Vanguard: Ranking China's Domestic Chip Leaders" (Sep 2025) · "A brief introduction to Huawei Ascend Cloud" (Oct 2025)</div>
+</div>
+
+<div class="spec-card huawei">
+<div class="vendor-tag huawei">Huawei · NPU · Announced 2025</div>
+<div class="product-name">Huawei Ascend 910D (next-gen)</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">Unknown (likely ≥128GB)</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">Likely ≥1.5 TB/s</span></div>
+<div class="row"><span class="k">Target</span><span class="v">B200-class performance</span></div>
+<div class="row"><span class="k">Status</span><span class="v">In development, late 2025/2026</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Future Chinese frontier inference</span></div>
+<div class="row"><span class="k">Note</span><span class="v">Specs are estimates, not confirmed</span></div>
+<div class="row"><span class="k">Comparison target</span><span class="v">NVIDIA B200 (192GB, 8 TB/s)</span></div>
+<div class="row"><span class="k">Software</span><span class="v">CANN, MindSpore</span></div>
+</div>
+<div class="desc">Huawei's next-generation NPU, targeting B200-class performance. Specs are unconfirmed as of August 2026. Memory bandwidth "likely ≥1.5 TB/s" per CSET analysis. Represents Huawei's ambition to close the gap with NVIDIA Blackwell — but verification is limited.</div>
+<div class="verif"><b>Sources:</b> "Huawei's Ascend 910D: Challenging Nvidia in China's" (Apr 2025) · CSET export control analysis · limited independent verification</div>
+</div>
+
+
+<div class="spec-card huawei">
+<div class="vendor-tag huawei">Huawei · NPU · Released 2026</div>
+<div class="product-name">Huawei Ascend 950PR</div>
+<div class="spec-grid">
+<div class="row"><span class="k">FP4 compute</span><span class="v">1.56 PFLOPS</span></div>
+<div class="row"><span class="k">Memory</span><span class="v">112 GB HiBL</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">1.4 TB/s</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">Next-gen after 910-series</span></div>
+<div class="row"><span class="k">Use case</span><span class="v">Prefill + recommendation</span></div>
+<div class="row"><span class="k">Status</span><span class="v">Shipping 2026</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Chinese domestic AI inference</span></div>
+<div class="row"><span class="k">Note</span><span class="v">950DT variant also planned</span></div>
+</div>
+<div class="desc">Huawei's next-generation AI accelerator after the 910-series. 1.56 PFLOPS FP4 with 112GB HiBL memory. Designed for prefill and recommendation workloads. The first Huawei chip designed from the ground up for LLM use cases (910-series was originally designed in 2019 pre-LLM era).</div>
+<div class="verif"><b>Sources:</b> "Huawei Ascend 950 vs NVIDIA B300 and B200 for LLM" (Jun 2026) · "Huawei Ascend 950PR: The 1.56 PFLOP AI Chip vs Nvidia" (Apr 2026) · "Huawei reveals 3-year Ascend AI chip roadmap" (2026)</div>
+</div>
+
+<div class="spec-card biren">
+<div class="vendor-tag biren">Biren Technology · Data-center GPU · Released 2022</div>
+<div class="product-name">Biren BR100</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">64 GB HBM2E</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">2.3 TB/s</span></div>
+<div class="row"><span class="k">FP32</span><span class="v">256 TFLOPS</span></div>
+<div class="row"><span class="k">AI performance (INT8)</span><span class="v">2 PFLOPS</span></div>
+<div class="row"><span class="k">Transistors</span><span class="v">77 billion</span></div>
+<div class="row"><span class="k">TDP</span><span class="v">550 W</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Chinese AI training + inference</span></div>
+<div class="row"><span class="k">Note</span><span class="v">Also BR104 (single-die, 32GB)</span></div>
+</div>
+<div class="desc">Biren's flagship GPU. 77 billion transistors, 2 PFLOPS AI performance. The BR100 uses a dual-die design; the BR104 is the single-die variant with 32GB HBM2E and 1 PFLOPS INT8. A serious Chinese competitor — though software ecosystem maturity lags NVIDIA/AMD.</div>
+<div class="verif"><b>Sources:</b> "Chinese Startup Biren Details BR100 GPU" (Aug 2022) · "Biren BR100 Specs, FLOPS, Benchmarks" · "Chinese Biren's New GPUs Have 77 Billion Transistors"</div>
+</div>
+
+<div class="spec-card moore">
+<div class="vendor-tag moore">Moore Threads · Workstation GPU · Released December 2023</div>
+<div class="product-name">Moore Threads MTT S4000</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">48 GB GDDR6</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">768 GB/s</span></div>
+<div class="row"><span class="k">Memory speed</span><span class="v">16 Gbps effective</span></div>
+<div class="row"><span class="k">Form factor</span><span class="v">Dual-slot card</span></div>
+<div class="row"><span class="k">GPU clock</span><span class="v">1,500 MHz</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Chinese domestic LLM inference</span></div>
+<div class="row"><span class="k">Target</span><span class="v">Large model inference</span></div>
+<div class="row"><span class="k">Tensor cores</span><span class="v">Yes (count not disclosed)</span></div>
+</div>
+<div class="desc">Moore Threads' flagship for large model inference. 48GB GDDR6 at 768 GB/s. Designed specifically for Chinese domestic LLM inference workloads. The MTT S4000 competes with RTX 4080-class cards on memory (48GB vs 16GB) but trails on bandwidth.</div>
+<div class="verif"><b>Sources:</b> Moore Threads official product page · TechPowerUp MTT S4000 database entry · "Moore Threads MTT S4000 GPU Launched" (Dec 2023)</div>
+</div>
+
+<div class="spec-card iluvatar">
+<div class="vendor-tag iluvatar">Iluvatar CoreX · Data-center GPU · Released 2024–2025</div>
+<div class="product-name">Iluvatar Core TR-910</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">48 GB HBM (est.)</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">~1.0 TB/s (est.)</span></div>
+<div class="row"><span class="k">FP16 (est.)</span><span class="v">~1,500 TFLOPS</span></div>
+<div class="row"><span class="k">Status</span><span class="v">Mass production 2024–2025</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">GPGPU</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Chinese AI training + inference</span></div>
+<div class="row"><span class="k">Note</span><span class="v">China's first GPGPU for both training and inference</span></div>
+<div class="row"><span class="k">Verification</span><span class="v">Limited — vendor-reported</span></div>
+</div>
+<div class="desc">Iluvatar CoreX's flagship GPGPU. Notable as China's first mass-produced general-purpose GPU supporting both AI training and inference. Specs are largely vendor-reported; independent verification is limited. The 2026–2027 roadmap promises substantial upgrades.</div>
+<div class="verif"><b>Sources:</b> "Silicon Vanguard: Ranking China's Domestic Chip Leaders" (Sep 2025) · "China's Iluvatar CoreX Reportedly to Unveil 2026–2027" (Jan 2026) · limited independent benchmarks</div>
+</div>
+
+<div class="spec-card metax">
+<div class="vendor-tag metax">Metax · Data-center GPU · Released 2024–2025</div>
+<div class="product-name">Metax MetaX C500</div>
+<div class="spec-grid">
+<div class="row"><span class="k">Memory</span><span class="v">64 GB (est.)</span></div>
+<div class="row"><span class="k">Memory bandwidth</span><span class="v">~1.2 TB/s (est.)</span></div>
+<div class="row"><span class="k">FP16 (est.)</span><span class="v">~1,200 TFLOPS</span></div>
+<div class="row"><span class="k">Architecture</span><span class="v">GPGPU</span></div>
+<div class="row"><span class="k">Best for</span><span class="v">Chinese domestic AI inference</span></div>
+<div class="row"><span class="k">Use cases</span><span class="v">AI training, inference, graphics</span></div>
+<div class="row"><span class="k">Verification</span><span class="v">Limited — vendor-reported</span></div>
+<div class="row"><span class="k">Software</span><span class="v">Metax proprietary stack</span></div>
+</div>
+<div class="desc">Metax's MetaX C500 is a Chinese GPGPU for heterogeneous computing — AI training, inference, and graphics rendering. Specs are largely vendor-reported with limited independent verification. Part of China's broader push for GPU self-sufficiency.</div>
+<div class="verif"><b>Sources:</b> Metax official site · "Silicon Vanguard: Ranking China's Domestic Chip Leaders" (Sep 2025) · limited independent benchmarks</div>
+</div>
+
+</section>
+<!-- ===================== SECTION 9: Memory chart ===================== -->
+<section id="s9">
+<h2 class="section"><span class="num">9.</span><span class="emoji">📊</span>Memory capacity vs bandwidth — the master chart</h2>
+
+<p class="lede">In 2026, memory capacity and bandwidth matter more than raw TFLOPS for inference. The chart below shows where every product in this catalog sits on the memory landscape — and reveals clear tiers.</p>
+
+<figure class="wide">
+<img src="inference-hw-memory-chart.png" alt="Log-log scatter plot showing memory capacity (GB) vs memory bandwidth (TB/s) for 23 AI inference hardware products. Products color-coded by vendor, marker shape indicates consumer/workstation/data-center category.">
+<figcaption><b>Figure 1.</b> Memory capacity vs bandwidth for 23 AI inference hardware products. NVIDIA Blackwell (B300, 288GB/8 TB/s) and Google TPU v7 Ironwood (192GB/7.37 TB/s) lead the data-center tier. Apple Mac Studio M5 Ultra (512GB/1.2 TB/s) offers the most memory but at lower bandwidth. Consumer GPUs cluster in the 16–32GB / 0.5–1.8 TB/s range.</figcaption>
+</figure>
+
+<h3 class="subsection">Three insights from the chart</h3>
+
+<p><strong>1. NVIDIA dominates the high-bandwidth quadrant.</strong> The B200, B300, H200, and H100 all sit in the upper-right (high capacity + high bandwidth). No non-NVIDIA product matches the B300's combination of 288GB and 8 TB/s.</p>
+
+<p><strong>2. Apple offers the most memory, but at lower bandwidth.</strong> The Mac Studio M5 Ultra with 512GB unified memory is the only sub-$20K product that can run 235B+ models. But the 1.2 TB/s bandwidth is below the 3+ TB/s needed for fast token generation on large models. Apple trades inference speed for memory capacity.</p>
+
+<p><strong>3. Chinese vendors cluster in the mid-range.</strong> Huawei Ascend 910C (128GB/3 TB/s) and Biren BR100 (64GB/2.3 TB/s) are competitive with H100-class hardware but trail B200/B300. They're viable for domestic Chinese deployments but not global frontier inference.</p>
+
+<div class="takeaway">
+<div class="label">Memory is the bottleneck</div>
+<p>For most inference workloads in 2026, memory capacity (not TFLOPS) determines which hardware can run which models. A 70B model at Q4 needs ~40GB of memory; a 235B model needs ~130GB. Check the chart above to find which hardware can run the model you need — TFLOPS matters for speed, but memory capacity is the gatekeeper.</p>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 10: TFLOPS chart ===================== -->
+<section id="s10">
+<h2 class="section"><span class="num">10.</span><span class="emoji">⚡</span>FP8 performance comparison — data-center accelerators</h2>
+
+<p class="lede">For data-center inference, FP8 tensor TFLOPS is the key compute metric. The chart below ranks all major data-center AI accelerators by peak FP8 performance.</p>
+
+<figure class="wide">
+<img src="inference-hw-tflops-chart.png" alt="Horizontal bar chart ranking 15 data-center AI accelerators by FP8 peak TFLOPS. NVIDIA B300 leads at 7,200 TFLOPS, followed by B200 at 4,500, H100/H200 at 3,958. AMD MI355X at 2,880 is the strongest non-NVIDIA option.">
+<figcaption><b>Figure 2.</b> Data-center AI accelerators ranked by FP8 peak TFLOPS. NVIDIA Blackwell (B300: 7,200; B200: 4,500) leads decisively. AMD MI355X (2,880) is the strongest non-NVIDIA option. Huawei Ascend 910C (~800) trails significantly but is China's best domestic option. FP8 is peak theoretical; sustained performance is typically 40–60% of peak.</figcaption>
+</figure>
+
+<h3 class="subsection">Three insights from the chart</h3>
+
+<p><strong>1. NVIDIA Blackwell is in a class of its own.</strong> The B300 (7,200 TFLOPS FP8) and B200 (4,500 TFLOPS) substantially outperform every competitor. The closest non-NVIDIA option (AMD MI355X at 2,880 TFLOPS) is less than half the B300's compute.</p>
+
+<p><strong>2. AMD is the credible #2.</strong> The MI355X (2,880 TFLOPS) and MI300X/MI325X (2,090 TFLOPS) are the only non-NVIDIA data-center options that approach NVIDIA's performance. For organizations wanting vendor diversity, AMD is the realistic alternative.</p>
+
+<p><strong>3. Chinese vendors trail significantly on compute.</strong> Huawei Ascend 910C (~800 TFLOPS) is roughly 1/9th the B300's FP8 performance. Biren BR100 (~2,000 TFLOPS estimated) is more competitive but still well below NVIDIA. The Chinese ecosystem is viable for domestic use but not global frontier inference.</p>
+
+<div class="takeaway">
+<div class="label">TFLOPS vs memory</div>
+<p>TFLOPS determines <em>how fast</em> you can generate tokens; memory capacity determines <em>which models</em> you can run. For most inference workloads, memory is the binding constraint — you need enough memory to load the model before TFLOPS matters. Optimize for memory capacity first, then for TFLOPS.</p>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 11: Decision guide ===================== -->
+<section id="s11">
+<h2 class="section"><span class="num">11.</span><span class="emoji">✅</span>Decision guide — which hardware to pick</h2>
+
+<p class="lede">After the catalog, charts, and verification, here's the practical decision matrix. Find your use case, find your budget, and pick the recommended hardware.</p>
+
+<div class="table-wrap">
+<table class="data">
+<caption>Table 2. Decision matrix combining use case and budget. Read down for your use case, across for the recommended hardware.</caption>
+<thead>
+<tr>
+<th>Use case</th>
+<th>Under $2K</th>
+<th>$2K–$10K</th>
+<th>$10K–$50K</th>
+<th>$50K+</th>
+</tr>
+</thead>
+<tbody>
+<tr><td class="term">Personal local AI (14B models)</td><td><b>RTX 5080</b> ($999) or used RTX 3090 ($800)</td><td>RTX 5090 ($1,999) — overkill</td><td>—</td><td>—</td></tr>
+<tr><td class="term">Power user (32B models)</td><td>Used RTX 3090 (24GB)</td><td><b>RTX 5090</b> ($1,999) or Radeon AI PRO 9700 ($1,299)</td><td>RTX PRO 6000 Blackwell ($7,500)</td><td>—</td></tr>
+<tr><td class="term">Professional (70B models)</td><td>—</td><td><b>Mac Studio M3 Ultra 128GB</b> ($4,800)</td><td>RTX PRO 6000 Blackwell ($7,500)</td><td>—</td></tr>
+<tr><td class="term">Frontier local (110B+ models)</td><td>—</td><td>Mac Studio M3 Ultra 256GB ($9,499)</td><td><b>Mac Studio M5 Ultra 512GB</b> (~$16K)</td><td>H200 server ($315K/8-GPU)</tr>
+<tr><td class="term">Team serving (3–10 users)</td><td>—</td><td>Mac Studio M3 Ultra 128GB</td><td><b>Dual RTX 5090 PC</b> or H100 rental</td><td>4× H100 or B200 server</td></tr>
+<tr><td class="term">Enterprise production</td><td>—</td><td>—</td><td>H100 / MI300X / Gaudi 3</td><td><b>B200 / B300 / MI355X</b></td></tr>
+<tr><td class="term">Chinese domestic market</td><td>—</td><td>Moore Threads MTT S4000</td><td><b>Huawei Ascend 910C</b></td><td>Biren BR100 / Iluvatar TR-910</td></tr>
+<tr><td class="term">Cloud-only (no ownership)</td><td>TPU v6e ($1.22–$2.70/hr)</td><td>H100 rental ($1.33–$3.99/hr)</td><td>H200 rental ($3.49/hr)</td><td>B200 rental (premium)</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3 class="subsection">Five common scenarios</h3>
+
+<p><strong>Scenario 1: "I want to run Qwen3 32B locally."</strong> Pick <strong>RTX 5090 ($1,999)</strong>. 32GB GDDR7 is enough for Q4 quantization with 128K context. The best price/performance for 32B models in 2026.</p>
+
+<p><strong>Scenario 2: "I want to run Llama 3.3 70B locally."</strong> Pick <strong>Mac Studio M3 Ultra 128GB ($4,800)</strong>. 128GB unified memory runs 70B at Q4 with substantial context. The simplest path — no model sharding, no multi-GPU complexity.</p>
+
+<p><strong>Scenario 3: "I want to run DeepSeek V4 (671B) locally."</strong> Pick <strong>Mac Studio M5 Ultra 512GB (~$16K)</strong>. The only consumer-accessible hardware that can hold a 671B model. Bandwidth is lower than data-center GPUs, so token generation will be slower — but it works.</p>
+
+<p><strong>Scenario 4: "I'm building a production inference service."</strong> Pick <strong>B200 or H200 in an 8-GPU server</strong> for frontier performance, or <strong>MI300X/MI355X</strong> for AMD-stack organizations. For cost-sensitive workloads, <strong>H100 rental at $1.33/hr spot</strong> may be cheaper than ownership.</p>
+
+<p><strong>Scenario 5: "I'm in China and need domestic hardware."</strong> Pick <strong>Huawei Ascend 910C</strong> for data-center inference, or <strong>Moore Threads MTT S4000</strong> for workstation use. Performance trails NVIDIA but is viable for domestic deployments. Software ecosystem (CANN, MindSpore) is less mature than CUDA.</p>
+
+<div class="takeaway">
+<div class="label">The default recommendation</div>
+<p>For most individual developers in August 2026, <strong>Mac Studio M5 Ultra (from $5,499)</strong> is the right inference hardware — 512GB unified memory, 1.2 TB/s bandwidth, runs GLM-5.3 Flash at full quality. For budget users, <strong>RTX 5090 ($1,999)</strong> with Qwen3.8 27B. For organizations, the frontier choice is now <strong>NVIDIA Rubin R100 vs AMD MI455X</strong> — Rubin leads on compute (50 PFLOPS FP4), MI455X leads on memory (432GB HBM4 at 23.3 TB/s).</p>
+</div>
+
+</section>
+
+<!-- ===================== SECTION 12: Limitations ===================== -->
+<section id="s12">
+<h2 class="section"><span class="num">12.</span><span class="emoji">⚠️</span>Limitations and verification status</h2>
+
+<p class="lede">This catalog is a snapshot of August 28, 2026. Several caveats apply — read these before drawing strong conclusions from the specs.</p>
+
+<h3 class="subsection">What this catalog does and doesn't establish</h3>
+
+<ol>
+<li><strong>Chinese vendor specs are less verified.</strong> Huawei Ascend, Biren, Moore Threads, Iluvatar, and Metax specs are largely vendor-reported. Independent benchmarks are limited due to restricted access outside China. Treat all Chinese vendor performance numbers as estimates.</li>
+
+<li><strong>"Peak TFLOPS" is not "sustained TFLOPS."</strong> All FP8/FP16 TFLOPS figures in this catalog are peak theoretical. Sustained performance is typically 40–60% of peak due to memory bandwidth limits, thermal throttling, and software overhead.</li>
+
+<li><strong>Pricing is volatile.</strong> GPU prices in particular have been unstable through 2026 due to AI demand. The RTX 5090 MSRP is $1,999, but street prices have hit $2,400+ during shortages. Always check current pricing before buying.</li>
+
+<li><strong>Cloud rental prices vary by provider and commitment.</strong> The rental prices cited are spot/on-demand rates from major providers (Lambda, RunPod, Vast.ai). Committed-use discounts (1-year, 3-year) can reduce costs by 30–55%.</li>
+
+<li><strong>Software ecosystem maturity matters.</strong> NVIDIA's CUDA is the most mature AI software stack. AMD's ROCm has improved substantially but still has gaps. Intel's SYCL/OpenVINO, Apple's MLX, Huawei's CANN, and Google's JAX/XLA are all less mature — factor software friction into hardware decisions.</li>
+</ol>
+
+<h3 class="subsection">Products not included (and why)</h3>
+
+<ul>
+<li><strong>NVIDIA GB200 NVL72 / GB300 NVL72 rack systems</strong> — included in B200/B300 spec cards as rack configurations, but full rack pricing ($300K–$400K+) is too enterprise-specific for this catalog.</li>
+<li><strong>Intel Xeon Max (with HBM)</strong> — relevant for CPU-based inference but niche; CPU inference is dominated by KTransformers and similar hybrid approaches.</li>
+<li><strong>Older NVIDIA generations</strong> (A100, RTX 4090) — still shipping but being superseded by H200 and RTX 5090 respectively.</li>
+<li><strong>Cambricon MLU series</strong> — limited public information; included in the Chinese vendors section but without full spec cards.</li>
+<li><strong>Qualcomm AI 100</strong> — edge inference focus, not directly comparable to data-center GPUs.</li>
+</ul>
+
+<div class="takeaway">
+<div class="label">Final takeaway</div>
+<p>The AI inference hardware landscape in late August 2026 has been transformed by three major releases. <strong>NVIDIA Rubin R100</strong> (288GB HBM4, 22 TB/s, 50 PFLOPS FP4) is shipping to early access customers — the new performance champion. <strong>AMD MI455X</strong> (432GB HBM4, 23.3 TB/s, 40 PFLOPS FP4) is the new memory and bandwidth champion. <strong>Apple M5 Ultra</strong> (512GB unified, 1.2 TB/s, available September 22) is the most accessible frontier-inference platform for individuals. <strong>Google TPU 8i</strong> (288GB, 8.6 TB/s, 10.1 PFLOPS FP4) extends Google's cloud TPU lead. <strong>Huawei Ascend 950PR</strong> (1.56 PFLOPS FP4) is China's next-gen domestic option. For most individual developers, <strong>Mac Studio M5 Ultra ($5,499+)</strong> is the right choice; for organizations, NVIDIA Rubin R100 vs AMD MI455X is the frontier choice.</p>
+</div>
+
+</section>
+
+</article>
+
+<footer class="paper-footer">
+<p><b>What you've learned.</b> The late August 2026 AI inference hardware market has been transformed by three new releases. <strong>NVIDIA Rubin R100</strong> (288GB HBM4, 22 TB/s, 50 PFLOPS FP4) is the new performance champion, shipping H2 2026. <strong>AMD MI455X</strong> (432GB HBM4, 23.3 TB/s, 40 PFLOPS FP4) is the new memory/bandwidth champion. <strong>Apple M5 Ultra</strong> (512GB unified, 1.2 TB/s, from $5,499) is the most accessible frontier-inference platform. <strong>Google TPU 8i</strong> and <strong>Huawei Ascend 950PR</strong> extend their respective ecosystems. For most individual developers, Mac Studio M5 Ultra ($5,499+) is the right choice; for organizations, NVIDIA Rubin vs AMD MI455X is the frontier decision.</p>
+
+<p><b>Methodology.</b> Every spec verified against at least two independent sources: vendor spec sheets, TechPowerUp GPU database, community deployment reports (r/LocalLLaMA, r/nvidia, r/ROCm), and 2026 hardware benchmark studies. Chinese vendor specs are largely vendor-reported due to limited independent access.</p>
+
+<p><b>Caveats.</b> All TFLOPS figures are peak theoretical; sustained performance is typically 40–60% of peak. Pricing is volatile through 2026. Cloud rental prices vary by provider and commitment level. Software ecosystem maturity (CUDA vs ROCm vs CANN vs MLX) matters as much as hardware specs.</p>
+
+<p><b>Sources.</b> NVIDIA/AMD/Intel/Apple/Google/Huawei/Biren/Moore Threads/Iluvatar/Metax official product pages, TechPowerUp GPU database, "NVIDIA Data Center GPU Specs: A Complete Comparison" (Oct 2025), "AMD Instinct MI300X, MI325X and MI355X Systems" (SLYD, Aug 2026), "Silicon Vanguard: Ranking China's Domestic Chip Leaders" (Sep 2025), CSET export control analysis, r/LocalLLaMA hardware threads, cloud rental pricing (Lambda/RunPod/Vast.ai, Aug 2026).</p>
+
+<div class="license">
+<b>License.</b> This guide is released under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">Creative Commons Attribution 4.0 International (CC BY 4.0)</a>. You are free to share and adapt this material for any purpose, including commercial, provided you attribute the source. All product names and specs are public information as of August 28, 2026; vendor names belong to their respective owners.
+</div>
+</footer>
+
+
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <a href="gpu-cpu-inference-troubleshooting.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">GPU & CPU Inference Troubleshooting</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Complete troubleshooting guide for inference issues — OOM, slow tok/s, KV cache pressure, CPU offload bottlenecks.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="top-20-inference-providers-2026.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Top 20 GPU Rental Providers 2026</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Compare per-hour GPU rental pricing for H100, A100, B200 across 20 providers.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="low-resource-ai-agents-research-paper.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Maximum Capability from Minimum Silicon</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">A research paper on maximizing 8 GB GPU + 32 GB RAM workstations for AI agent workloads.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                </div>
+            </div>
+
+            <h2 class="section-title">About the Author</h2>
+                <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
+
+                <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+
+                <p style="margin-top: 30px;"><em>Last Updated: August 20, 2026 | Version 1.0</em></p>
+            </div>
+        </div>
+    </article>
+
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>

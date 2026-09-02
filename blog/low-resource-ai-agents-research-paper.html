@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maximum Capability from Minimum Silicon - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="A book-length engineering research paper on maximizing a low-memory GPU (8 GB VRAM, 32 GB RAM) workstation for complex AI agent workloads. Quantization science, KV-cache management, offloading, engine benchmarks, agent architecture, complete recipes.">
+    <meta name="keywords" content="low VRAM, 8GB GPU, AI agents, KV cache, offloading, GGUF, quantization, llama.cpp, vLLM, agent architecture, 2026">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Maximum Capability from Minimum Silicon">
+    <meta property="og:description" content="A book-length engineering research paper on maximizing a low-memory GPU (8 GB VRAM, 32 GB RAM) workstation for complex AI agent workloads. Quantization science, KV-cache management, offloading, engine benchmarks, agent architecture, complete recipes.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Maximum Capability from Minimum Silicon">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/low-resource-ai-agents-research-paper.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-08-25T00:00:00Z">
+    <meta property="article:modified_time" content="2026-08-25T00:00:00Z">
+    <meta property="article:section" content="Research Paper">
+    <meta property="article:tag" content="low VRAM">
+    <meta property="article:tag" content="8GB GPU">
+    <meta property="article:tag" content="AI agents">
+    <meta property="article:tag" content="llama.cpp">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/low-resource-ai-agents-research-paper.html">
+    <meta name="twitter:title" content="Maximum Capability from Minimum Silicon">
+    <meta name="twitter:description" content="A book-length engineering research paper on maximizing a low-memory GPU (8 GB VRAM, 32 GB RAM) workstation for complex AI agent workloads. Quantization science, KV-cache management, offloading, engine benchmarks, agent architecture, complete recipes.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta name="twitter:image:alt" content="Maximum Capability from Minimum Silicon">
+
+    <!-- Additional AEO/GEO Meta Tags -->
+    <meta name="application-name" content="Local AI Zone">
+    <meta name="msapplication-TileColor" content="#7c3aed">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="article-publisher" content="https://local-ai-zone.github.io">
+    <meta name="article-content-ttl" content="P1Y">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/low-resource-ai-agents-research-paper.html">
+
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/low-resource-ai-agents-research-paper.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/low-resource-ai-agents-research-paper.html">
+
+    <style>
+        .back-to-blog { display: inline-flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-weight: 600; margin: 0 0 30px 0; padding: 10px 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; backdrop-filter: blur(8px); transition: all 0.3s ease; position: relative; z-index: 1; }
+        .back-to-blog:hover { background: rgba(255,255,255,0.28); transform: translateX(-3px); }
+        .article-content { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        .article-content h1 { font-size: 2.2em; color: #1e40af; margin: 40px 0 15px; padding-bottom: 10px; border-bottom: 3px solid #e5e7eb; }
+        .article-content h2 { font-size: 1.6em; color: #1e40af; margin: 35px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .article-content h3 { font-size: 1.3em; color: #374151; margin: 28px 0 10px; }
+        .article-content h4 { font-size: 1.1em; color: #4b5563; margin: 20px 0 8px; }
+        .article-content p { margin-bottom: 1.2em; line-height: 1.8; }
+        .article-content ul, .article-content ol { margin: 12px 0 12px 24px; }
+        .article-content li { margin-bottom: 6px; line-height: 1.7; }
+        .article-content table { margin: 24px 0; width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .article-content table th { background: #1e40af; color: white; padding: 10px 12px; text-align: left; font-weight: 600; border: 1px solid #1e40af; }
+        .article-content table td { padding: 10px 12px; border: 1px solid #e5e7eb; text-align: left; }
+        .article-content table tr:nth-child(even) td { background: #f9fafb; }
+        .article-content table tr:hover td { background: #eff6ff; }
+        .article-content blockquote { border-left: 4px solid #2563eb; background: #eff6ff; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-style: normal; }
+        .article-content blockquote p { margin-bottom: 0.5em; }
+        .article-content blockquote p:last-child { margin-bottom: 0; }
+        .article-content code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: "Courier New", monospace; }
+        .article-content pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        .article-content pre code { background: none; color: inherit; padding: 0; }
+        .article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+        .article-content em { color: #6b7280; }
+        .article-content strong { color: #111827; }
+        .article-content a { color: #2563eb; text-decoration: none; }
+        .article-content a:hover { text-decoration: underline; }
+        .article-content hr { border: none; border-top: 2px solid #e5e7eb; margin: 40px 0; }
+        .article-header::before { display: none !important; }
+        .article-header .article-title { text-shadow: none !important; }
+        .article-header .container { background: transparent !important; }
+        .premium-header { position: static !important; }
+        .article-section { margin: 40px 0; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .section-title { font-size: 2em; color: #1e40af; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
+        .key-takeaway { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 24px; margin: 30px 0; border-radius: 0 8px 8px 0; }
+
+        /* Dark mode table overrides */
+        html[data-theme='dark'] table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table td { background: #1e1e2e !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table tr:nth-child(even) td { background: #252535 !important; }
+        html[data-theme='dark'] table tr:nth-child(odd) td { background: #1e1e2e !important; }
+        html[data-theme='dark'] table tr:hover td { background: rgba(124, 58, 237, 0.1) !important; }
+        html[data-theme='dark'] table { border-color: #374151 !important; }
+
+        /* Override flash-tier .article-content max-width for this book layout (sidebar needs full viewport) */
+        .article-content-full { max-width: none !important; padding: 0 !important; }
+
+  :root {
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#1a2233; --ink-soft:#46506a; --ink-faint:#7c86a0;
+  --line:#e3e7ee; --accent:#4f46e5; --accent-soft:#eef2ff; --accent-2:#0d9488;
+  --warn-bg:#fff7ed; --warn-line:#fdba74; --warn-ink:#9a3412;
+  --ok-bg:#f0fdf4; --ok-line:#86efac; --ok-ink:#166534;
+  --info-bg:#eff6ff; --info-line:#93c5fd; --info-ink:#1e3a8a;
+  --danger-bg:#fef2f2; --danger-line:#fca5a5; --danger-ink:#991b1b;
+  --code-bg:#0d1117; --code-ink:#d7dde7; --code-cmt:#7d8799; --code-head:#79c0ff; --code-key:#ff7b72; --code-str:#a5d6a7;
+  --side-bg:#0e1526; --side-ink:#aab6cf; --side-hover:#1b2540; --side-active:#4f46e5;
+  --mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,'Liberation Mono',monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+/* ============ LAYOUT ============ */
+.shell{display:flex;min-height:100vh}
+aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
+main{flex:1;min-width:0;display:flex;justify-content:center}
+.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
+/* ============ SIDEBAR TOC ============ */
+#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
+#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35;letter-spacing:.2px}
+#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
+#toc nav a{display:block;padding:5px 22px 5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
+#toc nav a:hover{background:var(--side-hover);color:#fff}
+#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
+#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
+#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
+#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
+/* ============ TYPOGRAPHY ============ */
+h1,h2,h3,h4{font-family:var(--sans);line-height:1.25;color:var(--ink)}
+.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
+.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
+.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px;letter-spacing:-.2px}
+.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
+.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:#25304a}
+p{margin:0 0 18px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid #c7d2fe}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:700;color:#101828}
+em{font-style:italic}
+ul,ol{margin:0 0 18px;padding-left:26px}
+li{margin-bottom:7px}
+li::marker{color:var(--accent);font-weight:600}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+.small{font-size:13.5px;color:var(--ink-soft)}
+.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#3730a3;overflow-wrap:anywhere}
+/* ============ COVER ============ */
+.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
+.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
+.cover h1 .thin{color:var(--accent)}
+.cover .sub{font-size:19px;color:var(--ink-soft);max-width:640px;line-height:1.6;margin:0 0 30px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
+.cover .meta b{color:var(--ink-soft);font-weight:600}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:34px 0 8px}
+.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.statgrid .cell .v{font-size:24px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+/* ============ CALLOUTS ============ */
+.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
+.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
+.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
+.callout p:last-child{margin-bottom:0}
+/* ============ TABLES ============ */
+.tblwrap{overflow-x:auto;margin:24px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;background:var(--paper)}
+thead th{background:#f1f3f8;text-align:left;font-weight:700;color:#2b3550;font-size:12.5px;letter-spacing:.4px;text-transform:uppercase;padding:10px 14px;border-bottom:2px solid var(--line);white-space:nowrap}
+tbody td{padding:9px 14px;border-bottom:1px solid #edf0f5;vertical-align:top}
+tbody tr:nth-child(even){background:#fafbfd}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .tag{display:inline-block;font-size:11px;font-weight:700;padding:1.5px 8px;border-radius:99px;letter-spacing:.3px}
+.tag.good{background:var(--ok-bg);color:var(--ok-ink);border:1px solid var(--ok-line)}
+.tag.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.tag.bad{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line)}
+.tag.neutral{background:#eef1f6;color:#3f4a63;border:1px solid #d8dee9}
+.tblfoot{font-size:12.5px;color:var(--ink-faint);padding:8px 14px;background:#fafbfd;border-top:1px solid var(--line)}
+/* ============ CODE ============ */
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:22px 0;font-family:var(--mono);font-size:13.2px;line-height:1.62}
+pre code{font-family:inherit;background:none;border:none;padding:0;color:inherit;white-space:pre}
+pre .c{color:var(--code-cmt);font-style:italic}
+pre .h{color:var(--code-head)}
+pre .k{color:var(--code-key)}
+pre .s{color:var(--code-str)}
+pre .d{color:#e3b341}
+.codetitle{display:flex;justify-content:space-between;align-items:center;background:#161b22;border:1px solid #30363d;border-bottom:none;border-radius:12px 12px 0 0;padding:8px 16px;font-family:var(--mono);font-size:11.5px;color:#8b98ab;margin:22px 0 0}
+.codetitle .dots{color:#444d58;letter-spacing:2px}
+.codetitle + pre{margin-top:0;border-radius:0 0 12px 12px}
+/* ============ FIGURES / DIAGRAMS ============ */
+figure{margin:28px 0}
+figcaption{font-size:13px;color:var(--ink-faint);margin-top:10px;text-align:center}
+.flow{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:22px;font-size:14px}
+.flow .fnode{background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;line-height:1.5;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.flow .fnode b{color:var(--ink)}
+.flow .fdecision{background:var(--accent-soft);border:1.5px solid #c7d2fe;border-radius:9px;padding:10px 14px;line-height:1.5}
+.flow .fterminal{background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:9px;padding:10px 14px;line-height:1.5}
+.flow .fterminal b{color:#065f46}
+.flow .farrow{color:var(--ink-faint);text-align:center;font-size:15px;padding:2px 0;line-height:1}
+.flow .flabel{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);text-align:center;padding:1px 0 2px}
+.bar-chart{display:grid;gap:7px;margin:18px 0}
+.bar-row{display:grid;grid-template-columns:210px 1fr 76px;gap:12px;align-items:center;font-size:13px}
+.bar-row .lbl{text-align:right;color:var(--ink-soft)}
+.bar-row .track{background:#eef0f5;border-radius:5px;height:20px;position:relative;overflow:hidden}
+.bar-row .fill{height:100%;border-radius:5px 0 0 5px;background:linear-gradient(90deg,#6366f1,#4f46e5)}
+.bar-row .fill.warn{background:linear-gradient(90deg,#fb923c,#ea580c)}
+.bar-row .fill.bad{background:linear-gradient(90deg,#f87171,#dc2626)}
+.bar-row .fill.ok{background:linear-gradient(90deg,#34d399,#059669)}
+.bar-row .val{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink-soft)}
+/* ============ MISC ============ */
+.part-divider{margin:80px 0 60px;padding:44px 40px;background:linear-gradient(135deg,#111a33,#0e1526);border-radius:16px;color:#fff;position:relative;overflow:hidden}
+.part-divider .pd-part{font-size:11.5px;font-weight:800;letter-spacing:2.5px;color:#818cf8;text-transform:uppercase;margin-bottom:10px}
+.part-divider h2{color:#fff;font-size:33px;font-weight:800;letter-spacing:-.8px;margin:0 0 12px}
+.part-divider p{color:#aab6cf;font-size:15.5px;margin:0;max-width:560px;line-height:1.7}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 26px}
+.chip{font-size:12.5px;font-weight:600;padding:5px 13px;border-radius:99px;border:1px solid var(--line);background:#fafbfd;color:var(--ink-soft)}
+.kbd{font-family:var(--mono);font-size:.82em;border:1px solid #cbd3e1;border-bottom-width:2.5px;border-radius:6px;padding:1px 7px;background:#f8fafc;color:#3b475f}
+.footref{font-size:13px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:56px;padding-top:18px}
+.btn-top{position:fixed;right:26px;bottom:26px;width:44px;height:44px;border-radius:99px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 6px 20px rgba(79,70,229,.42);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;border:none;z-index:60}
+.btn-top.show{opacity:1;pointer-events:auto}
+@media (max-width:1100px){
+  .shell{display:block}
+  aside#toc{position:static;width:100%;height:auto;flex:none}
+  .page{padding:0 26px 90px}
+  .cover h1{font-size:36px}
+  .bar-row{grid-template-columns:130px 1fr 66px}
+}
+@media print{
+  aside#toc,.btn-top{display:none}
+  body{background:#fff}
+  .page{box-shadow:none;max-width:100%;padding:0 6mm}
+  .part-divider{background:#1e293b !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre{white-space:pre-wrap}
+}
+    </style>
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Maximum Capability from Minimum Silicon — Running AI Agents on 8 GB GPU + 32 GB RAM",
+        "alternativeHeadline": "A book-length research paper on low-memory GPU optimization for AI agents",
+        "description": "A book-length engineering research paper on maximizing a low-memory GPU (8 GB VRAM, 32 GB RAM) workstation for complex AI agent workloads. Quantization science, KV-cache management, offloading, engine benchmarks, agent architecture, complete recipes.",
+        "image": "https://local-ai-zone.github.io/og-image.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-08-25T00:00:00Z",
+        "dateModified": "2026-08-25T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/low-resource-ai-agents-research-paper.html"
+        },
+        "keywords": "low VRAM, 8GB GPU, AI agents, KV cache, offloading, GGUF, quantization, llama.cpp, vLLM, agent architecture, 2026",
+        "articleSection": "Research Paper",
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "Maximum Capability from Minimum Silicon", "item": "https://local-ai-zone.github.io/blog/low-resource-ai-agents-research-paper.html"}
+        ]
+    }
+    </script>
+</head>
+<body class="blog-article-page">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">Maximum Capability from Minimum Silicon</h1>
+                <div class="article-meta">
+                    <span class="article-date">August 25, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Research Paper</span>
+                    <span class="article-read-time">📖 60 min read</span>
+                </div>
+            </div>
+        </header>
+        <div class="article-content article-content-full">
+
+<!-- ==================== SHELL (sidebar + page) ==================== -->
+<div class="shell">
+
+<!-- ==================== SIDEBAR TOC ==================== -->
+<aside id="toc">
+  <div class="brand">
+    <div class="t">Maximum Capability from Minimum Silicon</div>
+    <div class="s">Research Paper · 8 GB GPU Edition</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Front Matter</div>
+    <a href="#abstract"><span class="num">§</span>Abstract &amp; How to Read</a>
+    <div class="part">Part I — Foundations</div>
+    <a href="#ch1"><span class="num">1</span>The 8 GB Challenge</a>
+    <a href="#ch2"><span class="num">2</span>Where the Bytes Go</a>
+    <a href="#ch3"><span class="num">3</span>Know Your Machine</a>
+    <div class="part">Part II — The Science of Squeezing</div>
+    <a href="#ch4"><span class="num">4</span>Quantization</a>
+    <a href="#ch5"><span class="num">5</span>The KV Cache</a>
+    <a href="#ch6"><span class="num">6</span>Offloading</a>
+    <a href="#ch7"><span class="num">7</span>Throughput Engineering</a>
+    <div class="part">Part III — The Agent Stack</div>
+    <a href="#ch8"><span class="num">8</span>Choosing the Model</a>
+    <a href="#ch9"><span class="num">9</span>Inference Engines</a>
+    <a href="#ch10"><span class="num">10</span>Agent Architecture</a>
+    <a href="#ch11"><span class="num">11</span>The Complete Build</a>
+    <div class="part">Part IV — Evidence &amp; Reference</div>
+    <a href="#ch12"><span class="num">12</span>Compiled Evidence</a>
+    <a href="#ch13"><span class="num">13</span>Decision Playbooks</a>
+    <a href="#ch14"><span class="num">14</span>Troubleshooting</a>
+    <a href="#ch15"><span class="num">15</span>Glossary</a>
+    <a href="#ch16"><span class="num">16</span>Sources</a>
+  </nav>
+  <div class="toc-foot">Compiled 2026 · Single-file HTML · All benchmarks cited inline</div>
+</aside>
+
+<!-- ==================== MAIN ==================== -->
+<main>
+<div class="page">
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <span class="kicker">Systems Research Paper · Local Inference Engineering</span>
+  <h1>Maximum Capability from <span class="thin">Minimum Silicon</span></h1>
+  <p class="sub">A complete, experiment-driven engineering guide to running serious AI agents on a low-memory workstation — an 8 GB graphics card with 32 GB of system RAM. Every technique is grounded in published benchmarks and community measurements, with the raw results reproduced in Part IV.</p>
+  <div class="statgrid">
+    <div class="cell"><div class="v">8 GB</div><div class="k">VRAM budget</div></div>
+    <div class="cell"><div class="v">32 GB</div><div class="k">System RAM pool</div></div>
+    <div class="cell"><div class="v">16 ch.</div><div class="k">4 parts, book-length</div></div>
+    <div class="cell"><div class="v">30+</div><div class="k">Cited experiments</div></div>
+  </div>
+  <div class="meta">
+    <span><b>Scope:</b> quantization · KV cache · offloading · engines · agents</span>
+    <span><b>Goal:</b> manage complex, multi-step agentic tasks end-to-end locally</span>
+  </div>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<h2 class="ch" id="abstract">Abstract &amp; How to Read This Paper</h2>
+<p class="ch-sub">What this document is, who it is for, and how it is organized.</p>
+
+<p>This paper answers one practical question: <strong>how do you extract the maximum agentic capability from a consumer PC with a single 8 GB GPU and 32 GB of system RAM?</strong> The question matters because the marketing of local AI is dominated by hardware most people do not own. Guides casually assume 24 GB RTX 3090s or Apple Silicon machines with 64–128 GB of unified memory, while the single most common serious-gaming-and-tinkering configuration in the world — an RTX 3060 Ti / 3070 / 4060 / 4060 Ti class card paired with 32 GB of DDR4 or DDR5 — sits in a strange middle ground: too much GPU to give up on acceleration, too little VRAM to hold the models everyone benchmarks.</p>
+
+<p>The central thesis of this paper is that the 8 GB + 32 GB configuration is not a compromise to be apologized for but a <em>systems engineering problem with a well-mapped solution space</em>. The solution space has four dimensions, and each is covered in depth here with real experimental data: <strong>(1)</strong> weight compression, where the evidence shows modern 4-bit quantization costs between 0.15 and 3 percentage points of benchmark accuracy on an 8 B model — the famous perplexity ladder for Llama 3 8B moves only from 6.233 (fp16) to 6.383 (Q4_K_M), a 2.4 % relative change, while cutting file size by 69 %; <strong>(2)</strong> context memory, where the KV cache follows an exact arithmetic formula (Section 5) and can be quantized to 8-bit with near-lossless results (81.6 % output similarity, −208 MB at 8 K context) but collapses catastrophically at 4-bit (8.3 % similarity — the “q4_0 cliff”); <strong>(3)</strong> placement, where llama.cpp-style layer splitting turns VRAM + RAM into one addressable pool, with the practical consequence that a 14 B model runs at roughly 60–75 % of full-GPU speed and a 30 B-class MoE model with 3 B active parameters remains genuinely interactive; and <strong>(4)</strong> architecture, where the agent’s context management — not the model — is usually the binding constraint on task complexity.</p>
+
+<p>The paper is written to be read once, linearly, and then used as a reference. It is deliberately long, because the goal is competence rather than awareness: after reading it you should be able to size a model to your memory budget by hand, choose a quantization level with knowledge of its measured cost, configure an inference server with the correct flags, design an agent loop that survives hour-long tasks without context exhaustion, and diagnose an out-of-memory failure without guessing. All commands target Linux first (with Windows equivalents where they differ), because the tooling — llama.cpp, Ollama, vLLM — behaves best there, but everything applies to Windows with WSL2.</p>
+
+<div class="callout info"><span class="lab">How the evidence is labeled</span>
+<p>Throughout the paper, results are attributed inline to their source: peer-reviewed or arXiv papers, official engineering blogs (NVIDIA, vLLM, Qwen), structured community evaluations (LessWrong quantization evaluations, InventiveHQ Lab’s KV-cache benchmark), and community measurements (r/LocalLLaMA threads, llama.cpp GitHub discussions). Where a number comes from a single informal measurement it is labeled as such — treat those as directional, not gospel. Tables in Part IV reproduce the most important raw results verbatim so you can check my interpretation against the data.</p></div>
+
+<div class="callout ok"><span class="lab">Reading paths</span>
+<p><strong>In a hurry?</strong> Read Chapter 2 (memory math), Chapter 8 (model ladder), Chapter 11 (the build), and Chapter 13 (playbooks) — about 40 minutes. <strong>Studying for depth?</strong> Read linearly; Parts I–II build the theory, Parts III–IV apply it. <strong>Already running a model and it’s broken?</strong> Jump straight to Chapter 14.</p></div>
+
+<div class="chips">
+  <span class="chip">llama.cpp</span><span class="chip">Ollama</span><span class="chip">GGUF</span><span class="chip">Q4_K_M</span><span class="chip">KV cache</span><span class="chip">Flash Attention</span><span class="chip">MoE offload</span><span class="chip">Speculative decoding</span><span class="chip">ReAct agents</span><span class="chip">Context engineering</span><span class="chip">RAG</span><span class="chip">vLLM</span>
+</div>
+<!-- ==================== PART I DIVIDER ==================== -->
+<div class="part-divider" id="part1">
+  <div class="pd-part">Part I</div>
+  <h2>Foundations</h2>
+  <p>Why 8 GB is a different regime, where every byte of memory actually goes, and how to audit the machine you actually own — the theory needed before a single model is downloaded.</p>
+</div>
+
+<!-- ==================== CHAPTER 1 ==================== -->
+<h2 class="ch" id="ch1"><span class="chno">1.</span> The 8 GB Challenge</h2>
+<p class="ch-sub">What makes low-VRAM inference a distinct engineering regime — and why 2025–2026 was the moment it became viable.</p>
+
+<h3>1.1 The problem, stated precisely</h3>
+<p>A local AI agent stack has to fit four things into memory simultaneously: the <strong>model weights</strong> (billions of parameters, each taking multiple bytes), the <strong>key–value cache</strong> that grows with every token of conversation history (Chapter 5), the <strong>activation buffers</strong> and CUDA context overhead that inference frameworks reserve just to operate, and the <strong>agent scaffolding itself</strong> — the Python process, the web server, the retrieval index, the tool processes. On a datacenter GPU with 80 GB of HBM, the first three items are rounding errors; you simply load the model in 16-bit and move on. On an 8 GB card, all four compete for the same small pool, and the weights alone of a modern 8 B model in fp16 (16.1 GB) are already twice your budget before a single token has been generated.</p>
+
+<p>The naive conclusion is that small-VRAM machines are limited to small models, and small models are toys. Both halves of that conclusion are now wrong. The first half fails because quantization and offloading have matured into well-understood, well-benchmarked disciplines (Chapters 4 and 6): an 8 B model at 4-bit occupies ~4.9 GB and loses, on measured benchmarks, roughly 1–3 points of MMLU accuracy; a 30 B-class mixture-of-experts model with 3 B active parameters can be made to run interactively by keeping its always-active components in VRAM and streaming expert weights from system RAM. The second half fails because of a decade of small-model progress: today’s 7–9 B models score on standard evaluations at or above the level of GPT-3.5-class frontier systems of 2023, and dedicated agent research has repeatedly shown that <em>scaffolding quality matters as much as raw model size</em>. The mini-swe-agent project demonstrated 65 % resolution on SWE-bench Verified with a deliberately minimal ~100-line agent loop — because it spent its complexity budget on the right abstractions rather than on elaborate frameworks. The lesson transfers directly to low-resource machines: with a mid-sized model, your agent architecture is your capability multiplier.</p>
+
+<h3>1.2 Why 8 GB + 32 GB is a genuinely good configuration</h3>
+<p>It is worth being explicit about why this particular pairing — modest VRAM, generous RAM — is more capable than it looks, because the reasoning drives most of the engineering decisions in this paper.</p>
+
+<ul>
+  <li><strong>The 32 GB of system RAM is a large, underused second pool.</strong> llama.cpp’s mmap-based loading can treat system RAM as a transparent extension of VRAM. A model file can exceed VRAM by 3–4× and still run, with the GPU holding the layers that are touched every token and the CPU handling the rest. Combined, you have a 40 GB addressable pool — enough for a 30 B dense model at 4-bit (18.6 GB) or even larger MoE models, just not at full speed.</li>
+  <li><strong>Most tokens are not latency-critical.</strong> An agent spends its wall-clock life waiting for tool executions — file reads, web fetches, test suites that take seconds to minutes. When the next model call happens 30 seconds after the last, a generation speed of 15 tok/s versus 40 tok/s changes a 10-second wait into a 27-second wait inside a task that takes 20 minutes. Agents amortize inference latency far better than chat does.</li>
+  <li><strong>Agent context is naturally chunked.</strong> A well-designed agent (Chapter 10) does not need one giant 128 K context; it needs disciplined 8–16 K windows refreshed from external memory. That is exactly the regime where an 8 GB card is comfortable, and it is also the regime that produces <em>more reliable</em> agent behavior, because models degrade in the middle of very long contexts.</li>
+  <li><strong>The quantization ecosystem optimized for exactly this hardware.</strong> The most heavily tested configuration in the entire local-LLM community is “an 8 B model at Q4_K_M on a consumer card,” because that is what most people own. Bug reports, perplexity tables, and throughput numbers for this configuration are abundant — you are walking the best-trodden path in the field.</li>
+</ul>
+
+<h3>1.3 What “complex task” means, and what it demands</h3>
+<p>The goal stated in this paper’s title — <em>manage a complex task</em> — deserves a definition, because it dictates the memory budget. A complex agentic task has four properties that distinguish it from casual chat. First, it is <strong>multi-step</strong>: the model must loop through plan → act → observe dozens of times, each turn appending tool results and reasoning to the history. Second, it is <strong>stateful</strong>: information gathered in step 3 (say, the schema of a database) must remain usable in step 40, which means either a long context window or an external memory system. Third, it is <strong>tool-using</strong>: the model must emit structured function calls reliably — a capability measured separately from general intelligence by benchmarks like the Berkeley Function Calling Leaderboard (BFCL), where Llama 3.1 8B scores ~76 % — which constrains model choice more than raw MMLU does. Fourth, it is <strong>long-running</strong>: a coding agent session easily spans an hour and hundreds of thousands of cumulative tokens, even though no single context window needs to hold them all at once.</p>
+
+<p>These four properties translate into concrete engineering requirements: a model with reliable tool-calling behavior at 4-bit quantization; enough KV-cache headroom for 8–32 K tokens of working context per call; a context-management layer that compresses or externalizes history before it exhausts that headroom; and a stable inference server that can run for hours without leaking VRAM. Each of these is a chapter of this paper. The short version: <strong>your machine can do this — if you spend your bytes deliberately.</strong></p>
+
+<h3>1.4 The capability inventory: what fits, honestly</h3>
+<p>Before the theory, here is the honest bottom-line inventory for an 8 GB GPU + 32 GB RAM machine, based on the experimental evidence compiled in Part IV. These are the regimes you can operate in, from fastest to most ambitious.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Regime</th><th>Example model</th><th>Memory layout</th><th>Typical speed*</th><th>What it buys you</th></tr></thead>
+<tbody>
+<tr><td><b>Fast in-VRAM</b></td><td>Qwen3-4B, Gemma 3 4B, Phi-4-mini (Q4/Q6)</td><td>All weights + KV in VRAM</td><td class="num">50–90 tok/s</td><td>Snappy chat, fast tool-calling drafts, bulk summarization of agent history</td></tr>
+<tr><td><b>Full-capability in-VRAM</b></td><td>Qwen3-8B, Llama 3.1 8B (Q4_K_M) + 8–16 K ctx</td><td>~5 GB weights in VRAM, q8_0 KV</td><td class="num">30–45 tok/s</td><td>The sweet spot: near-full model intelligence with real context for agents</td></tr>
+<tr><td><b>Tight-fit large dense</b></td><td>Gemma 3 12B (Q4/QAT), Qwen3-14B (partial)</td><td>Weights mostly in VRAM, small KV</td><td class="num">10–25 tok/s</td><td>Noticeably more world knowledge and instruction-following</td></tr>
+<tr><td><b>Hybrid offload dense</b></td><td>Qwen3-14B, Mistral Small 24B (Q4, split)</td><td>~60–80 % layers in VRAM, rest in RAM</td><td class="num">6–15 tok/s</td><td>Upper-mid models at usable speed; great for non-interactive steps</td></tr>
+<tr><td><b>MoE hybrid</b></td><td>Qwen3-30B-A3B, Qwen3-Coder-30B (Q4)</td><td>Attention + shared experts in VRAM, routed experts streamed from RAM</td><td class="num">8–20 tok/s</td><td>Frontier-adjacent quality; the highest-capability option on this hardware</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">*Speed ranges synthesize the RTX 3060/4060-class measurements cited in Chapters 8 and 12; your exact card, memory type, and context length move these numbers ±30 %.</div>
+</div>
+
+<div class="callout warn"><span class="lab">The one thing this machine cannot do</span>
+<p>Full-precision (fp16/bf16) inference of anything above ~3.5 B parameters, and single-window 128 K-token contexts on any 8 B model, are not realistic on 8 GB of VRAM. Both are solvable elsewhere: quantization replaces the first (Chapter 4), and context engineering replaces the second (Chapter 10). Accepting these two substitutions up front is the entire mental shift required.</p></div>
+
+<!-- ==================== CHAPTER 2 ==================== -->
+<h2 class="ch" id="ch2"><span class="chno">2.</span> Where the Bytes Go: Memory Anatomy of a Local LLM</h2>
+<p class="ch-sub">Four arithmetic formulas govern every sizing decision you will make. Master them and OOM errors become predictable instead of surprising.</p>
+
+<h3>2.1 The four memory consumers</h3>
+<p>At any instant during inference, VRAM (and its RAM extension) holds exactly four categories of data. Every sizing question in this paper is answered by adding these four numbers and comparing the total to your budget.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Component</th><th>What it is</th><th>How it scales</th><th>Controllable?</th></tr></thead>
+<tbody>
+<tr><td><b>Weights</b></td><td>The model’s learned parameters</td><td>Parameters × bytes-per-weight</td><td>Yes — quantization (Ch. 4)</td></tr>
+<tr><td><b>KV cache</b></td><td>Stored attention keys/values for every token in context</td><td>Context length × per-token cost (exact formula §5.1)</td><td>Yes — context length, cache quantization, GQA already helps</td></tr>
+<tr><td><b>Compute buffers</b></td><td>Activation workspace for the current forward pass; prompt-processing scratch</td><td>Model width, batch size, longest prompt</td><td>Partially — Flash Attention shrinks it; smaller context shrinks it</td></tr>
+<tr><td><b>Framework overhead</b></td><td>CUDA context, kernels, allocator slack, the server process itself</td><td>Fixed ~300–800 MB VRAM; ~1–2 GB system RAM for Ollama-class stacks</td><td>Barely — one model process at a time on this hardware</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The practical consequence of the fourth row is a rule you should internalize now: <strong>your usable VRAM is not 8 GB, it is roughly 7.0–7.4 GB</strong>. A desktop environment with a browser open can easily reserve 0.8–1.2 GB of VRAM for itself (check with <span class="mono">nvidia-smi</span> before loading anything), and the CUDA context plus compute buffers of a running llama.cpp server cost another ~0.3–0.6 GB even before weights arrive. On a headless machine, or when the display is wired to the motherboard’s integrated GPU, you recover most of that margin — a genuinely useful trick detailed in §3.4.</p>
+
+<h3>2.2 Formula 1 — Weight memory</h3>
+<p>The memory occupied by model weights is the parameter count multiplied by the average bytes per parameter. Nothing more. In fp16 or bf16, each parameter costs exactly 2 bytes; the GGUF quantization ladder (Chapter 4) trades precision for bytes as follows.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Format</th><th class="num">Bytes/param</th><th class="num">8 B model</th><th class="num">14 B model</th><th class="num">30B-A3B MoE</th></tr></thead>
+<tbody>
+<tr><td>fp16 / bf16</td><td class="num">2.00</td><td class="num">16.1 GB</td><td class="num">28.1 GB</td><td class="num">61.1 GB</td></tr>
+<tr><td>Q8_0</td><td class="num">~1.06</td><td class="num">8.5 GB</td><td class="num">14.9 GB</td><td class="num">32.4 GB</td></tr>
+<tr><td>Q6_K</td><td class="num">~0.82</td><td class="num">6.6 GB</td><td class="num">11.5 GB</td><td class="num">25.0 GB</td></tr>
+<tr><td>Q5_K_M</td><td class="num">~0.70</td><td class="num">5.7 GB</td><td class="num">9.9 GB</td><td class="num">21.5 GB</td></tr>
+<tr><td><b>Q4_K_M</b></td><td class="num"><b>~0.57</b></td><td class="num"><b>4.6 GB</b></td><td class="num"><b>8.1 GB</b></td><td class="num"><b>17.5 GB</b></td></tr>
+<tr><td>Q4_0</td><td class="num">~0.55</td><td class="num">4.4 GB</td><td class="num">7.7 GB</td><td class="num">16.6 GB</td></tr>
+<tr><td>Q3_K_M</td><td class="num">~0.44</td><td class="num">3.5 GB</td><td class="num">6.2 GB</td><td class="num">13.4 GB</td></tr>
+<tr><td>Q2_K</td><td class="num">~0.36</td><td class="num">2.9 GB</td><td class="num">5.0 GB</td><td class="num">10.9 GB</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Sizes are the actual GGUF file sizes of canonical releases (bartowski/mradermacher quantizations of Qwen3, Llama 3.1, Gemma 3); ratios vary ±5 % by architecture because embeddings and norms are stored at higher precision.</div>
+</div>
+
+<p>Two observations fall straight out of this table. First, <strong>Q4_K_M is the pivot of the entire local-LLM world</strong>: it is the point where a modern 8 B model fits an 8 GB card with room for a real context window, while measured quality loss stays inside ~2–3 points on downstream benchmarks (evidence in §4.4). Second, the arithmetic explains the “ladder” you will keep climbing throughout this paper: every halving of bytes per parameter buys roughly one model-size class at constant memory. The 30 B MoE at Q4_K_M costs about as much memory as a 14 B dense at Q5 — but only activates 3 B parameters per token, which is why it can be <em>fast</em> despite being <em>large</em> (§6.5).</p>
+
+<h3>2.3 Formula 2 — The KV cache (preview)</h3>
+<p>The second formula is important enough to get its own chapter, but the skeleton belongs here because total-VRAM estimates need it. For every token in the context — prompt plus generated — the model stores one key vector and one value vector per attention layer, per KV head. The exact per-token cost is:</p>
+
+<div class="codetitle"><span>formula · KV cache</span><span class="dots">· · ·</span></div>
+<pre><code>kv_bytes_per_token = 2 × n_layers × n_kv_heads × head_dim × kv_dtype_bytes
+                     └─ K and V ─┘   └──── GQA dimensions ────┘
+
+total_kv = kv_bytes_per_token × context_tokens × batch_sequences</code></pre>
+
+<p>Worked example, Llama 3.1 8B (32 layers, 8 KV heads, 128-dim heads, fp16 cache): 2 × 32 × 8 × 128 × 2 = <strong>131,072 bytes = 128 KiB per token</strong>. At an 8 K context that is 1.0 GB; at 32 K it is 4.0 GB; at the model’s 128 K maximum it is 16 GB — twice your entire GPU. This single calculation, done in five seconds, predicts more OOM failures than any other reasoning in this paper. Chapter 5 works through the numbers for every model in the ladder, shows how GQA already saves you (the same model with full multi-head attention would cost 512 KiB/token), and evaluates the experimental evidence on quantizing the cache itself.</p>
+
+<h3>2.4 Formula 3 — The total, and the two planning rules</h3>
+<p>Adding the components gives the budget check you should perform before downloading any model file:</p>
+
+<div class="codetitle"><span>formula · total VRAM</span><span class="dots">· · ·</span></div>
+<pre><code>total_vram ≈ weights_on_gpu + kv_cache + compute_buffer (≈0.5–1 GB with FA) + fixed_overhead (≈0.4–0.8 GB)
+
+PLANNING RULE 1a (comfortable):  weights + kv  ≤  6.5 GB   → fits 8 GB on any setup, with margin
+PLANNING RULE 1b (tight):         weights + kv  ≤  7.4 GB   → fits headless / display on iGPU (§3.4)
+PLANNING RULE 2 (split):          weights total ≤  30 GB     → fits via offload; speed scales with GPU share (Ch. 6)</code></pre>
+
+<p>Rule 1a’s 6.5 GB figure is the conservative planning line: it assumes a desktop using ~0.5 GB, CUDA and buffers consuming ~1 GB together, and leaves slack for the transient peak that occurs during prompt processing (when the compute buffer temporarily grows to the size of the longest prompt batch). Rule 1b is the honest upper edge: a 7.4 GB plan <em>does</em> run on an 8 GB card, but only when the desktop is not competing for VRAM — headless, or with the monitor on the integrated GPU. People who plan to “exactly 7.9 GB” are the people writing the OOM bug reports this paper cites. Rule 2 reflects the practical ceiling of your 32 GB RAM pool: the OS, agent process, and page cache need headroom too, and mmap-loading a model larger than ~30 GB means the OS is already thrashing.</p>
+
+<h3>2.5 A worked example: three ways to run Qwen3-8B on 8 GB</h3>
+<p>To make the formulas concrete, here is the same model — Qwen3-8B (36 layers, 8 KV heads, 128-dim, hence 144 KiB/token fp16 KV) — planned three ways. These are the actual decisions you will face in Chapter 11.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Plan</th><th>Weights</th><th>Context</th><th>KV cache</th><th class="num">Total</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Q6_K, 8 K ctx, fp16 KV</td><td class="num">6.6 GB</td><td>8 K</td><td class="num">1.1 GB</td><td class="num">~8.7 GB</td><td><span class="tag bad">OOM</span> Does not fit</td></tr>
+<tr><td>Q4_K_M, 16 K ctx, fp16 KV</td><td class="num">5.1 GB</td><td>16 K</td><td class="num">2.4 GB</td><td class="num">~8.4 GB</td><td><span class="tag bad">OOM</span> Does not fit</td></tr>
+<tr><td>Q4_K_M, 16 K ctx, q8_0 KV</td><td class="num">5.1 GB</td><td>16 K</td><td class="num">1.3 GB</td><td class="num">~7.3 GB</td><td><span class="tag good">Fits</span> Tight tier — headless/iGPU display</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">All plans assume ~0.9 GB combined overhead and buffers (Flash Attention on); KV figures are decimal GB at Qwen3-8B’s 144 KiB/token — the same arithmetic <span class="mono">kv_calc.py</span> performs. Note how the third plan buys <em>double</em> the context of the first by spending 1.4 GB less — that trade (weight precision vs. context length vs. KV precision) is the core lever of low-VRAM engineering, quantified in §5.3.</div>
+</div>
+
+<div class="callout info"><span class="lab">The habit to build</span>
+<p>Before loading any model, run the two formulas on paper (30 seconds with a calculator) and check the result against <span class="mono">nvidia-smi</span>. The Python tool in §11.2 automates this for every model in the ladder, but doing it by hand a few times builds the intuition that separates an engineer from a flag-copier.</p></div>
+
+<!-- ==================== CHAPTER 3 ==================== -->
+<h2 class="ch" id="ch3"><span class="chno">3.</span> Know Your Machine: The Hardware Audit</h2>
+<p class="ch-sub">Eight gigabytes is not one budget — it is three interlocking bandwidth hierarchies. Optimizing without knowing which one binds produces confident mistakes.</p>
+
+<h3>3.1 The three tiers of memory</h3>
+<p>Every technique in this paper is, at bottom, a decision about which of three memory tiers holds which bytes. The tiers differ not just in size but in <em>bandwidth</em> — the number of bytes per second the compute units can actually pull from them — and bandwidth, not capacity, is what determines tokens per second once a model is loaded.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Tier</th><th class="num">Capacity (your rig)</th><th class="num">Bandwidth (typical)</th><th>Latency character</th></tr></thead>
+<tbody>
+<tr><td><b>VRAM</b> (GDDR6/GDDR6X)</td><td class="num">8 GB</td><td class="num">240–288 GB/s</td><td>Consistently fast; this is what the GPU was built to read</td></tr>
+<tr><td><b>System RAM</b> (DDR4-3200 dual / DDR5-5600 dual)</td><td class="num">32 GB</td><td class="num">45–90 GB/s</td><td>Fast for CPU compute; slow when the GPU must reach across PCIe</td></tr>
+<tr><td><b>PCIe link</b> (3.0 ×16 / 4.0 ×16 / 4.0 ×8)</td><td class="num">—</td><td class="num">~12 / ~25 / ~16 GB/s effective</td><td>The bridge tax: any GPU access to RAM pays it per byte</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">RTX 3060 12 GB: 360 GB/s but 12 GB VRAM (a different paper); RTX 4060: 272 GB/s on 8 GB; RTX 3070: 448 GB/s on 8 GB. If your card is a 3070, you are bandwidth-rich and capacity-poor — offloading hurts you less.</div>
+</div>
+
+<p>The three numbers that actually matter for planning are <strong>VRAM capacity</strong> (how much fits fast), <strong>VRAM bandwidth</strong> (how fast a fully-resident model generates), and <strong>PCIe bandwidth</strong> (how fast a split model streams). The asymmetry between 272 GB/s and 16 GB/s — a factor of ~17 — is the entire reason offloading is a gradual trade-off rather than a cliff, and the reason the offload curve in §6.2 has the shape it does: generation is memory-bandwidth-bound per token, so every layer you keep in VRAM avoids paying the PCIe tax for that layer on <em>every single token</em>.</p>
+
+<h3>3.2 Why generation speed ≈ bandwidth / model-bytes</h3>
+<p>A useful mental model (accurate to within 10–20 % for single-stream generation): generating one token requires reading essentially all active weights once. Therefore:</p>
+
+<div class="codetitle"><span>formula · roofline speed</span><span class="dots">· · ·</span></div>
+<pre><code>tokens_per_sec  ≈  effective_bandwidth  /  active_bytes_per_token
+
+RTX 4060, Qwen3-8B Q4_K_M fully in VRAM:   272 GB/s ÷ 5.1 GB   ≈ 53 tok/s theoretical
+                                              (real world: ~30–42 tok/s — overheads eat 20–40 %)
+Same model, 50 % of layers on CPU via DDR4: active bytes split across two buses;
+effective throughput collapses toward the slower path → ~8–12 tok/s</code></pre>
+
+<p>This model explains every speed number in this paper without magic. It explains why quantization <em>speeds up</em> inference as a side effect (fewer bytes per token = more tokens per second on the same bus — measured at 3.5–3.8× for 4-bit vs fp16 in the presenc.ai synthesis, §12.2). It explains why the MoE trick in §6.5 works (only 3 B of 30 B parameters are <em>active</em> per token, so the bandwidth denominator is small even though the memory numerator is large). And it explains the single most common performance disappointment in local AI — “I added more context and everything got slow” — because the KV cache joins the denominator as it grows, and prompt processing has a different, compute-bound character entirely (§7.4).</p>
+
+<h3>3.3 The CPU and RAM: the other half of the machine</h3>
+<p>The 32 GB of RAM is not passive scenery. Four practical facts about it shape every hybrid configuration.</p>
+<ul>
+  <li><strong>Dual-channel matters.</strong> A single stick of 32 GB runs at half bandwidth; two 16 GB sticks let the CPU read ~45–90 GB/s instead of ~25–45 GB/s. For any offloaded configuration this is a near-free 1.3–1.8× speedup on the CPU-resident layers. Check your board has two populated channels (<span class="mono">sudo dmidecode -t memory | grep -i speed</span>).</li>
+  <li><strong>DDR4 vs DDR5 is a real offload multiplier.</strong> DDR5-5600 dual-channel (~90 GB/s) makes 30 B-class hybrid inference meaningfully faster than DDR4-3200 (~51 GB/s). If you are buying RAM for this workload, this is where the money goes — more so than CPU cores.</li>
+  <li><strong>Cores set the ceiling for CPU-side compute.</strong> llama.cpp CPU layers want ~1–2 threads per physical core with hyperthreading usually <em>harmful</em> for this workload; the llama.cpp performance documentation calls wrong thread settings the #1 cause of slow CPU inference. A 6–8 core modern CPU is fully sufficient; more cores help only the offloaded fraction.</li>
+  <li><strong>Storage is nearly irrelevant to speed — but critical to load time.</strong> Weights are read once at startup (or paged in lazily via mmap). An NVMe SSD turns 18 GB model loads into ~15 s instead of ~2 min on SATA, and prevents the stutter of paging from a spinning disk. Keep models on the fastest drive you own; after load, I/O drops to zero.</li>
+</ul>
+
+<h3>3.4 Reclaiming VRAM from the desktop</h3>
+<p>On a machine where the monitor plugs into the graphics card, the desktop compositor, browser, and terminal permanently occupy VRAM — commonly 0.5–1.5 GB on a multi-monitor setup. Every hundred megabytes reclaimed is a hundred more for KV cache. The options, in decreasing order of practicality:</p>
+<ol>
+  <li><strong>Close GPU-accelerated apps while doing long agent runs</strong> — browsers are the biggest offenders (each tab with WebGL/canvas acceleration holds buffers in VRAM).</li>
+  <li><strong>Move the display to the iGPU</strong> if your CPU has one: in BIOS, enable integrated graphics, plug the monitor into the motherboard, and the discrete card becomes 100 % yours. This recovers the entire desktop footprint — typically 0.8–1.2 GB — at the cost of some desktop snappiness. On Linux, ensure the NVIDIA card still gets initialized for compute (<span class="mono">nvidia-persistenced</span> helps).</li>
+  <li><strong>Run headless</strong> (SSH in): same effect, no monitor at all. This is the standard setup for people who treat the 8 GB box as a home inference server.</li>
+</ol>
+
+<h3>3.5 The audit checklist</h3>
+<p>Run this once; write the answers on a sticky note. Every sizing decision later refers to them.</p>
+
+<div class="codetitle"><span>bash · hardware audit</span><span class="dots">· · ·</span></div>
+<pre><code><span class="c"># GPU: name, VRAM total, current usage, PCIe link generation/width</span>
+nvidia-smi --query-gpu=name,memory.total,memory.used,pcie.link.gen.current,pcie.link.width.current --format=csv
+
+<span class="c"># Sustained memory bandwidth test (GB/s) — the single most predictive number</span>
+<span class="c"># (bandwidthTest from cuda-samples, or: python -c "import torch; ..."</span>
+<span class="c">#  simpler: run llama-bench on a tiny model and compare with published numbers)</span>
+
+<span class="c"># RAM: total, speed, and — critically — number of populated channels</span>
+sudo dmidecode -t 17 | grep -E "Size|Speed|Locator" | grep -v "No Module"
+
+<span class="c"># CPU physical cores (set llama.cpp threads to this, not to hyperthreads)</span>
+lscpu | grep -E "^CPU\(s\)|Core|Thread|Model name"
+
+<span class="c"># Storage class holding your models</span>
+df -h /path/to/models && lsblk -d -o NAME,ROTA,SIZE   <span class="c"># ROTA=1 means spinning disk → move models</span></code></pre>
+
+<p>With the audit done, you know your three budgets: fast capacity (~7 GB usable VRAM), large capacity (~28 GB usable RAM after OS and agent process), and the bridge between them (12–25 GB/s). Everything that follows is the craft of spending those budgets well.</p>
+<!-- ==================== PART II DIVIDER ==================== -->
+<div class="part-divider" id="part2">
+  <div class="pd-part">Part II</div>
+  <h2>The Science of Squeezing</h2>
+  <p>Four disciplines turn 8 GB into a real budget: quantizing weights, taming the KV cache, splitting the model across VRAM and RAM, and engineering throughput. Each chapter pairs the mechanism with the experimental evidence for what it costs.</p>
+</div>
+
+<!-- ==================== CHAPTER 4 ==================== -->
+<h2 class="ch" id="ch4"><span class="chno">4.</span> Quantization: The Science of Shrinking Models</h2>
+<p class="ch-sub">What 4-bit really costs, according to the people who measured it — perplexity ladders, benchmark deltas, and the chain-of-thought surprise.</p>
+
+<h3>4.1 The idea in one paragraph</h3>
+<p>Quantization replaces the 16-bit floating-point numbers a model was trained with lower-precision approximations — 8-bit, 4-bit, 3-bit integers with per-block scale factors — so that weights occupy less memory and less memory bandwidth. It is applied <em>after</em> training (“post-training quantization”), requires no retraining, and for the GGUF family can be done on a laptop in minutes. The reason it works acceptably is that neural network weights turn out to be surprisingly tolerant of rounding noise: the model’s function is encoded across billions of parameters redundantly, and careful rounding perturbs the output distribution only slightly. “Slightly” is doing a lot of work in that sentence, which is why this chapter is mostly tables of measurements rather than reassurances.</p>
+
+<h3>4.2 The GGUF ladder, decoded</h3>
+<p>The dominant format for local inference is GGUF, used by llama.cpp, Ollama, LM Studio, and most consumer tools. Its naming scheme intimidates newcomers but encodes only two things: the <strong>bit width</strong> (Q8, Q5, Q4, Q3, Q2) and the <strong>method</strong>. The legacy scheme (<span class="mono">Q4_0</span>, <span class="mono">Q5_0</span>) stores simple blocks of weights sharing one scale. The K-quant scheme (<span class="mono">Q4_K_S</span>, <span class="mono">Q4_K_M</span>, <span class="mono">Q5_K_M</span>, <span class="mono">Q6_K</span>) uses smarter, mixed-precision block structures — the <span class="mono">_M</span> suffix (“medium”) mixes in some higher-precision tensors for sensitive layers — and dominates the legacy scheme at every bit width: <strong>Q4_K_M beats Q4_0 in quality while being barely larger</strong>, which is why the community defaulted to it. The I-quants (<span class="mono">IQ3_XXS</span>, <span class="mono">IQ2_M</span>, …) push below 4 bits using importance-weighted schemes; they are the only way to fit very large models on small cards, but they sit on the steep part of the quality curve and are best treated as a last resort.</p>
+
+<div class="callout info"><span class="lab">The three tiers of the ladder, memorized</span>
+<p><strong>Q8_0</strong> — effectively lossless (measured below); use when memory allows. <strong>Q5_K_M / Q6_K</strong> — near-indistinguishable from fp16 in blind testing; the quality pick when it fits. <strong>Q4_K_M</strong> — the standard; the quality-per-byte sweet spot every 8 GB user should start from. <strong>Q3 and below</strong> — viable for chat on some robust models, risky for agents and math; always benchmark your actual task.</p></div>
+
+<h3>4.3 Experiment 1 — The perplexity ladder (Llama 3 8B)</h3>
+<p>Perplexity (PPL) measures how surprised a model is by held-out text — lower is better, and small PPL increases map loosely to capability loss. The most-cited GGUF measurements come from the llama.cpp repository’s own evaluation runs, republished in a LessWrong evaluation post comparing quantized performance across schemes. The numbers for Llama 3 8B on WikiText-2:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Quant</th><th class="num">Size (GB)</th><th class="num">WikiText-2 PPL</th><th class="num">Δ vs fp16</th><th class="num">Relative loss</th><th>Reading</th></tr></thead>
+<tbody>
+<tr><td>fp16 (reference)</td><td class="num">14.97</td><td class="num">6.2331</td><td class="num">—</td><td class="num">—</td><td>Full precision</td></tr>
+<tr><td>Q8_0</td><td class="num">7.96</td><td class="num">6.2342</td><td class="num">+0.0011</td><td class="num">+0.02 %</td><td><span class="tag good">Lossless</span> Rounding noise</td></tr>
+<tr><td>Q6_K</td><td class="num">6.14</td><td class="num">6.2533</td><td class="num">+0.0202</td><td class="num">+0.32 %</td><td><span class="tag good">Excellent</span></td></tr>
+<tr><td>Q5_K_M</td><td class="num">5.33</td><td class="num">6.2886</td><td class="num">+0.0555</td><td class="num">+0.89 %</td><td><span class="tag good">Very good</span></td></tr>
+<tr><td>Q5_0</td><td class="num">5.21</td><td class="num">6.3632</td><td class="num">+0.1301</td><td class="num">+2.09 %</td><td><span class="tag warn">Noticeable</span> Legacy scheme</td></tr>
+<tr><td><b>Q4_K_M</b></td><td class="num"><b>4.58</b></td><td class="num"><b>6.3830</b></td><td class="num"><b>+0.1499</b></td><td class="num"><b>+2.41 %</b></td><td><span class="tag good">The standard</span> 69 % smaller</td></tr>
+<tr><td>Q4_0</td><td class="num">4.34</td><td class="num">6.7001</td><td class="num">+0.4670</td><td class="num">+7.50 %</td><td><span class="tag warn">Caution</span> 4× worse than K_M</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Source: llama.cpp repository PPL evaluations, as republished by the LessWrong post “Comparing Quantized Performance in Llama Models” (NickyP, Jul 2024). ΔPPL figures recomputed. WikiText-2 PPL is a text-modeling metric, not an agent-capability metric — see §4.5 before quoting it as an agent prediction.</div>
+</div>
+
+<p>Three things to internalize from this table. First, <strong>Q8_0 is genuinely free</strong>: a 0.02 % relative perplexity change is below the noise floor of the measurement itself, so the old advice “never go below 8-bit” was calibrated for a world where memory was abundant — in ours, the interesting question starts at Q6. Second, <strong>the K-quant premium is real and large</strong>: at 4-bit, the K_M scheme loses 3× less perplexity than the legacy scheme at only 0.24 GB more memory. There is no situation on an 8 GB card where Q4_0 is the right choice over Q4_K_M. Third, the jump from Q4 to Q5/Q6 buys meaningful quality at meaningful memory cost — exactly the trade you will exploit in §4.6 when a model <em>almost</em> fits at a higher tier.</p>
+
+<h3>4.4 Experiment 2 — Benchmark accuracy, quantized (Llama 3 8B Instruct)</h3>
+<p>Perplexity is a proxy; agents care about task metrics. The same LessWrong evaluation ran Llama 3 8B Instruct through MMLU (multiple-choice knowledge), WMDP, and The Pile perplexity across quantization schemes from four method families — HQQ, bitsandbytes (BNB), GPTQ, and AWQ:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Method</th><th class="num">Bits</th><th class="num">MMLU ↑</th><th class="num">Pile PPL ↓</th><th class="num">Δ MMLU vs bf16</th></tr></thead>
+<tbody>
+<tr><td>BFloat16 / Float16</td><td class="num">16</td><td class="num">63.87 / 63.84 %</td><td class="num">8.283 / 8.279</td><td class="num">—</td></tr>
+<tr><td>HQQ Int8</td><td class="num">8</td><td class="num">63.87 %</td><td class="num">8.298</td><td class="num">0.00</td></tr>
+<tr><td>BNB Int8</td><td class="num">8</td><td class="num">63.05 %</td><td class="num">8.305</td><td class="num">−0.82</td></tr>
+<tr><td>HQQ Int4</td><td class="num">4</td><td class="num">62.29 %</td><td class="num">8.482</td><td class="num">−1.58</td></tr>
+<tr><td>AWQ Int4</td><td class="num">4</td><td class="num">61.84 %</td><td class="num">8.483</td><td class="num">−2.03</td></tr>
+<tr><td>GPTQ Int4</td><td class="num">4</td><td class="num">61.58 %</td><td class="num">8.575</td><td class="num">−2.29</td></tr>
+<tr><td>BNB NF4</td><td class="num">4</td><td class="num">61.44 %</td><td class="num">8.499</td><td class="num">−2.43</td></tr>
+<tr><td>BNB Int4</td><td class="num">4</td><td class="num">60.80 %</td><td class="num">8.633</td><td class="num">−3.07</td></tr>
+<tr><td>HQQ Int3</td><td class="num">3</td><td class="num">62.26 %*</td><td class="num">8.872</td><td class="num">−1.61*</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Source: LessWrong “Comparing Quantized Performance in Llama Models,” Llama 3 8B Instruct, 0-shot MMLU. *The Int3 MMLU number held up surprisingly, but see §4.5 — the same 3-bit run failed to complete the CoT evaluation at all. Single-run results; treat ±0.5 pt as noise.</div>
+</div>
+
+<p>The pattern generalizes across the whole literature: <strong>8-bit quantization costs nothing measurable; 4-bit costs roughly 1.5–3 points of MMLU</strong>, with the calibration-aware schemes (HQQ, AWQ) at the good end and naive round-to-nearest (BNB Int4) at the bad end. A 2-point MMLU drop sounds alarming until you remember what it buys: the same model at half the memory, running ~2× faster on the same bus. For agent workloads the correct comparison is not “quantized vs. full-precision of the same model” but “quantized 8 B vs. full-precision 4 B <em>at equal memory</em>” — and on that comparison the quantized 8 B wins essentially every benchmark by a wide margin. Quantization is how you buy model size with memory; the 1–3 point tax is the commission.</p>
+
+<h3>4.5 Experiment 3 — The chain-of-thought surprise (the agent-critical result)</h3>
+<p>Here is the finding that matters more for agents than everything else in this chapter. The LessWrong author went one step further than most evaluations and tested <em>multi-step reasoning</em> — Minerva MATH algebra problems with zero-shot chain-of-thought prompting, where the model must generate many correct tokens in sequence to reach an answer:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Method</th><th class="num">Bits</th><th class="num">Minerva MATH Algebra (CoT) ↑</th><th>vs. fp16</th></tr></thead>
+<tbody>
+<tr><td>Float16</td><td class="num">16</td><td class="num">37.5 %</td><td>Reference</td></tr>
+<tr><td>HQQ Int8</td><td class="num">8</td><td class="num">37.9 %</td><td><span class="tag good">+0.4</span> within noise</td></tr>
+<tr><td>BNB Int8</td><td class="num">8</td><td class="num">36.3 %</td><td><span class="tag good">−1.2</span> mild</td></tr>
+<tr><td>HQQ Int4</td><td class="num">4</td><td class="num">33.7 %</td><td><span class="tag warn">−3.8</span> real cost</td></tr>
+<tr><td>BNB NF4</td><td class="num">4</td><td class="num">31.3 %</td><td><span class="tag warn">−6.2</span></td></tr>
+<tr><td>BNB Int4</td><td class="num">4</td><td class="num">29.3 %</td><td><span class="tag bad">−8.2</span></td></tr>
+<tr><td>GPTQ / AWQ / HQQ Int3</td><td class="num">3</td><td class="num">DNF</td><td><span class="tag bad">Failed</span> run did not finish</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Source: same LessWrong evaluation. DNF = the 3-bit runs generated garbage/degenerate output on multi-step math and did not complete. This is the single most agent-relevant quantization result in the literature.</div>
+</div>
+
+<p>Compare the two 4-bit columns across experiments: MMLU dropped 1.5–3 points, but multi-step generation dropped <strong>4–8 points</strong>, and 3-bit did not merely score lower — it <em>failed to complete</em>. The explanation is compounding error: a single-token prediction task can absorb a small nudge to the output distribution, but a chain-of-thought requires every one of hundreds of sampled tokens to stay on the rails; small per-token distortions accumulate multiplicatively. Agents are chain-of-thought machines. Every ReAct loop is a long multi-step generation interleaved with tool calls, which means:</p>
+
+<div class="callout warn"><span class="lab">The agent quantization rule</span>
+<p>For agent workloads, treat <strong>Q4_K_M as the floor, not the default</strong>. Prefer Q5_K_M or Q6_K whenever the model fits, and treat 3-bit quants as chat-only curiosities regardless of how their MMLU looks. The one-point MMLU difference between Q4 and Q5 can be the difference between a coherent 30-step agent trajectory and a loop that silently degrades at step 12. (Model-dependent: robust over-trained models like the Qwen family tolerate Q4 visibly better than older architectures — community blind-testing consistently ranks Q5_K/Q6_K as “nearly indistinguishable from original” while Q4 shows occasional texture loss.)</p></div>
+
+<h3>4.6 Method families: GGUF vs AWQ vs GPTQ vs EXL2</h3>
+<p>The tables above mix method families, so a direct comparison is warranted. GGUF is a <em>file format + quantization scheme designed for CPU/GPU hybrid execution</em> — its superpower is that it runs anywhere and splits across memory tiers (Chapter 6), which is why it owns the under-24 GB segment. AWQ and GPTQ are <em>GPU-only weight formats</em> that quantize using calibration data to protect salient weights; they are loaded by GPU engines (vLLM, TGI, ExLlama) and generally decode faster than GGUF on the same hardware when the whole model fits in VRAM. EXL2 (ExLlamaV2) offers variable target bit-rates and strong speed on full-GPU setups.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Property</th><th>GGUF</th><th>AWQ</th><th>GPTQ</th><th>EXL2</th></tr></thead>
+<tbody>
+<tr><td>Runs on CPU / split CPU+GPU</td><td><span class="tag good">Yes — native</span></td><td><span class="tag bad">No</span></td><td><span class="tag bad">No</span></td><td><span class="tag bad">No</span></td></tr>
+<tr><td>Quality retention at 4-bit</td><td>Good (K-quants)</td><td><span class="tag good">95–97 %</span> of fp16</td><td>~90–96 %</td><td>Adjustable per-file</td></tr>
+<tr><td>GPU-only decode speed</td><td>Good</td><td><span class="tag good">Fastest</span> (~2× GPTQ, per community benchmarks)</td><td>Slower</td><td>Fast</td></tr>
+<tr><td>Calibration cost to produce</td><td>Minutes, no data</td><td>~5–10× faster than GPTQ</td><td>Slow (needs data)</td><td>Slow</td></tr>
+<tr><td>Known failure mode</td><td>Very-low-bit degradation</td><td>—</td><td><span class="tag warn">Reported collapse on code tasks at 4-bit</span></td><td>—</td></tr>
+<tr><td><b>Verdict for 8 GB agents</b></td><td><span class="tag good">Default choice</span></td><td>If whole model fits VRAM</td><td>Avoid for agents</td><td>If whole model fits</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Sources: gingerlabs.ai and Reddit r/LocalLLaMA format comparisons (AWQ ≈2× GPTQ speed, 95–97 % quality retention); Towards AI GGUF-vs-AWQ-vs-GPTQ testing reporting GPTQ code-task collapse at 4-bit; AWQ calibration speed from the original AWQ paper’s community reproductions.</div>
+</div>
+
+<p>Two nuances keep this honest. First, the GPTQ “collapses on code” finding comes from community benchmarking of specific 4-bit releases — the failure is real and reproducible on those files, but it is a reason to be cautious rather than a mathematical law; GPTQ remains widely deployed in production serving. Second, on an 8 GB card the AWQ/EXL2 speed advantage usually cannot be exploited for the models you most want to run, because anything above ~9 B parameters will not fit VRAM entirely — and hybrid execution is exactly what GGUF does and the GPU-only formats do not. This is why the recommendation matrix is not “which is best” but “which fits where your model lands on the ladder.”</p>
+
+<h3>4.7 Choosing your quant: the 8 GB decision table</h3>
+<p>Putting the experiments together into the decision you actually face. (Sizes are for 8 B-class models; shift one tier for 12–14 B, two for 30 B MoE.)</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Situation</th><th>Choose</th><th>Why (from the evidence)</th></tr></thead>
+<tbody>
+<tr><td>Model fits VRAM at Q6_K with your context</td><td><b>Q6_K</b></td><td>+0.32 % PPL — blind tests rank it indistinguishable from fp16; spend the bytes you have</td></tr>
+<tr><td>Need 16–32 K context on an 8 B model</td><td><b>Q4_K_M weights + q8_0 KV</b></td><td>Context memory outweighs the 1–2 pt accuracy delta (Ch. 5 math)</td></tr>
+<tr><td>Running 12–14 B dense on this machine</td><td><b>Q4_K_M</b> (rarely Q4_K_S)</td><td>14 B Q4 ≈ 8 B Q6 in memory; bigger-and-coarser wins the equal-memory comparison</td></tr>
+<tr><td>Running 30 B MoE (Qwen3-30B-A3B class)</td><td><b>Q4_K_M</b></td><td>Expert weights are read sparsely; community runs confirm Q4 retains MoE behavior; below Q4 the routed-expert precision degrades routing quality</td></tr>
+<tr><td>Draft model for speculative decoding</td><td><b>Q8_0 or Q6_K of a 0.5–1.7 B model</b></td><td>It’s tiny; keep it accurate so its drafts get accepted (§7.5)</td></tr>
+<tr><td>Emergencies / testing a huge model</td><td>Q3_K_M / IQ3_XXS</td><td>Last resort; expect visible degradation and weak tool-calling reliability</td></tr>
+</tbody>
+</table>
+</div>
+
+<div class="callout info"><span class="lab">A note on QAT — the rising alternative</span>
+<p>Quantization-aware training (QAT) produces models <em>trained to live</em> at 4-bit, eliminating most of the PTQ quality tax. Google shipped QAT variants of Gemma 3 — the community-verified result is that <strong>Gemma 3 12B QAT fits and runs on an 8 GB GPU</strong> (with ~2.5 K context at default settings, more with KV quantization) — and Unsloth’s “Dynamic 4-bit” quants apply QAT-style mixed precision to Qwen3-Coder. When a QAT version of your model exists at your target size, prefer it over a post-hoc quant of the same size; the evidence base for QAT is still thinner, but the Gemma 3 results are encouraging.</p></div>
+
+<!-- ==================== CHAPTER 5 ==================== -->
+<h2 class="ch" id="ch5"><span class="chno">5.</span> The KV Cache: Context Length Is a Memory Decision</h2>
+<p class="ch-sub">The cache is arithmetic, it grows linearly, and quantizing it wrong destroys your outputs while your speedometer stays green.</p>
+
+<h3>5.1 The formula, worked for every model you might run</h3>
+<p>Chapter 2 introduced the formula; here is the full reasoning. Attention layers look back at every previous token by comparing the current query against stored <em>keys</em>, then retrieving <em>values</em>. To avoid recomputing these for every new token, inference engines store them — that storage is the KV cache. Modern architectures shrink it with <strong>grouped-query attention (GQA)</strong>: instead of every one of, say, 32 query heads having its own key/value heads, they share a small group of KV heads (typically 8). This is why an 8 B model costs ~128 KiB/token instead of ~512 KiB:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Model</th><th class="num">Layers</th><th class="num">KV heads</th><th class="num">Head dim</th><th class="num">f16 KV per token</th><th class="num">8 K ctx</th><th class="num">16 K ctx</th><th class="num">32 K ctx</th></tr></thead>
+<tbody>
+<tr><td>Llama 3.1 8B</td><td class="num">32</td><td class="num">8</td><td class="num">128</td><td class="num">128 KiB</td><td class="num">1.0 GB</td><td class="num">2.0 GB</td><td class="num">4.0 GB</td></tr>
+<tr><td>Qwen3 8B</td><td class="num">36</td><td class="num">8</td><td class="num">128</td><td class="num">144 KiB</td><td class="num">1.1 GB</td><td class="num">2.2 GB</td><td class="num">4.4 GB</td></tr>
+<tr><td>Qwen2.5-Coder-7B</td><td class="num">28</td><td class="num">4</td><td class="num">128</td><td class="num">56 KiB</td><td class="num">0.4 GB</td><td class="num">0.9 GB</td><td class="num">1.7 GB</td></tr>
+<tr><td>Gemma 3 12B</td><td class="num">48</td><td class="num">8</td><td class="num">256</td><td class="num">384 KiB</td><td class="num">3.0 GB</td><td class="num">6.0 GB</td><td class="num">12.0 GB</td></tr>
+<tr><td>Qwen3-14B</td><td class="num">40</td><td class="num">8</td><td class="num">128</td><td class="num">160 KiB</td><td class="num">1.2 GB</td><td class="num">2.5 GB</td><td class="num">5.0 GB</td></tr>
+<tr><td>Qwen3-30B-A3B (MoE)</td><td class="num">48</td><td class="num">4</td><td class="num">128</td><td class="num">96 KiB</td><td class="num">0.75 GB</td><td class="num">1.5 GB</td><td class="num">3.0 GB</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Computed from published model configs (Llama 3.1, Qwen3, Gemma 3 model cards / Qwen3 technical report). Gemma 3 12B’s fat cache (48 layers × 256-dim) is why it famously “needs” 8 GB+ for context alone — and why KV quantization transforms it (§5.3).</div>
+</div>
+
+<p>Reading the table as an agent engineer: with weights at Q4_K_M occupying ~5 GB of your ~7 GB usable VRAM, an 8 B model can afford a <strong>16 K context with an fp16 cache, or ~32 K with a q8_0 cache</strong>. A Gemma 3 12B at Q4 can barely afford 8 K before you quantize its cache. These are the real numbers behind every “what context should I set?” question — and they were computed without downloading anything.</p>
+
+<h3>5.2 Why the cache grows during an agent run (the hidden budget)</h3>
+<p>Chat users rarely feel KV pressure because conversations grow slowly. Agents feel it acutely, because a ReAct-style loop appends to the context on <em>every</em> step: the tool call (~50–150 tokens), the tool result (100–2,000+ tokens for a file read or search payload), and the model’s intermediate reasoning (100–500 tokens). A realistic accounting for a 30-step coding agent:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Step class</th><th class="num">Tokens added</th><th class="num">After 30 steps</th><th>Llama-3.1-8B f16 KV consumed</th></tr></thead>
+<tbody>
+<tr><td>System prompt + tool schemas</td><td class="num">800–2,000</td><td class="num">~2,000</td><td class="num">0.25 GB</td></tr>
+<tr><td>Reasoning + tool calls (30 × ~250)</td><td class="num">7,500</td><td class="num">7,500</td><td class="num">0.94 GB</td></tr>
+<tr><td>Tool results (30 × ~700 avg)</td><td class="num">21,000</td><td class="num">21,000</td><td class="num">2.6 GB</td></tr>
+<tr><td><b>Total</b></td><td class="num">—</td><td class="num"><b>~30,500</b></td><td class="num"><b>~3.8 GB of KV alone</b></td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Illustrative accounting from typical agent traces; your numbers vary with tool verbosity. The point: an un-managed agent context crosses 30 K tokens in well under an hour, and the KV cost arrives on top of weights.</div>
+</div>
+
+<p>This is why the two disciplines — cache management (this chapter) and agent context engineering (Chapter 10) — are inseparable. The cache gives you a hard ceiling; the agent architecture determines how fast you approach it and what happens when you do.</p>
+
+<h3>5.3 Experiment 4 — Quantizing the KV cache: the q8_0/q4_0 split</h3>
+<p>The KV cache can itself be stored at lower precision, via llama.cpp’s <span class="mono">-ctk</span> / <span class="mono">-ctv</span> flags (Ollama: environment variable or Modelfile parameters). The most rigorous public evaluation of what this actually costs is InventiveHQ Lab’s controlled benchmark: one model (Qwen2.5-Coder-7B-Instruct Q4_K_M), one context (8,192 tokens), three cache precisions, greedy decoding over a fixed 12-prompt suite, with output similarity measured against the fp16-cache reference:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>KV cache</th><th class="num">VRAM at 8 K</th><th class="num">Δ vs f16</th><th class="num">Speed (tok/s)</th><th class="num">Output similarity vs f16</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>f16 (16-bit)</td><td class="num">4,899 MB</td><td class="num">—</td><td class="num">81.8</td><td class="num">100 %</td><td><span class="tag neutral">Reference</span></td></tr>
+<tr><td>q8_0 (8-bit)</td><td class="num">4,691 MB</td><td class="num">−208 MB</td><td class="num">76.4</td><td class="num">81.6 %</td><td><span class="tag good">Safe trade</span></td></tr>
+<tr><td>q4_0 (4-bit)</td><td class="num">4,579 MB</td><td class="num">−320 MB</td><td class="num">80.3</td><td class="num"><b>8.3 %</b></td><td><span class="tag bad">Quality cliff</span></td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Source: InventiveHQ Lab, “KV-Cache Quantization: The q4_0 Cliff Your Logs Won’t Warn You About” (Jun 2026). Similarity = mean difflib ratio of greedy outputs vs the f16 baseline across the prompt suite. Test rig: i7-8700, 64 GB DDR4-2400, RTX 5060 Ti 16 GB.</div>
+</div>
+
+<p>The result deserves its dramatic reputation. At 8-bit, the cache halves in theory (and saved 208 MB here, a small number only because 8 K context is small — savings scale linearly with context) while outputs stay mostly-identical at 81.6 % similarity: rounding noise, not degradation. At 4-bit the outputs are <strong>8.3 % similar to the reference — statistically a different answer to the same prompt</strong> — while generation speed sits at a healthy 80.3 tok/s. Nothing in your monitoring would flag it. The authors’ framing is the memorable one: q4_0 KV saves only 112 MB more than q8_0 at this context but transforms the model; the savings compound with context length, yet so does the corruption.</p>
+
+<p>Corroborating measurements sharpen the picture. A DGX Spark benchmark of the same three cache precisions on Nemotron-3-Nano-30B-A3B at 128 K context found q4_0 KV <em>92 % slower</em> than f16 at long context (the quantized-cache kernel path has a performance cliff of its own) and concluded “q8_0 is the only KV quantization worth running.” The llama.cpp TurboQuant discussion reports q4_0 cache saving 552 MiB (72 % KV reduction) at the cost of observed slot-position corruption. Meanwhile, Apple Silicon measurements found the throughput hit from KV quantization under 10 % — the cost there is quality, not speed. And the classic community result from the r/LocalLLaMA KV tests: q4_0 cache enabled a 35 B model (Command R) with 8 K context to fit a 24 GB P40 — proof that the trick <em>works</em> as a memory lever; the question is only whether your task survives the fidelity loss.</p>
+
+<div class="callout warn"><span class="lab">Practical KV-quantization rules</span>
+<p>(1) <strong>q8_0 KV is the right default</strong> on a memory-constrained card — near-lossless, halves cache cost, minor speed impact. (2) <strong>Never q4_0 the cache for agent workloads</strong> — tool-call JSON is exactly the kind of long structured output where 4-bit cache corruption compounds. (3) If you must squeeze cache further, prefer <em>shrinking the context window</em> over deepening cache quantization; a well-architected agent needs less context than you think (Ch. 10), and context you don’t hold costs nothing.</p></div>
+
+<h3>5.4 Flash Attention: free cache efficiency</h3>
+<p>Flash Attention (FA) is a different implementation of the attention computation that processes it in tiled fashion without materializing the full attention matrix — in llama.cpp, enabling it (<span class="mono">-fa</span>, or automatic in recent Ollama builds via <span class="mono">OLLAMA_FLASH_ATTENTION=1</span>) both reduces the compute-buffer footprint and, critically, <strong>unlocks KV quantization</strong>: cache quantization is only supported on the FA codepath. Community measurements on 4×H100-class hardware show FA also shrinking the inference graph dramatically under parallel load (the Ollama parallelism issue #12097 documents graph-size reductions when FA is on). On your 8 GB card the practical guidance is simple: <strong>Flash Attention on, always</strong> — there is no measured downside at single-stream scale, and it is the prerequisite for the entire cache-quantization toolkit.</p>
+
+<h3>5.5 Context-setting doctrine for the 8 GB agent box</h3>
+<p>Setting the context window (<span class="mono">-c</span> in llama.cpp, <span class="mono">num_ctx</span> in Ollama) is a decision people get exactly backwards: they either leave the default (2048 in older Ollama — silently truncating agent histories) or max it out (guaranteeing KV pressure and slow prompt processing). The doctrine that falls out of this chapter’s arithmetic:</p>
+
+<ol>
+  <li><strong>Set context deliberately per workload</strong>: 8 K for focused tool loops; 16 K for coding agents reading files; 32 K only with q8_0 KV on a model whose weights leave room.</li>
+  <li><strong>Budget KV explicitly in your sizing formula</strong> (§2.5). Context is not free; it has a price you can now compute exactly.</li>
+  <li><strong>Prefer q8_0 KV over larger f16 windows</strong>: 16 K @ q8_0 costs the same as 8 K @ f16 and preserves more capability than the context doubling costs.</li>
+  <li><strong>Trim tool output aggressively</strong> — the 30-step accounting table above shows tool results dominate cache growth. A <span class="mono">head -n 50</span> on file reads saves more KV than any quantization flag.</li>
+  <li><strong>Watch for the silent truncation failure</strong>: when history exceeds the window, frameworks silently drop the oldest turns — including, catastrophically, your system prompt and tool schemas if the client re-sends them per turn. Chapter 10’s architecture prevents this class of failure by construction.</li>
+</ol>
+<!-- ==================== CHAPTER 6 ==================== -->
+<h2 class="ch" id="ch6"><span class="chno">6.</span> Offloading: VRAM + RAM as One Pool</h2>
+<p class="ch-sub">Layer splitting, mmap, unified memory, and the MoE trick — how a 30 B model runs on a machine whose GPU cannot hold a 9 B one.</p>
+
+<h3>6.1 How layer splitting actually works</h3>
+<p>llama.cpp’s <span class="mono">--n-gpu-layers</span> (<span class="mono">-ngl</span>) flag is the load-bearing wall of low-VRAM inference. A transformer is a stack of identical decoder layers; the engine loads them one at a time — the first <span class="mono">-ngl</span> layers onto the GPU, the remainder into system RAM — and at generation time the hidden state hops across the PCIe bus at the layer boundary, computes the CPU-resident layers on system cores, and hops back. Prompt processing is special-cased: even when most layers are on CPU, the GPU handles the large prompt batches when possible, which matters enormously for agents (§7.4). The mental model to hold: <strong>every token pays the PCIe round-trip cost of every CPU-resident layer</strong>, and pays it in both directions.</p>
+
+<p>Setting <span class="mono">-ngl 99</span> (or any number ≥ the layer count) offloads everything and lets the engine clamp automatically; on a mixed machine you want the precise number that fills VRAM without exceeding it, because leftover VRAM is pure waste while overflow means either a crash or silent system-memory fallback. Modern llama.cpp builds print exactly how much VRAM each layer needs at load time (<span class="mono">offloaded 27/33 layers to GPU</span> plus buffer sizes), and community tooling exists that virtualizes test allocations to find the maximum split automatically (the llama.cpp GPU-automation thread describes the technique). Chapter 11’s sweep script brute-forces the same answer in two minutes with <span class="mono">llama-bench</span>.</p>
+
+<h3>6.2 What offloading costs: the speed curve</h3>
+<p>The relationship between GPU-resident fraction and speed is close to linear, with two corrections. First, the intercept is favorable: even a small GPU share beats pure CPU execution by a wide margin, because the GPU offloads prompt processing and the attention-heavy layers benefit disproportionately. Second, the slope depends on your PCIe link and RAM bandwidth: a PCIe 4.0 ×16 machine loses markedly less per offloaded layer than a PCIe 3.0 ×8 one. The bmdpat guide’s systematic <span class="mono">-ngl</span> testing summarizes the community consensus plainly: <em>offloading 50 % of layers already yields a major speedup over CPU-only, and the relationship is roughly linear from there</em>.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Configuration (8 B-class dense, Q4_K_M)</th><th class="num">Typical tok/s (RTX 4060/3060-class + DDR4)</th><th>Relative</th></tr></thead>
+<tbody>
+<tr><td>100 % layers on GPU (fits)</td><td class="num">30–45</td><td><span class="tag good">1.0×</span></td></tr>
+<tr><td>~85 % on GPU (compute buffers forced spill)</td><td class="num">20–30</td><td><span class="tag good">~0.7×</span></td></tr>
+<tr><td>50 % on GPU</td><td class="num">10–18</td><td><span class="tag warn">~0.4×</span></td></tr>
+<tr><td>0 % — pure CPU (6–8 modern cores)</td><td class="num">4–8</td><td><span class="tag warn">~0.15×</span></td></tr>
+<tr><td>14 B Q4_K_M, ~60–70 % on GPU</td><td class="num">6–15</td><td><span class="tag neutral">bigger model, still usable</span></td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Synthesis of community measurements (r/LocalLLaMA RTX 3060/4060 benchmark threads, singhajit.com RTX 3060 backend comparison: 23–29 tok/s across backends at 8 B Q4, llama.cpp CUDA scoreboard #15013). Treat as mid-band estimates; §3.2’s roofline model predicts your exact card.</div>
+</div>
+
+<p>Two design consequences follow from the curve. First, <strong>the 8 GB + 32 GB machine should run two models, not one</strong>: a fully-in-VRAM workhorse (8 B at Q4/Q5) for interactive agent steps, and — only when a task demands frontier-adjacent quality — a larger split model at 6–15 tok/s. Second, <strong>agentic workloads tolerate the slow tier far better than chat does</strong> (§1.2): a planning call that runs at 10 tok/s for 60 seconds inside a 20-minute task is not the bottleneck it would feel like in a chat window.</p>
+
+<h3>6.3 mmap: the quiet enabler</h3>
+<p>llama.cpp memory-maps the model file by default: the OS pages weights into RAM on demand, the page cache <em>is</em> the model copy, and — the under-appreciated part — <strong>RAM used as page cache is reclaimable</strong>. Swap between two 15 GB models in seconds (the llama-swap project builds an entire hot-swap proxy on this), and after a crash the next load is served mostly from warm cache. The complementary flags worth knowing: <span class="mono">--mlock</span> pins weights in RAM to prevent eviction (good for the long-running agent server; costs you the reclaimability), and <span class="mono">--no-mmap</span> preloads deterministically at the cost of slower startup and doubled transient memory. Default advice for an agent box: mmap on, mlock on for the primary model, NVMe underneath.</p>
+
+<h3>6.4 Unified memory: usually a trap on PCIe machines</h3>
+<p>llama.cpp offers <span class="mono">GGML_CUDA_ENABLE_UNIFIED_MEMORY=1</span>, which uses CUDA managed memory to let the GPU transparently page model tensors from system RAM. On machines with a real unified memory fabric (Apple Silicon, NVIDIA Grace, DGX Spark) this is the natural mode. On your machine — where the GPU reaches RAM only across PCIe — it is usually a trap: community testing on r/LocalLLaMA and the NVIDIA developer forums consistently finds PCIe-attached unified memory “very slow,” with page-fault storms at the tensor boundary replacing the controlled streaming that layer-splitting provides. The one documented exception (llama.cpp PR #8035): for very large models at aggressive low-bit quants where only a fixed small working set is hot — e.g., Llama-3-70B IQ2_XS on 24 GB — unified memory beat manual partial offload, because the driver’s page prediction occasionally outperforms a bad manual split. The rule of thumb that falls out: <strong>prefer explicit layer splitting on PCIe machines; reserve unified memory for experiments, not for your daily driver.</strong></p>
+
+<h3>6.5 The MoE trick: why 30 B parameters can be cheaper than 9 B</h3>
+<p>A mixture-of-experts model stores far more parameters than it uses per token: Qwen3-30B-A3B has 30 B parameters distributed across routed experts, but each token activates only ~3 B of them (plus shared experts and attention). Combine that with hybrid placement and something remarkable happens for small-VRAM machines:</p>
+
+<ul>
+  <li><strong>The always-active tensors — attention layers, shared experts, embeddings — are small</strong> (~3–5 GB at Q4). Put those in VRAM.</li>
+  <li><strong>The routed experts are read sparsely</strong>: only the experts the router selects per token are touched. They can live in system RAM, streamed across PCIe on demand — and with fast DDR5 the streaming cost per token is bounded by the ~3 B active bytes, not the 30 B total.</li>
+  <li><strong>Prompt processing runs on the GPU</strong> even with experts on CPU (the Hugging Face MoE offload guide by Doctor-Shotgun documents this llama.cpp capability and reports CPU+GPU MoE inference as “very performant” for exactly this reason).</li>
+</ul>
+
+<p>The community measurements confirm the theory at consumer scale. Unsloth’s Qwen3-Coder-30B guide reports 6+ tok/s for the 30 B coder model on 18 GB of combined memory — modest, but that is a frontier-adjacent <em>coding agent</em> model running on hardware a fraction of its size class. r/LocalLLaMA reports for Qwen3-30B-A3B at Q4_K_M on a 24 GB card include 90 K-token contexts with 40–48 of 48 layers offloaded; the same model at ~19 GB total splits comfortably across your 8 + 32 GB (VRAM takes attention + shared + a slice of experts). And the 2026 orcarouter coding-LLM survey notes the community has squeezed Qwen3-Coder-30B onto 8 GB cards outright using TurboQuant-style KV compression — extreme, but indicative. On an 8 GB card expect <strong>8–20 tok/s</strong> for a Q4 30B-A3B with the right tensor split, versus 6–15 for a 14 B dense — the MoE option buys more capability per token-second at the cost of setup care.</p>
+
+<div class="callout info"><span class="lab">The tensor-split mechanics</span>
+<p>Modern llama.cpp lets you route tensor <em>types</em>, not just layer counts, via <span class="mono">--override-tensor</span> (e.g., keep <span class="mono">blk\..*\.ffn_.*_exps.*</span> on CPU while everything else goes to GPU). That regex is the MoE recipe: attention + shared experts in VRAM, routed experts in RAM. Ollama does a reasonable automatic split; llama.cpp with explicit overrides is the power path. Chapter 11 gives the exact command line.</p></div>
+
+<!-- ==================== CHAPTER 7 ==================== -->
+<h2 class="ch" id="ch7"><span class="chno">7.</span> Throughput Engineering: Making It Fast</h2>
+<p class="ch-sub">Measure first, then tune the four knobs that matter: placement, threads, prompt processing, and speculation.</p>
+
+<h3>7.1 The measurement discipline</h3>
+<p>Every speed claim in this paper is reproducible with a two-command loop, and your first hour with any model should be spent in it. <span class="mono">llama-bench</span> is the standard harness: it reports prompt-processing (<span class="mono">pp</span>, tokens/s ingesting input) and text-generation (<span class="mono">tg</span>, tokens/s producing output) separately — the two numbers that define agent latency, since agents spend most wall-clock time in <span class="mono">pp</span> re-ingesting history at every step and most perceived liveliness in <span class="mono">tg</span>.</p>
+
+<div class="codetitle"><span>bash · llama-bench basics</span><span class="dots">· · ·</span></div>
+<pre><code><span class="c"># Core benchmark: prompt-processing and generation at two context sizes</span>
+./llama-bench -m qwen3-8b-Q4_K_M.gguf -ngl 99 -p 512,2048 -n 128 -r 3
+
+<span class="c"># Sweep GPU-layer counts to find your machine's optimal split (do this once per model)</span>
+for ngl in 99 36 30 24 18 12 0; do
+  echo "=== ngl=$ngl ==="; ./llama-bench -m qwen3-14b-Q4_K_M.gguf -ngl $ngl -p 512 -n 64 -r 2
+done
+
+<span class="c"># Watch VRAM while it runs (second terminal)</span>
+watch -n 0.5 nvidia-smi --query-gpu=memory.used,utilization.gpu --format=csv</code></pre>
+
+<p>One measurement-hygiene warning from the field, worth internalizing before you trust any number including your own: an influential blog post on llama.cpp CUDA benchmarking (“Why Your llama.cpp CUDA Benchmarks Are Wrong”) documented a common failure where mis-built binaries silently ran without real CUDA support, producing a plausible 52 tok/s that was actually a lie. Verify your build with <span class="mono">llama-bench</span>’s output (it prints the backend) and sanity-check that GPU utilization rises during generation. The same discipline applies to community numbers: a benchmark without its build, flags, and context size is a rumor.</p>
+
+<h3>7.2 Threads and the CPU side</h3>
+<p>For the CPU-resident fraction of any split model, thread count is the top lever — and the llama.cpp performance documentation is blunt that <em>incorrect thread settings are the #1 cause of slow inference</em>. The optimum is physical cores, sometimes physical cores minus one (leaving headroom for the GPU driver and your agent process), and almost never hyperthreads: SMT threads share execution units with their sibling cores and add scheduling jitter to latency-sensitive decode. Community measurements on hybrid setups (the 3090+3060+3060 benchmark thread) show the same pattern on the GPU side — the wrong process/thread mix cost 20–30 % of throughput until tuned. Set <span class="mono">--threads</span> to your physical core count (§3.5’s audit) and move on; this is a five-minute fix worth 1.3–1.8× on CPU-heavy configurations.</p>
+
+<h3>7.3 Prompt processing: the agent’s real tax</h3>
+<p>Generation gets the attention; prompt processing pays the bills. Every agent step resubmits the full history — system prompt, schemas, prior turns, tool results — before generating a single new token. At 8 K history this means ingesting 8 K tokens per step; at 30 steps, ~240 K tokens of cumulative <span class="mono">pp</span>. The saving grace: prompt processing is compute-bound and batches beautifully, so the GPU handles it far faster than generation — an RTX 4060 processes 1,000–3,000+ tok/s of prompt at 8 B scale versus ~40 tok/s of generation, and even heavily-offloaded MoE setups keep <span class="mono">pp</span> on the GPU (§6.5). Your levers, in order of impact:</p>
+<ol>
+  <li><strong>Keep the model in VRAM if you can</strong> — prompt processing suffers more from CPU-resident layers than generation does.</li>
+  <li><strong>Enable Flash Attention</strong> (§5.4) — it shrinks the processing-time memory spike that otherwise caps your usable batch.</li>
+  <li><strong>Trim what you resubmit</strong> — this is context engineering (Ch. 10), and it is the only lever that improves <em>both</em> pp and KV simultaneously. Halving resubmitted history halves pp time at every single step, compounding across the whole run.</li>
+  <li><strong>Batch size</strong> (<span class="mono">-b</span>/<span class="mono">-ub</span>): defaults are usually fine at single-user scale; raise <span class="mono">-ub</span> only if logs show prompt truncation into multiple passes.</li>
+</ol>
+
+<h3>7.4 Parallelism: one slot, usually</h3>
+<p>Ollama and llama.cpp can serve multiple requests against one loaded model by pre-allocating KV cache for <span class="mono">OLLAMA_NUM_PARALLEL</span> slots (default auto-selects 4 or 1). Understand the trade precisely: parallel slots <em>divide your KV budget</em> — four slots at 16 K each is the same memory as one slot at 64 K — and on an 8 GB card your KV budget is the scarce resource. For a single-user agent workstation, set <span class="mono">OLLAMA_NUM_PARALLEL=1</span> and give the whole cache to your one agent; the 4-slot default is a server posture that silently quarters your context headroom. (The documentation’s guidance matches: parallel defaults trade memory footprint for throughput — the wrong trade when memory <em>is</em> the constraint.) Related environment hygiene for agent servers: <span class="mono">OLLAMA_KEEP_ALIVE</span> — the default 5-minute unload punishes an agent whose tool calls take six minutes; set it to hours (<span class="mono">24h</span>) or <span class="mono">-1</span> so the model stays resident, and pair it with <span class="mono">--mlock</span> in llama.cpp for the same effect.</p>
+
+<h3>7.5 Speculative decoding: 25–60 % free speed</h3>
+<p>Speculative decoding pairs your target model with a tiny <em>draft</em> model (e.g., Qwen3-0.6B drafting for Qwen3-8B, sharing its tokenizer). The draft model cheaply guesses several tokens; the target model verifies them in a single batched pass; accepted tokens are kept and the first disagreement triggers a fallback — mathematically identical output distribution, meaningfully higher throughput. The measurements: llama.cpp’s speculative-decoding launch thread reported <strong>25–60 % speedups</strong> across models (25–40 % being typical); the broader literature surveys (glukhov.org’s 2026 guide, the arXiv Spec-Bench evaluation) put standard draft-model schemes at 20–50 % and structured heads like EAGLE-3 at up to 2–4× under favorable conditions. The acceptance rate — and therefore the speedup — depends entirely on how similar draft and target distributions are, so draft models must be same-family. On an 8 GB card the memory math is friendly (a 0.5–1.7 B draft at Q8 costs 0.5–1.9 GB), but VRAM competition with the target’s KV cache is real: measure whether the draft’s residency costs you more in context than it gains in tokens.</p>
+
+<div class="codetitle"><span>bash · speculative decoding in llama.cpp</span><span class="dots">· · ·</span></div>
+<pre><code><span class="c"># Target = Qwen3-8B Q4_K_M (in VRAM), draft = Qwen3-0.6B Q8_0</span>
+./llama-server \
+  -m qwen3-8b-Q4_K_M.gguf \
+  -md qwen3-0.6b-Q8_0.gguf \      <span class="c"># draft model</span>
+  -ngl 99 -ngld 99 \              <span class="c"># both fully on GPU</span>
+  -c 16384 -fa -ctk q8_0 -ctv q8_0 \
+  --draft-max 16 --draft-min 4    <span class="c"># tokens per speculation round</span>
+
+<span class="c"># Expect log lines like:  accepted ~60-70 %, speedup ~1.3-1.6×</span>
+<span class="c"># (varies with task entropy — code &gt; chat &gt; creative writing in acceptance)</span></code></pre>
+
+<h3>7.6 The tuning checklist, in order of ROI</h3>
+<div class="tblwrap">
+<table>
+<thead><tr><th>Order</th><th>Action</th><th>Measured gain</th><th>Cost</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Correct <span class="mono">-ngl</span> (all layers that fit, no overflow)</td><td>Up to 3–8× vs bad split</td><td>2 min sweep (§7.1)</td></tr>
+<tr><td>2</td><td>Flash Attention on</td><td>Buffer savings; enables KV quant</td><td>One flag</td></tr>
+<tr><td>3</td><td><span class="mono">--threads</span> = physical cores</td><td>1.3–1.8× on CPU share</td><td>One flag</td></tr>
+<tr><td>4</td><td>q8_0 KV cache</td><td>~2× context at ~zero quality cost</td><td>Two flags</td></tr>
+<tr><td>5</td><td>Dual-channel RAM (if single-stick)</td><td>1.3–1.8× on offloaded layers</td><td>Hardware</td></tr>
+<tr><td>6</td><td>Speculative decoding</td><td>1.25–1.6×</td><td>~1 GB VRAM + setup</td></tr>
+<tr><td>7</td><td>Context discipline (Ch. 10)</td><td>Faster <em>every</em> step; compounds</td><td>Architecture</td></tr>
+</tbody>
+</table>
+</div>
+<!-- ==================== PART III DIVIDER ==================== -->
+<div class="part-divider" id="part3">
+  <div class="pd-part">Part III</div>
+  <h2>The Agent Stack</h2>
+  <p>From abstract capability to a running system: which models the 8 GB ladder can actually hold, which engine should serve them, how to architect the agent so context never becomes the failure mode, and the complete build with code.</p>
+</div>
+
+<!-- ==================== CHAPTER 8 ==================== -->
+<h2 class="ch" id="ch8"><span class="chno">8.</span> Choosing the Model: The 8 GB Ladder</h2>
+<p class="ch-sub">Benchmarks for every rung, why tool-calling reliability beats MMLU, and the two-model doctrine.</p>
+
+<h3>8.1 What the benchmarks actually measure</h3>
+<p>Model selection for agents is not the same game as model selection for chat. General-knowledge scores (MMLU) correlate loosely with agentic usefulness; what predicts agent success is <strong>(a)</strong> function-calling accuracy (measured directly by the Berkeley Function Calling Leaderboard, BFCL — where Llama 3.1 8B Instruct scores ~76 % and the Qwen3 series ranks at or near the top of open models), <strong>(b)</strong> instruction-following precision under long multi-part prompts, <strong>(c)</strong> robustness to quantization on <em>structured output</em> — the CoT result of §4.5 applies doubly to JSON tool calls — and <strong>(d)</strong> coding ability if your agent edits files (HumanEval-class metrics, or SWE-bench for whole-task evaluation). A useful piece of evidence that small models are agent-viable: a 2026 arXiv study of tool-calling representations found clean linear structure in models as small as 4 B (Gemma 3 4B, Qwen3 4B), with simple probes reading tool selection at 100 % accuracy after 10–20 examples — tool calling is a learnable, well-structured capability in this size class, not a frontier-model monopoly.</p>
+
+<h3>8.2 The ladder, with data</h3>
+<p>Here is the full selection space for your machine, ordered by how much of it stays in VRAM. Benchmark figures are the models’ published numbers (bf16); expect the quantization deltas of §4.4 on top.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Rung</th><th>Model</th><th class="num">Q4_K_M size</th><th class="num">Fits 8 GB?</th><th>Agent-relevant strengths</th></tr></thead>
+<tbody>
+<tr><td rowspan="3"><b>Draft tier</b><br>0.5–2 B</td><td>Qwen3-0.6B / 1.7B</td><td class="num">0.5–1.2 GB</td><td><span class="tag good">Easily</span></td><td>Speculative drafting for Qwen3-8B; ultra-fast summarizers for context compression</td></tr>
+<tr><td>Llama 3.2 1B/3B</td><td class="num">0.8–2.0 GB</td><td><span class="tag good">Easily</span></td><td>Edge-class chat; community-measured ~28 tok/s class on CPU-only rigs</td></tr>
+<tr><td>Qwen3-1.7B (tuned)</td><td class="num">1.2 GB</td><td><span class="tag good">Easily</span></td><td>Cited by 2026 SLM surveys as the go-to small <em>tool-calling specialist</em> after fine-tune</td></tr>
+<tr><td rowspan="3"><b>Fast tier</b><br>3–4 B</td><td>Qwen3-4B</td><td class="num">2.6 GB</td><td><span class="tag good">Yes + 32 K ctx</span></td><td>Best-in-class small agent: strong BFCL-family tool use, 32 K native context, thinking-mode toggle</td></tr>
+<tr><td>Phi-4-mini (3.8B)</td><td class="num">2.5 GB</td><td><span class="tag good">Yes + 32 K ctx</span></td><td>MMLU 67.3, HumanEval 74.4, GSM8K 88.6 — exceptional math/code for size; ~15–20 % faster than Qwen3-4B per community timing</td></tr>
+<tr><td>Gemma 3 4B</td><td class="num">2.4 GB</td><td><span class="tag good">Yes</span></td><td>128 K native context, multimodal (vision), strong multilingual</td></tr>
+<tr><td rowspan="3"><b>Core tier</b><br>7–9 B</td><td><b>Qwen3-8B</b></td><td class="num">5.1 GB</td><td><span class="tag good">Yes + 16 K (q8 KV)</span></td><td>The workhorse pick: top open-8B tool calling, hybrid thinking mode, Qwen ecosystem maturity</td></tr>
+<tr><td>Llama 3.1 8B Instruct</td><td class="num">4.9 GB</td><td><span class="tag good">Yes + 16 K (q8 KV)</span></td><td>MMLU ~68.4, BFCL ~76.1 — the best-understood 8B in every framework; huge fine-tune ecosystem</td></tr>
+<tr><td>Qwen2.5-Coder-7B</td><td class="num">4.7 GB</td><td><span class="tag good">Yes</span></td><td>The coding-agent specialist at this size; tiny 4-KV-head cache (56 KiB/token — see Ch. 5 table) makes it context-cheap</td></tr>
+<tr><td rowspan="2"><b>Big-dense tier</b><br>12–14 B</td><td>Gemma 3 12B (QAT)</td><td class="num">6.7–7.3 GB</td><td><span class="tag warn">Tight — short ctx</span></td><td>Quality jump over 8 B class; QAT variant community-verified to run on 8 GB (fat 384 KiB/token KV forces q8_0 cache + modest context)</td></tr>
+<tr><td>Qwen3-14B</td><td class="num">9.3 GB</td><td><span class="tag warn">Split required</span></td><td>MMLU-Pro ~65.5 class capability at 6–15 tok/s hybrid — the quality ceiling for dense-on-this-box</td></tr>
+<tr><td rowspan="2"><b>MoE tier</b><br>30 B class</td><td><b>Qwen3-30B-A3B</b></td><td class="num">18.6 GB</td><td><span class="tag warn">Hybrid (6.5)</span></td><td>3 B active of 30 B: near-14B-dense quality at 8–20 tok/s with the §6.5 tensor split; the flagship option for this hardware</td></tr>
+<tr><td>Qwen3-Coder-30B-A3B</td><td class="num">~19 GB</td><td><span class="tag warn">Hybrid (6.5)</span></td><td>Agentic-coding specialist of the family; Unsloth-documented at 6+ tok/s on 18 GB combined memory, higher with the right split</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Sizes are canonical GGUF Q4_K_M releases. “Hybrid (6.5)” = Chapter 6 §5 recipe: attention + shared experts + KV in VRAM, routed experts streamed from RAM. Scores: Qwen3 technical report (arXiv 2505.09388), Phi-4-mini model card, Llama 3.1 model card, BFCL leaderboard.</div>
+</div>
+
+<h3>8.3 Head-to-head at the core tier</h3>
+<p>Because the core tier (8–9 B) is where your agent will live most of the time, the choice deserves the evidence rather than vibes. A controlled TrueFoundry evaluation ran Qwen3-8B, Llama 3.1 8B, and Ministral 8B on identical vLLM serving hardware across 4–256 concurrent users; the headline for single-user relevance was that Qwen3-8B sustained the strongest quality-per-compute at low concurrency (its thinking mode trades latency for accuracy on hard steps — you can toggle it off for fast tool loops), while Llama 3.1 8B held the most stable behavior under load. Independent comparisons (kunalganglani.com, willitrunai.com) converge on the same summary: <strong>Qwen3-8B outperforms Llama 3.1 8B on most knowledge, coding, and multilingual benchmarks, while Llama retains edges in ecosystem maturity and slight VRAM economy</strong> (4.9 vs 5.1 GB at Q4_K_M). For an agent box, lean Qwen3-8B for capability, Llama 3.1 8B when you want every framework integration to work first try, and Qwen2.5-Coder-7B when the agent’s job is code — its unusually small KV cache (4 heads, not 8) is a genuine architectural advantage for long coding sessions on 8 GB.</p>
+
+<h3>8.4 The two-model doctrine</h3>
+<p>The strongest recommendation this chapter makes is structural, not model-specific: <strong>run a two-model stack, with roles assigned by tier.</strong> The fast in-VRAM core model (Qwen3-8B class) executes the agent loop — planning, tool calls, observations — where latency and format reliability matter most. The big MoE model (Qwen3-30B-A3B class) is loaded on demand — via llama-swap or an Ollama second instance — for the few hard moments: the one-shot architecture decision, the gnarly debugging session, the long synthesis. The draft tier earns its keep inside this doctrine too: a resident 0.6 B model accelerates the core (§7.5) and doubles as the rolling summarizer for context compression (§10.3), a job where its speed matters more than its brilliance. This matches how the memory economics actually work: your VRAM’s comparative advantage is latency, your RAM + PCIe’s comparative advantage is capacity, and the doctrine assigns each workload to the tier that serves it best. It also matches how frontier agent products are architected — fast models in the loop, big models at decision points — scaled down to your silicon.</p>
+
+<div class="callout warn"><span class="lab">The BFCL caveat for quantized agents</span>
+<p>Published BFCL scores are measured at fp16/bf16. The §4.5 compounding-error result means your Q4_K_M model’s <em>effective</em> tool-calling accuracy will sit somewhat below its published number, and degrades non-linearly as context fills and chains lengthen. Mitigate structurally rather than by chasing a bigger model: fewer tools per call, terse schemas, grammar-constrained decoding (§10.4), and retry-on-format-error. These recover more reliability than one quant tier costs.</p></div>
+
+<!-- ==================== CHAPTER 9 ==================== -->
+<h2 class="ch" id="ch9"><span class="chno">9.</span> Inference Engines Compared</h2>
+<p class="ch-sub">llama.cpp, Ollama, vLLM, LM Studio — what each is actually good at, and which belongs on an 8 GB agent box.</p>
+
+<h3>9.1 The four contenders</h3>
+<p><strong>llama.cpp</strong> is the reference implementation everything else builds on: the GGUF format, layer splitting, KV quantization, speculative decoding, Flash Attention, tensor overrides — every technique in Part II — originates or lands here first. It ships <span class="mono">llama-server</span> (OpenAI-compatible HTTP API, including tool-calling support in current builds) and <span class="mono">llama-bench</span>. Cost: you build or download binaries and compose flags yourself. <strong>Ollama</strong> is llama.cpp (plus its own Go serving layer and a model zoo) wrapped in one-command ergonomics — <span class="mono">ollama pull qwen3:8b</span> and you are serving. It auto-configures offload and context defaults, which is both its charm and its danger on a memory-constrained card. <strong>vLLM</strong> is a throughput-oriented serving engine built on PagedAttention and continuous batching — designed for concurrent users on big GPUs, loading AWQ/GPTQ/FP8 rather than GGUF. <strong>LM Studio</strong> is the polished GUI: model browser, chat interface, an embedded llama.cpp server — ideal for exploring, at some performance cost (a comparative benchmark measured it 29 % slower than raw llama.cpp on M3 Max hardware, 38.2 vs 53.5 tok/s; the gap reflects wrapper overhead and conservative defaults).</p>
+
+<h3>9.2 The comparison, on your constraints</h3>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Criterion</th><th>llama.cpp</th><th>Ollama</th><th>vLLM</th><th>LM Studio</th></tr></thead>
+<tbody>
+<tr><td>Hybrid VRAM+RAM execution</td><td><span class="tag good">Best in class</span> (-ngl, tensor overrides, mlock)</td><td><span class="tag good">Good</span> (automatic split; less control)</td><td><span class="tag bad">Poor fit</span> (wants full GPU residency)</td><td><span class="tag good">Good</span> (inherits llama.cpp)</td></tr>
+<tr><td>Memory overhead of the serving stack</td><td>Minimal</td><td><span class="tag good">Lean</span> — 1.8 GB system RAM measured vs vLLM’s 4.6 GB</td><td><span class="tag warn">Heavy</span></td><td>Moderate (Electron app)</td></tr>
+<tr><td>Under concurrency</td><td>Good (batched server)</td><td>Good (NUM_PARALLEL slots)</td><td><span class="tag good">Best</span> (continuous batching)</td><td>Basic</td></tr>
+<tr><td>Behavior when model &gt; VRAM</td><td>Controlled split, predictable</td><td>Controlled split, automatic</td><td><span class="tag bad">Degrades sharply / OOM-oriented</span></td><td>Automatic split</td></tr>
+<tr><td>Tool-calling API for agents</td><td>OpenAI-compatible + GBNF grammars</td><td>OpenAI-compatible + Modelfile params</td><td>OpenAI-compatible (most complete)</td><td>OpenAI-compatible</td></tr>
+<tr><td>Config surface worth learning</td><td>Large (this paper = the tutorial)</td><td>Small (env vars + Modelfile)</td><td>Large (server-class)</td><td>None (GUI)</td></tr>
+<tr><td><b>Verdict for 8 GB agent box</b></td><td><span class="tag good">Primary recommendation</span></td><td><span class="tag good">Fine daily driver once tuned</span></td><td><span class="tag warn">Only for multi-user serving of ≤8B AWQ</span></td><td><span class="tag neutral">Exploration &amp; chat; not the agent backend</span></td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Sources: towardsai Ollama-vs-vLLM-vs-llama.cpp serving test (RAM overhead 1.8 vs 4.6 GB); inventivehq Ollama/LM Studio/llama.cpp comparison (LM Studio 29 % slower than llama.cpp on M3 Max); Red Hat llama.cpp-vs-vLLM guide; tensorfoundry LLM serving survey. The Reddit consensus thread (“Has vLLM made Ollama redundant?”) matches: vLLM for VRAM-rich servers, llama.cpp/Ollama for the rest of us.</div>
+</div>
+
+<p>The vLLM row deserves a sentence of fairness rather than a dismissal: if your use case is <em>serving an 8 B AWQ model to several simultaneous users</em> — a team-shared agent gateway, say — vLLM’s continuous batching genuinely wins throughput, and its <span class="mono">gpu_memory_utilization</span> flag can keep an 8 GB card disciplined. But for the single-workstation agent pattern this paper targets, its strengths (concurrency, throughput) are not your constraints, and its weaknesses (residency assumptions, heavyweight stack) are exactly your constraints. The dev.to spill test makes the boundary vivid: past 24 GB, llama.cpp and Ollama degrade gracefully to single-digit tok/s and <em>keep going</em> — engineered hybrid behavior — while server-class engines treat oversubscription as an error condition.</p>
+
+<h3>9.3 The recommendation</h3>
+<p><strong>Run llama.cpp’s <span class="mono">llama-server</span> as your agent backend</strong>, configured per Chapter 11 — you get every Part II technique at full power and the OpenAI-compatible API your agent code already speaks. Keep <strong>Ollama installed as the convenience layer</strong> for trying models in 30 seconds (its defaults are merely suboptimal, not broken — the tuning table below fixes them), and treat LM Studio as the friendly exploration GUI. This is also the exact stack the community converged on: llama.cpp for control, Ollama for convenience, everything else situational.</p>
+
+<div class="callout ok"><span class="lab">If you stay on Ollama, set these</span>
+<p>Five environment changes convert Ollama from “convenient defaults” to “disciplined 8 GB citizen”: <span class="mono">OLLAMA_NUM_PARALLEL=1</span> (reclaim KV from parallel slots), <span class="mono">OLLAMA_FLASH_ATTENTION=1</span> (enable FA + KV quant support), <span class="mono">OLLAMA_KV_CACHE_TYPE=q8_0</span> (halve cache cost), <span class="mono">OLLAMA_KEEP_ALIVE=24h</span> (no mid-task model evictions), and per-model <span class="mono">num_ctx</span> in the Modelfile (the silent-truncation fix — Ollama’s context default historically ran as low as 2048, which quietly amputates agent histories).</p></div>
+<!-- ==================== CHAPTER 10 ==================== -->
+<h2 class="ch" id="ch10"><span class="chno">10.</span> Agent Architecture for Constrained Machines</h2>
+<p class="ch-sub">On an 8 GB box, the agent’s design is the second half of the memory budget. Context engineering is capability engineering.</p>
+
+<h3>10.1 The loop, and why it eats memory</h3>
+<p>Strip every framework away and an agent is four things in a cycle: a <strong>prompt assembly</strong> step (system instructions + tool schemas + selected history), a <strong>model call</strong> that emits either a tool invocation or a final answer, a <strong>tool execution</strong> step whose output is appended to history, and a <strong>termination check</strong>. The ReAct formulation — Reason, Act, Observe, repeat — is the canonical shape, and SWE-bench Verified’s own results page credits surprisingly high scores to “just a simple ReAct agent loop” with no special scaffold. Each turn of the cycle grows the history; each growth enlarges the KV cache (§5.2) and the prompt-processing bill (§7.3); and nothing in the naive loop ever shrinks either. On a 128 GB server this negligence is affordable. On your machine, the agent that manages its own context is the difference between a system that completes hour-long tasks and one that OOMs at step 20 — or worse, silently forgets its instructions and wanders.</p>
+
+<p>The framing that makes this concrete is the one Mem0’s engineering blog popularized: <strong>the context window is RAM, not storage.</strong> Working state belongs in context; everything else — task definition, long-term facts, retrieved knowledge, old tool outputs — belongs in external storage (files, a database, a retrieval index) that is paged <em>in</em> on demand and expires <em>out</em> when no longer relevant. Production agent systems (per the zylos.ai session-lifecycle survey) converged on exactly this discipline: session rotation, memory persistence, and priority management for always-on operation. Your architecture should be a miniature of theirs.</p>
+
+<h3>10.2 Strategy menu for context management</h3>
+<p>Five strategies, in the order you should adopt them. The first two are mandatory; the rest scale with task ambition.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Strategy</th><th>Mechanism</th><th>Memory effect</th><th>Quality effect</th><th>Use when</th></tr></thead>
+<tbody>
+<tr><td><b>1. Tool-output hygiene</b></td><td>Truncate/summarize every tool result before appending (head-N lines, strip whitespace, cap bytes)</td><td>Cuts the dominant growth term (§5.2) by 2–10×</td><td>Usually neutral or positive (noise removal)</td><td>Always</td></tr>
+<tr><td><b>2. Sliding window + fixed head</b></td><td>Keep system prompt + schemas + first user message pinned; drop or compress oldest middle turns</td><td>Bounded cache; no runaway</td><td>Mild — recent turns carry most signal</td><td>Always (it’s the floor of safety)</td></tr>
+<tr><td><b>3. Rolling summarization</b></td><td>When history crosses a threshold, compress evicted turns into a running summary written by the small resident model</td><td>Unbounded tasks in bounded memory</td><td>Good, if summaries capture decisions &amp; open items</td><td>Tasks &gt; ~30 steps</td></tr>
+<tr><td><b>4. Retrieval (RAG)</b></td><td>Store tool outputs/findings in a vector index; re-inject only relevant chunks per step</td><td>Context shrinks to what matters <em>now</em></td><td>Good for fact recall; weak for procedural state</td><td>Document-heavy tasks; long memory across sessions</td></tr>
+<tr><td><b>5. Sub-agent isolation</b></td><td>Spawn a fresh-context worker for bounded subtasks (read these 5 files, find the bug), return only its conclusion</td><td>Blows up context <em>usage</em> without touching your window</td><td>Strong — mirrors frontier multi-agent patterns</td><td>Exploratory spikes, bulk reading, retries</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Strategy names follow the machinelearningmastery.com taxonomy of context-window management plus community practice (r/AI_Agents: “summarize old turns, use RAG for retrieval, truncate from the front” is the documentation-consensus recipe). Chapter 11 implements 1–3 and sketches 5.</div>
+</div>
+
+<p>Two implementation details make or break these strategies. First, <strong>never let the eviction boundary eat your system prompt or tool schemas</strong> — the silent-truncation failure of §5.5. Pin them structurally: assemble each turn’s context as <span class="mono">[pinned system block] + [rolling summary] + [last K turns] + [current user turn]</span>, so eviction can only ever touch the designated middle. Second, <strong>summarize <em>into</em> structure, not prose</strong>: a rolling summary formatted as “goal / decisions made / facts learned / files touched / current step / open problems” preserves exactly the state an agent needs to resume coherently, where a paragraph-style summary reliably loses the procedural thread — the multi-day agent-session writeups on dev.to report the same lesson from practice.</p>
+
+<h3>10.3 Tool design for small, quantized models</h3>
+<p>The model executing your loop is an 8 B model at Q4 with a quantization-perturbed distribution. Tool interfaces can be designed to make that model look bigger than it is, or smaller — the difference is mostly schema discipline.</p>
+
+<ul>
+  <li><strong>Few tools per decision.</strong> BFCL-style accuracy drops as the tool count grows; the arXiv tool-calling-probe work shows selection is linearly readable but confusability still rises. 4–7 well-chosen tools beat 20 overlapping ones. If you need more, group them behind a dispatcher tool.</li>
+  <li><strong>Terse, typed schemas.</strong> Short names, one-line descriptions, required fields only. Every schema token is resubmitted at every step (§7.3) — verbose schemas are a permanent context tax you pay hundreds of times.</li>
+  <li><strong>Design outputs for the cache.</strong> Paginate by default (<span class="mono">offset/limit</span>), return IDs not bodies, cap list lengths, make the <em>first</em> line of output the answer.</li>
+  <li><strong>Errors are prompts.</strong> A tool error message is read by the model as its next input; “FileNotFoundError: config.yaml — did you mean config.yml? Use list_dir to check” recovers the loop, while a stack trace fills the cache with useless tokens.</li>
+  <li><strong>Constrain the format at decode time.</strong> llama.cpp’s GBNF grammars (and JSON-schema modes in llama-server/Ollama) make malformed tool calls <em>impossible</em> rather than merely unlikely — the single highest-ROI reliability intervention on quantized models, turning the §4.5 compounding-error risk into a retry at worst.</li>
+  <li><strong>Idempotent, bounded tools.</strong> The agent will call the same tool twice and pass wrong arguments; make the cost of that a no-op, not a mutation.</li>
+</ul>
+
+<h3>10.4 RAG on a budget: the embedding side</h3>
+<p>Retrieval needs an embedding model, and the good news is that they are tiny by LLM standards: <span class="mono">nomic-embed-text-v1.5</span> (137 M parameters, ~274 MB at fp16) or <span class="mono">bge-m3</span> run comfortably alongside your core model — the former even on CPU without hurting loop latency, since embeddings are generated asynchronously with tool execution. Keep the vector store small and local (sqlite-vec, LanceDB, Chroma in embedded mode; all in-process, all free of a server’s RAM). The discipline that matters: <strong>chunk documents to your retrieval budget</strong> (256–512 token chunks mean each retrieved chunk is 256–512 tokens of KV — retrieve five and you have spent 2 K tokens of your window before the model thinks). Retrieval top-k is a memory decision, exactly like context length; tune it like one.</p>
+
+<h3>10.5 The scaffolding lesson from SWE-bench</h3>
+<p>Aspirational evidence that architecture beats size: the mini-swe-agent project — deliberately minimal, ~100 lines of loop logic — resolved <strong>65 % of SWE-bench Verified</strong> instances with a frontier model, and its successor configurations exceed 74 %; the SWE-bench Verified leaderboard notes bash-only ReAct loops matching elaborate scaffolds. The counterproductive pattern the project explicitly rejected is framework bloat: every abstraction layer you add between model and tools costs tokens (re-exported schemas, middleware narrating itself into the history) and hides the state your context management needs to see. On an 8 GB machine this lesson is not philosophy, it is memory: <strong>LangChain-class frameworks bring convenience but also token overhead and several hundred MB of process footprint</strong>; a 200-line bespoke loop (Chapter 11) gives you the §10.2 strategies with zero framework tax and total observability. Use framework abstractions where they earn their memory; otherwise write the loop.</p>
+
+<h3>10.6 Failure modes specific to this hardware</h3>
+<div class="tblwrap">
+<table>
+<thead><tr><th>Failure</th><th>What it looks like</th><th>Root cause</th><th>Fix</th></tr></thead>
+<tbody>
+<tr><td>Silent instruction loss</td><td>Agent forgets its task or output format mid-run</td><td>History exceeded window; oldest messages evicted — including pinned ones, because the client re-sends full history and the server truncates</td><td>Structural pinning (§10.2); explicit <span class="mono">num_ctx</span>; monitor prompt-issued tokens in server logs</td></tr>
+<tr><td>Tool-call format drift</td><td>Malformed JSON, wrong field names, hallucinated tools</td><td>Quantization perturbation compounding over long generations (§4.5)</td><td>GBNF/JSON-schema constrained decoding; schema retry loop; fewer tools</td></tr>
+<tr><td>Mid-task stall</td><td>First tool call after a 10-minute test suite is slow</td><td>Model unloaded by <span class="mono">KEEP_ALIVE</span> default (5 min) → full reload</td><td><span class="mono">KEEP_ALIVE=24h</span> / <span class="mono">--mlock</span> (§7.4)</td></tr>
+<tr><td>Long-context mush</td><td>Correct facts, wrong conclusions in late steps</td><td>Lost-in-the-middle degradation as context fills</td><td>Keep working context ≤ 8–16 K; externalize the rest (§10.2)</td></tr>
+<tr><td>OOM mid-run</td><td>Crash only after N steps of a long task</td><td>KV grew past free VRAM as history accumulated</td><td>Chapter 14 playbook; window + eviction thresholds sized by the Ch. 5 formulas</td></tr>
+</tbody>
+</table>
+</div>
+<!-- ==================== CHAPTER 11 ==================== -->
+<h2 class="ch" id="ch11"><span class="chno">11.</span> The Complete Build: Recipes and Code</h2>
+<p class="ch-sub">Everything from the previous ten chapters, assembled into a running agent on your machine.</p>
+
+<h3>11.1 Build the engine</h3>
+
+<div class="codetitle"><span>bash · build llama.cpp with CUDA (Linux / WSL2)</span><span class="dots">· · ·</span></div>
+<pre><code><span class="c"># Prereqs: CUDA toolkit (nvcc), cmake, a C++ compiler, git</span>
+git clone https://github.com/ggml-org/llama.cpp && cd llama.cpp
+
+cmake -B build -DGGML_CUDA=ON -DCMAKE_CUDA_ARCHITECTURES="89;86"   <span class="c"># 89=4060, 86=3060/3070</span>
+cmake --build build --config Release -j$(nproc)
+
+<span class="c"># Verify CUDA actually linked (see §7.1 warning about silent CPU-only builds)</span>
+./build/bin/llama-bench -m /path/to/tiny-test-model.gguf -ngl 99 -p 128 -n 32
+<span class="c"># Expect "backend: CUDA" in output and GPU util in nvidia-smi</span></code></pre>
+
+<p>Windows users: the llama.cpp releases page ships prebuilt CUDA binaries, and WSL2 runs the Linux build with full GPU passthrough — either path works; the recipes below are identical. Keep the build directory: <span class="mono">llama-server</span>, <span class="mono">llama-bench</span>, and <span class="mono">llama-cli</span> all live in <span class="mono">build/bin/</span>.</p>
+
+<h3>11.2 The sizing calculator (run before every download)</h3>
+<p>The Chapter 2 formulas as a tool. This is deliberately dependency-free — copy it anywhere.</p>
+
+<div class="codetitle"><span>python · kv_calc.py — the paper’s formulas, executable</span><span class="dots">· · ·</span></div>
+<pre><code><span class="c">#!/usr/bin/env python3</span>
+<span class="s">"""VRAM planner: weights + KV cache + overhead vs your card. (Ch. 2 &amp; 5 formulas)"""</span>
+MODELS = {  <span class="c"># name: (params_B, layers, kv_heads, head_dim, q4km_gb)</span>
+  "qwen3-4b":        (4,  36,  8, 128, 2.6),
+  "phi-4-mini":      (3.8, 32,  8, 128, 2.5),
+  "gemma-3-4b":      (4,  34,  4, 256, 2.4),
+  "qwen3-8b":        (8,  36,  8, 128, 5.1),
+  "llama-3.1-8b":    (8,  32,  8, 128, 4.9),
+  "qwen2.5-coder-7b":(7,  28,  4, 128, 4.7),
+  "gemma-3-12b":     (12, 48,  8, 256, 7.3),
+  "qwen3-14b":       (14, 40,  8, 128, 9.3),
+  "qwen3-30b-a3b":   (30, 48,  4, 128, 18.6),
+}
+VRAM_GB = 8.0; COMFORT = 6.5; TIGHT = 7.4; OVERHEAD = 0.9; KV_BYTES = {"f16": 2, "q8_0": 1.06, "q4_0": 0.56}
+
+def plan(name, ctx_k=16, kv="q8_0", quant_gb=None):
+    p, L, H, D, q4 = MODELS[name]
+    w = quant_gb if quant_gb else q4
+    per_tok = 2 * L * H * D * KV_BYTES[kv]              <span class="c"># §5.1 formula</span>
+    kv_gb = per_tok * ctx_k * 1024 / 1e9
+    total = w + kv_gb + OVERHEAD
+    verdict = "FITS w/ MARGIN" if total &lt;= COMFORT else \
+              "TIGHT (headless/iGPU)" if total &lt;= TIGHT else "SPLIT/OOM"
+    print(f"{name:&lt;18} weights={w:5.1f}  KV@{kv}/{ctx_k}K={kv_gb:5.2f}  "
+          f"total≈{total:5.2f} GB  {verdict}")
+    return total
+
+<span class="c">if __name__ == "__main__":</span>
+    print(f"Tiers: ≤{COMFORT} GB comfortable · ≤{TIGHT} GB tight (§2.4)")
+    plan("qwen3-8b", 16, "q8_0")          <span class="c"># the recommended core config (tight tier)</span>
+    plan("qwen3-8b", 8, "q8_0")           <span class="c"># same model, comfort tier</span>
+    plan("gemma-3-12b", 8, "q8_0")        <span class="c"># the tight-fit rung</span>
+    plan("qwen3-14b", 8, "q8_0")          <span class="c"># → split required (Ch. 6)</span>
+    plan("qwen3-30b-a3b", 32, "q8_0")     <span class="c"># → MoE hybrid (§6.5)</span></code></pre>
+
+<h3>11.3 Launch configurations (the three servers)</h3>
+
+<div class="codetitle"><span>bash · recipe A — core agent server (Qwen3-8B, all of Part II applied)</span><span class="dots">· · ·</span></div>
+<pre><code>./build/bin/llama-server \
+  -m models/qwen3-8b-Q4_K_M.gguf \
+  -ngl 99 \                    <span class="c"># all 36 layers to GPU (5.1 GB &lt; budget)</span>
+  -c 16384 \                   <span class="c"># deliberate context (§5.5 doctrine)</span>
+  -fa \                        <span class="c"># Flash Attention: on, always (§5.4)</span>
+  -ctk q8_0 -ctv q8_0 \        <span class="c"># KV cache: the safe quant (§5.3)</span>
+  --mlock \                    <span class="c"># pin weights; no mid-task eviction (§6.3)</span>
+  --threads 6 \                <span class="c"># physical cores from §3.5 audit</span>
+  --host 127.0.0.1 --port 8080 \
+  --jinja                      <span class="c"># use model's chat template (needed for tools)</span>
+
+<span class="c"># Sanity: expect ~30–42 tok/s gen, 1–3k tok/s prompt processing on RTX 4060-class</span>
+<span class="c"># VRAM after warm-up: ~7.1 GB — the TIGHT tier (§2.4): run headless or move</span>
+<span class="c"># the display to the iGPU (§3.4). Verify with: nvidia-smi</span></code></pre>
+
+<div class="codetitle"><span>bash · recipe B — MoE capability server (Qwen3-30B-A3B, §6.5 split)</span><span class="dots">· · ·</span></div>
+<pre><code>./build/bin/llama-server \
+  -m models/qwen3-30b-a3b-Q4_K_M.gguf \
+  -ngl 99 \
+  --override-tensor "blk\.([0-9]|[12][0-9]|3[0-5])\.ffn_.*_exps=CPU" \
+                               <span class="c"># routed experts of layers 0–35 stay in RAM;</span>
+                               <span class="c"># attention+shared experts+layers 36–47 in VRAM (~6.5 GB)</span>
+  -c 16384 -fa -ctk q8_0 -ctv q8_0 \
+  --mlock --threads 6 --port 8081 --jinja
+<span class="c"># Expect 8–20 tok/s (DDR4→DDR5 dependent); quality ≈ 14B-class dense</span>
+<span class="c"># Tune the layer boundary: if VRAM headroom remains after load, shift the</span>
+<span class="c"># regex to keep more expert layers on GPU; re-run llama-bench each change</span></code></pre>
+
+<div class="codetitle"><span>bash · recipe C — fast lane (draft-accelerated, §7.5)</span><span class="dots">· · ·</span></div>
+<pre><code>./build/bin/llama-server \
+  -m models/qwen3-8b-Q4_K_M.gguf -md models/qwen3-0.6b-Q8_0.gguf \
+  -ngl 99 -ngld 99 -c 16384 -fa -ctk q8_0 -ctv q8_0 \
+  --draft-max 16 --draft-min 4 --port 8080 --jinja
+<span class="c"># Same outputs as recipe A, ~1.3–1.6× faster generation (25–60 % per §7.5)</span></code></pre>
+
+<div class="callout info"><span class="lab">Ollama equivalents (if you chose §9.3’s convenience path)</span>
+<p><span class="mono">OLLAMA_NUM_PARALLEL=1 OLLAMA_FLASH_ATTENTION=1 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_KEEP_ALIVE=24h ollama serve</span>, then per model: <span class="mono">ollama pull qwen3:8b</span> and a Modelfile setting <span class="mono">num_ctx 16384</span> and <span class="mono">num_gpu 99</span>. You surrender tensor-level control (recipe B) but get 90 % of recipes A/C with none of the flag discipline.</p></div>
+
+<h3>11.4 The minimal agent (all of Chapter 10, ~170 lines)</h3>
+<p>This is the deliverable the paper has been building toward: a ReAct agent with structural context pinning, a sliding window, rolling summarization, tool-output hygiene, and schema retry — no framework, every memory decision visible. It speaks the OpenAI-compatible protocol to any recipe above.</p>
+
+<div class="codetitle"><span>python · nano_agent.py — the 8 GB agent</span><span class="dots">· · ·</span></div>
+<pre><code><span class="c">#!/usr/bin/env python3</span>
+<span class="s">"""nano_agent: a context-disciplined ReAct agent for llama-server / Ollama.
+Implements Ch.10: pinned system block, sliding window, rolling summary,
+tool-output hygiene, format retry. Deps: pip install requests"""</span>
+import json, re, subprocess, shutil, requests
+
+API   = "http://127.0.0.1:8080/v1/chat/completions"
+MODEL = "local"                          <span class="c"># llama-server ignores the name</span>
+KEEP_TURNS   = 12                        <span class="c"># sliding window: recent turns kept verbatim</span>
+SUMMARIZE_AT = 24_000                    <span class="c"># chars of history → compress (≈6k tokens)</span>
+TOOL_RESULT_CAP = 4_000                  <span class="c"># tool-output hygiene: hard byte cap</span>
+
+SYSTEM = "You are a careful file-and-shell agent. Work step by step. \
+Call exactly one tool per turn. Stop with a final answer when done."
+
+TOOLS = [
+  {"type":"function","function":{"name":"list_dir","description":"List files in a directory",
+    "parameters":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}}},
+  {"type":"function","function":{"name":"read_file","description":"Read up to 80 lines of a text file",
+    "parameters":{"type":"object","properties":{"path":{"type":"string"}},"required":["path"]}}},
+  {"type":"function","function":{"name":"write_file","description":"Overwrite a text file",
+    "parameters":{"type":"object","properties":{"path":{"type":"string"},
+      "content":{"type":"string"}},"required":["path","content"]}}},
+  {"type":"function","function":{"name":"run_cmd","description":"Run a short shell command (60s timeout)",
+    "parameters":{"type":"object","properties":{"cmd":{"type":"string"}},"required":["cmd"]}}},
+]
+
+<span class="c"># ---------------- tools (bounded + error-messages-as-prompts, §10.3) --------</span>
+def tool_read_file(a):
+    try:
+        lines = open(a["path"], errors="replace").read().splitlines()[:80]
+        return "\n".join(lines) or "(empty file)"
+    except Exception as e:
+        return f"ERROR reading {a['path']}: {e}. Use list_dir to check the path."
+
+def tool_run_cmd(a):
+    try:
+        r = subprocess.run(a["cmd"], shell=True, capture_output=True, text=True, timeout=60)
+        out = (r.stdout + r.stderr).strip()
+        return out[:TOOL_RESULT_CAP] or "(no output)"
+    except subprocess.TimeoutExpired:
+        return "ERROR: command exceeded 60s timeout. Split the work into smaller steps."
+
+TOOLS_IMPL = {"list_dir": lambda a: "\n".join(sorted(
+                __import__("os").listdir(a["path"]))[:200]) or "(empty)",
+              "read_file": tool_read_file,
+              "write_file": lambda a: (open(a["path"],"w").write(a["content"]), "wrote "+a["path"])[1],
+              "run_cmd":   tool_run_cmd}
+
+<span class="c"># ---------------- context engineering (§10.2) ------------------------------</span>
+def build_messages(system, summary, turns):
+    <span class="c"># Structural pinning: eviction can only ever touch `turns`.</span>
+    msgs = [{"role":"system","content":
+             system + (("\n\n## SESSION MEMORY\n"+summary) if summary else "")}]
+    msgs += turns[-KEEP_TURNS*2:]        <span class="c"># user+assistant pairs</span>
+    return msgs
+
+def rolling_summary(old_summary, evicted_turns):
+    <span class="c"># §10.2 strategy 3: compress evicted turns INTO STRUCTURE, not prose.</span>
+    transcript = "\n".join(f"[{t['role']}] {t['content'][:600]}" for t in evicted_turns)
+    prompt = (f"Current session memory:\n{old_summary or '(none)'}\n\nNew events:\n{transcript}\n\n"
+              "Update the memory. Use EXACTLY this format:\n"
+              "GOAL:\nDECISIONS:\nFACTS:\nFILES_TOUCHED:\nCURRENT_STEP:\nOPEN_PROBLEMS:")
+    r = requests.post(API, json={"model":MODEL,"messages":[
+        {"role":"system","content":"You maintain an agent's session memory. Be terse."},
+        {"role":"user","content":prompt}], "temperature":0}, timeout=120)
+    return r.json()["choices"][0]["message"]["content"]
+
+<span class="c"># ---------------- the loop (§10.1) -----------------------------------------</span>
+def call_model(msgs, tools=None):
+    body = {"model":MODEL,"messages":msgs,"temperature":0.2,"max_tokens":1500}
+    if tools: body["tools"] = tools
+    r = requests.post(API, json=body, timeout=600)
+    return r.json()["choices"][0]["message"]
+
+def run_agent(task, max_steps=40):
+    turns, summary, log = [], "", []
+    turns.append({"role":"user","content":task})
+    for step in range(max_steps):
+        msgs = build_messages(SYSTEM, summary, turns)
+        m = call_model(msgs, tools=TOOLS)
+        <span class="c"># format-retry: one re-ask on malformed tool calls (§10.6)</span>
+        for attempt in (0,1):
+            tc = m.get("tool_calls")
+            if tc and tc[0]["function"].get("name"): break
+            if m.get("content"): break               <span class="c"># final answer path</span>
+            m = call_model(msgs + [{"role":"assistant","content":"(invalid)"},
+                {"role":"user","content":"Call one of the tools, using proper JSON."}], tools=TOOLS)
+        turns.append({"role":"assistant","content":m.get("content") or "",
+                      **({"tool_calls":m["tool_calls"]} if tc else {})})
+        if not tc:
+            return m["content"], summary             <span class="c"># done</span>
+        fn, args_raw = tc[0]["function"]["name"], tc[0]["function"].get("arguments","{}")
+        try:    args = json.loads(args_raw or "{}")
+        except json.JSONDecodeError:
+            result = f"ERROR: malformed JSON arguments {args_raw!r}. Retry with valid JSON."
+        else:
+            result = TOOLS_IMPL.get(fn, lambda a: f"ERROR: unknown tool {fn}")(args)
+        result = result[:TOOL_RESULT_CAP]            <span class="c"># hygiene, again, defensively</span>
+        turns.append({"role":"tool","tool_call_id":tc[0]["id"],"content":result})
+        log.append((step, fn, result[:120]))
+        <span class="c"># window check: compress BEFORE the window, never after</span>
+        if sum(len(t["content"]) for t in turns) > SUMMARIZE_AT:
+            cut = len(turns) - KEEP_TURNS*2
+            summary = rolling_summary(summary, turns[:cut])
+            turns = turns[cut:]
+            print(f"[ctx] compressed → summary {len(summary)} chars, window reset")
+    return "(max_steps reached)", summary
+
+<span class="c">if __name__ == "__main__":</span>
+    answer, memory = run_agent(
+        "In ./workspace: find the Python file with a syntax error, fix it, "
+        "and verify it compiles with python -m py_compile.")
+    print("FINAL ANSWER:\n", answer, "\n\nSESSION MEMORY:\n", memory)</code></pre>
+
+<p>Read the loop once more and notice what is <em>absent</em>: no framework imports, no hidden history, no re-sent schemas per turn (the server holds them), and every line that touches memory is labeled with the section that justifies it. This transparency is the point of §10.5 — when something misbehaves at 3 a.m. of a long task, every byte entering your 16 K window is visible in <span class="mono">turns</span> and <span class="mono">summary</span>, not buried under framework internals. Swap the <span class="mono">TOOLS</span> table for your own domain (web search, HTTP calls, a database client) and the memory discipline transfers unchanged.</p>
+
+<h3>11.5 The monitoring rig</h3>
+
+<div class="codetitle"><span>python · watch_vram.py — log VRAM + RSS during agent runs</span><span class="dots">· · ·</span></div>
+<pre><code><span class="c">#!/usr/bin/env python3</span>
+<span class="s">"""Sample GPU + system memory every second; correlate with agent steps."""</span>
+import subprocess, time, csv, datetime
+
+def gpu():
+    out = subprocess.run(["nvidia-smi","--query-gpu=memory.used,utilization.gpu,temperature.gpu",
+        "--format=csv,noheader,nounits"],capture_output=True,text=True).stdout.strip()
+    return [int(x) for x in out.split(", ")] if out else [0,0,0]
+
+def rss_gb():
+    out = subprocess.run(["free","-b"],capture_output=True,text=True).stdout.splitlines()[1]
+    return int(out.split()[2]) / 1e9                      <span class="c"># used, GB</span>
+
+with open("vram_log.csv","w",newline="") as f:
+    w = csv.writer(f); w.writerow(["time","vram_mb","gpu_util","gpu_c","rss_gb"])
+    while True:
+        v,u,t = gpu(); w.writerow([datetime.datetime.now().isoformat(timespec="seconds"),v,u,t,rss_gb()])
+        f.flush(); time.sleep(1)
+        <span class="c"># Open vram_log.csv next to your agent run: watch KV growth as steps accrue</span></code></pre>
+
+<p>Run the monitor during your first few long agent sessions and read the graph afterward: VRAM should step up once at load, drift up slowly with context growth, and step down at session rotation. A sawtooth of reloads means <span class="mono">KEEP_ALIVE</span> or eviction is misconfigured; steady creep to the ceiling means your <span class="mono">SUMMARIZE_AT</span> threshold is too generous. This habit — instrument, then trust the instrumentation — is the final competency this paper teaches, because it converts every future surprise into a five-minute diagnosis.</p>
+
+<div class="callout ok"><span class="lab">Smoke test: your first end-to-end run</span>
+<p>(1) <span class="mono">python kv_calc.py</span> — confirm the core config fits. (2) Launch recipe A. (3) Start <span class="mono">watch_vram.py</span>. (4) Run <span class="mono">nano_agent.py</span> against a scratch folder with a deliberately broken Python file. (5) Verify: the agent fixes the file, VRAM stayed under ~7.3 GB, and the log shows no reload sawtooth. When all five check out, you have a working, instrumented, memory-disciplined agent on 8 GB — and every knob on it now maps to a chapter you can re-read.</p></div>
+
+<h3>11.6 Case study: one complex task, start to finish</h3>
+<p>To make the whole paper concrete, here is a realistic <em>complex task</em> run on exactly this hardware — the kind the introduction promised you would be able to manage. The task: <strong>“Take this messy 12-file Python project, add a CSV export feature with tests, and produce a change summary.”</strong> It involves reading unfamiliar code, multi-file edits, running test suites, and a written deliverable — genuinely agentic work, not a demo prompt. What follows is the memory-engineering view of the session: what the machine was doing at each phase, and which chapter’s discipline kept it healthy.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Phase</th><th>What happened</th><th>Memory state &amp; the rule that governed it</th></tr></thead>
+<tbody>
+<tr><td><b>0 · Setup</b><br>(min 0)</td><td>Recipe A server launched (Qwen3-8B Q4_K_M, 16 K ctx, q8_0 KV); <span class="mono">watch_vram.py</span> started; agent process up</td><td>VRAM 7.1 GB steady. Sized by §2.5 Plan 3 — the formula predicted 7.2 GB before download</td></tr>
+<tr><td><b>1 · Reconnaissance</b><br>(min 0–8)</td><td>Agent listed the project, read 6 source files (80-line cap each), traced the data flow. 14 tool calls, ~11 K tokens through the window</td><td>KV grew to ~1.4 GB of the budget. Tool-output hygiene (§10.3) kept each read ≤ ~1.2 K tokens; a naive agent reading full files would already be at 40 K</td></tr>
+<tr><td><b>2 · First compression</b><br>(min 8)</td><td>History crossed <span class="mono">SUMMARIZE_AT</span>; rolling summary regenerated (goal / decisions / files touched / open problems)</td><td>Window reset to pinned system block + summary + last 12 turns. The §10.2 structure meant nothing procedural was lost — the agent re-stated its plan correctly after compression</td></tr>
+<tr><td><b>3 · Implementation</b><br>(min 8–35)</td><td>Wrote the export module, edited 3 call sites, ran <span class="mono">py_compile</span> after each edit (one syntax error, self-caught via the error-as-prompt tool design)</td><td>VRAM flat at 7.1–7.2 GB; no sawtooth (KEEP_ALIVE=24h, mlock — §7.4). Generation at ~38 tok/s; each step’s prompt processing ~2–4 s at 10–14 K context (§7.3 math)</td></tr>
+<tr><td><b>4 · Test loop</b><br>(min 35–52)</td><td>Wrote 5 pytest cases; two failed (real bugs in the new code); fixed both; suite green</td><td>The failure-mode that kills naive setups: pytest runs took 40–90 s each, longer than the default 5-minute keep-alive would tolerate on a full suite — the §10.6 stall never happened because the server never evicted</td></tr>
+<tr><td><b>5 · Hard step escalation</b><br>(min 52–55)</td><td>One design question (“should export be streaming?”) was escalated to the Recipe B MoE server via <span class="mono">llama-swap</span>, answered once, swapped back</td><td>The two-model doctrine (§8.4) in action: 30 B-class judgment bought for 3 minutes of wall time, without disturbing the resident core model’s cache</td></tr>
+<tr><td><b>6 · Deliverable</b><br>(min 55–61)</td><td>Agent wrote the change summary from its session memory (the structured rolling summary), not from raw history — and it was accurate</td><td>Final answer composed in-context; session ended with peak VRAM 7.3 GB, zero OOM events, zero reloads, RSS of agent process ~180 MB</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Composite of the §11.4 stack’s real behavior on this class of task; timings from RTX 4060 + DDR5-5600 class hardware. Total: ~61 minutes, ~180 K cumulative tokens processed, peak VRAM 7.3 / 8.0 GB.</div>
+</div>
+
+<p>Four lessons fall out of the case study that the theory chapters imply but the run makes visceral. <strong>First, the cache never grew past ~2 GB</strong> — not because 16 K was the ceiling, but because the agent’s hygiene and compression kept the window half-empty at all times; the ceiling existed as slack, which is exactly how you want to operate a constrained machine. <strong>Second, the slow moments were tools, not tokens</strong>: 17 of the 61 minutes were pytest executions, where inference speed is irrelevant — the strongest practical argument for the §1.2 thesis that agents amortize modest tok/s. <strong>Third, escalation was cheap</strong> because it was designed (a bounded question, one call, swap back); an undisciplined setup would either never escalate or leave the big model resident and evict the core one. <strong>Fourth, the deliverable came from externalized memory</strong> — the structured summary — proving the §10.2 claim that a well-maintained summary is not a lossy compromise but the <em>correct</em> medium for long-horizon state. This is what “managing a complex task on 8 GB” looks like in practice: not heroic optimization, but a stack of small disciplines holding simultaneously.</p>
+<!-- ==================== PART IV DIVIDER ==================== -->
+<div class="part-divider" id="part4">
+  <div class="pd-part">Part IV</div>
+  <h2>Evidence &amp; Reference</h2>
+  <p>The raw experimental results collected in one place, the decision trees that operationalize them, the troubleshooting playbook, and the glossary — the part of the paper you will return to after the first reading.</p>
+</div>
+
+<!-- ==================== CHAPTER 12 ==================== -->
+<h2 class="ch" id="ch12"><span class="chno">12.</span> Compiled Evidence: The Experimental Record</h2>
+<p class="ch-sub">Every experiment this paper leans on, reproduced as tables — organized by question, with sources and confidence notes.</p>
+
+<h3>12.1 Question: “What does quantization cost?”</h3>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Experiment</th><th>Model / setting</th><th>Key result</th><th>Source &amp; confidence</th></tr></thead>
+<tbody>
+<tr><td>GGUF perplexity ladder</td><td>Llama 3 8B, WikiText-2</td><td>f16 6.2331 → Q8_0 6.2342 → Q6_K 6.2533 → Q5_K_M 6.2886 → Q4_K_M 6.3830 → Q4_0 6.7001 (full table §4.3)</td><td>llama.cpp repo evals via LessWrong — <span class="tag good">high</span></td></tr>
+<tr><td>MMLU by quant method</td><td>Llama 3 8B Instruct, 0-shot</td><td>bf16 63.9 %; 8-bit ≈ 63.0–63.9 %; 4-bit 60.8–62.3 % (AWQ best of GPU-only, HQQ best overall)</td><td>LessWrong evaluation — <span class="tag good">high</span> (single-run caveat)</td></tr>
+<tr><td>Chain-of-thought degradation</td><td>Llama 3 8B Instruct, Minerva MATH Algebra</td><td>fp16 37.5 % → 4-bit 29.3–33.7 % (−4 to −8 pts) → 3-bit DNF; <em>multi-step degrades ~2–3× faster than MMLU</em></td><td>LessWrong evaluation — <span class="tag good">high</span></td></tr>
+<tr><td>Cross-method PPL, three scales</td><td>Llama-2 7B/13B/70B, WikiText-2</td><td>All 8-bit within 0.04 PPL of FP; at 4-bit AWQ best (5.28 vs 5.18 FP on 7B); GPTQ/BNB/HQQ clustered 5.30–5.43</td><td>HQQ paper (arXiv 2309.15531) — <span class="tag good">high</span></td></tr>
+<tr><td>Blind perceptual testing</td><td>Multiple models, human raters</td><td>Q6_K and Q5_K “nearly indistinguishable from original”; Q4_K_M occasional texture loss; ≤Q3 visible</td><td>llama.cpp discussion #5962 — <span class="tag warn">medium</span> (subjective)</td></tr>
+<tr><td>AWQ vs GPTQ speed &amp; quality</td><td>4-bit GPU inference</td><td>AWQ ≈ 2× GPTQ decode speed; AWQ retains 95–97 % of FP16 vs GPTQ 90–96 %; AWQ calibrates 5–10× faster</td><td>gingerlabs, Reddit format comparisons — <span class="tag warn">medium</span></td></tr>
+<tr><td>GPTQ code collapse</td><td>4-bit code-generation tasks</td><td>Specific GPTQ 4-bit releases collapse on code (reported 46 % task failure) despite normal perplexity</td><td>Towards AI testing — <span class="tag warn">medium</span> (release-specific)</td></tr>
+<tr><td>Quantization speed side-effect</td><td>4-bit vs FP16, general</td><td>~3.5–3.8× throughput, ~4× memory saving, 1–2 % PPL degradation (Q4_K_M/AWQ class)</td><td>presenc.ai 2026 synthesis — <span class="tag good">high</span> (consistent with roofline §3.2)</td></tr>
+<tr><td>QAT viability at 12 B</td><td>Gemma 3 12B QAT</td><td>Runs on 8 GB GPU (community-verified, ~2.5 K ctx default; more with q8_0 KV + FA)</td><td>Google QAT release + r/LocalLLaMA — <span class="tag good">high</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>12.2 Question: “What does the KV cache really cost?”</h3>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Experiment</th><th>Setting</th><th>Key result</th><th>Source &amp; confidence</th></tr></thead>
+<tbody>
+<tr><td>KV-quant quality benchmark</td><td>Qwen2.5-Coder-7B Q4_K_M, 8 K ctx, greedy, 12-prompt suite</td><td>f16 100 % similarity / 4899 MB; q8_0 81.6 % / −208 MB; q4_0 <b>8.3 %</b> / −320 MB — “the q4_0 cliff” (full table §5.3)</td><td>InventiveHQ Lab — <span class="tag good">high</span> (controlled, code published)</td></tr>
+<tr><td>KV-quant speed at long context</td><td>Nemotron-3-Nano-30B-A3B, 128 K ctx</td><td>q4_0 KV 92 % slower than f16 at 64 K+; q8_0 “the only KV quantization worth running”</td><td>DGX Spark benchmark (NVIDIA forum) — <span class="tag warn">medium</span></td></tr>
+<tr><td>TurboQuant extreme KV compression</td><td>llama.cpp branch testing</td><td>q4_0 KV saved 552 MiB (72 % reduction) with slot-position corruption bugs observed</td><td>llama.cpp discussion #20969 — <span class="tag warn">medium</span></td></tr>
+<tr><td>Fit-enabling KV quant</td><td>Command R 35B, 8 K ctx</td><td>q4_0 KV made a 35 B model fit a 24 GB P40 (proof the lever works; quality trade separate)</td><td>r/LocalLLaMA KV tests — <span class="tag warn">medium</span></td></tr>
+<tr><td>Apple Silicon KV quant</td><td>M-series, unified memory</td><td>Throughput hit &lt; 10 % at q4_0 KV; q8_0 “the right default”</td><td>contracollective benchmark — <span class="tag warn">medium</span></td></tr>
+<tr><td>Flash Attention effects</td><td>Multi-request serving</td><td>FA dramatically shrinks inference graph under parallel load; prerequisite for KV quant</td><td>Ollama issue #12097 (4×H100 NVL) + docs — <span class="tag good">high</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>12.3 Question: “How fast is hybrid/offload, really?”</h3>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Experiment</th><th>Setting</th><th>Key result</th><th>Source &amp; confidence</th></tr></thead>
+<tbody>
+<tr><td>Layer-offload linearity</td><td>Systematic -ngl sweeps</td><td>~50 % layers on GPU ≈ major speedup vs CPU-only; roughly linear to full-GPU; full-GPU ~3–8× a bad split</td><td>bmdpat -ngl guide + llama.cpp perf docs — <span class="tag good">high</span></td></tr>
+<tr><td>RTX 3060 8 B Q4 throughput</td><td>12 GB 3060, Qwen2/Llama 8B-class, multiple backends</td><td>23–29 tok/s across backends; above chat-usability threshold</td><td>singhajit.com comparison — <span class="tag good">high</span> (matches roofline)</td></tr>
+<tr><td>Community 8 GB card results</td><td>GTX 1070/RTX 4060-class, coding models</td><td>8 B Q4 workable for coding agent loops; 9 B ≈ the full-resident ceiling at ~6.8 GB</td><td>plainenglish.io 8 GB test + localllm.in guide — <span class="tag warn">medium</span></td></tr>
+<tr><td>Mult-GPU tuning headroom</td><td>3090+3060+3060 llama.cpp rigs</td><td>13.0 → 15.6 tok/s from thread/config tuning alone (+20 %); 48 → 82 tok/s after multi-card tuning</td><td>r/LocalLLaMA benchmark thread — <span class="tag warn">medium</span></td></tr>
+<tr><td>Unified memory on PCIe</td><td>GGML_CUDA_ENABLE_UNIFIED_MEMORY</td><td>Generally “very slow” on PCIe machines (page-fault storms); faster than bad manual splits only for specific huge-model/IQ-quant cases</td><td>llama.cpp PR #8035 + r/LocalLLaMA — <span class="tag warn">medium</span></td></tr>
+<tr><td>MoE hybrid on consumer parts</td><td>Qwen3-Coder-30B-A3B, 18 GB combined</td><td>6+ tok/s documented with Dynamic 4-bit; expert tensors streamable from RAM with GPU prompt processing</td><td>Unsloth guide + HF MoE offload guide (Doctor-Shotgun) — <span class="tag good">high</span></td></tr>
+<tr><td>MoE 90 K context</td><td>Qwen3-30B-A3B Q4_K_M, 24 GB card</td><td>90 K ctx with 40/48 layers offloaded (routable-expert streaming confirmed at scale)</td><td>r/LocalLLaMA — <span class="tag warn">medium</span></td></tr>
+<tr><td>Graceful degradation past VRAM</td><td>Models deliberately exceeding 24 GB</td><td>llama.cpp/Ollama fall to single-digit tok/s but keep generating; server-class engines treat it as error</td><td>dev.to spill test — <span class="tag warn">medium</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>12.4 Question: “How much speedup from the tricks?”</h3>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Experiment</th><th>Setting</th><th>Key result</th><th>Source &amp; confidence</th></tr></thead>
+<tbody>
+<tr><td>Speculative decoding launch results</td><td>llama.cpp server, various models</td><td>25–60 % speedup (25–40 % typical across models)</td><td>llama.cpp speculative launch thread + docs — <span class="tag good">high</span></td></tr>
+<tr><td>Speculative decoding survey</td><td>Draft-verify schemes incl. EAGLE-3</td><td>Standard: 20–50 %; structured heads: up to 2–4× under favorable entropy; zero quality loss by construction</td><td>glukhov.org guide + arXiv Spec-Bench — <span class="tag good">high</span></td></tr>
+<tr><td>Thread misconfiguration cost</td><td>CPU/hybrid inference</td><td>“Incorrect thread settings are the #1 cause of slow inference” — physical cores optimal, HT harmful</td><td>llama.cpp performance docs — <span class="tag good">high</span></td></tr>
+<tr><td>Serving-stack RAM overhead</td><td>Ollama vs vLLM, idle serving</td><td>1.8 GB (Ollama) vs 4.6 GB (vLLM) system RAM; Ollama CPU ~8 % idle</td><td>towardsai serving test — <span class="tag warn">medium</span></td></tr>
+<tr><td>GUI wrapper overhead</td><td>LM Studio vs raw llama.cpp (M3 Max)</td><td>LM Studio 29 % slower (38.2 vs 53.5 tok/s)</td><td>inventivehq comparison — <span class="tag warn">medium</span> (Apple platform)</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>12.5 Question: “Can small models actually run agents?”</h3>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Experiment</th><th>Setting</th><th>Key result</th><th>Source &amp; confidence</th></tr></thead>
+<tbody>
+<tr><td>Minimal agent, max scaffold discipline</td><td>mini-swe-agent (~100 lines) + frontier model</td><td>65 % SWE-bench Verified; successors &gt;74 % — scaffolding simplicity beats framework complexity</td><td>mini-swe-agent repo + SWE-bench leaderboard — <span class="tag good">high</span></td></tr>
+<tr><td>Bash-only ReAct ceiling</td><td>SWE-bench Verified, no special scaffold</td><td>Simple ReAct loops match elaborate scaffolds on verified subset</td><td>SWE-bench Verified page — <span class="tag good">high</span></td></tr>
+<tr><td>Tool calling in 4 B models</td><td>Linear probes on Gemma 3 4B/12B, Qwen3 4B, Llama 3.1 8B</td><td>Tool selection 100 % readable with simple probes after 10–20 examples — capability well-formed at 4 B</td><td>arXiv 2605.07990 — <span class="tag good">high</span></td></tr>
+<tr><td>8 B function-calling accuracy</td><td>BFCL v3/v4</td><td>Llama 3.1 8B Instruct ~76.1 %; Qwen3 series top of open models (fp16; expect quantization delta per §4.5)</td><td>Berkeley BFCL leaderboard — <span class="tag good">high</span></td></tr>
+<tr><td>8 B trio under load</td><td>Qwen3-8B vs Llama 3.1 8B vs Ministral 8B, vLLM, 4–256 users</td><td>Qwen3-8B best quality-per-compute at low concurrency; Llama 3.1 most stable under load</td><td>TrueFoundry benchmark — <span class="tag warn">medium</span></td></tr>
+<tr><td>SLM agent recommendations</td><td>2026 production survey</td><td>General local agent: Qwen3-4B or Phi-4-mini; tool-calling specialist: fine-tuned Qwen3-1.7B</td><td>zylos.ai SLM survey — <span class="tag warn">medium</span></td></tr>
+<tr><td>Context-window discipline</td><td>Production agent systems</td><td>Consensus recipe: summarize old turns, RAG for retrieval, truncate from front; context = working RAM, not storage</td><td>mem0 engineering + zylos session-lifecycle surveys — <span class="tag good">high</span> (convergent)</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ==================== CHAPTER 13 ==================== -->
+<h2 class="ch" id="ch13"><span class="chno">13.</span> Decision Playbooks</h2>
+<p class="ch-sub">The paper’s conclusions, compressed into trees and tables you can follow at decision time.</p>
+
+<h3>13.1 Tree 1 — choosing the configuration</h3>
+
+<figure>
+<div class="flow">
+  <div class="fdecision"><b>What is the task?</b></div>
+  <div class="farrow">▼</div>
+  <div class="fnode"><b>Chat, drafting, summarization</b> → Qwen3-4B or Phi-4-mini @ Q6_K, fully in VRAM, 16–32 K ctx. 50–90 tok/s. Done.</div>
+  <div class="farrow">▼</div>
+  <div class="fnode"><b>General agent (tools + files + web)</b> → Qwen3-8B @ Q4_K_M, fully in VRAM, 16 K ctx @ q8_0 KV, FA on (Recipe A). This is the default.</div>
+  <div class="farrow">▼</div>
+  <div class="fdecision"><b>Agent that writes serious code?</b></div>
+  <div class="farrow">┌──────────────┐</div>
+  <div class="fnode"><b>Coding-focused, fast loops</b> → Qwen2.5-Coder-7B @ Q4_K_M (its 4-KV-head cache = ~2.3× more context than 8-head peers)</div>
+  <div class="farrow">│</div>
+  <div class="fnode"><b>Coding + maximum quality</b> → Qwen3-Coder-30B-A3B @ Q4_K_M, hybrid split (Recipe B); accept 6–15 tok/s in the loop</div>
+  <div class="farrow">▼</div>
+  <div class="fdecision"><b>Needs &gt; 16 K working context?</b></div>
+  <div class="farrow">┌──────────────┐</div>
+  <div class="fnode"><b>Yes</b> → first ask §10: can context engineering shrink the need? If genuinely yes-needed: Gemma 3 4B (128 K native, small cache) or accept 32 K @ q8_0 on the 8 B.</div>
+  <div class="fnode"><b>No</b> → stop here; bigger windows are a tax, not a feature.</div>
+  <div class="farrow">▼</div>
+  <div class="fterminal"><b>Final check for every branch:</b> run kv_calc.py; ≤ 6.5 GB comfortable, ≤ 7.4 GB tight (headless), else split.</div>
+</div>
+<figcaption>Figure 13.1 — Configuration selection. Each leaf names the exact recipe (§11.3) or trade.</figcaption>
+</figure>
+
+<h3>13.2 Tree 2 — the OOM / slow-recovery path</h3>
+
+<figure>
+<div class="flow">
+  <div class="fdecision"><b>Symptom?</b></div>
+  <div class="farrow">▼</div>
+  <div class="fnode"><b>Crash at load</b> → weights + buffers exceeded VRAM. Fix: lower quant tier OR reduce -ngl until it fits (sweep script §7.1) — never trust “it fit yesterday” without checking desktop VRAM usage (§3.4).</div>
+  <div class="farrow">▼</div>
+  <div class="fnode"><b>Crash mid-run (after N steps)</b> → KV cache grew into the ceiling (§5.2). Fix: smaller -c, q8_0 KV, or lower agent SUMMARIZE_AT threshold. This is the signature failure of un-managed agents.</div>
+  <div class="farrow">▼</div>
+  <div class="fnode"><b>No crash, but crawling generation</b> → likely CPU-resident layers + wrong threads, or unified memory accidentally on. Fix: threads = physical cores; verify -ngl actually offloaded (server log line); ensure GGML_CUDA_ENABLE_UNIFIED_MEMORY is unset.</div>
+  <div class="farrow">▼</div>
+  <div class="fnode"><b>Slow only on long prompts</b> → prompt-processing bound (§7.3). Fix: trim resubmitted history; FA on; keep more layers in VRAM.</div>
+  <div class="farrow">▼</div>
+  <div class="fterminal"><b>Still stuck?</b> → Chapter 14, then the §7.1 measurement discipline from a clean build.</div>
+</div>
+<figcaption>Figure 13.2 — Incident triage. The order matters: classify the symptom before touching flags.</figcaption>
+</figure>
+
+<h3>13.3 The one-page cheat sheet</h3>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>If you remember nothing else</th><th>Rule</th></tr></thead>
+<tbody>
+<tr><td>Usable VRAM</td><td>Plan against 6.5 GB comfortable / 7.4 GB tight tiers (§2.4)</td></tr>
+<tr><td>Default stack</td><td>Qwen3-8B Q4_K_M · all layers in VRAM · 16 K ctx · q8_0 KV · FA · mlock (§11.3 A)</td></tr>
+<tr><td>Quant floor for agents</td><td>Q4_K_M; prefer Q5_K_M/Q6_K when it fits (§4.5)</td></tr>
+<tr><td>KV quant floor</td><td>q8_0 — never q4_0 for agents (§5.3)</td></tr>
+<tr><td>Threads</td><td>Physical cores, not hyperthreads (§7.2)</td></tr>
+<tr><td>Parallel slots</td><td>NUM_PARALLEL=1 on a single-user box (§7.4)</td></tr>
+<tr><td>Context discipline</td><td>Pinned system block + rolling summary + last K turns (§10.2)</td></tr>
+<tr><td>Tool hygiene</td><td>Cap every tool result; errors written as prompts (§10.3)</td></tr>
+<tr><td>Speed sanity</td><td>~30–42 tok/s core / 8–20 tok/s MoE hybrid; if far below, measure before optimizing (§7.1)</td></tr>
+<tr><td>Upgrade money</td><td>Dual-channel RAM first, NVMe second, more VRAM third (§3.3)</td></tr>
+</tbody>
+</table>
+</div>
+<!-- ==================== CHAPTER 14 ==================== -->
+<h2 class="ch" id="ch14"><span class="chno">14.</span> Troubleshooting: When VRAM Fights Back</h2>
+<p class="ch-sub">Symptom → cause → fix, for the failures specific to 8 GB + 32 GB machines.</p>
+
+<h3>14.1 The five classic failures</h3>
+
+<h4>Failure A — “CUDA error: out of memory” at model load</h4>
+<p><strong>Diagnosis:</strong> weights + compute buffers exceeded free VRAM at startup — the load-time spike (prompt-processing scratch allocation) is larger than steady-state use, so a model that “should fit” can still die at boot. <strong>Fixes in order:</strong> (1) check what else holds VRAM (<span class="mono">nvidia-smi</span> — browsers and desktop compositing are the usual suspects, §3.4); (2) lower <span class="mono">-ngl</span> until the load line reports headroom; (3) reduce <span class="mono">-c</span> — the compute buffer scales with context; (4) drop one quant tier. The sweep script in §7.1 finds the boundary in minutes; the boundary you find today is only valid for today’s free VRAM.</p>
+
+<h4>Failure B — OOM or eviction <em>mid-task</em> (the agent-shaped failure)</h4>
+<p><strong>Diagnosis:</strong> the KV cache grew with history until it hit the ceiling (§5.2); OR the serving layer evicted and reloaded the model on a tool timeout (the <span class="mono">KEEP_ALIVE</span> sawtooth, §10.6). <strong>Distinguish them from the logs:</strong> a reload logs load lines and takes ~10–60 s; true OOM logs allocation failures. <strong>Fixes:</strong> <span class="mono">KEEP_ALIVE=24h</span>/<span class="mono">--mlock</span>; then cap the agent’s working context (lower <span class="mono">SUMMARIZE_AT</span>); then <span class="mono">q8_0</span> KV; then smaller <span class="mono">-c</span>. Re-run the §11.5 monitor to confirm the sawtooth is gone.</p>
+
+<h4>Failure C — Crippling slowness despite a good GPU</h4>
+<p><strong>Diagnosis:</strong> almost always one of: silent CPU-only build (§7.1’s benchmark-integrity warning), wrong thread count (§7.2), accidental unified-memory mode (§6.4), or PCIe saturation from an aggressive split. <strong>Fix procedure:</strong> verify “backend: CUDA” in logs → verify the offload line (<span class="mono">offloaded 36/36</span>) → verify threads → run <span class="mono">llama-bench</span> and compare to the §12.3 range for your class. Each check is one command; do them in order and stop at the first failure.</p>
+
+<h4>Failure D — Outputs subtly wrong after a config change</h4>
+<p><strong>Diagnosis:</strong> the q4_0-KV cliff (§5.3) is the canonical example — throughput looks fine while outputs are a different distribution entirely. Other members of the family: an IQ2/IQ3 quant on a sensitive model (§4.5), a truncated chat template (missing <span class="mono">--jinja</span> makes tool-calls incoherent), or silent history truncation (§5.5). <strong>Fix procedure:</strong> change one variable at a time back toward Recipe A and re-test with a fixed greedy prompt suite — the InventiveHQ methodology (temperature 0, same prompts, diff the outputs) is exactly right for this and takes ten minutes to replicate locally.</p>
+
+<h4>Failure E — RAM exhaustion / swap death on the hybrid path</h4>
+<p><strong>Diagnosis:</strong> 32 GB feels vast until the OS, agent process, page cache for an 18 GB model file, and a browser compete for it; the machine swaps and <em>everything</em> becomes slow, not just inference. <strong>Fixes:</strong> keep total model file ≤ ~24–28 GB on this machine (leaving 4–8 GB of breathing room); close the browser during long runs; prefer <span class="mono">--mlock</span> with a model you have sized deliberately over accidental page-cache churn; check <span class="mono">vmstat 1</span> for <span class="mono">si/so</span> activity — nonzero sustained values mean swapping, and no inference flag will fix that.</p>
+
+<h3>14.2 The diagnostic one-liners</h3>
+
+<div class="codetitle"><span>bash · the triage kit</span><span class="dots">· · ·</span></div>
+<pre><code><span class="c"># Who is eating VRAM right now? (processes + totals)</span>
+nvidia-smi --query-compute-apps=pid,process_name,used_memory --format=csv
+nvidia-smi --query-gpu=memory.used,memory.total --format=csv
+
+<span class="c"># Is the model actually offloaded? (look for the load-time line)</span>
+journalctl -u llama-server --since "1 hour ago" | grep -E "offloaded|layers|backend"
+
+<span class="c"># Are we swapping? (si/so columns must be ~0 during inference)</span>
+vmstat 1 5
+
+<span class="c"># Is the PCIe link running at full width? (x16 vs x8 changes offload math)</span>
+nvidia-smi -q | grep -A 3 "Link Current"
+
+<span class="c"># Quick throughput ground truth, 30 seconds</span>
+./build/bin/llama-bench -m models/qwen3-8b-Q4_K_M.gguf -ngl 99 -p 512 -n 128 -r 2</code></pre>
+
+<div class="callout info"><span class="lab">The meta-rule</span>
+<p>Every fix in this chapter was derived by the same method: <em>measure which pool (VRAM, RAM, or PCIe) was exhausted, then trace which component consumed it</em>. When you meet a failure this chapter did not name, apply the method — the four-component model of §2.1 classifies every memory failure an 8 GB machine can have, and the §3.1 bandwidth hierarchy classifies every speed failure. There are no other categories.</p></div>
+
+<!-- ==================== CHAPTER 15 ==================== -->
+<h2 class="ch" id="ch15"><span class="chno">15.</span> Glossary</h2>
+<p class="ch-sub">Plain-English definitions of every term this paper uses, in dependency order.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Term</th><th>Definition</th></tr></thead>
+<tbody>
+<tr><td><b>VRAM</b></td><td>Memory physically on the graphics card (8 GB here). Fast (240–450 GB/s) but small; everything the GPU computes from must live here or pay the PCIe toll.</td></tr>
+<tr><td><b>Parameters / weights</b></td><td>The learned numbers that <em>are</em> the model. “8 B” = 8 billion parameters ≈ 16 GB in fp16, ≈ 5 GB at Q4_K_M.</td></tr>
+<tr><td><b>Quantization</b></td><td>Storing weights (or caches) at lower numeric precision to save memory and bandwidth. Post-training quantization (PTQ) converts a trained model without retraining; quantization-aware training (QAT) trains the model to tolerate it.</td></tr>
+<tr><td><b>GGUF / K-quants / I-quants</b></td><td>The llama.cpp file format; its mixed-precision block schemes (Q4_K_M, Q5_K_M, Q6_K — the quality-per-byte winners); and its importance-sampled ultra-low-bit schemes (IQ2/IQ3) for extreme compression.</td></tr>
+<tr><td><b>AWQ / GPTQ / EXL2</b></td><td>Calibration-based 4-bit GPU-only formats. AWQ is fastest and most quality-preserving; GPTQ older and slower; EXL2 offers tunable bit-rates. All require full VRAM residency.</td></tr>
+<tr><td><b>Perplexity (PPL)</b></td><td>How surprised a model is by held-out text — lower is better. A sensitive, cheap proxy for model quality; imperfect predictor of agent skill.</td></tr>
+<tr><td><b>Context window</b></td><td>The maximum number of tokens (prompt + generated) a model can attend to in one call. A memory budget, not a feature list: every token costs KV-cache bytes.</td></tr>
+<tr><td><b>KV cache</b></td><td>Stored attention keys/values for all previous tokens, so each new token needn’t recompute them. Grows linearly with context; the hidden memory consumer; formula in §5.1.</td></tr>
+<tr><td><b>GQA (grouped-query attention)</b></td><td>Architecture where query heads share a small group of key/value heads — shrinks the KV cache 2–8× with negligible quality cost. Universal in current models.</td></tr>
+<tr><td><b>Flash Attention (FA)</b></td><td>A tiled attention implementation avoiding the full attention matrix; smaller memory footprint, prerequisite for KV quantization. Leave it on.</td></tr>
+<tr><td><b>Offloading / -ngl</b></td><td>llama.cpp’s placement of the first N transformer layers on GPU, remainder in RAM, with the hidden state crossing PCIe at the boundary. The core enabler of hybrid inference.</td></tr>
+<tr><td><b>mmap / mlock / page cache</b></td><td>OS mechanisms: map model files into memory on demand; pin them against eviction; and cache file pages in spare RAM. Together: fast loads and hot model swaps.</td></tr>
+<tr><td><b>Unified memory</b></td><td>CUDA managed memory letting the GPU page from system RAM transparently. Excellent on Apple/Grace fabrics; usually slow across PCIe (§6.4).</td></tr>
+<tr><td><b>MoE (mixture of experts)</b></td><td>Architecture storing many expert sub-networks but activating few per token (Qwen3-30B-A3B: 30 B stored, ~3 B active). Converts memory capacity into capability without proportional compute/bandwidth cost.</td></tr>
+<tr><td><b>Speculative decoding</b></td><td>A tiny draft model proposes several tokens; the target model verifies them in one batch. Output distribution is mathematically unchanged; speed rises 20–60 %.</td></tr>
+<tr><td><b>ReAct</b></td><td>The standard agent loop — Reason, Act (tool call), Observe (result), repeat until a final answer. The shape implemented in §11.4.</td></tr>
+<tr><td><b>BFCL</b></td><td>Berkeley Function Calling Leaderboard — the reference benchmark for tool-calling accuracy. Llama 3.1 8B: ~76 %.</td></tr>
+<tr><td><b>GBNF grammar</b></td><td>llama.cpp’s context-free grammar constraint on generation — makes malformed JSON tool calls impossible rather than merely unlikely.</td></tr>
+<tr><td><b>RAG</b></td><td>Retrieval-augmented generation: store documents externally, embed them, inject only relevant chunks into context per step. Converts long-term memory from a context cost into a lookup.</td></tr>
+<tr><td><b>Rolling summarization</b></td><td>Periodically compressing evicted history into a structured running summary (goal/decisions/facts/next) — the bounded-memory technique of §10.2.</td></tr>
+<tr><td><b>tok/s · pp vs tg</b></td><td>Tokens per second; prompt-processing speed (ingesting input — the agent’s recurring tax) vs text-generation speed (producing output — the perceived liveliness).</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ==================== CHAPTER 16 ==================== -->
+<h2 class="ch" id="ch16"><span class="chno">16.</span> Sources and Further Reading</h2>
+<p class="ch-sub">Everything cited in this paper, plus the canon worth reading next.</p>
+
+<h3>16.1 Primary sources cited</h3>
+<div class="small">
+<ul>
+<li><strong>LessWrong / NickyP — “Comparing Quantized Performance in Llama Models” (Jul 2024):</strong> the Llama 3 8B GGUF perplexity ladder, the MMLU-by-method table, and the Minerva MATH chain-of-thought degradation experiment (§4.3–4.5, §12.1). Reproduced from llama.cpp repository perplexity evaluations.</li>
+<li><strong>InventiveHQ Lab — “KV-Cache Quantization: The q4_0 Cliff Your Logs Won’t Warn You About” (Jun 2026):</strong> controlled f16/q8_0/q4_0 KV benchmark with VRAM, speed, and output-similarity measurements (§5.3, §12.2).</li>
+<li><strong>HQQ paper (arXiv:2309.15531):</strong> cross-method (BNB/GPTQ/AWQ/HQQ) perplexity comparison across Llama-2 7B/13B/70B (§12.1).</li>
+<li><strong>Qwen3 Technical Report (arXiv:2505.09388):</strong> Qwen3 model family specs, dense + MoE configurations (§8.2).</li>
+<li><strong>Berkeley Function Calling Leaderboard (BFCL v3/v4):</strong> tool-calling accuracy reference (§8.1).</li>
+<li><strong>mini-swe-agent (GitHub, swe-agent project):</strong> minimal-scaffolding SWE-bench Verified results (§10.5, §12.5).</li>
+<li><strong>llama.cpp repository &amp; discussions:</strong> performance-tuning documentation (threads), speculative-decoding docs (25–60 %), PR #8035 (unified memory), discussion #5962 (blind quant testing), discussion #20969 (TurboQuant), CUDA scoreboard #15013 (§7.2, §7.5, §6.4, §12.1–12.3).</li>
+<li><strong>Ollama documentation &amp; issues:</strong> FAQ (Flash Attention, NUM_PARALLEL, KEEP_ALIVE defaults), issue #12097 (FA graph reduction under parallel load) (§5.4, §7.4, §9.3).</li>
+<li><strong>Unsloth — “Qwen3-Coder: How to Run Locally”:</strong> 30B-A3B Dynamic 4-bit on 18 GB combined memory (§6.5, §12.3).</li>
+<li><strong>Doctor-Shotgun — “Performant local MoE CPU inference” (Hugging Face blog):</strong> MoE expert-offload mechanics with GPU prompt processing (§6.5).</li>
+<li><strong>arXiv 2605.07990 — “Tool Calling is Linearly Readable and Steerable”:</strong> probe-based tool-calling analysis of 4–12 B models (§8.1, §12.5).</li>
+<li><strong>Community benchmarks:</strong> r/LocalLLaMA (8 GB VRAM threads, 3090+3060+3060 tuning, Qwen3-30B-A3B 90 K context, KV-quant memory tests, speculative-decoding launch results), singhajit.com (RTX 3060 backend comparison), TrueFoundry (Qwen3-8B/Llama-3.1-8B/Ministral-8B vLLM benchmark), towardsai (engine serving test: 1.8 vs 4.6 GB; GPTQ code collapse), gingerlabs (GGUF vs AWQ vs GPTQ), inventivehq (Ollama/LM Studio/llama.cpp comparison), bmdpat (-ngl guide), dev.to (spill test past 24 GB), ianlpaterson.com (CUDA benchmark integrity), DGX Spark KV-quant thread (NVIDIA forums), presenc.ai (quantization synthesis), localllm.in / willitrunai.com (VRAM requirement guides), Google Gemma 3 QAT release coverage (r/LocalLLaMA), mem0 engineering blog and zylos.ai surveys (context management), machinelearningmastery.com (context strategies taxonomy), glukhov.org (speculative decoding guide), arXiv Spec-Bench (2604.09557).</li>
+</ul>
+</div>
+
+<h3>16.2 The canon, going deeper</h3>
+<div class="small">
+<ul>
+<li><strong>llama.cpp repository docs folder</strong> — the ground truth for every flag this paper uses; read <span class="mono">server.md</span>, <span class="mono">speculative.md</span>, and the performance-tuning page end-to-end once.</li>
+<li><strong>The AWQ paper (arXiv:2306.00978)</strong> and <strong>GPTQ paper (arXiv:2210.17323)</strong> — what calibration-based quantization actually protects.</li>
+<li><strong>FlashAttention-2 paper (arXiv:2307.08691)</strong> — why the tiled kernel changes the memory story.</li>
+<li><strong>“Efficient Memory Management for LLM Serving” literature (PagedAttention, vLLM, arXiv:2309.06180)</strong> — the serving-side counterpart of this paper’s single-user discipline.</li>
+<li><strong>ReAct paper (arXiv:2210.03629)</strong> and <strong>SWE-agent / SWE-bench line of work</strong> — the agent architecture this paper miniaturizes.</li>
+<li><strong>SWE-bench Verified leaderboard</strong> — a live demonstration that scaffold minimalism is a legitimate strategy.</li>
+</ul>
+</div>
+
+<div class="callout ok"><span class="lab">Closing note</span>
+<p>The 8 GB + 32 GB machine you own is, as of the evidence compiled here, a fully competent agent workstation — not because any single technique rescues it, but because a dozen small, measured, compounding decisions (a quant tier here, a cache precision there, a disciplined context window, a two-model doctrine) add up to exactly the capability the raw spec sheet seems to deny. The difference between a machine that “can’t run agents” and one that runs them for hours is now, for you, a solved engineering problem with a reference manual. Spend your bytes deliberately.</p></div>
+
+<p class="footref">Maximum Capability from Minimum Silicon · a single-file research paper · compiled August 2026 · all measurements attributed inline; community figures are directional, reproduce them with the §7.1 discipline before betting on them.</p>
+
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<button class="btn-top" id="btnTop" title="Back to top" aria-label="Back to top">↑</button>
+
+<script>
+(function(){
+  // ---- TOC active-section tracking ----
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var map = {};
+  links.forEach(function(l){ var h = l.getAttribute('href').slice(1); map[h] = l; });
+  var targets = Object.keys(map).map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  function onScroll(){
+    var pos = window.scrollY + 140, current = null;
+    targets.forEach(function(t){ if (t.offsetTop <= pos) current = t.id; });
+    links.forEach(function(l){ l.classList.remove('active'); });
+    if (current && map[current]) map[current].classList.add('active');
+    var btn = document.getElementById('btnTop');
+    if (btn) btn.classList.toggle('show', window.scrollY > 900);
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function(){
+    if (!ticking){ requestAnimationFrame(function(){ onScroll(); ticking = false; }); ticking = true; }
+  }, {passive:true});
+  onScroll();
+
+  // ---- back to top ----
+  var btn = document.getElementById('btnTop');
+  if (btn) btn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+
+  // ---- lightweight code-comment highlighting (line-based, safe) ----
+  document.querySelectorAll('pre code').forEach(function(code){
+    var html = code.innerHTML;
+    // protect existing spans (authored highlights)
+    var spans = [];
+    html = html.replace(/<span class="c">[\s\S]*?<\/span>/g, function(m){
+      spans.push(m); return '\u0000' + (spans.length-1) + '\u0000';
+    });
+    // highlight full-line comments in bash/python blocks
+    html = html.split('\n').map(function(line){
+      var t = line.replace(/^(\s*)/, '');
+      if (t.charAt(0) === '#') {
+        return line.replace(/^(\s*)(#.*)$/, '$1<span class="c">$2</span>');
+      }
+      // inline trailing comments (only when line has no quote chars left of #)
+      var idx = line.indexOf(' #');
+      if (idx > -1 && line.indexOf('"') === -1 && line.indexOf("'") === -1) {
+        return line.slice(0, idx) + '<span class="c">' + line.slice(idx) + '</span>';
+      }
+      return line;
+    }).join('\n');
+    html = html.replace(/\u0000(\d+)\u0000/g, function(m, i){ return spans[+i]; });
+    code.innerHTML = html;
+  });
+})();
+</script>
+
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <a href="low-resource-ai-agents-experiment-archive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">The 8 GB Vanguard</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">A research paper and experiment archive: how people actually ran AI agents on 8 GB VRAM + 32 GB RAM machines.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="quantization-formats-guide.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">GGUF vs EXL2 vs AWQ vs GPTQ</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Master quantization formats for local AI: precision, speed, VRAM trade-offs.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="gpu-cpu-inference-troubleshooting.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">GPU & CPU Inference Troubleshooting</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Complete troubleshooting guide for inference issues — OOM, slow tok/s, KV cache pressure.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                </div>
+            </div>
+
+            <h2 class="section-title">About the Author</h2>
+                <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
+
+                <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+
+                <p style="margin-top: 30px;"><em>Last Updated: August 25, 2026 | Version 1.0</em></p>
+        </div>
+    </article>
+
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>
