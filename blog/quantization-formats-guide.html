@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GGUF vs EXL2 vs AWQ vs GPTQ - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Master GGUF, EXL2, AWQ, and GPTQ quantization formats for local AI. Comparison of precision, speed, VRAM, and best use cases for 2026.">
+    <meta name="keywords" content="GGUF, EXL2, AWQ, GPTQ, quantization, VRAM, local LLM, 2026">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="GGUF vs EXL2 vs AWQ vs GPTQ - Quantization Formats Guide">
+    <meta property="og:description" content="Master GGUF, EXL2, AWQ, and GPTQ quantization formats for local AI. Comparison of precision, speed, VRAM, and best use cases for 2026.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="GGUF vs EXL2 vs AWQ vs GPTQ - Quantization Formats Guide">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/quantization-formats-guide.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-08-15T00:00:00Z">
+    <meta property="article:modified_time" content="2026-08-15T00:00:00Z">
+    <meta property="article:section" content="Guides">
+    <meta property="article:tag" content="GGUF">
+    <meta property="article:tag" content="EXL2">
+    <meta property="article:tag" content="AWQ">
+    <meta property="article:tag" content="GPTQ">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/quantization-formats-guide.html">
+    <meta name="twitter:title" content="GGUF vs EXL2 vs AWQ vs GPTQ - Quantization Formats Guide">
+    <meta name="twitter:description" content="Master GGUF, EXL2, AWQ, and GPTQ quantization formats for local AI. Comparison of precision, speed, VRAM, and best use cases for 2026.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta name="twitter:image:alt" content="GGUF vs EXL2 vs AWQ vs GPTQ - Quantization Formats Guide">
+
+    <!-- Additional AEO/GEO Meta Tags -->
+    <meta name="application-name" content="Local AI Zone">
+    <meta name="msapplication-TileColor" content="#7c3aed">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="article-publisher" content="https://local-ai-zone.github.io">
+    <meta name="article-content-ttl" content="P1Y">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/quantization-formats-guide.html">
+
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/quantization-formats-guide.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/quantization-formats-guide.html">
+
+    <style>
+        .back-to-blog { display: inline-flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-weight: 600; margin: 0 0 30px 0; padding: 10px 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; backdrop-filter: blur(8px); transition: all 0.3s ease; position: relative; z-index: 1; }
+        .back-to-blog:hover { background: rgba(255,255,255,0.28); transform: translateX(-3px); }
+        .article-content { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        .article-content h1 { font-size: 2.2em; color: #1e40af; margin: 40px 0 15px; padding-bottom: 10px; border-bottom: 3px solid #e5e7eb; }
+        .article-content h2 { font-size: 1.6em; color: #1e40af; margin: 35px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .article-content h3 { font-size: 1.3em; color: #374151; margin: 28px 0 10px; }
+        .article-content h4 { font-size: 1.1em; color: #4b5563; margin: 20px 0 8px; }
+        .article-content p { margin-bottom: 1.2em; line-height: 1.8; }
+        .article-content ul, .article-content ol { margin: 12px 0 12px 24px; }
+        .article-content li { margin-bottom: 6px; line-height: 1.7; }
+        .article-content table { margin: 24px 0; width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .article-content table th { background: #1e40af; color: white; padding: 10px 12px; text-align: left; font-weight: 600; border: 1px solid #1e40af; }
+        .article-content table td { padding: 10px 12px; border: 1px solid #e5e7eb; text-align: left; }
+        .article-content table tr:nth-child(even) td { background: #f9fafb; }
+        .article-content table tr:hover td { background: #eff6ff; }
+        .article-content blockquote { border-left: 4px solid #2563eb; background: #eff6ff; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-style: normal; }
+        .article-content blockquote p { margin-bottom: 0.5em; }
+        .article-content blockquote p:last-child { margin-bottom: 0; }
+        .article-content code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: "Courier New", monospace; }
+        .article-content pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        .article-content pre code { background: none; color: inherit; padding: 0; }
+        .article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+        .article-content em { color: #6b7280; }
+        .article-content strong { color: #111827; }
+        .article-content a { color: #2563eb; text-decoration: none; }
+        .article-content a:hover { text-decoration: underline; }
+        .article-content hr { border: none; border-top: 2px solid #e5e7eb; margin: 40px 0; }
+        .article-header::before { display: none !important; }
+        .article-header .article-title { text-shadow: none !important; }
+        .article-header .container { background: transparent !important; }
+        .premium-header { position: static !important; }
+        .article-section { margin: 40px 0; background: white; border-radius: 12px; padding: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .section-title { font-size: 2em; color: #1e40af; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 3px solid #e5e7eb; }
+        .key-takeaway { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left: 4px solid #2563eb; padding: 24px; margin: 30px 0; border-radius: 0 8px 8px 0; }
+    
+        /* Dark mode table overrides */
+        html[data-theme='dark'] table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table td { background: #1e1e2e !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table tr:nth-child(even) td { background: #252535 !important; }
+        html[data-theme='dark'] table tr:nth-child(odd) td { background: #1e1e2e !important; }
+        html[data-theme='dark'] table tr:hover td { background: rgba(124, 58, 237, 0.1) !important; }
+        html[data-theme='dark'] table { border-color: #374151 !important; }
+</style>
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "GGUF vs EXL2 vs AWQ vs GPTQ - Quantization Formats Guide",
+        "alternativeHeadline": "Master quantization formats for local AI: precision, speed, and VRAM trade-offs",
+        "description": "Master GGUF, EXL2, AWQ, and GPTQ quantization formats for local AI. Comparison of precision, speed, VRAM, and best use cases for 2026.",
+        "image": "https://local-ai-zone.github.io/og-image.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-08-15T00:00:00Z",
+        "dateModified": "2026-08-15T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/quantization-formats-guide.html"
+        },
+        "keywords": "GGUF, EXL2, AWQ, GPTQ, quantization, VRAM, local LLM, 2026",
+        "articleSection": "Guides",
+        "wordCount": 5000,
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
+    }
+    </script>
+    
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "GGUF vs EXL2 vs AWQ vs GPTQ - Quantization Formats Guide", "item": "https://local-ai-zone.github.io/blog/quantization-formats-guide.html"}
+        ]
+    }
+    </script>
+</head>
+<body class="blog-article-page">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+
+            <figure style="margin: 24px 0; text-align: center;">
+                <img src="quant-vram-comparison.png" alt="VRAM requirements comparison across quantization levels showing memory savings at each bit width" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </figure>
+
+            <figure style="margin: 24px 0; text-align: center;">
+                <img src="quant-format-comparison.png" alt="Quantization format comparison chart showing GGUF, GPTQ, AWQ, and EXL2 formats side by side" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </figure>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">GGUF vs EXL2 vs AWQ vs GPTQ — Quantization Formats Guide</h1>
+                <div class="article-meta">
+                    <span class="article-date">August 15, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Guides</span>
+                    <span class="article-read-time">📖 18 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h2>Introduction: Why Quantization Format Choice Matters</h2>
+            <p>If you run large language models locally, you have to choose a quantization format. The format you pick determines how much VRAM you need, how fast inference runs, and how much quality you lose. In 2026, four formats dominate the local-AI ecosystem: <strong>GGUF</strong>, <strong>EXL2</strong>, <strong>AWQ</strong>, and <strong>GPTQ</strong>. Each has a different philosophy, a different toolchain, and a different sweet spot.</p>
+
+            <p>This guide walks through every format, explains the underlying math at a high level, shows you the exact trade-offs, and recommends a default format for each use case. By the end you'll know which format to download, which tool to run, and which file size to expect.</p>
+
+            <div class="key-takeaway">
+                <h3>🚀 Key Takeaway</h3>
+                <p><strong>Use GGUF for llama.cpp / Ollama / LM Studio workflows (CPU + GPU, broadest hardware support).</strong> Use EXL2 for ExLlamaV2 on NVIDIA GPUs (best speed-quality balance at 4-6 bpw). Use AWQ for low-VRAM NVIDIA GPUs (best quality-per-bit at 4-bit). Use GPTQ for legacy compatibility only — it's been superseded by AWQ and EXL2.</p>
+            </div>
+
+            <h2>1. GGUF — The Universal Format</h2>
+            <p>GGUF (GPT-Generated Unified Format) is the format created by Georgi Gerganov for <strong>llama.cpp</strong> and is now the de-facto standard for local LLM inference. It runs on virtually any hardware: NVIDIA, AMD, Apple Silicon, Intel CPUs, and even Raspberry Pi. A single GGUF file contains the model weights, tokenizer, metadata, and any quantization parameters — no external config needed.</p>
+
+            <h3>Quantization schemes</h3>
+            <p>GGUF supports many quantization types, named by their effective bits-per-weight (bpw):</p>
+            <ul>
+                <li><strong>Q2_K, Q3_K_S, Q3_K_M, Q3_K_L</strong> — 2-3 bit, aggressive compression for very large models on small hardware</li>
+                <li><strong>Q4_0, Q4_1, Q4_K_S, Q4_K_M</strong> — 4-bit, the sweet spot for most users. Q4_K_M is the default recommendation</li>
+                <li><strong>Q5_0, Q5_1, Q5_K_S, Q5_K_M</strong> — 5-bit, near-lossless for most models</li>
+                <li><strong>Q6_K</strong> — 6-bit, essentially identical to Q8 with smaller files</li>
+                <li><strong>Q8_0</strong> — 8-bit, near-BF16 quality with ~50% size reduction</li>
+                <li><strong>F16, F32</strong> — full precision, reference only</li>
+            </ul>
+
+            <h3>Strengths</h3>
+            <ul>
+                <li><strong>Universal hardware support</strong> — runs on literally any modern device with a CPU or GPU</li>
+                <li><strong>Mature ecosystem</strong> — Ollama, LM Studio, KoboldCpp, text-generation-webui, llama.cpp itself</li>
+                <li><strong>Per-layer mixed precision</strong> — K-quants can use higher precision for sensitive layers</li>
+                <li><strong>Excellent CPU performance</strong> — the only format that runs efficiently on pure CPU setups</li>
+                <li><strong>Apple Silicon MLX support</strong> — GGUF can be converted to MLX for native Apple Silicon inference</li>
+            </ul>
+
+            <h3>Weaknesses</h3>
+            <ul>
+                <li><strong>Not the fastest on high-end NVIDIA GPUs</strong> — EXL2 and AWQ pull ahead on RTX 4090/5090</li>
+                <li><strong>Larger file sizes at equivalent quality</strong> — GGUF Q4_K_M is typically 10-15% larger than EXL2 4.0 bpw</li>
+            </ul>
+
+            <h2>2. EXL2 — ExLlamaV2's Native Format</h2>
+            <p>EXL2 is the format designed for <strong>ExLlamaV2</strong>, a high-performance inference engine for NVIDIA GPUs. It uses a flexible bits-per-weight target (e.g., 4.25 bpw, 5.5 bpw) rather than fixed quantization levels, which lets it pack weights more efficiently than formats that round to 4-bit or 8-bit boundaries.</p>
+
+            <h3>How EXL2 differs</h3>
+            <p>EXL2 uses the same underlying quantization math as GPTQ (calibration-based) but stores the result in a more efficient binary format. The key innovation: you can quantize to <em>any</em> target bpw (3.5, 4.0, 4.25, 5.0, 6.0, 8.0) and the tool picks the optimal bit allocation per layer to hit your target size.</p>
+
+            <ul>
+                <li><strong>4.0 bpw</strong> — equivalent to GPTQ 4-bit, smaller files than GGUF Q4_K_M</li>
+                <li><strong>4.25-5.0 bpw</strong> — sweet spot for most use cases, near-lossless quality</li>
+                <li><strong>6.0-8.0 bpw</strong> — for users who want maximum quality with some compression</li>
+            </ul>
+
+            <h3>Strengths</h3>
+            <ul>
+                <li><strong>Best speed-quality balance on NVIDIA</strong> — ExLlamaV2 is the fastest inference engine for consumer NVIDIA GPUs</li>
+                <li><strong>Flexible bpw targets</strong> — get exactly the file size you want</li>
+                <li><strong>Smaller files than GGUF at equivalent quality</strong> — typically 10-15% smaller</li>
+                <li><strong>Excellent VRAM efficiency</strong> — better than GPTQ at low bit counts</li>
+            </ul>
+
+            <h3>Weaknesses</h3>
+            <ul>
+                <li><strong>NVIDIA only</strong> — no AMD, no Apple Silicon, no CPU</li>
+                <li><strong>Requires calibration data</strong> — quantizing a new model needs a calibration dataset</li>
+                <li><strong>Smaller community</strong> — fewer pre-quantized models on Hugging Face compared to GGUF</li>
+            </ul>
+
+            <h2>3. AWQ — Activation-aware Weight Quantization</h2>
+            <p>AWQ is a 4-bit quantization method from MIT that protects the most important weights based on the activation patterns observed during a small calibration run. The key insight: not all weights are equally important, and you can identify the "salient" weights by watching which channels have the largest activations during inference.</p>
+
+            <h3>How AWQ works</h3>
+            <p>AWQ doesn't quantize every weight to 4 bits. Instead, it:</p>
+            <ol>
+                <li>Runs a small calibration dataset through the model to record per-channel activation magnitudes</li>
+                <li>Identifies the top ~1% of "salient" weight channels</li>
+                <li>Keeps those channels at higher precision (effectively 8-bit) and quantizes the rest to 4-bit</li>
+                <li>Applies a learned scaling factor per channel to minimize quantization error</li>
+            </ol>
+            <p>The result: a model that, at 4-bit, has quality close to 6-bit GPTQ but with the file size of 4-bit. On benchmarks AWQ often matches GGUF Q5_K_M at Q4 file sizes.</p>
+
+            <figure style="margin: 24px 0; text-align: center;">
+                <img src="benchmark-prompt-to-score.png" alt="Benchmark prompt-to-score pipeline showing how model inputs are transformed into evaluation metrics" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </figure>
+
+            <figure style="margin: 24px 0; text-align: center;">
+                <img src="benchmark-anatomy.png" alt="Anatomy of an AI benchmark showing how evaluation scores are computed and what they measure" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </figure>
+
+            <h3>Strengths</h3>
+            <ul>
+                <li><strong>Best quality at 4-bit</strong> — meaningfully better than GPTQ 4-bit, often comparable to 5-6 bit</li>
+                <li><strong>Fast inference</strong> — supported by vLLM, TGI, AutoAWQ, and TensorRT-LLM</li>
+                <li><strong>Low VRAM</strong> — 4-bit AWQ fits larger models on smaller GPUs than FP16</li>
+            </ul>
+
+            <h3>Weaknesses</h3>
+            <ul>
+                <li><strong>NVIDIA only</strong> — uses INT4 GEMM kernels, not portable to AMD/Apple</li>
+                <li><strong>4-bit only</strong> — no flexible bpw like EXL2</li>
+                <li><strong>Calibration required</strong> — quantizing new models needs care to pick the right calibration set</li>
+            </ul>
+
+            <h2>4. GPTQ — The Legacy Format</h2>
+            <p>GPTQ (GPT Quantization) is the original post-training quantization method for LLMs, published in 2022. It uses second-order information (Hessian) to minimize the error introduced by quantizing each weight in sequence. It was the dominant format from 2023-2024 and is still widely available on Hugging Face, but has been largely superseded by AWQ and EXL2.</p>
+
+            <h3>How GPTQ works</h3>
+            <p>GPTQ processes the weight matrix column by column. For each weight, it computes the quantization error and uses the Hessian matrix to compensate for that error in the remaining unquantized columns. The result is a globally optimized 4-bit (or 8-bit) quantization that's much better than naive per-weight rounding.</p>
+
+            <h3>Strengths</h3>
+            <ul>
+                <li><strong>Wide hardware support</strong> — runs on NVIDIA, AMD (via ROCm), and some Apple Silicon setups</li>
+                <li><strong>Many pre-quantized models</strong> — vast Hugging Face ecosystem</li>
+                <li><strong>Mature toolchain</strong> — well-documented quantization scripts</li>
+            </ul>
+
+            <h3>Weaknesses</h3>
+            <ul>
+                <li><strong>Worse than AWQ at 4-bit</strong> — AWQ's activation-aware approach yields better quality at the same bit count</li>
+                <li><strong>Slower than EXL2</strong> — ExLlamaV2 is faster than most GPTQ runtimes</li>
+                <li><strong>Group size trade-offs</strong> — smaller group sizes are better quality but larger files</li>
+            </ul>
+
+            <h2>5. Format Comparison Matrix</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>GGUF</th>
+                        <th>EXL2</th>
+                        <th>AWQ</th>
+                        <th>GPTQ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td><strong>Hardware</strong></td><td>Any (CPU/GPU)</td><td>NVIDIA only</td><td>NVIDIA only</td><td>NVIDIA, some AMD</td></tr>
+                    <tr><td><strong>Bit widths</strong></td><td>2-8 bit (K-quants)</td><td>Any (1-8 bpw)</td><td>4-bit only</td><td>4-bit, 8-bit</td></tr>
+                    <tr><td><strong>File size at Q4</strong></td><td>~4.5 GB/8B model</td><td>~4.0 GB/8B model</td><td>~4.0 GB/8B model</td><td>~4.0 GB/8B model</td></tr>
+                    <tr><td><strong>Quality at Q4</strong></td><td>Very good (Q4_K_M)</td><td>Excellent (4.25 bpw)</td><td>Best (4-bit)</td><td>Good</td></tr>
+                    <tr><td><strong>Inference speed (NVIDIA)</strong></td><td>Good</td><td>Excellent</td><td>Very good</td><td>Good</td></tr>
+                    <tr><td><strong>CPU inference</strong></td><td>Best</td><td>Not supported</td><td>Not supported</td><td>Limited</td></tr>
+                    <tr><td><strong>Apple Silicon</strong></td><td>Yes (MLX conversion)</td><td>No</td><td>No</td><td>Limited</td></tr>
+                    <tr><td><strong>Calibration required</strong></td><td>No</td><td>Yes</td><td>Yes</td><td>Yes</td></tr>
+                    <tr><td><strong>Best tool</strong></td><td>llama.cpp / Ollama</td><td>ExLlamaV2</td><td>AutoAWQ</td><td>GPTQ-for-LLaMA</td></tr>
+                </tbody>
+            </table>
+
+            <h2>6. Choosing the Right Format</h2>
+            <h3>For NVIDIA GPU users (RTX 3060+)</h3>
+            <ul>
+                <li><strong>Want best quality at 4-bit?</strong> Use AWQ</li>
+                <li><strong>Want best speed-quality balance?</strong> Use EXL2 at 4.25-5.0 bpw</li>
+                <li><strong>Want max compatibility?</strong> Use GGUF Q4_K_M</li>
+            </ul>
+
+            <h3>For AMD GPU users</h3>
+            <ul>
+                <li><strong>Best option:</strong> GGUF (ROCm support in llama.cpp is mature)</li>
+                <li><strong>Limited:</strong> GPTQ with ROCm-compatible kernels</li>
+            </ul>
+
+            <h3>For Apple Silicon users</h3>
+            <ul>
+                <li><strong>Best option:</strong> GGUF converted to MLX, or run GGUF directly via llama.cpp</li>
+                <li><strong>Alternative:</strong> Native MLX format (separate ecosystem)</li>
+            </ul>
+
+            <h3>For CPU-only users</h3>
+            <ul>
+                <li><strong>Only option that works well:</strong> GGUF (Q4_K_M or Q5_K_M)</li>
+            </ul>
+
+            <h2>7. Quality at Different Bit Counts</h2>
+            <p>The general rule for 2026 (Llama-3-class 8B-70B models):</p>
+            <ul>
+                <li><strong>2-3 bit (Q2_K, Q3_K):</strong> Noticeable quality loss, only for very large models where you need to fit them in limited VRAM</li>
+                <li><strong>4 bit (Q4_K_M, EXL2 4.0, AWQ):</strong> Sweet spot for most users. ~99% of BF16 quality on most benchmarks</li>
+                <li><strong>5 bit (Q5_K_M, EXL2 5.0):</strong> Near-lossless for most tasks. Recommended for coding/reasoning where quality matters</li>
+                <li><strong>6 bit (Q6_K, EXL2 6.0):</strong> Essentially indistinguishable from BF16 in practice</li>
+                <li><strong>8 bit (Q8_0):</strong> Reference quality with ~50% size reduction</li>
+            </ul>
+
+            <h2>8. Practical Recommendations</h2>
+            <div class="key-takeaway">
+                <h3>💎 Default Recommendations</h3>
+                <p><strong>For a 24GB NVIDIA GPU (RTX 3090/4090):</strong> EXL2 5.0 bpw for 70B models, EXL2 6.0 bpw for 13B models</p>
+                <p><strong>For a 12GB NVIDIA GPU (RTX 3060/4070):</strong> AWQ 4-bit for 13B, EXL2 4.0 bpw for 7B</p>
+                <p><strong>For a 8GB GPU (RTX 3060 Ti / 4060 Ti):</strong> AWQ 4-bit for 7B, GGUF Q4_K_M for 3-4B</p>
+                <p><strong>For Apple Silicon (M2/M3/M4):</strong> GGUF Q4_K_M via llama.cpp, or MLX format directly</p>
+                <p><strong>For CPU-only:</strong> GGUF Q4_K_M is the only practical option</p>
+            </div>
+
+            <h2>9. Converting Between Formats</h2>
+            <p>All formats can be converted from each other with the right tools:</p>
+            <ul>
+                <li><strong>HF → GGUF:</strong> <code>llama.cpp/convert_hf_to_gguf.py</code></li>
+                <li><strong>GGUF → MLX:</strong> <code>mlx_lm.convert</code></li>
+                <li><strong>HF → EXL2:</strong> <code>exllamav2/conversion</code> (requires calibration data)</li>
+                <li><strong>HF → AWQ:</strong> <code>AutoAWQ</code> (requires calibration data)</li>
+                <li><strong>HF → GPTQ:</strong> <code>GPTQ-for-LLaMA</code> or <code>auto-gptq</code></li>
+            </ul>
+
+            <h2>10. The Future of Quantization</h2>
+            <p>Three trends to watch in 2026-2027:</p>
+            <ol>
+                <li><strong>Sub-4-bit (FP4, NVFP4):</strong> NVIDIA's Blackwell GPUs and DeepSeek V4 ship native FP4 weights. Expect FP4 to become the default for new models by end of 2026</li>
+                <li><strong>Quantization-Aware Training (QAT):</strong> Models trained with quantization baked in (rather than post-training quantized) preserve quality better. This is becoming the norm for new releases</li>
+                <li><strong>Unified formats:</strong> The industry is moving toward formats that work across all backends. GGUF's universal approach is winning this race, with vLLM and others adding GGUF support</li>
+            </ol>
+
+            <h2>Conclusion</h2>
+            <p>The quantization format you choose is a trade-off between hardware support, file size, inference speed, and quality. For most users in 2026, <strong>GGUF Q4_K_M</strong> is the safe default — it runs everywhere and the quality is excellent. If you're on a high-end NVIDIA GPU and want the absolute best speed-quality balance, <strong>EXL2 at 4.25-5.0 bpw</strong> is the choice. If you need 4-bit quality and have a smaller NVIDIA GPU, <strong>AWQ</strong> is unmatched. <strong>GPTQ</strong> remains useful for legacy compatibility but is no longer the best option for new deployments.</p>
+
+            <p>The best part: you can download all four formats and benchmark them on your specific hardware with your specific prompts. Every format is one Hugging Face search away.</p>
+
+            <!-- Related Posts Section -->
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <a href="gpu-cpu-inference-troubleshooting.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">GPU & CPU Inference Troubleshooting</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Complete troubleshooting guide for inference issues — OOM, slow tok/s, KV cache pressure.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="ai-inference-hardware-2026.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">AI Inference Hardware 2026</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Complete 2026 catalog of AI inference hardware across NVIDIA, AMD, Apple Silicon.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="low-resource-ai-agents-research-paper.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Maximum Capability from Minimum Silicon</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">A research paper on maximizing 8 GB GPU + 32 GB RAM workstations for AI agent workloads.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                </div>
+            </div>
+
+            <h2 class="section-title">About the Author</h2>
+            <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
+            <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+            <p style="margin-top: 30px;"><em>Last Updated: August 15, 2026 | Version 1.0</em></p>
+        </div>
+    </article>
+
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>
