@@ -468,6 +468,20 @@
         html[data-theme='dark'] table tr:nth-child(odd) td { background: #1e1e2e !important; }
         html[data-theme='dark'] table tr:hover td { background: rgba(124, 58, 237, 0.1) !important; }
         html[data-theme='dark'] table { border-color: #374151 !important; }
+
+        /* === Dark mode: table row overrides (match .article-content specificity) === */
+        html[data-theme='dark'] .article-content table tr:nth-child(even) td { background: #252535 !important; color: #e0e0e0 !important; }
+        html[data-theme='dark'] .article-content table tr:nth-child(odd) td { background: #1e1e2e !important; color: #e0e0e0 !important; }
+        html[data-theme='dark'] .article-content table tr:hover td { background: rgba(124, 58, 237, 0.12) !important; }
+        html[data-theme='dark'] .article-content table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] .article-content table td { border-color: #374151 !important; color: #e0e0e0 !important; }
+        html[data-theme='dark'] .article-content table { border-color: #374151 !important; }
+        /* === Dark mode: blockquote === */
+        html[data-theme='dark'] .article-content blockquote { background: rgba(59, 130, 246, 0.12) !important; border-left-color: #3b82f6 !important; color: #e0e0e0 !important; }
+        /* === Dark mode: code blocks === */
+        html[data-theme='dark'] .article-content pre { background: #1a1a2e !important; color: #e0e0e0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] .article-content code { background: rgba(124, 58, 237, 0.15) !important; color: #c4b5fd !important; }
+
 </style>
 
     <!-- JSON-LD Structured Data -->
