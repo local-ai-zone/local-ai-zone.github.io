@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini 3.8 Flash: Deep Technical Breakdown — Architecture, Benchmarks, Pricing - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Gemini 3.8 Flash technical breakdown: Google's fourth Flash model in four months. Architecture lineage, 'works harder' compute design, Terminal-Bench 2.1 90.8%, DeepSWE, Flash Cyber and Fairwind, full pricing, and API migration guide.">
+    <meta name="keywords" content="Gemini 3.8 Flash, Google DeepMind, Gemini 3.7 Flash, Flash Cyber, Fairwind Program, Terminal-Bench 2.1, DeepSWE, SWE-Bench Pro, Artificial Analysis Intelligence Index, Gemini API pricing, thinking levels, Interactions API, agentic coding models, AI benchmarks 2026">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="theme-color" content="#1a73e8">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Gemini 3.8 Flash: Google's Fastest-Shipping Workhorse, Dissected">
+    <meta property="og:description" content="The third Flash release in six weeks — 'works harder' by design. A deep technical breakdown of Gemini 3.8 Flash: benchmarks, the Flash Cyber variant, pricing economics, and the full API migration path.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Gemini 3.8 Flash: Deep Technical Breakdown">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/gemini-3-8-flash-technical-breakdown.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-09-03T00:00:00Z">
+    <meta property="article:modified_time" content="2026-09-03T00:00:00Z">
+    <meta property="article:section" content="AI Models">
+    <meta property="article:tag" content="Gemini 3.8 Flash">
+    <meta property="article:tag" content="Google DeepMind">
+    <meta property="article:tag" content="AI Benchmarks">
+    <meta property="article:tag" content="Agentic Coding">
+    <meta property="article:tag" content="Frontier Models">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/gemini-3-8-flash-technical-breakdown.html">
+    <meta name="twitter:title" content="Gemini 3.8 Flash: Deep Technical Breakdown">
+    <meta name="twitter:description" content="Google's fourth Flash model in four months: 'works harder' by design. Benchmarks, Flash Cyber, pricing economics, and API migration — dissected.">
+    <meta name="twitter:creator" content="@hussainnazary">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta name="twitter:image:alt" content="Gemini 3.8 Flash: Deep Technical Breakdown">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/gemini-3-8-flash-technical-breakdown.html">
+
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/gemini-3-8-flash-technical-breakdown.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/gemini-3-8-flash-technical-breakdown.html">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Gemini 3.8 Flash: Deep Technical Breakdown — Architecture, Benchmarks, Pricing",
+      "description": "Google's fourth Flash model in four months, dissected: architecture lineage, the 'works harder' compute design, Terminal-Bench 2.1 90.8%, Flash Cyber and the Fairwind Program, full pricing economics, and the API migration guide.",
+      "author": {"@type": "Person", "name": "Hussain Nazary"},
+      "publisher": {"@type": "Organization", "name": "Local AI Zone"},
+      "datePublished": "2026-09-03",
+      "dateModified": "2026-09-03",
+      "proficiencyLevel": "Expert",
+      "dependencies": "Gemini API (Interactions API), gemini-3.8-flash",
+      "about": [
+        {"@type": "Thing", "name": "Gemini 3.8 Flash"},
+        {"@type": "Thing", "name": "Google DeepMind"},
+        {"@type": "Thing", "name": "Large Language Models"}
+      ],
+      "mainEntityOfPage": "https://local-ai-zone.github.io/blog/gemini-3-8-flash-technical-breakdown.html"
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {"@type": "Question", "name": "What is Gemini 3.8 Flash?", "acceptedAnswer": {"@type": "Answer", "text": "Gemini 3.8 Flash is Google DeepMind's most intelligent Flash-tier model, released September 2, 2026. It is built on Gemini 3.7 Flash and engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows, with a 1M token context window and 64K max output."}},
+        {"@type": "Question", "name": "How much does Gemini 3.8 Flash cost?", "acceptedAnswer": {"@type": "Answer", "text": "Through December 31, 2026, Gemini 3.8 Flash costs $0.75 per 1M input tokens and $3.75 per 1M output tokens (introductory rate, output includes thinking tokens). From January 1, 2027, standard pricing doubles to $1.50/$7.50. Batch and Flex tiers run at 50% off; Priority costs 1.8x."}},
+        {"@type": "Question", "name": "How does Gemini 3.8 Flash compare to Gemini 3.7 Flash?", "acceptedAnswer": {"@type": "Answer", "text": "Coding and tool-use benchmarks jumped — Terminal-Bench 2.1 went from 81.6% to 90.8% — but gains are uneven: Humanity's Last Exam stayed flat (45.4% vs 45.7%) and SWE-Bench Pro moved just 1.2 points. By design it uses more tokens per task at higher effort levels, costing roughly 40% more per task than 3.7 Flash at the same token prices."}},
+        {"@type": "Question", "name": "What is Gemini 3.8 Flash Cyber?", "acceptedAnswer": {"@type": "Answer", "text": "Gemini 3.8 Flash Cyber is a cybersecurity-tuned variant sharing 3.8 Flash's foundational intelligence, focused on autonomous vulnerability discovery and automated patching. It exceeds a 70% success rate on Google's internal 20-language vulnerability benchmark and sits on the CWE-Bench Pareto frontier. Access is restricted to trusted defenders through the Fairwind Program."}},
+        {"@type": "Question", "name": "Which thinking levels does Gemini 3.8 Flash support?", "acceptedAnswer": {"@type": "Answer", "text": "Three tunable thinking levels: low, medium (default), and high. The minimal level is NOT supported and will return an error. The thinking_level string enum replaces the older thinking_budget parameter. Artificial Analysis measured Intelligence Index scores of 52 (low), 57 (medium), and 59 (high) across the levels."}},
+        {"@type": "Question", "name": "Should I migrate from Gemini 3.7 Flash to 3.8 Flash?", "acceptedAnswer": {"@type": "Answer", "text": "If you build coding agents, terminal-heavy workflows, or domain agents in finance and law, the upgrade is meaningful. For efficiency-first workloads where token cost matters more than last-point accuracy, staying on 3.7 Flash (which remains fully supported) is a reasonable choice. Google explicitly recommends routing between the two based on workload."}}
+      ]
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {"@type": "ListItem", "position": 1, "name": "Local AI Zone", "item": "https://local-ai-zone.github.io/"},
+        {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog"},
+        {"@type": "ListItem", "position": 3, "name": "Gemini 3.8 Flash: Deep Technical Breakdown", "item": "https://local-ai-zone.github.io/blog/gemini-3-8-flash-technical-breakdown.html"}
+      ]
+    }
+    </script>
+
+    <style>
+    :root {
+        --primary: #1a73e8;
+        --primary-deep: #174ea6;
+        --primary-bright: #4285f4;
+        --accent: #7c3aed;
+        --bg: #eef1f6;
+        --card: #ffffff;
+        --ink: #1f2937;
+        --ink-soft: #4b5563;
+        --ink-faint: #6b7280;
+        --line: #e5e7eb;
+        --wash: #e8f0fe;
+        --wash-deep: #d2e3fc;
+        --code-bg: #0f172a;
+        --code-ink: #e2e8f0;
+        --track: #e5e7eb;
+        --bar-a: #1a73e8;
+        --bar-b: #a8c7fa;
+        --hero-grad: linear-gradient(135deg, #0d3b8e 0%, #1a73e8 55%, #7c3aed 130%);
+        --shadow: 0 5px 15px rgba(15, 23, 42, 0.06);
+        --shadow-lift: 0 8px 24px rgba(15, 23, 42, 0.10);
+        --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        --mono: ui-monospace, "SF Mono", "Cascadia Code", Consolas, Menlo, monospace;
+    }
+    [data-theme="dark"] {
+        --bg: #0b1220;
+        --card: #131c2e;
+        --ink: #e5e9f0;
+        --ink-soft: #b6c0cf;
+        --ink-faint: #8894a7;
+        --line: #263248;
+        --wash: #16233d;
+        --wash-deep: #1c2d4f;
+        --track: #263248;
+        --bar-b: #5e8bd6;
+        --shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
+        --shadow-lift: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+        font-family: var(--sans);
+        background: var(--bg);
+        color: var(--ink);
+        line-height: 1.75;
+        font-size: 16.5px;
+        -webkit-font-smoothing: antialiased;
+    }
+    .page { max-width: 880px; margin: 0 auto; padding: 0 20px 80px; }
+
+    /* Hero */
+    .hero {
+        background: var(--hero-grad);
+        border-radius: 0 0 28px 28px;
+        color: #fff;
+        padding: 64px 48px 56px;
+        margin: 0 -20px 40px;
+        position: relative;
+        overflow: hidden;
+    }
+    .hero::before {
+        content: "";
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(600px 300px at 85% -10%, rgba(255,255,255,0.14), transparent 60%),
+            radial-gradient(500px 400px at -10% 110%, rgba(124,58,237,0.25), transparent 60%);
+        pointer-events: none;
+    }
+    .hero * { position: relative; }
+    .crumb { font-size: 13px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.85; margin-bottom: 22px; }
+    .crumb a { color: #fff; text-decoration: none; }
+    .hero h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.15; font-weight: 800; letter-spacing: -0.015em; margin-bottom: 18px; }
+    .hero .sub { font-size: clamp(16px, 2.2vw, 19px); opacity: 0.92; max-width: 640px; font-weight: 300; }
+    .hero .meta { display: flex; flex-wrap: wrap; gap: 22px; margin-top: 30px; font-size: 14px; opacity: 0.9; }
+    .hero .meta span { display: inline-flex; align-items: center; gap: 7px; }
+    .hero .meta svg { width: 15px; height: 15px; stroke: #fff; fill: none; stroke-width: 2; }
+    .hero-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+    .hero-badges .b {
+        background: rgba(255,255,255,0.14);
+        border: 1px solid rgba(255,255,255,0.25);
+        backdrop-filter: blur(4px);
+        padding: 5px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.03em;
+    }
+
+    /* Theme toggle */
+    .theme-toggle {
+        position: fixed; top: 18px; right: 18px; z-index: 50;
+        background: var(--card); color: var(--ink);
+        border: 1px solid var(--line); border-radius: 999px;
+        padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+        box-shadow: var(--shadow); font-family: var(--sans);
+    }
+    .theme-toggle:hover { box-shadow: var(--shadow-lift); }
+
+    /* Abstract */
+    .abstract {
+        background: var(--card); border: 1px solid var(--line);
+        border-left: 4px solid var(--primary);
+        border-radius: 14px; padding: 26px 30px; margin: 34px 0 26px;
+        box-shadow: var(--shadow);
+    }
+    .abstract h2 { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--primary); margin-bottom: 10px; }
+    .abstract p { font-size: 15.5px; color: var(--ink-soft); }
+    .abstract p + p { margin-top: 10px; }
+
+    /* Stat cards */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; margin: 30px 0 10px; }
+    .stat {
+        background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+        padding: 18px 20px; box-shadow: var(--shadow);
+    }
+    .stat .k { font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 6px; }
+    .stat .v { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.01em; }
+    .stat .d { font-size: 12.5px; color: var(--ink-faint); margin-top: 5px; line-height: 1.5; }
+
+    /* TOC */
+    .toc {
+        background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+        padding: 24px 28px; margin: 28px 0; box-shadow: var(--shadow);
+    }
+    .toc h2 { font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin-bottom: 14px; }
+    .toc ol { list-style: none; counter-reset: toc; columns: 2; column-gap: 36px; }
+    .toc li { counter-increment: toc; margin-bottom: 9px; break-inside: avoid; }
+    .toc a { color: var(--ink-soft); text-decoration: none; font-size: 14.5px; display: flex; gap: 10px; }
+    .toc a::before { content: counter(toc, decimal-leading-zero); color: var(--primary); font-weight: 700; font-family: var(--mono); font-size: 12.5px; padding-top: 2px; }
+    .toc a:hover { color: var(--primary); }
+
+    /* Sections */
+    section { margin-top: 54px; }
+    h2.sec {
+        font-size: 27px; font-weight: 800; letter-spacing: -0.015em; line-height: 1.3;
+        padding-bottom: 12px; border-bottom: 2px solid var(--line); margin-bottom: 24px;
+    }
+    h2.sec .no { color: var(--primary); font-family: var(--mono); font-size: 18px; margin-right: 10px; }
+    h3 { font-size: 19px; font-weight: 700; margin: 30px 0 12px; letter-spacing: -0.01em; }
+    h4 { font-size: 15.5px; font-weight: 700; margin: 22px 0 8px; color: var(--ink-soft); }
+    p { margin-bottom: 16px; color: var(--ink-soft); }
+    p strong, li strong { color: var(--ink); }
+    ul.bul, ol.num { margin: 0 0 16px 22px; color: var(--ink-soft); }
+    ul.bul li, ol.num li { margin-bottom: 8px; }
+    a { color: var(--primary); }
+
+    .callout {
+        background: var(--wash); border: 1px solid var(--wash-deep);
+        border-radius: 12px; padding: 18px 22px; margin: 22px 0;
+    }
+    .callout .tag { font-size: 11.5px; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; color: var(--primary); display: block; margin-bottom: 7px; }
+    .callout p { margin: 0; font-size: 15px; }
+    .callout.warn { background: #fef3cd; border-color: #fde68a; }
+    [data-theme="dark"] .callout.warn { background: #2b2410; border-color: #57501c; }
+    .callout.warn .tag { color: #92700c; }
+    .callout p + p { margin-top: 8px; }
+
+    .pullquote {
+        border-left: 3px solid var(--accent); margin: 26px 0; padding: 6px 0 6px 22px;
+        font-size: 18px; line-height: 1.55; color: var(--ink); font-weight: 500; font-style: italic;
+    }
+    .pullquote cite { display: block; margin-top: 8px; font-size: 13px; color: var(--ink-faint); font-style: normal; font-weight: 600; }
+
+    /* Tables */
+    .tw { overflow-x: auto; margin: 22px 0; border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); background: var(--card); }
+    table { border-collapse: collapse; width: 100%; min-width: 560px; font-size: 14px; }
+    thead th {
+        background: var(--wash); color: var(--ink);
+        text-align: left; padding: 12px 16px; font-weight: 700; font-size: 12.5px;
+        letter-spacing: 0.05em; text-transform: uppercase; border-bottom: 2px solid var(--wash-deep);
+        white-space: nowrap;
+    }
+    tbody td { padding: 11px 16px; border-bottom: 1px solid var(--line); vertical-align: top; color: var(--ink-soft); }
+    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:nth-child(even) { background: color-mix(in srgb, var(--wash) 40%, var(--card)); }
+    td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; font-family: var(--mono); font-size: 13px; }
+    td .up { color: #15803d; font-weight: 700; }
+    td .down { color: #b91c1c; font-weight: 700; }
+    td .flat { color: var(--ink-faint); font-weight: 700; }
+    [data-theme="dark"] td .up { color: #4ade80; }
+    [data-theme="dark"] td .down { color: #f87171; }
+    .tb-note { font-size: 12.5px; color: var(--ink-faint); margin: -12px 0 20px; padding: 0 6px; line-height: 1.5; }
+    .best { background: var(--wash); font-weight: 700; color: var(--ink); }
+
+    /* Code */
+    pre {
+        background: var(--code-bg); color: var(--code-ink);
+        border-radius: 12px; padding: 20px 22px; overflow-x: auto;
+        font-family: var(--mono); font-size: 13px; line-height: 1.65; margin: 20px 0;
+        box-shadow: var(--shadow);
+    }
+    pre .cm { color: #7c8db0; }
+    pre .kw { color: #93c5fd; }
+    pre .st { color: #fca5a5; }
+    pre .fn { color: #fde68a; }
+    code {
+        font-family: var(--mono); font-size: 13.5px;
+        background: var(--wash); color: var(--primary-deep);
+        padding: 2px 7px; border-radius: 6px;
+    }
+    [data-theme="dark"] code { color: #9bc1ff; }
+    pre code { background: none; padding: 0; color: inherit; font-size: inherit; }
+
+    /* CSS bar chart */
+    .chart { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 26px 28px 20px; margin: 26px 0; box-shadow: var(--shadow); }
+    .chart .ch-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+    .chart .ch-sub { font-size: 12.5px; color: var(--ink-faint); margin-bottom: 20px; }
+    .legend { display: flex; gap: 20px; margin-bottom: 16px; flex-wrap: wrap; }
+    .legend .li { display: flex; align-items: center; gap: 7px; font-size: 12.5px; color: var(--ink-soft); }
+    .legend .sw { width: 12px; height: 12px; border-radius: 3px; }
+    .bar-row { display: grid; grid-template-columns: 170px 1fr 62px; align-items: center; gap: 12px; margin-bottom: 13px; }
+    .bar-row .lbl { font-size: 13px; font-weight: 600; color: var(--ink-soft); text-align: right; line-height: 1.3; }
+    .bar-row .track { position: relative; height: 20px; background: var(--track); border-radius: 5px; overflow: hidden; }
+    .bar-row .fill { position: absolute; top: 0; left: 0; height: 100%; border-radius: 5px; }
+    .bar-row .fA { background: var(--bar-a); }
+    .bar-row .fB { background: var(--bar-b); }
+    .bar-row .val { font-family: var(--mono); font-size: 12.5px; font-weight: 700; color: var(--ink); }
+    .chart .src { font-size: 11.5px; color: var(--ink-faint); margin-top: 14px; border-top: 1px dashed var(--line); padding-top: 10px; }
+
+    /* SVG scatter */
+    .scatter-wrap { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; margin: 26px 0; box-shadow: var(--shadow); }
+    .scatter-wrap svg { width: 100%; height: auto; display: block; }
+    .scatter-wrap .src { font-size: 11.5px; color: var(--ink-faint); margin-top: 12px; border-top: 1px dashed var(--line); padding-top: 10px; }
+
+    /* Timeline */
+    .timeline { position: relative; margin: 26px 0; padding-left: 26px; }
+    .timeline::before { content: ""; position: absolute; left: 7px; top: 6px; bottom: 6px; width: 2px; background: linear-gradient(var(--primary), var(--accent)); }
+    .t-item { position: relative; margin-bottom: 22px; }
+    .t-item::before {
+        content: ""; position: absolute; left: -25px; top: 7px;
+        width: 12px; height: 12px; border-radius: 50%;
+        background: var(--card); border: 3px solid var(--primary);
+    }
+    .t-item.minor::before { border-color: var(--bar-b); }
+    .t-item .t-date { font-family: var(--mono); font-size: 12px; color: var(--primary); font-weight: 700; }
+    .t-item .t-title { font-weight: 700; font-size: 15px; margin: 2px 0 3px; }
+    .t-item .t-desc { font-size: 13.5px; color: var(--ink-soft); line-height: 1.55; }
+
+    /* Impact cards (cyber) */
+    .impact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin: 24px 0; }
+    .impact {
+        background: var(--card); border: 1px solid var(--line); border-top: 3px solid var(--accent);
+        border-radius: 12px; padding: 18px 20px; box-shadow: var(--shadow);
+    }
+    .impact .big { font-size: 26px; font-weight: 800; color: var(--accent); letter-spacing: -0.01em; line-height: 1.2; }
+    .impact .who { font-size: 13.5px; font-weight: 700; margin-top: 6px; }
+    .impact .what { font-size: 13px; color: var(--ink-faint); margin-top: 4px; line-height: 1.55; }
+
+    /* Pros / cons */
+    .pc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 24px 0; }
+    @media (max-width: 640px) { .pc-grid { grid-template-columns: 1fr; } }
+    .pc { border-radius: 14px; padding: 22px 24px; border: 1px solid var(--line); background: var(--card); box-shadow: var(--shadow); }
+    .pc.pros { border-top: 3px solid #15803d; }
+    .pc.cons { border-top: 3px solid #b91c1c; }
+    .pc h4 { margin: 0 0 12px; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; }
+    .pc.pros h4 { color: #15803d; }
+    .pc.cons h4 { color: #b91c1c; }
+    .pc ul { margin-left: 18px; }
+    .pc li { font-size: 14px; margin-bottom: 9px; color: var(--ink-soft); line-height: 1.5; }
+
+    /* FAQ */
+    .faq-item { background: var(--card); border: 1px solid var(--line); border-radius: 12px; margin-bottom: 12px; box-shadow: var(--shadow); overflow: hidden; }
+    .faq-item details summary {
+        cursor: pointer; padding: 16px 22px; font-weight: 700; font-size: 15px;
+        list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 14px;
+    }
+    .faq-item details summary::-webkit-details-marker { display: none; }
+    .faq-item details summary::after { content: "+"; font-size: 20px; color: var(--primary); font-weight: 400; transition: transform 0.2s; }
+    .faq-item details[open] summary::after { transform: rotate(45deg); }
+    .faq-item details .faq-body { padding: 0 22px 18px; font-size: 14.5px; color: var(--ink-soft); border-top: 1px dashed var(--line); padding-top: 14px; }
+
+    /* Sources */
+    .src-list { font-size: 13px; }
+    .src-list li { margin-bottom: 8px; color: var(--ink-soft); line-height: 1.55; }
+    .src-list .s-tag { display: inline-block; font-size: 10.5px; font-weight: 800; letter-spacing: 0.06em; padding: 2px 8px; border-radius: 4px; margin-right: 8px; text-transform: uppercase; vertical-align: 1px; }
+    .s-tag.off { background: var(--wash); color: var(--primary); }
+    .s-tag.ind { background: #fce7f3; color: #9d174d; }
+    [data-theme="dark"] .s-tag.ind { background: #3b0f27; color: #f9a8d4; }
+    .s-tag.com { background: #dcfce7; color: #166534; }
+    [data-theme="dark"] .s-tag.com { background: #0f2e18; color: #86efac; }
+
+    /* Verdict box */
+    .verdict {
+        background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+        padding: 28px 32px; margin: 30px 0; box-shadow: var(--shadow-lift);
+        border-left: 4px solid var(--accent);
+    }
+    .verdict h3 { margin-top: 0; color: var(--accent); }
+
+    footer {
+        margin-top: 60px; padding-top: 28px; border-top: 1px solid var(--line);
+        font-size: 13px; color: var(--ink-faint); text-align: center;
+    }
+    footer p { margin-bottom: 8px; color: var(--ink-faint); }
+
+    @media (max-width: 640px) {
+        .hero { padding: 44px 26px 40px; border-radius: 0 0 20px 20px; }
+        .toc ol { columns: 1; }
+        h2.sec { font-size: 23px; }
+        .bar-row { grid-template-columns: 118px 1fr 52px; }
+        .bar-row .lbl { font-size: 11.5px; }
+    }
+    @media print {
+        .theme-toggle { display: none; }
+        .hero { color: #000; background: #fff; border-bottom: 3px solid #1a73e8; }
+        body { font-size: 12pt; }
+    }
+
+    /* Override flash-tier .article-content max-width for this custom layout (uses .page and .hero with its own widths) */
+    .article-content-full { max-width: none !important; padding: 0 !important; }
+
+    /* Hide the flash-tier .article-header blue gradient/white background so it doesn't double up with this file's own .hero styling */
+    .article-header { background: transparent !important; color: inherit !important; padding: 0 !important; margin: 0 !important; }
+    .article-header::before, .article-header::after { display: none !important; }
+    .article-header .container { background: transparent !important; padding: 0 !important; }
+    .article-header .article-title { text-shadow: none !important; color: inherit !important; }
+    .article-header .back-to-blog { color: #2563eb; background: transparent; border: 1px solid #2563eb; padding: 8px 16px; border-radius: 8px; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; font-weight: 600; margin: 24px auto; }
+    .article-header .back-to-blog:hover { background: #2563eb; color: white; }
+    .article-header .article-meta { color: #6b7280; margin-top: 12px; }
+    .article-header .article-meta span { color: #6b7280; }
+    html[data-theme='dark'] .article-header .back-to-blog { color: #93c5fd; border-color: #93c5fd; }
+    html[data-theme='dark'] .article-header .back-to-blog:hover { background: #93c5fd; color: #1e293b; }
+    html[data-theme='dark'] .article-header .article-meta,
+    html[data-theme='dark'] .article-header .article-meta span { color: #cbd5e1; }
+    </style>
+</head>
+<body class="blog-article-page">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">Gemini 3.8 Flash: Google's Hard-Working Workhorse, Dissected</h1>
+                <div class="article-meta">
+                    <span class="article-date">September 3, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">AI Models</span>
+                    <span class="article-read-time">📖 28 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content article-content-full">
+
+<div class="page">
+
+    <!-- ================= HERO (original custom) ================= -->
+    <header class="hero">
+        <div class="crumb"><a href="../index.html">Local AI Zone</a> &nbsp;·&nbsp; AI Models &nbsp;·&nbsp; Technical Breakdown</div>
+        <h1>Gemini 3.8 Flash: Google's<br>Hard-Working Workhorse, Dissected</h1>
+        <p class="sub">The third Flash release in six weeks ships frontier-adjacent coding and agentic intelligence at $0.75 per million input tokens — by deliberately burning more tokens. Here is the full technical picture: architecture lineage, benchmark deltas, the Flash Cyber experiment, pricing economics, and the migration path.</p>
+        <div class="meta">
+            <span><svg viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M4 21v-2a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v2"/></svg>Hussain Nazary</span>
+            <span><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 11h18"/></svg>Sep 3, 2026</span>
+            <span><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>~28 min read</span>
+            <span><svg viewBox="0 0 24 24"><path d="M9 3H5a2 2 0 0 0-2 2v4m0 6v4a2 2 0 0 0 2 2h4m6-18h4a2 2 0 0 1 2 2v4m0 6v4a2 2 0 0 1-2 2h-4"/></svg>9,000+ words</span>
+        </div>
+        <div class="hero-badges">
+            <span class="b">gemini-3.8-flash · GA</span>
+            <span class="b">1M context · 64K output</span>
+            <span class="b">$0.75 / $3.75 per 1M (intro)</span>
+            <span class="b">AA Intelligence Index: 59</span>
+            <span class="b">2 variants incl. Flash Cyber</span>
+        </div>
+    </header>
+
+    <!-- ================= ABSTRACT ================= -->
+    <div class="abstract">
+        <h2>Abstract</h2>
+        <p>On September 2, 2026, Google DeepMind released <strong>Gemini 3.8 Flash</strong>, its fourth Flash-tier model in under four months and its self-described "best reasoning &amp; coding model yet" at the price and speed of its three-week-old predecessor, 3.7 Flash. The release pairs a general-purpose workhorse with a security-focused twin, <strong>Gemini 3.8 Flash Cyber</strong>, gated behind a new trusted-defender access program called Fairwind.</p>
+        <p>The engineering story is unusual and worth a technical reader's attention: Google did not grow the model — the model card confirms 3.8 Flash is trained on top of 3.7 Flash's architecture and weights — instead it taught the same network to <em>work harder</em>: more reasoning steps, iterative tool calls, and self-verification, at the cost of roughly 40% more tokens per task. The gains land exactly where that design predicts: terminal and agentic coding jumped (Terminal-Bench 2.1: 81.6% → 90.8%), domain-agent benchmarks surged (finance, legal), while static exam-style reasoning stayed flat. This article reconstructs the full picture from primary sources, independent measurements, and community data — including the parts Google's announcement glosses over.</p>
+    </div>
+
+    <!-- ================= STAT CARDS ================= -->
+    <div class="stats">
+        <div class="stat"><div class="k">Released</div><div class="v">Sep 2, 2026</div><div class="d">GA on day one; 3rd Flash in 6 weeks; codename "Skimaki"</div></div>
+        <div class="stat"><div class="k">Intro price</div><div class="v">$0.75/$3.75</div><div class="d">per 1M in/out tokens through Dec 31, 2026; doubles Jan 1, 2027</div></div>
+        <div class="stat"><div class="k">Context</div><div class="v">1M tokens</div><div class="d">64K max output; text, image, audio, video, PDF input</div></div>
+        <div class="stat"><div class="k">AA Intelligence</div><div class="v">59 / 636</div><div class="d">Index v4.1.1 at high effort; +3 vs 3.7 Flash; rank #27</div></div>
+        <div class="stat"><div class="k">Output speed</div><div class="v">~305 t/s</div><div class="d">302–313 t/s across effort levels; fastest AA has clocked</div></div>
+        <div class="stat"><div class="k">Terminal-Bench 2.1</div><div class="v">90.8%</div><div class="d">vs 81.6% for 3.7 Flash; edges GPT-5.6 Terra (87.4%)</div></div>
+    </div>
+
+    <!-- ================= TOC ================= -->
+    <nav class="toc" aria-label="Table of contents">
+        <h2>Contents</h2>
+        <ol>
+            <li><a href="#s1">Context: the Flash cadence war</a></li>
+            <li><a href="#s2">What Gemini 3.8 Flash actually is</a></li>
+            <li><a href="#s3">The design change: "works harder"</a></li>
+            <li><a href="#s4">Benchmarks: 3.8 vs 3.7 Flash</a></li>
+            <li><a href="#s5">Against the frontier</a></li>
+            <li><a href="#s6">Speed and cost economics</a></li>
+            <li><a href="#s7">Flash Cyber and the Fairwind Program</a></li>
+            <li><a href="#s8">API and migration guide</a></li>
+            <li><a href="#s9">Limitations, regressions, caveats</a></li>
+            <li><a href="#s10">Who should switch</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#sources">Sources</a></li>
+        </ol>
+    </nav>
+
+    <!-- ================= SECTION 1 ================= -->
+    <section id="s1">
+        <h2 class="sec"><span class="no">01</span>Context: the Flash cadence war</h2>
+
+        <p>To understand why Gemini 3.8 Flash exists at all, you have to understand the position Google was in during the summer of 2026. This was not a company comfortably leading the frontier — it was a company under visible pressure, iterating publicly at a pace that reads more like a startup shipping patches than a lab gating releases behind months of alignment reviews.</p>
+
+        <p>The pressure came from three directions. First, <strong>organizational turbulence</strong>: in early August, Google DeepMind CEO Demis Hassabis stepped down from the chief executive role to become chairman of the AI research business, with long-time research lead Koray Kavukcuoglu taking over under the less exalted title of SVP. Second, <strong>missed expectations</strong>: Google failed to ship Gemini 3.5 Pro in June as promised, and the model it did ship — Gemini 3.5 Flash, unveiled at I/O on May 19 — was fast and cheap but modest in its benchmark metrics, and over the following months was overshadowed on intelligence scores by open-weight models from Chinese AI companies. Third, <strong>the coding gap</strong>: throughout 2026, Anthropic's and OpenAI's flagships dominated the agentic-coding conversation that developers actually care about.</p>
+
+        <p>Google's answer to all three was cadence. The Flash line became the delivery vehicle:</p>
+
+        <div class="timeline">
+            <div class="t-item">
+                <div class="t-date">MAY 19, 2026</div>
+                <div class="t-title">Gemini 3.5 Flash — Google I/O</div>
+                <div class="t-desc">The generation reset: agentic-first Flash at I/O, alongside Gemini Omni. Fast and cost-efficient, but intelligence scores later overshadowed by open-weight competitors.</div>
+            </div>
+            <div class="t-item">
+                <div class="t-date">JUL 21, 2026</div>
+                <div class="t-title">Gemini 3.6 Flash, 3.5 Flash-Lite, 3.5 Flash Cyber</div>
+                <div class="t-desc">A three-model drop. 3.6 Flash at $1.35/$6.30 per 1M tokens; Flash-Lite for the cost floor; Flash Cyber introduced the security-tuned variant concept.</div>
+            </div>
+            <div class="t-item">
+                <div class="t-date">AUG 13, 2026</div>
+                <div class="t-title">Gemini 3.7 Flash</div>
+                <div class="t-desc">"Most intelligent workhorse model yet for coding and agents." DeepSWE v1.1 jumped 49.0% → 65.3% over 3.6, and the intro price halved to $0.75/$3.75. Powers Gemini Spark for consumers.</div>
+            </div>
+            <div class="t-item">
+                <div class="t-date">SEP 2, 2026</div>
+                <div class="t-title">Gemini 3.8 Flash + 3.8 Flash Cyber</div>
+                <div class="t-desc">The third Flash release in six weeks. Best reasoning-and-coding Flash yet, same price and speed class as 3.7 — plus the Fairwind Program for the Cyber twin.</div>
+            </div>
+        </div>
+
+        <p>One day before launch, the <em>Wall Street Journal</em> reported that Google's AI research unit was preparing the model — internally codenamed <strong>"Skimaki"</strong> — as an effort to "narrow the gap on coding ability" against rivals. Two details from that reporting matter for the technical record. First, Google employees had been testing the model internally on <strong>Jetski</strong>, Google's side-by-side evaluation platform, and engineers reportedly preferred 3.8 Flash to Anthropic's Opus model for coding work. Second, Alphabet shares moved 0.7% higher in after-hours trading on the report alone — a measure of how much narrative pressure had built around Google's model-making reputation.</p>
+
+        <div class="callout">
+            <span class="tag">Why this release reads differently</span>
+            <p>Google itself frames 3.8 Flash as building "on the momentum of 3.7 Flash from three weeks ago" — three weeks, not three quarters. When a lab ships its best Flash model ever on a 20-day cycle over an existing architecture, the interesting questions are not "how big is it" (it isn't bigger) but "what did they change about how it behaves" and "what does that cost at the token level." The rest of this article is organized around exactly those questions.</p>
+        </div>
+    </section>
+
+    <!-- ================= SECTION 2 ================= -->
+    <section id="s2">
+        <h2 class="sec"><span class="no">02</span>What Gemini 3.8 Flash actually is</h2>
+
+        <p>Gemini 3.8 Flash is a proprietary, API-served multimodal reasoning model from Google DeepMind — <strong>not a new architecture</strong>. The model card is unusually direct on this point: 3.8 Flash "is the next iteration in the Gemini 3 model family, building on Gemini 3.7 Flash," and for architecture, training dataset, hardware, and software details it simply points readers to the 3.7 Flash model card. Parameter counts are not disclosed, weights are not published, and no self-hosting path exists.</p>
+
+        <p>What <em>is</em> new is the behavioral profile and the packaging. The release actually contains two models sharing one foundational intelligence:</p>
+
+        <ul class="bul">
+            <li><strong>Gemini 3.8 Flash</strong> (<code>gemini-3.8-flash</code>) — generally available from day one, positioned as "our most intelligent Flash model, engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows."</li>
+            <li><strong>Gemini 3.8 Flash Cyber</strong> — the same core with a cybersecurity-tuned mitigation set, available only to vetted defenders (government authorities, critical infrastructure operators, software maintainers) through the new <strong>Fairwind Program</strong>. Covered in depth in section 7.</li>
+        </ul>
+
+        <h3>Specification sheet</h3>
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Property</th><th>Value</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>API model ID</td><td><code>gemini-3.8-flash</code></td></tr>
+                <tr><td>Status</td><td>Generally available (GA), production-ready at launch</td></tr>
+                <tr><td>Architecture base</td><td>Gemini 3.7 Flash (same weights lineage; parameters undisclosed)</td></tr>
+                <tr><td>Context window</td><td>1,048,576 tokens (1M) input</td></tr>
+                <tr><td>Max output</td><td>64K tokens (thinking tokens included in billed output)</td></tr>
+                <tr><td>Input modalities</td><td>Text, image, video, audio, PDF</td></tr>
+                <tr><td>Output modalities</td><td>Text</td></tr>
+                <tr><td>Reasoning control</td><td><code>thinking_level</code>: <code>low</code> / <code>medium</code> (default) / <code>high</code> — <code>minimal</code> is <strong>not supported and returns an error</strong></td></tr>
+                <tr><td>Built-in tools</td><td>Function calling, Google Search as a tool, computer use, code execution, URL context, file search</td></tr>
+                <tr><td>Knowledge cutoff</td><td>March 2026 (some domains limited to January 2025, per the Gemini 3 family policy)</td></tr>
+                <tr><td>Default agent</td><td>The Antigravity managed agent and Antigravity SDK both default to 3.8 Flash</td></tr>
+                <tr><td>Availability</td><td>Gemini API / AI Studio, Gemini Enterprise Agent Platform, Android Studio, Stitch, Gemini app (AI Pro/Ultra), AI Mode in Search, Google Sheets, Google Antigravity</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Sources: Gemini 3.8 Flash model card (Google DeepMind), "What's new in Gemini 3.8 Flash" (ai.google.dev), Gemini API pricing page.</p>
+
+        <h3>The details that matter to practitioners</h3>
+
+        <p><strong>The <code>minimal</code> thinking level is gone.</strong> Earlier Flash models exposed a <code>minimal</code> effort tier for near-instant responses. On 3.8 Flash it is not merely deprecated — the API <em>errors out</em> if you request it. If your production pipeline was tuned to <code>minimal</code> on 3.5/3.6/3.7, that is a hard breaking change, and the closest migration target is <code>low</code>. The removal is philosophically consistent with the whole release: this model is designed to think, and Google is not pretending otherwise.</p>
+
+        <p><strong>The API surface is the new Interactions API.</strong> Google's recommended integration is now <code>client.interactions.create()</code> (REST: <code>POST /v1beta/interactions</code>), not the legacy <code>generateContent</code> endpoint. Multi-turn state moves server-side via <code>previous_interaction_id</code>, which changes how you structure conversation history in agents. The full migration checklist is in section 8.</p>
+
+        <p><strong>Output pricing includes thinking tokens.</strong> There is no separate reasoning-token line item — whatever the model emits, visible reasoning included, bills at the output rate. This matters when you compare 3.8 against a "same-priced" 3.7 workload, because 3.8 thinks longer by design. One independent measurement (The Register, citing Artificial Analysis data) put the effective per-task cost increase at roughly 40% even though the per-token price is identical.</p>
+
+        <p><strong>Knowledge cutoff is March 2026</strong> — recent for a September release — but the model card carries an honest caveat inherited from the Gemini 3 family: for some domains, effective knowledge dates to January 2025. For agentic workflows that ground with search tools this barely matters; for offline knowledge work it can, and the card says so explicitly.</p>
+    </section>
+
+    <!-- ================= SECTION 3 ================= -->
+    <section id="s3">
+        <h2 class="sec"><span class="no">03</span>The design change: "works harder"</h2>
+
+        <p>Every model launch claims intelligence gains. What makes 3.8 Flash technically interesting is that Google is explicit about the mechanism — and the mechanism is not a bigger network, a longer context, or a new attention variant. It is a behavioral contract: <strong>the same model, trained to spend more compute per task</strong>.</p>
+
+        <div class="pullquote">
+            "On complex tasks, it exhibits greater diligence — executing extra reasoning steps, and calling tools iteratively. At times, the model might use more tokens to maximize performance, especially at higher effort levels."
+            <cite>— Tulsee Doshi &amp; Raluca Ada Popa, Google blog announcement, Sep 2, 2026</cite>
+        </div>
+
+        <p>Strip the marketing language and three concrete mechanisms remain:</p>
+
+        <ol class="num">
+            <li><strong>Smaller, more granular reasoning steps.</strong> Rather than compressing a chain of thought into fewer, larger leaps, the model decomposes hard problems into finer increments — which reduces compounding errors at the cost of more emitted tokens.</li>
+            <li><strong>Iterative tool invocation.</strong> The model calls tools repeatedly in a loop, consuming intermediate results and re-querying when outputs look wrong, instead of one-shotting a tool call and hallucinating around a bad result.</li>
+            <li><strong>Self-verification.</strong> The model checks its own work mid-task — re-reading generated code, re-validating constraints — before committing to an answer. Google's developer docs describe this as verifying "its work along the way."</li>
+        </ol>
+
+        <p>The API docs phrase the trade-off with unusual candor: "Not every workflow needs this level of verification." That sentence deserves attention. It is Google telling you, in an official launch document, that the model's extra diligence is a cost you may not want to pay — and explicitly noting that 3.7 Flash "remains fully supported" for efficiency-first workloads. When a vendor ships an upgrade and simultaneously tells you when not to use it, that is signal, not hedging.</p>
+
+        <h3>How they trained it: recursive agentic loops</h3>
+
+        <p>The announcement reveals one genuinely novel training detail: both 3.8 variants are "further accelerated by <strong>long-running agentic loops designed to recursively evaluate and refine the underlying models</strong>." Read that carefully — the training pipeline itself runs extended agent sessions, uses their outcomes to evaluate the model, and feeds refinements back in. This is reinforcement-through-deployment at a cadence we rarely see acknowledged in launch posts, and it plausibly explains both the three-week turnaround and where the gains landed: agentic loops train agentic behavior, and that is precisely what improved (terminal tasks, tool use, multi-step domain work) while static knowledge exams did not.</p>
+
+        <p>The second training lever is the domain: Google attributes the shared core's coding and reasoning gains partly to <strong>"rigorous training in the highly demanding domain of cybersecurity."</strong> Vulnerability discovery and patching are, mechanically, long-horizon code comprehension and precise editing under adversarial constraints — exactly the skill profile the general model needed. The Cyber variant is the specialist deployment of a training program the whole model family went through; the "two products, one intelligence" framing in the announcement is literal.</p>
+
+        <h3>The effort dial, quantified</h3>
+
+        <p>Because "works harder" is tunable, the model you actually buy depends on how you set <code>thinking_level</code>. Artificial Analysis measured the three settings independently on their v4.1.1 Intelligence Index:</p>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Metric (Artificial Analysis)</th><th class="num">Low</th><th class="num">Medium (default)</th><th class="num">High</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Intelligence Index (0–100)</td><td class="num">52</td><td class="num">57</td><td class="num"><span class="up">59</span></td></tr>
+                <tr><td>Output speed</td><td class="num"><span class="up">313 t/s</span></td><td class="num">312 t/s</td><td class="num">302 t/s</td></tr>
+                <tr><td>Cost per Intelligence Index task</td><td class="num"><span class="up">$0.24</span></td><td class="num">$0.41</td><td class="num">$0.58</td></tr>
+                <tr><td>Time to first answer token</td><td class="num"><span class="up">0.70 s</span></td><td class="num">—</td><td class="num">—</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Artificial Analysis, "Gemini 3.8 Flash Models — Release Intelligence," Sep 3, 2026. Cost per task is a weighted average across the nine evaluations in the index, including reasoning tokens. Note the price spread: 2.4× from low to high, with 7 index points to show for it.</p>
+
+        <p>That table is the release in miniature. The high-effort setting buys seven index points over low and costs 2.4× more per task; medium — the default — sits near the middle on every axis. Speed barely moves across settings (302–313 t/s is a 4% band), which tells you the effort dial changes <em>how much</em> the model thinks, not how fast it streams once it starts. The right mental model is not "three models" but one model with a compute-per-task slider — and the fact that Google defaults it to <code>medium</code> rather than <code>high</code> is itself informative about where they think the value curve bends.</p>
+
+        <div class="callout warn">
+            <span class="tag">Practical implication</span>
+            <p>Do not benchmark 3.8 Flash at one effort level and deploy at another. The delta between settings is large enough (52 → 59 index points, $0.24 → $0.58 per task) that an eval run at <code>high</code> with production traffic at <code>medium</code> will mismatch both quality and cost expectations. Pin <code>thinking_level</code> explicitly in your configs rather than relying on the default, and treat the three levels as distinct SKUs when modeling unit economics.</p>
+        </div>
+    </section>
+
+    <!-- ================= SECTION 4 ================= -->
+    <section id="s4">
+        <h2 class="sec"><span class="no">04</span>Benchmarks: 3.8 vs 3.7 Flash</h2>
+
+        <p>Google published a full head-to-head against 3.7 Flash in its developer documentation, and the pattern in the data is more informative than any single number. Every benchmark that involves <em>executing</em> something — running terminal commands, orchestrating tools, completing banking workflows — jumped by 4 to 9 points. Every benchmark that involves <em>knowing</em> something on paper moved a point and change, or went flat.</p>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Benchmark</th><th class="num">Gemini 3.8 Flash</th><th class="num">Gemini 3.7 Flash</th><th class="num">Δ</th><th>What it measures</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Terminal-Bench 2.1</strong></td><td class="num"><strong>90.8%</strong></td><td class="num">81.6%</td><td class="num"><span class="up">+9.2</span></td><td>End-to-end real command-line task completion, incl. tool runs and error recovery</td></tr>
+                <tr><td><strong>τ³-Bench Banking</strong></td><td class="num"><strong>38.1%</strong></td><td class="num">30.9%</td><td class="num"><span class="up">+7.2</span></td><td>Multi-turn, tool-reliant banking customer-service workflows</td></tr>
+                <tr><td><strong>SWE-Atlas</strong></td><td class="num"><strong>51.9%</strong></td><td class="num">48.0%</td><td class="num"><span class="up">+3.9</span></td><td>Repository-level issue fixing across real codebases</td></tr>
+                <tr><td><strong>CharXiv</strong></td><td class="num"><strong>86.2%</strong></td><td class="num">84.5%</td><td class="num"><span class="up">+1.7</span></td><td>Multimodal reasoning over charts and figures in documents</td></tr>
+                <tr><td><strong>SWE-Bench Pro</strong></td><td class="num"><strong>61.6%</strong></td><td class="num">60.4%</td><td class="num"><span class="up">+1.2</span></td><td>Agentic fixes for real GitHub issues in real repositories</td></tr>
+                <tr><td><strong>Humanity's Last Exam</strong></td><td class="num">45.4%</td><td class="num">45.7%</td><td class="num"><span class="down">−0.3</span></td><td>Hard open-ended academic exam reasoning</td></tr>
+                <tr><td>HLE-Verified</td><td class="num"><strong>54.9%</strong></td><td class="num">—</td><td class="num">—</td><td>Multi-step reasoning across STEM, humanities, professional fields</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Source: Google developer documentation and launch materials as compiled by DataCamp (Sep 2, 2026) and Google's announcement. All scores pass@1, single attempt.</p>
+
+        <!-- CSS bar chart: 3.8 vs 3.7 -->
+        <div class="chart">
+            <div class="ch-title">3.8 Flash vs 3.7 Flash — where the gains landed</div>
+            <div class="ch-sub">Published benchmark scores (%). Bars scaled to 100%.</div>
+            <div class="legend">
+                <span class="li"><span class="sw" style="background:var(--bar-a)"></span>Gemini 3.8 Flash</span>
+                <span class="li"><span class="sw" style="background:var(--bar-b)"></span>Gemini 3.7 Flash</span>
+            </div>
+            <div class="bar-row"><div class="lbl">Terminal-Bench 2.1</div><div class="track"><div class="fill fA" style="width:90.8%"></div><div class="fill fB" style="width:81.6%; opacity:0.55; top:auto; bottom:0; height:100%;"></div></div><div class="val">90.8 / 81.6</div></div>
+            <div class="bar-row"><div class="lbl">τ³-Bench Banking</div><div class="track"><div class="fill fA" style="width:38.1%"></div><div class="fill fB" style="width:30.9%; opacity:0.55; top:auto; bottom:0; height:100%;"></div></div><div class="val">38.1 / 30.9</div></div>
+            <div class="bar-row"><div class="lbl">SWE-Atlas</div><div class="track"><div class="fill fA" style="width:51.9%"></div><div class="fill fB" style="width:48%; opacity:0.55; top:auto; bottom:0; height:100%;"></div></div><div class="val">51.9 / 48.0</div></div>
+            <div class="bar-row"><div class="lbl">CharXiv</div><div class="track"><div class="fill fA" style="width:86.2%"></div><div class="fill fB" style="width:84.5%; opacity:0.55; top:auto; bottom:0; height:100%;"></div></div><div class="val">86.2 / 84.5</div></div>
+            <div class="bar-row"><div class="lbl">SWE-Bench Pro</div><div class="track"><div class="fill fA" style="width:61.6%"></div><div class="fill fB" style="width:60.4%; opacity:0.55; top:auto; bottom:0; height:100%;"></div></div><div class="val">61.6 / 60.4</div></div>
+            <div class="bar-row"><div class="lbl">Humanity's Last Exam</div><div class="track"><div class="fill fA" style="width:45.4%"></div><div class="fill fB" style="width:45.7%; opacity:0.55; top:auto; bottom:0; height:100%;"></div></div><div class="val">45.4 / 45.7</div></div>
+            <div class="src">Chart: Local AI Zone. Data: Google developer documentation (via DataCamp compilation, Sep 2, 2026). The overlay shows 3.7's score (lighter) beneath 3.8's (solid).</div>
+        </div>
+
+        <h3>Reading the deltas honestly</h3>
+
+        <p><strong>The Terminal-Bench jump is the headline and it is real.</strong> A 9.2-point gain on a benchmark that measures whether a model can actually complete command-line tasks — run tools, read output, recover from errors, finish the job — is a step change, not noise. For anyone building coding agents, this is the number that predicts fewer failed loops and abandoned sessions. It also matches the design mechanism from section 3: iterative tool calling and error recovery are precisely what Terminal-Bench rewards, and precisely what "works harder" trains.</p>
+
+        <p><strong>The τ³-Bench Banking gain (+7.2) is the underrated one.</strong> This benchmark is multi-turn and tool-reliant — an agent must hold a conversation, call policy-constrained tools, and integrate results over several exchanges. A model that scores 38.1% where its predecessor scored 30.9% is a model that survives longer horizons without derailing. Google's claim of "substantially reducing failed loops and errors" in autonomous agents maps directly onto this row of the table.</p>
+
+        <p><strong>SWE-Bench Pro's +1.2 is the honest counterweight.</strong> On repository-level issue fixing — the task that most closely resembles "resolve this GitHub issue in my codebase" — 3.8 Flash is only marginally better than 3.7. The gains that did land in repository-level work went to SWE-Atlas (+3.9), a newer and harder eval. If you were hoping 3.8 Flash would transform straightforward bug-fixing throughput, the data says it won't; if you need it to survive complex multi-file refactors and long agentic sessions, it might.</p>
+
+        <p><strong>Humanity's Last Exam is flat, and that is consistent, not damning.</strong> HLE rewards deep knowledge and exam-style reasoning under time constraints — a capability profile that has nothing to do with how many tool calls you make or how carefully you verify output. A behavior-focused training push predictably does not move it. The flip side matters for procurement: if your workload is "answer hard open-ended questions," 3.8 Flash is not an upgrade over 3.7 Flash, and paying 40% more tokens for the privilege is a bad trade.</p>
+
+        <div class="callout">
+            <span class="tag">Baseline for context — the 3.6 → 3.7 jump</span>
+            <p>One generation earlier, 3.7 Flash over 3.6 Flash delivered DeepSWE v1.1 65.3% vs 49.0%, FrontierCode 1.1 43.6% vs 34.4%, GDP.pdf 34.0% vs 22.0%, and AutomationBench 30.4% vs 17.0% — broad, double-digit gains. The 3.7 → 3.8 delta is narrower and more targeted. That is the shape of a maturing product line: less lift across the board, more depth in the lanes the vendor has decided to own.</p>
+        </div>
+
+        <h3>The long-horizon claim</h3>
+
+        <p>On DeepSWE v1.1 — the long-horizon software engineering benchmark where agents must autonomously solve complex engineering problems end-to-end — Google's published claim is qualitative: 3.8 Flash "outperforms most larger frontier models... at a fraction of the cost." No exact percentage appears in the launch materials. Independent measurements (section 5) put 3.8 Flash around 71% on DeepSWE-family evals — ahead of most of the field, but behind the two flagships it is usually compared against. The word "most" in Google's sentence is doing precise, defensible work.</p>
+
+        <p>The strongest long-horizon datapoint is instead a partner claim: <strong>Glean</strong>, whose product runs document-heavy knowledge workflows, reported that 3.8 Flash completes <strong>more than three times as many tasks</strong> as 3.7 Flash in their evaluations of long-running workflows. A 3× completion-rate difference at the same token price is a bigger operational delta than any single benchmark score — though as a vendor-partner quote, it deserves the same skepticism you would apply to any launch-day testimonial.</p>
+    </section>
+
+    <!-- ================= SECTION 5 ================= -->
+    <section id="s5">
+        <h2 class="sec"><span class="no">05</span>Against the frontier</h2>
+
+        <p>Flash-tier positioning means every claim has to survive comparison with models costing 5–13× more per token. Two independent sources — Artificial Analysis and Beam AI's launch-day testing — provide the comparison points.</p>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Agent benchmark</th><th class="num">Gemini 3.8 Flash</th><th class="num">Claude Opus 5</th><th class="num">GPT-5.6 Sol</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Vals Finance Agent v2</td><td class="num best">61.4%</td><td class="num">58.6%</td><td class="num">53.8%</td></tr>
+                <tr><td>Harvey's Legal Agent</td><td class="num best">10.0%</td><td class="num">6.7%</td><td class="num">2.5%</td></tr>
+                <tr><td>Terminal-Bench 2.1 (indep.)</td><td class="num best">89.4%</td><td class="num">89.1%</td><td class="num">—</td></tr>
+                <tr><td>DeepSWE v1 (hardest)</td><td class="num">71.0%</td><td class="num best">74.0%</td><td class="num">72.7%</td></tr>
+                <tr><td>Price per 1M in/out</td><td class="num best">$0.75 / $3.75</td><td class="num">$5 / $25</td><td class="num">$4 / $20</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Source: Beam AI independent launch-day measurements (Sep 2, 2026). Terminal-Bench measured at 89.4% in Beam's harness vs Google's official 90.8% — harness differences of a point or so are normal. "Best" per row in bold.</p>
+
+        <p>The pattern repeats with almost mechanical consistency: <strong>3.8 Flash wins or ties wherever the task is domain-bounded agent work, and loses wherever the task is the hardest open-ended engineering.</strong> On finance and legal agent benchmarks it doesn't just approach the frontier — it leads it, by 2.8 points over Opus 5 on Vals Finance and by 50% relative margin on Harvey's Legal. On Terminal-Bench it is statistically tied with Opus 5. But on DeepSWE v1, the benchmark designed to be maximally hostile — long horizons, complex dependencies, multi-file coherence — the order restores itself: Opus 5 at 74.0%, GPT-5.6 Sol at 72.7%, 3.8 Flash at 71.0%.</p>
+
+        <p>Beam's routing conclusion is the right one: this is not a "replace your frontier model" result, it is a "route the right work to it" result. Finance-and-operations agents, high-volume latency-sensitive calls, and mid-difficulty terminal work belong on 3.8 Flash; the hardest long-horizon engineering and highest-stakes decisions stay on a frontier model — <em>if</em> the frontier model's 6–7× price premium is justified by the marginal task-success rate in your workload.</p>
+
+        <h3>The independent index: 59, level with the big spenders</h3>
+
+        <p>Artificial Analysis's Intelligence Index (v4.1.1, nine evaluations including GDPval-AA v2, τ³-Banking, Terminal-Bench 2.1, SciCode, HLE, GPQA Diamond, CritPt, AA-Omniscience, and AA-LCR) provides the cleanest cross-model ladder. At <code>high</code> effort, Gemini 3.8 Flash scores <strong>59</strong> — three points above 3.7 Flash's 56 — and the company it keeps is the interesting part:</p>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Model (effort)</th><th class="num">AA Intelligence Index</th><th class="num">Cost per index task</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Claude Fable 5.1 (max)</td><td class="num"><strong>66</strong></td><td class="num">$3.76</td></tr>
+                <tr><td>Claude Opus 5 (max)</td><td class="num">63</td><td class="num">~$2.40 (est.)</td></tr>
+                <tr><td>GPT-5.6 Sol (max)</td><td class="num">61</td><td class="num">~$1.90 (est.)</td></tr>
+                <tr><td>Grok 4.6 (high)</td><td class="num">61</td><td class="num">—</td></tr>
+                <tr><td>GLM-5.3 (max) · Kimi K3 (max)</td><td class="num">60</td><td class="num">—</td></tr>
+                <tr class="best"><td>Gemini 3.8 Flash (high)</td><td class="num">59</td><td class="num">$0.58</td></tr>
+                <tr><td>GPT-5.6 Sol (extra high)</td><td class="num">59</td><td class="num">—</td></tr>
+                <tr><td>Grok 4.6 (medium)</td><td class="num">59</td><td class="num">—</td></tr>
+                <tr><td>Gemini 3.7 Flash (high)</td><td class="num">56</td><td class="num">~$0.41</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Source: The Register (Sep 2, 2026) and Artificial Analysis. Rank context: 3.8 Flash (high) sits at #27 of 636 tracked models. Estimated costs where AA's published per-task figure was not in the source.</p>
+
+        <p>Read as a ladder, the table says 3.8 Flash (at its most expensive effort setting) matches GPT-5.6 Sol at extra-high and Grok 4.6 at medium, sits seven points under the general-purpose leader Claude Fable 5.1, and does it at <strong>$0.58 per Intelligence Index task — the cheapest cost-to-intelligence ratio in its band</strong>. Artificial Analysis's own framing is that 3.8 Flash "reaches the Intelligence vs. Cost per Task Pareto frontier": no cheaper model scores higher, and no higher-scoring model at its level costs less. Fable 5.1, for contrast, costs about six times more per task at 66 points. Whether that 7-point intelligence gap is worth 6× the cost is exactly the routing question your workload should answer.</p>
+
+        <!-- SVG scatter: intelligence vs cost -->
+        <div class="scatter-wrap">
+            <div class="ch-title" style="font-size:15px;font-weight:800;margin-bottom:4px;">Intelligence vs. cost per task — the Pareto picture</div>
+            <div class="ch-sub" style="font-size:12.5px;color:var(--ink-faint);margin-bottom:14px;">AA Intelligence Index (x) vs. cost per index task in USD (y, log scale). Lower-right is better.</div>
+            <svg viewBox="0 0 760 380" role="img" aria-label="Scatter plot of intelligence index versus cost per task for seven models">
+                <!-- grid -->
+                <g stroke="var(--line)" stroke-width="1">
+                    <line x1="70" y1="330" x2="720" y2="330"/>
+                    <line x1="70" y1="262" x2="720" y2="262" stroke-dasharray="4 5" opacity="0.6"/>
+                    <line x1="70" y1="194" x2="720" y2="194" stroke-dasharray="4 5" opacity="0.6"/>
+                    <line x1="70" y1="126" x2="720" y2="126" stroke-dasharray="4 5" opacity="0.6"/>
+                    <line x1="70" y1="58" x2="720" y2="58" stroke-dasharray="4 5" opacity="0.6"/>
+                </g>
+                <!-- y axis labels (log scale: $0.2 -> ~y58, $0.5->~126, $1->~194, $2.5->~262... adjust) -->
+                <g font-family="ui-monospace, monospace" font-size="11" fill="var(--ink-faint)">
+                    <text x="62" y="334" text-anchor="end">$0.1</text>
+                    <text x="62" y="266" text-anchor="end">$0.3</text>
+                    <text x="62" y="198" text-anchor="end">$1</text>
+                    <text x="62" y="130" text-anchor="end">$3</text>
+                    <text x="62" y="62" text-anchor="end">$10</text>
+                </g>
+                <!-- x axis labels: 50 -> 70, 68 -> 720 (2.8 pts per unit... 38.9px/unit) -->
+                <g font-family="ui-monospace, monospace" font-size="11" fill="var(--ink-faint)">
+                    <text x="70" y="350" text-anchor="middle">50</text>
+                    <text x="148" y="350" text-anchor="middle">52</text>
+                    <text x="226" y="350" text-anchor="middle">54</text>
+                    <text x="304" y="350" text-anchor="middle">56</text>
+                    <text x="382" y="350" text-anchor="middle">58</text>
+                    <text x="460" y="350" text-anchor="middle">60</text>
+                    <text x="538" y="350" text-anchor="middle">62</text>
+                    <text x="616" y="350" text-anchor="middle">64</text>
+                    <text x="694" y="350" text-anchor="middle">66</text>
+                </g>
+                <text x="400" y="374" text-anchor="middle" font-family="var(--sans)" font-size="12" fill="var(--ink-faint)">AA Intelligence Index (v4.1.1)</text>
+                <text x="18" y="194" text-anchor="middle" font-size="12" fill="var(--ink-faint)" transform="rotate(-90 18 194)">Cost per index task (USD, log)</text>
+
+                <!-- pareto line: 3.8F(59,0.58) -> Sol(61,~1.9) -> Opus(63,2.4) -> Fable(66,3.76) -->
+                <polyline points="404,180 482,132 560,116 714,79" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="7 6" opacity="0.7"/>
+
+                <!-- points: x = 70 + (idx-50)*39; y: log10 mapping $0.1->330, $10->58 => y = 330 - (log10(cost)+1)/2*272 -->
+                <!-- 3.7 F (56, ~0.41): x=304, y=330-(log10(0.41)+1)/2*272 = 330-0.612/2*272=330-83=247 -->
+                <circle cx="304" cy="247" r="7" fill="var(--bar-b)"/>
+                <text x="304" y="234" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink-soft)">3.7 Flash</text>
+                <!-- 3.8 F (59, 0.58): x=404, y=330-(0.763/2)*272=330-104=226; label placed below point for clearance -->
+                <circle cx="404" cy="226" r="10" fill="var(--primary)" stroke="#fff" stroke-width="2.5"/>
+                <text x="404" y="252" text-anchor="middle" font-size="12.5" font-weight="800" fill="var(--primary)">3.8 Flash ★</text>
+                <!-- Sol (61, 1.9): x=482, y=330-(1.279/2)*272=330-174=156 -->
+                <circle cx="482" cy="156" r="7" fill="#10b981"/>
+                <text x="482" y="143" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink-soft)">GPT-5.6 Sol</text>
+                <!-- Opus (63, 2.4): x=560, y=330-(1.38/2)*272=330-188=142 -->
+                <circle cx="560" cy="142" r="7" fill="#f59e0b"/>
+                <text x="560" y="129" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink-soft)">Claude Opus 5</text>
+                <!-- Fable (66, 3.76): x=677 -> use 694? x=70+(66-50)*39=694, y=330-(1.575/2)*272=330-214=116 -->
+                <circle cx="694" cy="116" r="7" fill="#ef4444"/>
+                <text x="694" y="103" text-anchor="middle" font-size="11.5" font-weight="700" fill="var(--ink-soft)">Fable 5.1</text>
+                <!-- Grok med (59, est ~0.9): shifted label right of point to avoid collision with 3.8 Flash label -->
+                <circle cx="428" cy="192" r="6" fill="var(--ink-faint)" opacity="0.8"/>
+                <text x="440" y="196" text-anchor="start" font-size="11" fill="var(--ink-faint)">Grok 4.6 (med, est.)</text>
+            </svg>
+            <div class="src">Chart: Local AI Zone, from Artificial Analysis per-task costs and The Register's index compilation (Sep 2–3, 2026). Points without published per-task costs are estimated (marked). The dashed line sketches the Pareto frontier through measured points — cheaper-and-smarter combinations would sit below-left of it.</div>
+        </div>
+
+        <h3>One more lens: category-level rankings</h3>
+
+        <p>BenchLM, which aggregates only source-verified benchmark rows, scores 3.8 Flash at <strong>75.4/100 — #11 of 230 tracked models</strong> — with a category profile that quietly complicates the launch narrative. Its strongest eligible category is <em>Multimodal &amp; Grounded</em> (#17 of 36, "particularly strong for screenshots, documents, charts, and grounded multimodal workflows"). Agentic lands at #28 of 143 (81st percentile). Coding — the headline claim of the entire release — is actually its <em>lowest</em> eligible category at #36 of 148, albeit on only two source-displayable rows. The caveat matters: 12 published rows is thin coverage, and Google did not publish exact scores for several coding evals, which suppresses category ranks. But taken at face value, it is a useful reminder that "best coding Flash model" is a tier-relative claim, not a field-relative one.</p>
+    </section>
+
+    <!-- ================= SECTION 6 ================= -->
+    <section id="s6">
+        <h2 class="sec"><span class="no">06</span>Speed and cost economics</h2>
+
+        <p>Flash models are bought on unit economics, so this section is the decision-relevant one. Three numbers define the value proposition: <strong>~305 tokens/second output</strong> (Artificial Analysis called it the fastest output speed they have measured — across all models, not just the Flash tier), <strong>0.70 seconds to first answer token</strong> at low effort, and <strong>$0.58 per Intelligence Index task</strong> at high effort. Community latency testing broadly corroborates the speed story: in an r/singularity side-by-side, 3.8 Flash finished benchmark tasks 1.7–2.5 seconds faster than 3.7 Flash (on a ~45-second task) while consuming around 5% more tokens — faster <em>and</em> more verbose, exactly as designed.</p>
+
+        <p>One nuance on latency: BenchLM measured a 13.39-second time to first token on some runs, which looks contradictory until you note the difference — their figure includes reasoning tokens streamed before the answer begins, while AA's 0.70s measures time to the first <em>answer</em> token. At high effort, this model thinks for a while before it speaks. Budget for time-to-answer, not time-to-first-byte, when you set agent timeouts — the model card itself flags "occasional slowness or timeout issues" as a known limitation.</p>
+
+        <h3>The full price sheet</h3>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Tier</th><th class="num">Input / 1M<br>(thru Dec 31, 2026)</th><th class="num">Output / 1M<br>(thru Dec 31, 2026)</th><th class="num">Input / Output<br>(from Jan 1, 2027)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>Standard</strong></td><td class="num">$0.75</td><td class="num">$3.75</td><td class="num">$1.50 / $7.50</td></tr>
+                <tr><td><strong>Batch API</strong> (50% off)</td><td class="num">$0.375</td><td class="num">$1.875</td><td class="num">$0.75 / $3.75</td></tr>
+                <tr><td><strong>Flex</strong></td><td class="num">$0.375</td><td class="num">$1.875</td><td class="num">$0.75 / $3.75</td></tr>
+                <tr><td><strong>Priority</strong></td><td class="num">$1.35</td><td class="num">$6.75</td><td class="num">$2.70 / $13.50</td></tr>
+                <tr><td>Context caching (reads)</td><td class="num">$0.075</td><td class="num">—</td><td class="num">$0.15</td></tr>
+                <tr><td>Cache storage</td><td class="num" colspan="2">$0.50 / 1M tokens per hour</td><td class="num">$1.00 / hr</td></tr>
+                <tr><td>Grounding (Search / Maps)</td><td class="num" colspan="3">5,000 free requests/month shared across Gemini 3.x, then $14 / 1,000</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Source: Google AI for Developers pricing page, Sep 2026. Output pricing includes thinking tokens. Batch limits: 200,000 requests per job, 100 concurrent jobs, 2 GB input files, 20 GB file storage.</p>
+
+        <p>Several structural facts are buried in that sheet and deserve to be surfaced:</p>
+
+        <ul class="bul">
+            <li><strong>The intro price is a clock, not a category.</strong> Every Flash price shown — including the 50%-off batch tier — reverts to its full standard rate on January 1, 2027. The standard rate is exactly <strong>double</strong> the intro rate. Any unit-economics model built on $0.75 input needs a second model for January. The Register's framing — "doesn't cost too much <em>(yet)</em>" — is the correct reading.</li>
+            <li><strong>Batch at $0.375/$1.875 is the actual floor.</strong> For evals, backfills, and any workload that tolerates hours of latency, batch pricing makes 3.8 Flash one of the cheapest capable reasoning models on the market — and if you are running the eval suites from section 4 yourself, this is the tier to do it on.</li>
+            <li><strong>Caching reads at $0.075</strong> are 90% off the intro input price. Agent loops that re-send large system prompts or document context on every turn — which is exactly what "iterative tool calling" workloads do — should treat context caching as mandatory, not optional, or the token overhead of the harder-working model compounds.</li>
+            <li><strong>The effort dial is a pricing tier in disguise.</strong> Section 3's table already showed the 2.4× per-task spread between low and high. Combined with batch vs standard, the real price surface of this "one model" spans from roughly $0.12 per task (batch + low effort) to $0.58 (standard + high), before caching optimizations.</li>
+        </ul>
+
+        <h3>Competitive price context</h3>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Model</th><th class="num">Input / 1M</th><th class="num">Output / 1M</th><th class="num">Multiple of 3.8F (blended)</th></tr>
+            </thead>
+            <tbody>
+                <tr class="best"><td>Gemini 3.8 Flash (intro)</td><td class="num">$0.75</td><td class="num">$3.75</td><td class="num">1.0×</td></tr>
+                <tr><td>Qwen3.8 Flash</td><td class="num">$0.15</td><td class="num">~$0.60</td><td class="num">~0.2× (cheaper, less capable)</td></tr>
+                <tr><td>GPT-5.6 Sol</td><td class="num">$4.00</td><td class="num">$20.00</td><td class="num">~5.9×</td></tr>
+                <tr><td>Claude Opus 5</td><td class="num">$5.00</td><td class="num">$25.00</td><td class="num">~7.3×</td></tr>
+                <tr><td>Claude Fable 5.1</td><td class="num">$10.00</td><td class="num">$50.00</td><td class="num">~14.7×</td></tr>
+                <tr><td>Gemini 3.8 Flash (Jan 2027 std)</td><td class="num">$1.50</td><td class="num">$7.50</td><td class="num">2.0×</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Rival pricing as compiled by DataCamp, Beam AI, and OpenRouter-community data (Sep 2026). Qwen3.8 Flash pricing from OpenRouter listings; capability comparison not like-for-like.</p>
+
+        <p>Two honest observations about this table. First, the "cheapest at its intelligence level" claim survives contact with the data — nothing between 59 and 66 index points is in 3.8 Flash's price neighborhood, and the only meaningfully cheaper option (Qwen3.8 Flash at $0.15) plays in a lower capability class. Second, the comparison that flatters 3.8 Flash the most is against the flagships' <em>list</em> prices; enterprise commitments, committed-use discounts, and agentic-bundle pricing can compress those gaps materially at scale, so treat the multiples as ceilings rather than quotes.</p>
+
+        <div class="callout warn">
+            <span class="tag">The January problem, quantified</span>
+            <p>At the intro rate, 3.8 Flash (high) delivers intelligence at roughly $9.83 per index point per thousand tasks. At the January standard rate, the same computation costs $19.66 — and if a rival Flash-tier model matches 3.8's behavior by then (Google's own six-week cadence makes this plausible), the "cheapest at its level" position is a snapshot, not a moat. Anyone designing a multi-quarter deployment around this model should model the doubled rates from day one and treat the intro window as a migration subsidy, which is, transparently, what it is designed to be.</p>
+        </div>
+    </section>
+
+    <!-- ================= SECTION 7 ================= -->
+    <section id="s7">
+        <h2 class="sec"><span class="no">07</span>Flash Cyber and the Fairwind Program</h2>
+
+        <p>The second half of the release is, in some ways, the more strategically interesting half. <strong>Gemini 3.8 Flash Cyber</strong> shares the general model's foundational intelligence but ships with a "more permissive set of mitigations for cybersecurity" — a deliberately lowered guardrail set that makes the model willing to engage with vulnerability analysis, exploitation patterns, and security-sensitive code at a depth the standard model refuses. Because that same relaxation would be an attack surface in the wrong hands, access is not sold: it is <strong>granted</strong>, through a vetted program called <strong>Fairwind</strong>, to "trusted government authorities, as well as critical infrastructure operators and software maintainers," with prioritized access for applicants. Think of it as Google's answer to the dual-use dilemma that has kept every major lab's most security-capable models behind policy gates: same weights, different constitution, gated distribution.</p>
+
+        <p>The launch post is explicit about an ethical ordering that deserves note: Google "prioritized [vulnerability fixing] over offensive capabilities like exploitation." That choice is visible in the benchmark profile — Cyber's headline results are in <em>finding</em> and <em>fixing</em> flaws, not weaponizing them — and it aligns the product with defender workflows (patch, verify, ship) rather than red-team theatrics.</p>
+
+        <h3>The cyber benchmark record</h3>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Evaluation</th><th>Result</th><th>Reference point</th></tr>
+            </thead>
+            <tbody>
+                <tr><td><strong>CyberGym</strong> (industry standard vuln discovery)</td><td>Frontier-level; surpasses 3.5 Flash Cyber <em>and</em> significantly larger frontier models</td><td>Google-reported</td></tr>
+                <tr><td><strong>Internal real-world benchmark</strong> (vuln discovery, 20 programming languages, complex codebases)</td><td><strong>&gt;70% success rate</strong></td><td>"Impressive leap over previous models"</td></tr>
+                <tr><td><strong>CWE-Bench</strong> (Collinear, external, patching)</td><td><strong>pass@1 47.2%</strong></td><td>Leading frontier model: 47.8%, at significantly higher cost — Cyber sits on the cost/performance Pareto frontier</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Source: Google blog announcement, Sep 2, 2026. Note that all three rows are vendor-reported at launch; no independent reproduction existed at publication time.</p>
+
+        <h3>The field evidence</h3>
+
+        <p>More persuasive than the benchmarks are four deployment claims from teams already running the model inside Google and at partners:</p>
+
+        <div class="impact-grid">
+            <div class="impact">
+                <div class="big">2.6×</div>
+                <div class="who">Chrome Security team</div>
+                <div class="what">More correct vulnerability patches produced in Chrome than the best commercial models "that are much larger."</div>
+            </div>
+            <div class="impact">
+                <div class="big">+7.5–9.7%</div>
+                <div class="who">Wiz (internal pentest benchmark)</div>
+                <div class="what">Higher recall than other leading frontier models, at 2.3–5.2× lower cost.</div>
+            </div>
+            <div class="impact">
+                <div class="big">&lt; 2 hours</div>
+                <div class="who">Google Cloud Vulnerability Research</div>
+                <div class="what">Found a critical foundational vulnerability — research and discovery for which "usually takes months."</div>
+            </div>
+            <div class="impact">
+                <div class="big">47.2%</div>
+                <div class="who">CWE-Bench (Collinear, external)</div>
+                <div class="what">Patching pass@1 within 0.6 points of the leading frontier model at a fraction of the cost.</div>
+            </div>
+        </div>
+
+        <p>The Cloud Vulnerability Research claim deserves a pause, because it is the difference between a benchmark and a capability statement: a critical foundational vulnerability found end-to-end in under two hours, where the human research baseline is months. If that generalizes — and one anecdote does not establish that it does — the economics of defensive security research change shape: continuous autonomous scanning of an entire codebase stops being a cost question and becomes an always-on background process. The Wiz numbers, measured on an external partner's internal benchmark rather than Google's, are the strongest independent-ish evidence in the set.</p>
+
+        <h3>Safety posture of the pair</h3>
+
+        <p>The standard 3.8 Flash ships with safeguards against CBRN (chemical, biological, radiological, nuclear) misuse and cyber offense, per Google's Frontier Safety Framework, and the model card records a "significant leap in prompt injection robustness as measured by Gray Swan" — a defense-relevant improvement for exactly the agentic workloads the model targets, since prompt injection is the attack surface of tool-using agents. On the framework's capability ladder, 3.8 Flash did not reach any Tracked or Critical Capability Levels (T/CCLs) — Google's assessment reasons from 3.7 Flash's assessment, on the grounds that 3.8 shows no meaningful new capabilities in the framework's domains.</p>
+
+        <p>Cyber, by contrast, is the deliberate exception: more permissive cyber mitigations, no general availability, vetted-defender access only. The Fairwind Program is thus the load-bearing policy structure of the whole release — if the gating works, Google gets to claim frontier cyber capability for defenders without putting it in the open market; if it leaks, the mitigation differential becomes the story. Security researchers will reasonably want to know what Fairwind's vetting actually entails over time; at launch, Google has described the eligibility classes but not the verification mechanics.</p>
+
+        <div class="callout">
+            <span class="tag">For most readers: this section is context, not a purchase decision</span>
+            <p>If you are not a government authority, critical infrastructure operator, or major software maintainer, Flash Cyber is not available to you, and the standard 3.8 Flash will refuse the depth of security work Cyber does. What the Cyber program signals to everyone else is where Google thinks the next competitive frontier lies: the same reasoning model, specialized and gated by use case rather than sold by size. Watch whether the Fairwind pattern — one foundation, many policy-scoped deployments — becomes the industry template.</p>
+        </div>
+    </section>
+
+    <!-- ================= SECTION 8 ================= -->
+    <section id="s8">
+        <h2 class="sec"><span class="no">08</span>API and migration guide</h2>
+
+        <p>3.8 Flash arrives GA on the new <strong>Interactions API</strong> — Google's recommended surface, designed around agent workflows rather than single-shot generation. The minimal call is genuinely minimal:</p>
+
+<pre><code><span class="cm"># Python — google-genai SDK</span>
+<span class="kw">from</span> google <span class="kw">import</span> genai
+
+client = genai.Client()
+
+interaction = client.interactions.create(
+    model=<span class="st">"gemini-3.8-flash"</span>,
+    input=<span class="st">"Write a three.js script that renders a realistic 3D black hole."</span>
+)
+
+<span class="fn">print</span>(interaction.output_text)</code></pre>
+
+<pre><code><span class="cm">// JavaScript — @google/genai SDK</span>
+<span class="kw">import</span> { GoogleGenAI } <span class="kw">from</span> <span class="st">"@google/genai"</span>;
+
+<span class="kw">const</span> client = <span class="kw">new</span> GoogleGenAI({});
+
+<span class="kw">const</span> interaction = <span class="kw">await</span> client.interactions.create({
+  model: <span class="st">"gemini-3.8-flash"</span>,
+  input: <span class="st">"Write a three.js script that renders a realistic 3D black hole."</span>,
+});
+
+console.<span class="fn">log</span>(interaction.output_text);</code></pre>
+
+<pre><code><span class="cm"># REST — curl</span>
+curl <span class="st">"https://generativelanguage.googleapis.com/v1beta/interactions"</span> \
+  -H <span class="st">"x-goog-api-key: $GEMINI_API_KEY"</span> \
+  -H <span class="st">'Content-Type: application/json'</span> \
+  -X POST \
+  -d <span class="st">'{
+    "model": "gemini-3.8-flash",
+    "input": "Write a three.js script that renders a realistic 3D black hole."
+  }'</span></code></pre>
+
+        <p>Controlling the effort dial is equally direct — and this is the parameter that most affects your bill:</p>
+
+<pre><code>interaction = client.interactions.create(
+    model=<span class="st">"gemini-3.8-flash"</span>,
+    input=<span class="st">"Analyze this payment processing pipeline for race conditions during retry attempts and rewrite the transaction locks safely."</span>,
+    generation_config={
+        <span class="st">"thinking_level"</span>: <span class="st">"medium"</span>  <span class="cm"># low | medium (default) | high — minimal is NOT valid</span>
+    }
+)</code></pre>
+
+        <p>Google's guidance maps the levels to use cases: <strong>low</strong> for latency-critical paths (incident response pipelines, real-time chat, drafts, fast analysis), <strong>medium</strong> for most work including complex code and agentic use ("higher first-pass accuracy"), <strong>high</strong> for deep reasoning, mathematics, and difficult multi-step tasks. Requesting <code>minimal</code> returns an error, not a fallback.</p>
+
+        <h3>Migration checklist: 3.7 Flash (or earlier) → 3.8 Flash</h3>
+
+        <p>Google published an official checklist, including an automated path — if you use a coding agent that supports skills (like Antigravity), install the <code>gemini-api-dev</code> skill and run <code>/gemini-api-dev migrate my app to Gemini 3.8 Flash</code>. The manual checklist:</p>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Step</th><th>Action</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>1</td><td>Update the model string to <code>gemini-3.8-flash</code></td><td>Pin it; do not rely on aliases while 3.7 remains supported</td></tr>
+                <tr><td>2</td><td>Strip <code>temperature</code>, <code>top_p</code>, <code>top_k</code></td><td>Deprecated sampling parameters are removed for Gemini 3.x</td></tr>
+                <tr><td>3</td><td>Replace <code>thinking_budget</code> with <code>thinking_level</code></td><td>String enum; <code>minimal</code> unsupported on 3.8 — errors on request</td></tr>
+                <tr><td>4</td><td>Remove <code>candidate_count</code></td><td>Unsupported in Gemini 3 and later</td></tr>
+                <tr><td>5</td><td>Standardize multi-turn on <code>previous_interaction_id</code></td><td>Server-side state on the Interactions API</td></tr>
+                <tr><td>6</td><td>Remove prefilled model turns</td><td>Turn validation rules reject them</td></tr>
+                <tr><td>7</td><td>Audit function calling</td><td>Multimodal assets go inside the response payload; inline instructions formatted with <code>\n\n</code>; check for <code>Malformed_Function_Call</code> errors tied to pre-tool text</td></tr>
+                <tr><td>8</td><td>(generateContent only) Include <code>call_id</code> and <code>name</code> on every <code>FunctionResponse</code></td><td>Legacy-API requirement</td></tr>
+                <tr><td>9</td><td>Review the Gemini 3.5 migration checklist</td><td>SDK updates and thought-signature preservation rules carry forward</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Source: "What's new in Gemini 3.8 Flash," Google AI for Developers, updated Sep 2, 2026.</p>
+
+        <h3>The Antigravity angle</h3>
+
+        <p>For agent builders, the more consequential change may be what Google did inside its own stack: the <strong>Antigravity managed agent now runs 3.8 Flash by default</strong>, and the Antigravity SDK follows. A single natural-language instruction can drive a build loop through the agent with tools, sub-agents, and verification — Google's launch demos include a fully playable DOS-style Google Maps built from one prompt, a 3D wizard-castle game with Nano Banana-generated textures, a USGS topographic-data explorer, and an interactive 3D hardware-teardown visualizer. The pitch is that the effort-dial and tool-loop behavior from section 3 were designed <em>for</em> this runtime: an agent that keeps refining rather than stopping at a first draft, billed per token while it works.</p>
+
+        <div class="callout warn">
+            <span class="tag">Migration risk to check first</span>
+            <p>Before flipping the model string in production, run a token-usage diff on your top workflows. The official docs warn plainly: 3.8 Flash "can use more tokens on longer running and complex tasks, by design." If your cost dashboards are built around 3.7 Flash's per-task token counts, the same traffic on 3.8 can run materially hotter at the same unit price — The Register's estimate is ~40% more per task. Route the delta deliberately: keep latency-critical and cost-capped paths on 3.7 Flash (fully supported), and put 3.8 Flash where the quality-per-task gain is worth the token overhead.</p>
+        </div>
+    </section>
+
+    <!-- ================= SECTION 9 ================= -->
+    <section id="s9">
+        <h2 class="sec"><span class="no">09</span>Limitations, regressions, caveats</h2>
+
+        <p>A breakdown that only repeats the launch claims is marketing with citations. This section collects everything the primary sources say when read against the grain.</p>
+
+        <div class="pc-grid">
+            <div class="pc pros">
+                <h4>What the evidence supports</h4>
+                <ul>
+                    <li><strong>Genuine agentic step change.</strong> Terminal-Bench 2.1 +9.2 and τ³-Banking +7.2 are large, mechanism-consistent gains in exactly the behavior the model was trained to exhibit.</li>
+                    <li><strong>Domain-agent leadership at Flash prices.</strong> Beats Opus 5 and GPT-5.6 Sol on Vals Finance and Harvey's Legal — independently measured, not just vendor-claimed.</li>
+                    <li><strong>Best cost-to-intelligence in its band.</strong> $0.58 per index task at 59 points; AA places it on the Pareto frontier; output speed is the fastest independently measured.</li>
+                    <li><strong>Operational honesty.</strong> Google's own docs say when not to use it ("not every workflow needs this level of verification") and keep 3.7 Flash supported for efficiency-first workloads.</li>
+                    <li><strong>Transparent model card.</strong> Architecture lineage, safety deltas, and known limitations are published — including the regressions listed opposite.</li>
+                </ul>
+            </div>
+            <div class="pc cons">
+                <h4>What to discount or watch</h4>
+                <ul>
+                    <li><strong>Uneven capability profile.</strong> HLE flat (45.4 vs 45.7), SWE-Bench Pro +1.2, and on the hardest long-horizon eval (DeepSWE v1) it trails both flagships it is compared against.</li>
+                    <li><strong>Multilingual safety regression.</strong> The model card reports +5.4pp on automated multilingual safety evals (lower is better) vs 3.7 Flash — acknowledged, unexplained in depth.</li>
+                    <li><strong>More refusals.</strong> Unjustified-refusals +1.1pp (lower is better) — the harder-working model is also marginally more conservative on borderline prompts.</li>
+                    <li><strong>Operational rough edges.</strong> Model card lists "occasional slowness or timeout issues" — material for agent timeout budgets.</li>
+                    <li><strong>Launch-day evidence base.</strong> Most cyber numbers, the 3× Glean claim, and the Jetski-vs-Opus preference are vendor- or partner-reported with no independent reproduction yet.</li>
+                    <li><strong>The pricing clock.</strong> Everything doubles January 1, 2027; six weeks of cadence means 3.9 Flash may re-anchor expectations before the intro window even closes.</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>The safety ledger, verbatim</h3>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Automated eval (vs 3.7 Flash)</th><th class="num">Delta</th><th>Direction</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Text-to-text safety</td><td class="num"><span class="down">−0.4pp</span></td><td>Marginally worse (within noise)</td></tr>
+                <tr><td>Multilingual safety</td><td class="num"><span class="down">+5.4pp</span></td><td>Regression — worse, acknowledged by Google</td></tr>
+                <tr><td>Image-to-text safety</td><td class="num"><span class="flat">0.0pp</span></td><td>Unchanged</td></tr>
+                <tr><td>Tone</td><td class="num"><span class="up">+0.2pp</span></td><td>Improved (higher is better)</td></tr>
+                <tr><td>Unjustified refusals</td><td class="num"><span class="down">+1.1pp</span></td><td>Worse (lower is better) — slightly more conservative</td></tr>
+            </tbody>
+        </table>
+        </div>
+        <p class="tb-note">Source: Gemini 3.8 Flash model card, "Ethics and Content Safety" section. Deltas are automated-eval percentage-point changes; Google notes these use improved eval harnesses and are not directly comparable to older model cards.</p>
+
+        <p>Two framing notes on that ledger. First, Google's own caveat matters: these are automated evaluations run with improved harnesses, so cross-card comparisons are approximate, and their manual review "confirmed losses were overwhelmingly either a) false positives or b) not egregious." Second, the multilingual regression is the one item that deserves an engineering follow-up if your traffic is non-English-heavy — a +5.4pp movement on safety evals is a behavioral change in the model, whatever its real-world severity, and it landed in the same training push that produced the coding gains.</p>
+
+        <h3>Reading the benchmarks with appropriate skepticism</h3>
+
+        <p>DataCamp's launch-day verdict is the right calibration: "I'd want to see independent reproductions before taking the CyberGym and CWE-Bench numbers at face value, since almost all the data so far comes from Google itself." The same applies with different force to each tier of evidence in this article: the 3.7-delta table comes from Google's developer docs but has been cross-confirmed by third-party compilations; the frontier comparisons come from two independent labs (AA, Beam) using their own harnesses; the cyber results and partner quotes are vendor-reported at publication time; and the community latency observations are single-user anecdotes that nonetheless match the official claims' direction. Every number above is labeled with its tier of evidence — treat the labels seriously when you make procurement bets.</p>
+
+        <p>Finally, the deepest caveat is structural, and it is the same one that has applied to every reasoning model since the effort dial was invented: <strong>benchmarks measure the model, deployments measure the system.</strong> Beam's launch note puts it well — most enterprise agent pilots that fail do so on evaluation, governance, and reliability, not on the model underneath. A Flash model with no eval harness, no audit trail, and no exception handling is a cheaper demo, not a cheaper deployment. Nothing in 3.8 Flash changes that; it just lowers the price of the component.</p>
+    </section>
+
+    <!-- ================= SECTION 10 ================= -->
+    <section id="s10">
+        <h2 class="sec"><span class="no">10</span>Who should switch</h2>
+
+        <p>Everything above compresses into a routing decision. The model's own evidence profile — strong where tasks are domain-bounded and tool-reliant, flat-to-behind where tasks reward raw knowledge or maximal-depth engineering — maps cleanly onto workload archetypes:</p>
+
+        <div class="tw">
+        <table>
+            <thead>
+                <tr><th>Your workload</th><th>Recommendation</th><th>Effort setting</th><th>Why</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Coding agents, CLI automation, terminal tooling</td><td><strong>Switch to 3.8 Flash</strong></td><td>medium</td><td>Terminal-Bench 2.1 at 90.8% is the tier's best; error recovery and loop survival are the trained behaviors</td></tr>
+                <tr><td>Finance / legal / compliance domain agents</td><td><strong>Switch to 3.8 Flash</strong></td><td>medium–high</td><td>Leads the frontier (not just the tier) on Vals Finance and Harvey's Legal at a fraction of flagship cost</td></tr>
+                <tr><td>High-volume chat, drafts, classification, fast analysis</td><td>3.8 Flash or stay on 3.7</td><td>low</td><td>0.70s first-answer token and 313 t/s; token overhead is controllable at low effort</td></tr>
+                <tr><td>Bulk evals, backfills, dataset generation</td><td>3.8 Flash on <strong>Batch</strong></td><td>low–medium</td><td>$0.375/$1.875 is the real cost floor; latency-tolerant work should never pay standard rates</td></tr>
+                <tr><td>Hardest long-horizon engineering (DeepSWE-class)</td><td>Keep a frontier model</td><td>—</td><td>71.0% vs Opus 5's 74.0%; route only if the 6–7× price gap outweighs the ~3-point success gap in your economics</td></tr>
+                <tr><td>Hard open-ended reasoning, exam-style knowledge work</td><td>Stay on 3.7 Flash</td><td>—</td><td>HLE is flat; 3.8 burns ~40% more tokens per task for no gain on this profile</td></tr>
+                <tr><td>Cost-capped production at scale</td><td>Stay on 3.7 Flash, re-evaluate after Jan 1</td><td>—</td><td>3.7 remains fully supported; the intro-rate doubling changes the math for 2027 budgets either way</td></tr>
+            </tbody>
+        </table>
+        </div>
+
+        <p>The community's early read converges on the same picture from the other direction. The dominant themes in launch-week discussion (r/singularity, Hacker News) are: it is <em>slightly faster</em> than 3.7 in real use while using a few percent more tokens; it "does the evals cheaper and faster" in agentic contexts; and the pre-release framing that stuck — "Fable 5 level performance at Flash pricing" — is directionally right for agentic work and overstated for pure reasoning. There is no community controversy about the speed claim; the skepticism is concentrated, correctly, on the vendor-reported cyber numbers and on the January price doubling.</p>
+
+        <div class="verdict">
+            <h3>Verdict</h3>
+            <p>Gemini 3.8 Flash is the clearest expression yet of a strategy: stop competing on model size, compete on <em>behavior-per-dollar</em>. Google took a three-week-old model, taught it to be more diligent through recursive agentic training, priced the extra diligence at zero premium during a migration window, and shipped a policy-gated cyber twin to seed a market its rivals cannot easily enter. The result is the best agentic value in the Flash tier — statistically tied with Claude Opus 5 on terminal work and ahead of it on domain-agent benchmarks, at roughly one-seventh the blended price.</p>
+            <p>It is not a frontier model, it is not an upgrade for everyone, and its headline pricing expires on a known date. But if your year is spent building agents that call tools, survive long loops, and complete real work — and if your routing layer lets you send each task to the model that earns it — this is the release that changes your cost structure. That Google told you, in its own launch docs, when <em>not</em> to use it, is the part worth trusting most.</p>
+        </div>
+    </section>
+
+    <!-- ================= FAQ ================= -->
+    <section id="faq">
+        <h2 class="sec"><span class="no">Q&amp;A</span>Frequently asked questions</h2>
+
+        <div class="faq-item"><details>
+            <summary>What is Gemini 3.8 Flash?</summary>
+            <div class="faq-body">Google DeepMind's most intelligent Flash-tier model, released September 2, 2026 and generally available from day one. It is trained on top of Gemini 3.7 Flash (same architecture lineage — the model card defers architecture, data, and hardware details to the 3.7 card) and is engineered for long-horizon software engineering, autonomous agents, and complex enterprise workflows. It supports a 1M-token context window, 64K max output, multimodal input (text, image, audio, video, PDF), text output, and three tunable thinking levels.</div>
+        </details></div>
+
+        <div class="faq-item"><details>
+            <summary>How much does it cost?</summary>
+            <div class="faq-body">Introductory rate through December 31, 2026: $0.75 per 1M input tokens and $3.75 per 1M output tokens (output billing includes thinking tokens). Standard rate from January 1, 2027: $1.50/$7.50 — double. Batch and Flex tiers are 50% off the standard rate ($0.375/$1.875 introductory), Priority runs at 1.8×, and context caching reads cost $0.075/1M with $0.50/1M-tokens-per-hour storage. Grounding with Google Search or Maps includes 5,000 free requests per month shared across Gemini 3.x models, then $14 per 1,000.</div>
+        </details></div>
+
+        <div class="faq-item"><details>
+            <summary>How does it compare to Gemini 3.7 Flash?</summary>
+            <div class="faq-body">Coding and tool-use jumped sharply — Terminal-Bench 2.1 went from 81.6% to 90.8%, and τ³-Bench Banking from 30.9% to 38.1% — while SWE-Bench Pro moved just 1.2 points and Humanity's Last Exam stayed flat (45.4% vs 45.7%). The design difference is behavioral: 3.8 "works harder," taking smaller reasoning steps, calling tools iteratively, and verifying its own work, which means more tokens per task (roughly 40% more cost per task at the same per-token price, per The Register's analysis of Artificial Analysis data). Google keeps 3.7 Flash fully supported for efficiency-first workloads and recommends routing between the two.</div>
+        </details></div>
+
+        <div class="faq-item"><details>
+            <summary>What is Gemini 3.8 Flash Cyber and who can get it?</summary>
+            <div class="faq-body">A cybersecurity-tuned variant sharing the same foundational intelligence but shipping with more permissive cyber mitigations, focused on autonomous vulnerability discovery and automated patching. It exceeds a 70% success rate on Google's internal real-world benchmark across 20 programming languages and scores 47.2% pass@1 on CWE-Bench — within 0.6 points of the leading frontier model at far lower cost. It is not generally available: access is granted through the Fairwind Program to trusted government authorities, critical infrastructure operators, and software maintainers.</div>
+        </details></div>
+
+        <div class="faq-item"><details>
+            <summary>Which thinking levels are supported?</summary>
+            <div class="faq-body">Three: <code>low</code>, <code>medium</code> (the default), and <code>high</code>, set via the <code>thinking_level</code> string enum, which replaces the older <code>thinking_budget</code> parameter. The <code>minimal</code> level is not supported on 3.8 Flash and returns an API error — a hard breaking change for pipelines tuned to earlier Flash models. Artificial Analysis measured the Intelligence Index at 52/57/59 for low/medium/high respectively, with per-task costs of $0.24/$0.41/$0.58.</div>
+        </details></div>
+
+        <div class="faq-item"><details>
+            <summary>Should I migrate from 3.7 Flash (or another model)?</summary>
+            <div class="faq-body">If you run coding agents, terminal-heavy workflows, or domain agents in finance, law, or compliance — yes, the evidence supports switching, ideally with a token-usage diff first to absorb the ~40% per-task cost increase at higher effort. If your workload is hard open-ended reasoning, HLE-style knowledge work, or cost-capped high-volume inference, stay on 3.7 Flash (fully supported) or a cheaper tier. If you are paying flagship prices for domain-agent work that 3.8 Flash does at equal quality — the routing economics favor moving that traffic now, before introductory pricing expires.</div>
+        </details></div>
+
+        <div class="callout">
+            <span class="tag">Methodology note</span>
+            <p>This article was compiled on September 3, 2026 from primary sources (Google's launch announcement, the Gemini 3.8 Flash model card, developer documentation, and pricing pages), independent measurements (Artificial Analysis, Beam AI, BenchLM, The Register), third-party compilations (DataCamp, 247wallst), and labeled community observations (r/singularity, Hacker News). Vendor-reported figures are marked as such throughout. Benchmark numbers are launch-day values and may be revised as harnesses and reproductions mature.</p>
+        </div>
+    </section>
+
+    <!-- ================= SOURCES ================= -->
+    <section id="sources">
+        <h2 class="sec"><span class="no">※</span>Sources</h2>
+        <ul class="src-list">
+            <li><span class="s-tag off">Official</span>Doshi, T. &amp; Popa, R. A. — <em>Introducing Gemini 3.8 Flash and 3.8 Flash Cyber</em> — Google Blog, Sep 2, 2026 — blog.google</li>
+            <li><span class="s-tag off">Official</span><em>Gemini 3.8 Flash — Model Card</em> — Google DeepMind, Sep 2026 — deepmind.google/models/model-cards/gemini-3-8-flash</li>
+            <li><span class="s-tag off">Official</span><em>What's new in Gemini 3.8 Flash</em> — Google AI for Developers, updated Sep 2, 2026 — ai.google.dev/gemini-api/docs/latest-model</li>
+            <li><span class="s-tag off">Official</span><em>Gemini Developer API pricing</em> — Google AI for Developers — ai.google.dev/gemini-api/docs/pricing</li>
+            <li><span class="s-tag off">Official</span><em>Gemini 3.8 Flash</em> — model page — deepmind.google/models/gemini/flash</li>
+            <li><span class="s-tag off">Official</span>Doshi, T. — <em>Introducing Gemini 3.7 Flash: our most intelligent workhorse model</em> — Google Blog, Aug 13, 2026</li>
+            <li><span class="s-tag ind">Independent</span><em>Gemini 3.8 Flash: Release Intelligence, Performance &amp; Price</em> — Artificial Analysis, Sep 3, 2026 — artificialanalysis.ai</li>
+            <li><span class="s-tag ind">Independent</span>Claburn, T. — <em>With Gemini 3.8 Flash, Google reminds everyone it's still in the race</em> — The Register, Sep 2, 2026</li>
+            <li><span class="s-tag ind">Independent</span>Falk, F. — <em>Gemini 3.8 Flash for AI Agents: What the Early Benchmarks Show</em> — Beam AI, Sep 2, 2026</li>
+            <li><span class="s-tag ind">Independent</span><em>Gemini 3.8 Flash — model record</em> — BenchLM.ai, Sep 2, 2026</li>
+            <li><span class="s-tag com">Press</span><em>New Google AI Model Said to Narrow Gap on Coding Ability</em> — Wall Street Journal, Sep 2, 2026 (incl. "Skimaki" codename, Jetski internal testing)</li>
+            <li><span class="s-tag com">Press</span><em>Google's Gemini 3.8 Flash: Four Models in Four Months</em> — 247wallst.com, Sep 2, 2026</li>
+            <li><span class="s-tag com">Analysis</span>Crabtree, M. — <em>Gemini 3.8 Flash and 3.8 Flash Cyber: Features, Benchmarks, and Pricing</em> — DataCamp, Sep 2, 2026</li>
+            <li><span class="s-tag com">Analysis</span><em>Gemini (language model)</em> — Wikipedia (release chronology) — en.wikipedia.org</li>
+            <li><span class="s-tag com">Community</span>r/singularity — <em>Gemini 3.8 Flash Benchmarks</em> thread (hands-on latency/token observations, Sep 2026); Hacker News — <em>Gemini 3.8 Flash and 3.8 Flash Cyber</em> discussion, Sep 2, 2026</li>
+        </ul>
+    </section>
+
+    <footer>
+        <p>Local AI Zone · Technical Breakdown Series · <a href="../blog.html">Gemini 3.8 Flash</a> · Published Sep 3, 2026 by Hussain Nazary</p>
+        <p>Independently researched from primary and independent sources. All benchmark figures belong to their respective publishers; deltas and charts are Local AI Zone compilations. Evidence tiers are labeled throughout.</p>
+    </footer>
+</div>
+
+            <!-- Related Posts Section -->
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <a href="claude-fable-5-1-technical-breakdown.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Claude Fable 5.1 Technical Breakdown</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">One set of weights, two safeguard regimes - architecture, benchmarks, economics, migration, and safety, read for engineers.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="Claude_Mythos_5.1_Technical_Analysis.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Claude Mythos 5.1 Technical Analysis</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The safeguard-free twin of Claude Fable 5.1: benchmarks, architecture, access programs, and what the system card actually says.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                    <a href="ai-inference-hardware-2026.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">AI Inference Hardware 2026</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Complete 2026 catalog of AI inference hardware across NVIDIA, AMD, Apple Silicon.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
+                </div>
+            </div>
+
+            <h2 class="section-title">About the Author</h2>
+            <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
+            <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+            <p style="margin-top: 30px;"><em>Last Updated: September 3, 2026 | Version 1.0</em></p>
+        </div>
+    </article>
+
+    <script src="../js/theme-switcher.js"></script>
+</body>
+</html>
