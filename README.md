@@ -25,26 +25,25 @@ Live site: [https://local-ai-zone.github.io](https://local-ai-zone.github.io)
 
 ## 💡 Example Project: A Local AI Agent
 
-Want to see a complete agent built entirely on local, open-weight models? **Lawyer Assistant** is a working reference implementation of the RAG (Retrieval-Augmented Generation) pipeline — an open-source, MIT-licensed legal document assistant that runs 100% on-device.
+Want to see a complete local AI agent you can run today? **GGUF Loader** is a production desktop application — a LangGraph-powered, plan-driven agent with a developer-style inline process UI. No cloud, no subscriptions, no data leaves your machine.
 
 It demonstrates the same patterns this site's guides teach:
 
-- **RAG pipeline** — full ingest → index → retrieve → generate flow
-- **Multi-model orchestration** — BGE-M3 embeddings, ChromaDB vector store, and an Ollama-hosted LLM working as separate services
-- **Agent loop** — query routing, tool calls, and iterative retrieval
-- **Hybrid retrieval** — BM25 keyword + semantic vector search combined
-- **Grounding & citations** — answers link back to exact page & paragraph numbers
-- **Streaming responses** — REST + SSE (Server-Sent Events)
+- **Plan-driven agent (LangGraph)** — planner node decides each turn: tool-free questions answered directly; tasks get a step-by-step plan
+- **10 sandboxed tools** — file read/write/edit/search, shell commands, Python execution, git ops — all workspace-jailed
+- **Human-approval gates** — destructive or executable operations pause for Allow / Deny
+- **Streaming chat** — token-by-token delivery via WebSocket with inline plan steps and tool results
+- **Find Paragraph search** — locate passages in documents with the model itself, no RAG or vector DB required
+- **Hardware-aware** — auto-detects RAM/VRAM, recommends models that fit your PC; one-click GPU acceleration
 
 | Resource | Link |
 |---|---|
-| **Project Website** | [lawyers-assistant.github.io](https://lawyers-assistant.github.io) |
-| **Source Code (GitHub)** | [github.com/haal-lab/Lawyer-Assistant](https://github.com/haal-lab/Lawyer-Assistant) |
-| **Case Study** | [blog/lawyer-assistant-privacy-first-legal-ai.html](blog/lawyer-assistant-privacy-first-legal-ai.html) |
-| **Build Guide** | [blog/how-to-build-local-ai-legal-assistant.html](blog/how-to-build-local-ai-legal-assistant.html) |
-| **RAG Infrastructure Guides** | [guides/best-ai-embedding-models-ultimate-ranking-2026.html](guides/best-ai-embedding-models-ultimate-ranking-2026.html) · [rerankers](guides/best-ai-reranker-models-ultimate-ranking-2026.html) · [OCR](guides/best-ai-ocr-models-ultimate-ranking-2026.html) |
+| **Download** | [ggufloader.github.io](https://ggufloader.github.io) |
+| **Source Code (GitHub)** | [github.com/GGUFloader/gguf-loader](https://github.com/GGUFloader/gguf-loader) |
+| **Install via pip** | [pypi.org/project/ggufloader](https://pypi.org/project/ggufloader/) |
+| **All Releases** | [github.com/GGUFloader/gguf-loader/releases](https://github.com/GGUFloader/gguf-loader/releases) |
 
-Built by **Hussain Nazary** — use it as a reference when building your own local AI agent.
+Works on **Windows, Linux, and macOS**. Install with `pip install ggufloader` or grab a standalone build from the releases page.
 
 ## 🏗️ Architecture
 

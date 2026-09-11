@@ -439,34 +439,34 @@
             <section class="agent-spotlight" aria-label="Example project: local AI agent">
                 <div class="articles-header">
                     <h2 class="articles-title">💡 Example Project: A Local AI Agent</h2>
-                    <p class="articles-subtitle">A complete open-source reference implementation. If you want to build an agent on local models, study how this one is wired together.</p>
+                    <p class="articles-subtitle">A complete local AI agent you can run today — no cloud, no subscriptions, no data leaves your machine.</p>
                 </div>
                 <div class="spotlight-card">
                     <div class="spotlight-main">
-                        <div class="spotlight-badges"><span class="trending-badge badge-new">REFERENCE PROJECT</span><span class="trending-badge badge-score">Open Source · MIT</span></div>
-                        <h3 class="spotlight-title">⚖️ Lawyer Assistant — A RAG Agent for Legal Documents</h3>
-                        <p class="spotlight-desc">A reference project showing a complete retrieval-augmented generation pipeline: it indexes contracts into a local vector store, retrieves relevant passages for a query, and answers with citations. It uses <strong>BGE-M3</strong> for embeddings, <strong>ChromaDB</strong> as the vector store, and <strong>Ollama</strong> for local LLM inference. Everything runs on-device; the source is MIT-licensed.</p>
-                        <p class="spotlight-patterns-label">Patterns you can study in the source:</p>
+                        <div class="spotlight-badges"><span class="trending-badge badge-new">DESKTOP APP</span><span class="trending-badge badge-score">v2.3.0 — Open Source · MIT</span></div>
+                        <h3 class="spotlight-title">🧠 GGUF Loader — Privacy-First Desktop AI Agent</h3>
+                        <p class="spotlight-desc">A production desktop AI agent that runs entirely on your hardware. <strong>GGUF Loader</strong> is a LangGraph-powered, plan-driven agent with a developer-style inline process UI — it plans multi-step tasks, calls sandboxed tools on your files, and streams every step live. Powered by <strong>llama.cpp</strong> on the backend, it ships as a single <strong>Electron app</strong> (Windows, Linux, macOS) or installs via <code>pip install ggufloader</code>. The v2.3.0 release features a strictly plan-driven agent architecture with human-approval gates for shell commands, code execution, and git writes.</p>
+                        <p class="spotlight-patterns-label">What makes it a real local AI agent:</p>
                         <ul class="spotlight-patterns">
-                            <li><strong>RAG pipeline</strong> — full ingest → index → retrieve → generate flow</li>
-                            <li><strong>Multi-model orchestration</strong> — embeddings, rerankers &amp; LLM working as separate services</li>
-                            <li><strong>Agent loop</strong> — query routing, tool calls, and iterative retrieval</li>
-                            <li><strong>Hybrid retrieval</strong> — BM25 keyword + semantic vector search combined</li>
-                            <li><strong>Grounding &amp; citations</strong> — answers link back to exact page &amp; paragraph numbers</li>
-                            <li><strong>Streaming responses</strong> — REST + SSE (Server-Sent Events) output</li>
+                            <li><strong>Plan-driven agent (LangGraph)</strong> — planner node decides each turn: tool-free questions answered directly; tasks get a step-by-step plan</li>
+                            <li><strong>10 sandboxed tools</strong> — file read/write/edit/search, shell commands, Python execution, git ops — all workspace-jailed</li>
+                            <li><strong>Human-approval gates</strong> — destructive or executable operations pause for Allow / Deny; read-only tools run automatically</li>
+                            <li><strong>Find Paragraph search</strong> — locate passages in documents or folders with the model itself, no RAG or vector DB required</li>
+                            <li><strong>Streaming chat</strong> — token-by-token delivery via WebSocket with inline plan steps and tool results</li>
+                            <li><strong>Hardware-aware</strong> — auto-detects RAM/VRAM, recommends models that fit your PC; one-click GPU acceleration (CUDA / Metal)</li>
                         </ul>
                         <div class="spotlight-tech">
-                            <span class="spotlight-chip">BGE-M3 Embeddings</span>
-                            <span class="spotlight-chip">ChromaDB Vector Store</span>
-                            <span class="spotlight-chip">Ollama (Llama · Mistral · Gemma)</span>
-                            <span class="spotlight-chip">BM25 Keyword Search</span>
-                            <span class="spotlight-chip">OCR Document Parsing</span>
+                            <span class="spotlight-chip">LangGraph Agent</span>
+                            <span class="spotlight-chip">llama.cpp Engine</span>
+                            <span class="spotlight-chip">Electron Desktop App</span>
+                            <span class="spotlight-chip">Streaming WebSocket</span>
+                            <span class="spotlight-chip">100% Local — Zero Cloud</span>
                         </div>
                         <div class="spotlight-actions">
-                            <a href="https://github.com/haal-lab/Lawyer-Assistant" target="_blank" rel="noopener noreferrer" class="spotlight-btn spotlight-btn-primary">View Source on GitHub ↗</a>
-                            <a href="https://lawyers-assistant.github.io" target="_blank" rel="noopener noreferrer" class="spotlight-btn spotlight-btn-secondary">Project Website ↗</a>
-                            <a href="blog/how-to-build-local-ai-legal-assistant.html" class="spotlight-btn spotlight-btn-ghost">Follow the Build Guide →</a>
-                            <a href="blog/lawyer-assistant-privacy-first-legal-ai.html" class="spotlight-btn spotlight-btn-ghost">Case Study &amp; Benchmarks →</a>
+                            <a href="https://github.com/GGUFloader/gguf-loader" target="_blank" rel="noopener noreferrer" class="spotlight-btn spotlight-btn-primary">View Source on GitHub ↗</a>
+                            <a href="https://ggufloader.github.io" target="_blank" rel="noopener noreferrer" class="spotlight-btn spotlight-btn-secondary">Download v2.3.0 ↗</a>
+                            <a href="https://pypi.org/project/ggufloader/" target="_blank" rel="noopener noreferrer" class="spotlight-btn spotlight-btn-ghost">Install via pip ↗</a>
+                            <a href="https://github.com/GGUFloader/gguf-loader/releases" target="_blank" rel="noopener noreferrer" class="spotlight-btn spotlight-btn-ghost">All Releases ↗</a>
                         </div>
                     </div>
                 </div>
