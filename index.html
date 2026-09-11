@@ -369,6 +369,14 @@
                     <p class="articles-subtitle">The newest frontier models, ranked by latest benchmark scores. All available as GGUF for local deployment.</p>
                 </div>
                 <div class="articles-grid">
+                    <a href="blog/deepseek-v4-1-flash-deep-dive.html" class="article-card">
+                        <div class="article-card-content">
+                            <div class="trending-badges"><span class="trending-badge badge-new">NEW · Sep 11</span><span class="trending-badge badge-score">Deep Dive</span></div>
+                            <h3 class="article-card-title">DeepSeek V4.1 Flash — Technical Architecture Deep Dive</h3>
+                            <p class="article-card-excerpt">Causal Encoder-Decoder with CSA2 attention, FP4 KV cache compression, Engram memory, and DSpark speculative decoding. Complete architectural breakdown.</p>
+                            <div class="article-card-footer"><span class="read-more-link">Read Deep Dive →</span></div>
+                        </div>
+                    </a>
                     <a href="models/qwen3-8-27b.html" class="article-card">
                         <div class="article-card-content">
                             <div class="trending-badges"><span class="trending-badge badge-new">NEW · Aug 14</span><span class="trending-badge badge-score">15/19 vs Opus 4.6</span></div>
@@ -461,100 +469,10 @@
                                 </div>
                             </div>
                             <div style="flex-shrink:0;">
-                                <img src="blog/ggufloader-chat.png" alt="GGUF Loader Chat Interface" style="max-width:340px;width:100%;height:auto;border-radius:8px;border:1px solid var(--border-color, #e5e7eb);box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                                <img src="blog/ggufloader-chat.png" alt="GGUF Loader Chat Interface" style="max-width:480px;width:100%;height:auto;border-radius:8px;border:1px solid var(--border-color, #e5e7eb);box-shadow:0 2px 8px rgba(0,0,0,0.08);">
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <!-- Featured Articles Section -->
-            <section id="educational-content-index" class="featured-articles" aria-label="Featured Articles">
-                <div class="articles-header">
-                    <h2 class="articles-title">From the Blog</h2>
-                    <p class="articles-subtitle">Expert guides and analysis to help you master local AI.</p>
-                </div>
-                <div class="articles-grid">
-                    <a href="guides/what-is-ai-quantization-q4-k-m-q8-gguf-guide-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">The Ultimate Guide to AI Quantization</h3>
-                            <p class="article-card-excerpt">Understand the magic behind GGUF, Q4_K_M, and Q8_0 that allows massive AI models to run on your home computer.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/what-is-ai-model-3b-7b-30b-parameters-guide-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">AI Model Parameters Explained (3B, 7B, 30B)</h3>
-                            <p class="article-card-excerpt">What do the 'B's in model names mean? This guide breaks down parameters and how they affect model performance and hardware needs.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/ai-model-licensing-complete-legal-guide-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">AI Model Licensing Explained</h3>
-                            <p class="article-card-excerpt">A complete legal guide for 2025. Can you use that open-source model for your business? Find out here.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/best-ai-coding-assistant-models-ultimate-ranking-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">Best AI Coding Assistants (Local)</h3>
-                            <p class="article-card-excerpt">An ultimate ranking of the top AI models that can run locally to help you code faster, debug smarter, and learn more effectively.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/context-length-optimization-ultimate-guide-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">Context Length Optimization Guide</h3>
-                            <p class="article-card-excerpt">Learn expert strategies to get the most out of your model's context window, enabling more complex conversations and analysis.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/best-ai-multilingual-models-ultimate-ranking-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">Top Multilingual AI Models</h3>
-                            <p class="article-card-excerpt">Discover the best models for translation, cross-lingual summarization, and understanding diverse languages, all on your local machine.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/best-ai-research-assistant-models-ultimate-ranking.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">AI Research Assistant Models</h3>
-                            <p class="article-card-excerpt">A definitive ranking of models that can accelerate your research by summarizing papers, analyzing data, and generating insights.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/ai-coding-prompts-master-techniques-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">Mastering AI Coding Prompts</h3>
-                            <p class="article-card-excerpt">Go beyond basic questions. Learn master techniques for crafting prompts that generate superior code, tests, and documentation.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/ai-research-prompts-expert-strategies-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">Expert AI Research Prompts</h3>
-                            <p class="article-card-excerpt">Unlock your AI's potential for academic and scientific work with these expert strategies for crafting effective research prompts.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/best-ai-analysis-models-ultimate-ranking-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">Best AI Models for Analysis</h3>
-                            <p class="article-card-excerpt">A comprehensive ranking of the top models for data analysis, sentiment analysis, and logical reasoning tasks.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                    <a href="guides/best-ai-brainstorming-models-ultimate-ranking-2025.html" class="article-card">
-                        <div class="article-card-content">
-                            <h3 class="article-card-title">Top AI Brainstorming Models</h3>
-                            <p class="article-card-excerpt">Break through creative blocks with the best AI models for brainstorming, idea generation, and creative writing.</p>
-                            <div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div>
-                        </div>
-                    </a>
-                </div>
-                <div style="text-align: center; margin-top: 40px;">
-                    <a href="blog.html" class="hire-me-btn">View All Posts</a>
                 </div>
             </section>
 
