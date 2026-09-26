@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>From One Giant FFN to 384 Tiny Experts — DeepSeek's Feed-Forward Evolution from V1 to V4.1-Flash</title>
+<meta name="description" content="A book-length technical history of DeepSeek's feed-forward network (FFN) evolution: from the dense SwiGLU blocks of DeepSeek LLM 7B/67B (2023), through DeepSeekMoE's fine-grained and shared experts (2024), auxiliary-loss-free balancing and Multi-Token Prediction in V3, FP4 expert weights in V4, to the asymmetric CED MoE and Engram memory of DeepSeek-V4.1-Flash (2026). Every number cited against the papers, configs, and serving stacks.">
+<meta name="keywords" content="DeepSeek, FFN, feed-forward network, MoE, Mixture of Experts, DeepSeekMoE, fine-grained experts, shared experts, auxiliary-loss-free, load balancing, MTP, multi-token prediction, FP8, FP4, MXFP4, Muon, mHC, Engram, CED, V4.1-Flash, V3, V2, expert parallelism, DeepEP, EPLB, 2026">
+<meta name="author" content="DeepSeek Architecture Research Series">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "From One Giant FFN to 384 Tiny Experts — DeepSeek's Feed-Forward Evolution from V1 to V4.1-Flash",
+  "alternativeHeadline": "A book-length research paper on the complete history of DeepSeek's feed-forward and Mixture-of-Experts design",
+  "description": "A book-length engineering research paper tracing every DeepSeek feed-forward innovation from dense SwiGLU FFNs in DeepSeek LLM 7B/67B (2023) through DeepSeekMoE (Jan 2024), DeepSeek-V2/V3 sparse scaling, auxiliary-loss-free load balancing, Multi-Token Prediction, FP4 expert quantization in V4, to the Causal Encoder-Decoder MoE and Engram memory of DeepSeek-V4.1-Flash (September 2026).",
+  "author": {
+    "@type": "Organization",
+    "name": "DeepSeek Architecture Research Series"
+  },
+  "datePublished": "2026-09-13T00:00:00Z",
+  "dateModified": "2026-09-26T00:00:00Z",
+  "keywords": "DeepSeek, FFN, MoE, DeepSeekMoE, load balancing, MTP, FP4, Engram, V4.1-Flash, 2026",
+  "articleSection": "Research Paper",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 16000,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Local AI Zone",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://local-ai-zone.github.io/logo.svg"
+    }
+  },
+  "about": [
+    {"@type": "Thing", "name": "DeepSeek"},
+    {"@type": "Thing", "name": "Mixture of Experts"},
+    {"@type": "Thing", "name": "Feed-Forward Network"},
+    {"@type": "Thing", "name": "DeepSeekMoE"},
+    {"@type": "Thing", "name": "Multi-Token Prediction"},
+    {"@type": "Thing", "name": "DeepSeek V4.1 Flash"}
+  ],
+  "isPartOf": {
+    "@type": "Blog",
+    "name": "Local AI Zone — Blog",
+    "url": "https://local-ai-zone.github.io/blog.html"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://local-ai-zone.github.io/og-image.png",
+    "width": 1200,
+    "height": 630
+  },
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": ["h1", ".cover .sub"]
+  }
+}
+</script>
+
+<!-- ==================== SEO ==================== -->
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow">
+<meta name="bingbot" content="index, follow">
+<meta name="rating" content="general">
+<meta name="revisit-after" content="7 days">
+<meta name="theme-color" content="#4f46e5">
+<meta name="creator" content="Local AI Zone">
+<meta name="publisher" content="Local AI Zone">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:title" content="From One Giant FFN to 384 Tiny Experts — DeepSeek's Feed-Forward Evolution from V1 to V4.1-Flash">
+<meta property="og:description" content="A book-length technical history of DeepSeek's feed-forward network: from the dense SwiGLU blocks of 2023, through DeepSeekMoE, auxiliary-loss-free routing and Multi-Token Prediction, to the 384-expert FP4 MoE with Engram memory in DeepSeek-V4.1-Flash (September 2026). Every number cited.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="From One Giant FFN to 384 Tiny Experts — DeepSeek's Feed-Forward Evolution">
+<meta property="article:author" content="Hussain Nazary">
+<meta property="article:published_time" content="2026-09-13T00:00:00Z">
+<meta property="article:modified_time" content="2026-09-26T00:00:00Z">
+<meta property="article:section" content="Research Paper">
+<meta property="article:tag" content="DeepSeek">
+<meta property="article:tag" content="Mixture of Experts">
+<meta property="article:tag" content="MoE">
+<meta property="article:tag" content="Feed-Forward Network">
+<meta property="article:tag" content="Model Architecture">
+<meta property="article:tag" content="DeepSeekMoE">
+<meta property="article:tag" content="Multi-Token Prediction">
+<meta property="article:tag" content="DeepSeek V4.1 Flash">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@localaizone">
+<meta name="twitter:creator" content="@hussainnazary">
+<meta name="twitter:title" content="DeepSeek FFN &amp; MoE Evolution: Dense SwiGLU to 384 Experts">
+<meta name="twitter:description" content="16 chapters tracing every DeepSeek feed-forward and MoE design — DeepSeekMoE fine-grained experts, aux-loss-free balancing, Multi-Token Prediction, FP4 expert weights, and V4.1-Flash's 196B Engram memory.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta name="twitter:image:alt" content="From One Giant FFN to 384 Tiny Experts — DeepSeek's Feed-Forward Evolution">
+
+<!-- FAQ Schema (AEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is DeepSeekMoE?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DeepSeekMoE is DeepSeek's Mixture-of-Experts architecture, introduced in January 2024. It replaces each transformer layer's single dense feed-forward network with many fine-grained routed experts plus a small set of always-on shared experts. In its 16.4B-parameter instantiation it matched LLaMA2-7B with roughly 40% of the computation."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does DeepSeek balance its experts without an auxiliary loss?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DeepSeek-V3 replaced the three auxiliary balance losses used in V2 with a per-expert bias term added to the routing affinity. The bias is adjusted by a fixed control rule rather than by gradient descent, so expert load is balanced without the quality penalty an auxiliary loss imposes on the language-model objective."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Multi-Token Prediction (MTP) in DeepSeek-V3?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Multi-Token Prediction adds modules that predict several future tokens at each position. In DeepSeek-V3 the same MTP modules are reused at inference time as the draft heads for speculative decoding, where they reach an 85-90% token acceptance rate and about 1.8x decode throughput."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How large is DeepSeek-V3's MoE and how much of it runs per token?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DeepSeek-V3 has 671B total parameters and activates approximately 37B per token — about 5.5% — using 256 routed experts and 1 shared expert per layer, trained in FP8 on 14.8T tokens for 2.788M H800 GPU-hours."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is new in DeepSeek-V4.1-Flash's feed-forward design?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DeepSeek-V4.1-Flash makes the feed-forward path asymmetric: a 552B-parameter multimodal MoE with 384 routed experts and 1 shared expert per layer activates 8B parameters per token during prefill and 16B during decode. It adds a 196B-parameter conditional-memory module called Engram, built from multi-head hashing and context-aware gating, and stores expert weights in FP4."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Breadcrumb Schema (GEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://local-ai-zone.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://local-ai-zone.github.io/blog.html"
+    },
+    {
+      "@type": "ListItem",
+      "position": 3,
+      "name": "DeepSeek FFN & MoE Evolution Research Paper",
+      "item": "https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html"
+    }
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<style>
+:root {
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#1a2233; --ink-soft:#46506a; --ink-faint:#7c86a0;
+  --line:#e3e7ee; --accent:#4f46e5; --accent-soft:#eef2ff; --accent-2:#0d9488;
+  --warn-bg:#fff7ed; --warn-line:#fdba74; --warn-ink:#9a3412;
+  --ok-bg:#f0fdf4; --ok-line:#86efac; --ok-ink:#166534;
+  --info-bg:#eff6ff; --info-line:#93c5fd; --info-ink:#1e3a8a;
+  --danger-bg:#fef2f2; --danger-line:#fca5a5; --danger-ink:#991b1b;
+  --code-bg:#0d1117; --code-ink:#d7dde7; --code-cmt:#7d8799; --code-head:#79c0ff; --code-key:#ff7b72; --code-str:#a5d6a7;
+  --side-bg:#0e1526; --side-ink:#aab6cf; --side-hover:#1b2540; --side-active:#4f46e5;
+  --mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,'Liberation Mono',monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif;
+}
+html[data-theme='dark'] {
+  --bg:#0b0f1a; --paper:#111827; --ink:#e5e9f2; --ink-soft:#b8c2d9; --ink-faint:#7c8aa5;
+  --line:#242f47; --accent:#818cf8; --accent-soft:#1e2440; --accent-2:#2dd4bf;
+  --warn-bg:#2a1c0e; --warn-line:#9a5b21; --warn-ink:#fdba74;
+  --ok-bg:#0d2418; --ok-line:#2f7a4f; --ok-ink:#86efac;
+  --info-bg:#101d33; --info-line:#2b4d8a; --info-ink:#93c5fd;
+  --danger-bg:#2a1214; --danger-line:#8a3a3f; --danger-ink:#fca5a5;
+  --side-bg:#0a0f1e; --side-ink:#aab6cf; --side-hover:#1b2540; --side-active:#6366f1;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+/* ============ LAYOUT ============ */
+.shell{display:flex;min-height:100vh}
+aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
+main{flex:1;min-width:0;display:flex;justify-content:center}
+.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
+/* ============ SIDEBAR TOC ============ */
+#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
+#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35;letter-spacing:.2px}
+#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
+#toc nav a{display:block;padding:5px 22px 5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
+#toc nav a:hover{background:var(--side-hover);color:#fff}
+#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
+#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
+#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
+#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
+/* ============ THEME TOGGLE ============ */
+.theme-btn{position:fixed;top:16px;right:20px;z-index:80;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:17px;line-height:1;box-shadow:0 2px 10px rgba(15,23,42,.12);transition:transform .15s}
+.theme-btn:hover{transform:scale(1.07)}
+/* ============ TYPOGRAPHY ============ */
+h1,h2,h3,h4{font-family:var(--sans);line-height:1.25;color:var(--ink)}
+.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
+.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
+.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px;letter-spacing:-.2px}
+.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
+.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--ink-soft)}
+p{margin:0 0 18px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid #c7d2fe}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:700;color:var(--ink)}
+em{font-style:italic}
+ul,ol{margin:0 0 18px;padding-left:26px}
+li{margin-bottom:7px}
+li::marker{color:var(--accent);font-weight:600}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+.small{font-size:13.5px;color:var(--ink-soft)}
+.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#3730a3;overflow-wrap:anywhere}
+html[data-theme='dark'] .mono, html[data-theme='dark'] code:not(pre code){background:#1c2438;border-color:#2c3752;color:#a5b4fc}
+/* ============ COVER ============ */
+.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
+.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
+.cover h1 .thin{color:var(--accent)}
+.cover .sub{font-size:19px;color:var(--ink-soft);max-width:640px;line-height:1.6;margin:0 0 30px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
+.cover .meta b{color:var(--ink-soft);font-weight:600}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:34px 0 8px}
+.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+html[data-theme='dark'] .statgrid .cell{background:linear-gradient(180deg,#141b2e,#10162a)}
+.statgrid .cell .v{font-size:24px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+/* ============ CALLOUTS ============ */
+.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
+.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
+.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
+.callout p:last-child{margin-bottom:0}
+.callout p{margin-bottom:8px}
+/* ============ TABLES ============ */
+.tblwrap{overflow-x:auto;margin:24px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;background:var(--paper)}
+thead th{background:#f1f3f8;text-align:left;font-weight:700;color:#2b3550;font-size:12.5px;letter-spacing:.4px;text-transform:uppercase;padding:10px 14px;border-bottom:2px solid var(--line);white-space:nowrap}
+html[data-theme='dark'] thead th{background:#1a2338;color:#c7d0e8}
+tbody td{padding:9px 14px;border-bottom:1px solid #edf0f5;vertical-align:top}
+html[data-theme='dark'] tbody td{border-bottom-color:#202a42}
+tbody tr:nth-child(even){background:#fafbfd}
+html[data-theme='dark'] tbody tr:nth-child(even){background:#131a2c}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .tag{display:inline-block;font-size:11px;font-weight:700;padding:1.5px 8px;border-radius:99px;letter-spacing:.3px}
+.tag.good{background:var(--ok-bg);color:var(--ok-ink);border:1px solid var(--ok-line)}
+.tag.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.tag.bad{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line)}
+.tag.neutral{background:#eef1f6;color:#3f4a63;border:1px solid #d8dee9}
+html[data-theme='dark'] .tag.neutral{background:#1c2438;color:#b8c2d9;border-color:#2c3752}
+.tblfoot{font-size:12.5px;color:var(--ink-faint);padding:8px 14px;background:#fafbfd;border-top:1px solid var(--line)}
+html[data-theme='dark'] .tblfoot{background:#131a2c}
+/* ============ CODE ============ */
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:22px 0;font-family:var(--mono);font-size:13.2px;line-height:1.62}
+pre code{font-family:inherit;background:none;border:none;padding:0;color:inherit;white-space:pre}
+pre .c{color:var(--code-cmt);font-style:italic}
+pre .h{color:var(--code-head)}
+pre .k{color:var(--code-key)}
+pre .s{color:var(--code-str)}
+pre .d{color:#e3b341}
+.codetitle{display:flex;justify-content:space-between;align-items:center;background:#161b22;border:1px solid #30363d;border-bottom:none;border-radius:12px 12px 0 0;padding:8px 16px;font-family:var(--mono);font-size:11.5px;color:#8b98ab;margin:22px 0 0}
+.codetitle .dots{color:#444d58;letter-spacing:2px}
+.codetitle + pre{margin-top:0;border-radius:0 0 12px 12px}
+/* ============ FIGURES / DIAGRAMS ============ */
+figure{margin:28px 0}
+figcaption{font-size:13px;color:var(--ink-faint);margin-top:10px;text-align:center}
+.flow{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:22px;font-size:14px}
+html[data-theme='dark'] .flow{background:#101728}
+.flow .fnode{background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;line-height:1.5;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.flow .fnode b{color:var(--ink)}
+.flow .fdecision{background:var(--accent-soft);border:1.5px solid #c7d2fe;border-radius:9px;padding:10px 14px;line-height:1.5}
+html[data-theme='dark'] .flow .fdecision{border-color:#39406b}
+.flow .fterminal{background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:9px;padding:10px 14px;line-height:1.5}
+html[data-theme='dark'] .flow .fterminal{background:#0d2418;border-color:#2f7a4f}
+.flow .fterminal b{color:#065f46}
+html[data-theme='dark'] .flow .fterminal b{color:#86efac}
+.flow .farrow{color:var(--ink-faint);text-align:center;font-size:15px;padding:2px 0;line-height:1}
+.flow .flabel{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);text-align:center;padding:1px 0 2px}
+.flow .fgrid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.flow .fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media (max-width:760px){.flow .fgrid2,.flow .fgrid3{grid-template-columns:1fr}}
+.bar-chart{display:grid;gap:7px;margin:18px 0}
+.bar-row{display:grid;grid-template-columns:210px 1fr 86px;gap:12px;align-items:center;font-size:13px}
+.bar-row .lbl{text-align:right;color:var(--ink-soft)}
+.bar-row .track{background:#eef0f5;border-radius:5px;height:20px;position:relative;overflow:hidden}
+html[data-theme='dark'] .bar-row .track{background:#1c2438}
+.bar-row .fill{height:100%;border-radius:5px 0 0 5px;background:linear-gradient(90deg,#6366f1,#4f46e5)}
+.bar-row .fill.warn{background:linear-gradient(90deg,#fb923c,#ea580c)}
+.bar-row .fill.bad{background:linear-gradient(90deg,#f87171,#dc2626)}
+.bar-row .fill.ok{background:linear-gradient(90deg,#34d399,#059669)}
+.bar-row .val{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink-soft)}
+/* ============ TIMELINE ============ */
+.tline{margin:26px 0;border-left:3px solid var(--line);padding-left:26px}
+.tline .tl-item{position:relative;margin-bottom:26px}
+.tline .tl-item::before{content:"";position:absolute;left:-35.5px;top:5px;width:15px;height:15px;border-radius:99px;background:var(--accent);border:3px solid var(--paper);box-shadow:0 0 0 2px var(--accent-soft)}
+.tline .tl-item .tl-date{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.5px}
+.tline .tl-item .tl-head{font-weight:750;font-size:16.5px;color:var(--ink);margin:2px 0 4px}
+.tline .tl-item .tl-body{font-size:14.5px;color:var(--ink-soft);line-height:1.6}
+/* ============ MISC ============ */
+.part-divider{margin:80px 0 60px;padding:44px 40px;background:linear-gradient(135deg,#111a33,#0e1526);border-radius:16px;color:#fff;position:relative;overflow:hidden}
+.part-divider .pd-part{font-size:11.5px;font-weight:800;letter-spacing:2.5px;color:#818cf8;text-transform:uppercase;margin-bottom:10px}
+.part-divider h2{color:#fff;font-size:33px;font-weight:800;letter-spacing:-.8px;margin:0 0 12px}
+.part-divider p{color:#aab6cf;font-size:15.5px;margin:0;max-width:560px;line-height:1.7}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 26px}
+.chip{font-size:12.5px;font-weight:600;padding:5px 13px;border-radius:99px;border:1px solid var(--line);background:#fafbfd;color:var(--ink-soft)}
+html[data-theme='dark'] .chip{background:#131a2c}
+.kbd{font-family:var(--mono);font-size:.82em;border:1px solid #cbd3e1;border-bottom-width:2.5px;border-radius:6px;padding:1px 7px;background:#f8fafc;color:#3b475f}
+.footref{font-size:13px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:56px;padding-top:18px}
+.btn-top{position:fixed;right:26px;bottom:26px;width:44px;height:44px;border-radius:99px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 6px 20px rgba(79,70,229,.42);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;border:none;z-index:60}
+.btn-top.show{opacity:1;pointer-events:auto}
+.src-block{margin:18px 0;padding:14px 18px;border:1px dashed var(--line);border-radius:10px;font-size:14px;color:var(--ink-soft);background:#fbfcfe}
+html[data-theme='dark'] .src-block{background:#101728}
+@media (max-width:1100px){
+  .shell{display:block}
+  aside#toc{position:static;width:100%;height:auto;flex:none}
+  .page{padding:0 26px 90px}
+  .cover h1{font-size:36px}
+  .bar-row{grid-template-columns:130px 1fr 70px}
+}
+@media print{
+  aside#toc,.btn-top,.theme-btn{display:none}
+  body{background:#fff}
+  .page{box-shadow:none;max-width:100%;padding:0 6mm}
+  .part-divider{background:#1e293b !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre{white-space:pre-wrap}
+}
+/* ============ INTEGRATED SITE HEADER ============ */
+.premium-header{position:static !important}
+.theme-btn{display:none !important}
+</style>
+</head>
+<body>
+
+<!-- ==================== SITE HEADER ==================== -->
+<header class="premium-header blog-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-brand">
+                    <div class="header-logo-section">
+                        <div class="header-logo" onclick="window.location.href='../index.html'">
+                            <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="logo-fallback" style="display: none;">
+                                <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <div class="brand-title">GGUF Discovery</div>
+                            <p class="brand-subtitle">Blog &amp; Guides</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <nav class="blog-nav" aria-label="Main navigation">
+                    <a href="../index.html">Home</a>
+                    <a href="../about.html">About</a>
+                    <a href="../services.html">Need Help?</a>
+                    <a href="../blog.html" class="active">Blog</a>
+                </nav>
+                <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                    <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                    <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                    <span class="theme-label light-label">Light</span>
+                    <span class="theme-label dark-label">Dark</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<button class="theme-btn" id="themeBtn" aria-label="Toggle light/dark theme" title="Toggle theme">&#9788;</button>
+<div class="shell">
+
+<!-- ==================== SIDEBAR TOC ==================== -->
+<aside id="toc">
+  <div class="brand">
+    <div class="t">One Giant FFN &rarr; 384 Tiny Experts</div>
+    <div class="s">Research Paper &middot; DeepSeek FFN &amp; MoE Edition</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Front Matter</div>
+    <a href="#abstract"><span class="num">&sect;</span>Abstract &amp; How to Read</a>
+    <div class="part">Part I &mdash; Foundations &amp; the Dense Era</div>
+    <a href="#ch1"><span class="num">1</span>The Two-Thirds Problem</a>
+    <a href="#ch2"><span class="num">2</span>The 2023 Baseline: Dense SwiGLU</a>
+    <div class="part">Part II &mdash; The Sparsity Invention (2024)</div>
+    <a href="#ch3"><span class="num">3</span>MoE Before DeepSeek</a>
+    <a href="#ch4"><span class="num">4</span>DeepSeekMoE: Fine &amp; Shared</a>
+    <a href="#ch5"><span class="num">5</span>DeepSeek-V2: Scale &amp; Its Taxes</a>
+    <a href="#ch6"><span class="num">6</span>Balancing Without the Damage</a>
+    <div class="part">Part III &mdash; The Industrial MoE (2024&ndash;2025)</div>
+    <a href="#ch7"><span class="num">7</span>DeepSeek-V3: 256 Experts, No Losses</a>
+    <a href="#ch8"><span class="num">8</span>MTP: The FFN Plans Ahead</a>
+    <a href="#ch9"><span class="num">9</span>The Expert-Parallel Machine</a>
+    <a href="#ch10"><span class="num">10</span>V3.1 &amp; V3.2: The Frozen Backbone</a>
+    <div class="part">Part IV &mdash; The V4 Era &amp; Reference (2026)</div>
+    <a href="#ch11"><span class="num">11</span>DeepSeek-V4: Trillion-Parameter Sparsity</a>
+    <a href="#ch12"><span class="num">12</span>V4-Pro GA &amp; the Flash Lineage</a>
+    <a href="#ch13"><span class="num">13</span>V4.1-Flash: Asymmetry &amp; Engram</a>
+    <a href="#ch14"><span class="num">14</span>Compiled Evidence &amp; Timeline</a>
+    <a href="#ch15"><span class="num">15</span>The Rivals: A DeepSeek-fied World</a>
+    <a href="#ch16"><span class="num">16</span>Field Guide: Serving the Beast</a>
+  </nav>
+  <div class="toc-foot">Compiled September 2026 &middot; Single-file HTML &middot; All figures cited inline</div>
+</aside>
+
+<!-- ==================== MAIN ==================== -->
+<main>
+<div class="page">
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <span class="kicker">Systems Research Paper &middot; LLM Architecture Engineering</span>
+  <h1>From One Giant FFN to <span class="thin">384 Tiny Experts</span></h1>
+  <p class="sub">A complete, citation-driven technical history of how DeepSeek dismantled the feed-forward network &mdash; from the dense SwiGLU blocks of DeepSeek LLM 7B/67B in 2023, through the fine-grained and shared experts of DeepSeekMoE, the auxiliary-loss-free routing and Multi-Token Prediction of V3, the FP4-quantized trillion-parameter sparsity of V4, to the asymmetric encoder&ndash;decoder MoE and the 196B-parameter Engram memory of DeepSeek-V4.1-Flash. Every number is checked against the papers, the config files, and the serving stacks.</p>
+  <div class="statgrid">
+    <div class="cell"><div class="v">5.5%</div><div class="k">Params active per token, V3 (37B of 671B)</div></div>
+    <div class="cell"><div class="v">42.5%</div><div class="k">Training cost saved, V2 vs 67B dense</div></div>
+    <div class="cell"><div class="v">1.8&times;</div><div class="k">Decode TPS from MTP speculative decoding</div></div>
+    <div class="cell"><div class="v">384+1</div><div class="k">Experts per MoE layer, V4.1-Flash</div></div>
+  </div>
+  <div class="meta">
+    <span><b>Scope:</b> Dense SwiGLU &rarr; DeepSeekMoE &rarr; aux-loss-free &rarr; MTP &rarr; FP4/Engram &middot; 2023&ndash;2026</span>
+    <span><b>Goal:</b> account for every expert, every gate, and every load-balancing trick</span>
+    <span><b>Read time:</b> ~60 minutes</span>
+  </div>
+</div>
+<!-- ==================== ABSTRACT ==================== -->
+<h2 class="ch" id="abstract"><span class="chno">&sect;</span>Abstract &amp; How to Read</h2>
+<p class="ch-sub">What this paper argues, how it is sourced, and how to navigate four parts and sixteen chapters.</p>
+
+<p>Between November 2023 and September 2026, DeepSeek shipped eight generations of large language models, and the public conversation tracked their attention stacks almost exclusively &mdash; Multi-head Latent Attention in V2, DeepSeek Sparse Attention in V3.2, Compressed Sparse Attention in V4. This paper is about the other half of the Transformer. The feed-forward network (FFN) is where a language model keeps most of its knowledge and most of its parameters: in a conventional decoder block, roughly two-thirds of the non-embedding weight lives in the FFN, and roughly two-thirds of the per-token arithmetic is spent there. Whoever restructures the FFN restructures the cost base of the entire model. That is precisely what DeepSeek did, five times in a row.</p>
+
+<p>The arc is easy to state and demanding to execute. DeepSeek LLM 7B/67B (2023) carried one giant SwiGLU FFN per layer, inherited almost verbatim from LLaMA. DeepSeekMoE (January 2024) replaced it with fine-grained routed experts plus always-on shared experts &mdash; a design whose 16.4B-parameter instantiation matched LLaMA2-7B with about 40% of the computation. DeepSeek-V2 (May 2024) scaled that design to 236B total parameters with 21B activated, paying for scale with three auxiliary balance losses and a device-limited routing scheme. DeepSeek-V3 (December 2024) industrialized it: 671B total, 37B activated, 256 routed experts and 1 shared expert per layer, load balanced by a bias term instead of an auxiliary loss, trained in FP8 on 14.8T tokens for 2.788M H800 GPU-hours, and extended with Multi-Token Prediction modules that later served as speculative-decoding draft heads with an 85&ndash;90% token acceptance rate. DeepSeek-V4 (April 2026) pushed the same paradigm to 1.6T total with 49B activated, changed the routing affinity to <span class="mono">Sqrt(Softplus)</span>, converted the first layers to hash-routed MoE, clamped its SwiGLU gates to stabilize trillion-parameter training, and quantized expert weights to FP4. DeepSeek-V4.1-Flash (September 2026) made the feed-forward path itself asymmetric: a 552B multimodal MoE that activates 8B parameters per token during prefill and 16B during decode, with 384 routed experts and 1 shared expert per layer and a 196B conditional memory module &mdash; Engram &mdash; built from multi-head hashing and context-aware gating.</p>
+
+<p>Every configuration number in this paper was verified against the primary technical reports and, where possible, against the <span class="mono">config.json</span> files published with each checkpoint. Where a number is derived arithmetic rather than a quotation (parameter shares, FLOP splits), the derivation is shown inline so it can be checked with a calculator. Chapter 14 compiles the full evidence tables; Chapter 15 places the design against Mixtral, Qwen3, Kimi K2, GLM-4.5 and Llama 4; Chapter 16 tells you how to actually serve one of these things. Readers who only want the narrative can read the chapter subtitles and the part dividers; readers who want to rebuild the argument can start at Chapter 14 and work backwards.</p>
+
+<div class="callout info">
+<span class="lab">How to read this paper</span>
+<p><strong>Part I</strong> covers the dense-SwiGLU baseline of 2023 and the arithmetic that made it unsustainable. <strong>Part II</strong> covers the DeepSeekMoE invention and its first production scale-up in V2, including the auxiliary-loss tax. <strong>Part III</strong> covers the V3 system &mdash; the aux-loss-free bias, Multi-Token Prediction, FP8 training, and the open-sourced expert-parallel infrastructure &mdash; and the 2025 releases that left the FFN untouched. <strong>Part IV</strong> covers V4, V4-Pro GA, and V4.1-Flash, plus compiled evidence, rivals, and serving recipes.</p>
+</div>
+
+<div class="callout warn">
+<span class="lab">A note on scope</span>
+<p>This is a paper about feed-forward networks, so attention appears only where it changes the FFN's operating conditions (FP8/FP4 formats, mHC residual streams, the CED encoder&ndash;decoder split that makes 8B/16B activation asymmetry possible). The companion volume to this paper covers DeepSeek's KV-cache lineage in full; the two share sources but not subject matter.</p>
+</div>
+
+<!-- ==================== PART I ==================== -->
+<div class="part-divider">
+  <div class="pd-part">Part I &middot; Foundations &amp; the Dense Era</div>
+  <h2>The Two-Thirds Problem</h2>
+  <p>Before there were experts, there was one enormous gated MLP per layer &mdash; and a hard arithmetic ceiling on how much knowledge a model could hold per unit of inference cost.</p>
+</div>
+
+<!-- ==================== CHAPTER 1 ==================== -->
+<h2 class="ch" id="ch1"><span class="chno">01</span>The Two-Thirds Problem</h2>
+<p class="ch-sub">What the FFN actually does, why it owns most of the parameters, and why 2023&rsquo;s economics made conditional computation inevitable.</p>
+
+<p>The decoder-only Transformer is made of two alternating machine families. The attention block moves information <em>between</em> positions &mdash; it is the only place where token <em>i</em> can read token <em>j</em>. The feed-forward network, by contrast, never looks across positions at all. It takes each token&rsquo;s post-attention representation <strong>u</strong> and pushes it through a position-wise two-layer MLP, on the theory that the model&rsquo;s factual and procedural knowledge &mdash; what a protocol header looks like, how a metaphor resolves, which digits follow which &mdash; can be stored in these big matrices and retrieved on demand. Attention is the retrieval index; the FFN is the library.</p>
+
+<p>Since the GPT-3 era, the library has been built to a standard blueprint. A projection up from the model dimension <em>d</em> to an intermediate dimension <em>d</em><sub>ff</sub>, a nonlinearity, and a projection back down. The modern refinement is SwiGLU, standard since LLaMA and the direct ancestor of every DeepSeek FFN to date: instead of one up-projection, there are two parallel ones &mdash; a <em>value</em> branch and a <em>gate</em> branch &mdash; and the gate&rsquo;s activation modulates the value element-wise before the down-projection:</p>
+
+<div class="codetitle"><span class="dots">&#9679;&#9679;&#9679;</span><span>the dense SwiGLU FFN &mdash; every Transformer since 2021, including every DeepSeek model</span></div>
+<pre><code>u      : [d]                          # token representation entering the FFN
+z_v    = W_up(u)          : [d_ff]     # value branch:  W_up   in R^{d_ff x d}
+z_g    = W_gate(u)        : [d_ff]     # gate branch:   W_gate in R^{d_ff x d}
+h      = SiLU(z_g) * z_v  : [d_ff]     # SiLU(x) = x * sigmoid(x)  (Shazeer, 2020)
+y      = W_down(h)        : [d]        # down projection: W_down in R^{d x d_ff}
+
+# parameter count: 3 * d * d_ff   (three matrices, not two)
+# FLOPs per token: ~6 * d * d_ff  (multiply-accumulate both ways)</code></pre>
+
+<p>The three-matrix structure is the detail that quietly sets the budget of the whole field. An attention block with standard multi-head attention owns approximately <em>4d</em><sup>2</sup> parameters per layer (Q, K, V, O projections). A SwiGLU FFN with the conventional widening ratio of <em>d</em><sub>ff</sub> &asymp; (8/3)<em>d</em> owns <em>3d</em>&middot;(8/3)<em>d</em> = <em>8d</em><sup>2</sup>. Per layer, the FFN therefore owns roughly two of every three non-embedding parameters, and &mdash; because matrix&ndash;vector work costs the same per parameter everywhere &mdash; it also burns roughly two of every three multiply-accumulate operations at decode time. The library is twice the size of the index, and it is consulted in full on every single token.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Model (2023, dense)</th><th class="num">Layers</th><th class="num">Hidden <em>d</em></th><th class="num"><em>d</em><sub>ff</sub></th><th class="num">FFN params/layer</th><th class="num">FFN share (no emb.)</th></tr></thead>
+<tbody>
+<tr><td>DeepSeek LLM 7B</td><td class="num">30</td><td class="num">4,096</td><td class="num">11,008</td><td class="num">135.3M</td><td class="num">66.8%</td></tr>
+<tr><td>DeepSeek LLM 67B</td><td class="num">95</td><td class="num">8,192</td><td class="num">22,016</td><td class="num">541.1M</td><td class="num">78.2%</td></tr>
+<tr><td>DeepSeek Coder 33B</td><td class="num">62</td><td class="num">7,168</td><td class="num">19,200</td><td class="num">412.9M</td><td class="num">77.9%</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 1.1 &mdash; The dense baseline, from each model&rsquo;s published config. FFN params/layer = 3&middot;<em>d</em>&middot;<em>d</em><sub>ff</sub>; the share is against non-embedding parameters (attention + FFN). Derived arithmetic &mdash; checkable by hand.</div>
+</div>
+
+<p>That table is the whole story of why 2023 ended the way it did. In a dense model, knowledge capacity and per-token compute are the <em>same number</em>. Adding parameters to the library means adding arithmetic to every token, forever, because there is no mechanism for consulting part of the library. A dense 70B model must move all 70B weights (or their quantized shadows) through the GPU for every token generated; a hypothetical dense 700B model must move 700B. Capacity scales linearly with cost, and the industry&rsquo;s appetite for capacity was scaling faster than anyone&rsquo;s inference budget.</p>
+
+<p>The escape hatch had existed on paper since Shazeer&rsquo;s 2017 &ldquo;Outrageously Large Neural Networks&rdquo;: <em>conditional computation</em>. Split the FFN into many expert sub-networks, install a cheap router that inspects each token and activates only a few of them, and the two locked quantities come apart &mdash; total parameters (knowledge capacity) grows with the number of experts, while activated parameters (compute per token) grow with the top-<em>k</em> selection, which you can hold constant. GShard and Switch Transformer proved the concept at scale for machine translation and sparse language modeling, and Mixtral 8x7B would prove it commercially in December 2023. But the 2021-era recipe had known diseases: coarse experts that wasted capacity by learning redundant copies of common knowledge, auxiliary balance losses that fought the language-modeling objective, and routing collapse that left most of the library unread.</p>
+
+<div class="callout info">
+<span class="lab">The lock this paper is about</span>
+<p>Dense: <strong>knowledge &equiv; compute</strong>. Sparse: <strong>knowledge = <em>N</em><sub>experts</sub>, compute = <em>k</em> + shared</strong>. Every DeepSeek generation from V2 onward is a different answer to one question: <em>how far can you pull those two apart before the model stops learning?</em> By V4.1-Flash the separation reached 69:1 &mdash; 552B backbone parameters against 8B activated during prefill.</p>
+</div>
+
+<h3>1.1 &mdash; The three diseases of 2021-style MoE</h3>
+<p>It is worth naming the three failure modes precisely, because every DeepSeek design decision from 2024 onward is a direct response to one of them. They are the reason the gap between &ldquo;MoE works in a paper&rdquo; and &ldquo;MoE trains a frontier model&rdquo; stayed open for three years.</p>
+
+<p><strong>Disease one: coarse-grained redundancy.</strong> A GShard-style layer splits the FFN into a handful of full-size experts (say 8 or 16) and activates the top 1&ndash;2. Tokens that share common linguistic material &mdash; which is most tokens, most of the time &mdash; arrive at different experts and drag the same common knowledge into each of them. The expert pool fills with near-duplicate encodings of syntax and function words while genuinely specialized knowledge fights for the remaining capacity. Capacity is spent on the <em>average</em> token instead of the <em>unusual</em> one, which is exactly backwards.</p>
+
+<p><strong>Disease two: the auxiliary-loss tax.</strong> A router that can learn anything will happily collapse onto a favorite expert, stranding the rest and wrecking expert-parallel throughput. The standard cure is a differentiable balance loss &mdash; reward load uniformity with a gradient term &mdash; but that gradient flows through the same parameters as the language-modeling loss, and the two objectives are simply not aligned. Turn the loss up and routing balances while model quality degrades; turn it down and quality rises until imbalance strangles throughput. The coefficient becomes a permanent, model-wide compromise.</p>
+
+<p><strong>Disease three: load imbalance in practice.</strong> Even with an auxiliary loss, per-batch balance is statistical, not guaranteed. Systems shipped with token-dropping &mdash; discarding the tokens that would overload an expert&rsquo;s capacity factor &mdash; which silently deletes training signal and creates a train/inference discrepancy that has to be reasoned about at every deployment.</p>
+
+<p>DeepSeek&rsquo;s engineers did not invent the idea of curing these diseases; they invented the specific cures that survived contact with frontier scale. Fine-grained segmentation attacks disease one. Shared experts attack disease one from the other side. The auxiliary-loss-free bias attacks disease two. Node-limited routing and redundant expert placement attack disease three. The next three chapters take those cures in the order DeepSeek shipped them.</p>
+
+<!-- ==================== CHAPTER 2 ==================== -->
+<h2 class="ch" id="ch2"><span class="chno">02</span>The 2023 Baseline: Dense SwiGLU</h2>
+<p class="ch-sub">DeepSeek LLM 7B/67B and DeepSeek Coder: LLaMA&rsquo;s feed-forward block, adopted wholesale, then deepened instead of widened.</p>
+
+<p>DeepSeek&rsquo;s first two model families arrived within weeks of each other in November 2023. DeepSeek Coder (1.3B, 6.7B, 33B) targeted code; DeepSeek LLM (7B, 67B) targeted general language. Both were deliberately conventional. The DeepSeek LLM technical report describes the micro-architecture in one sentence&rsquo;s worth of design: &ldquo;the micro design of DeepSeek LLM largely follows the design of LLaMA, adopting a Pre-Norm structure with RMSNorm function and using SwiGLU as the activation function for the Feed-Forward Network (FFN), with an intermediate layer dimension of <sup>8</sup>&frasl;<sub>3</sub><em>d</em><sub>model</sub>.&rdquo; Rotary embeddings throughout; Grouped-Query Attention (8 KV heads) on the 67B to cut KV-cache traffic; plain MHA on the 7B. Nothing in the FFN was novel, and that was the point &mdash; the novelty budget of the 2023 papers went into data engineering and scaling-law methodology, not blocks.</p>
+
+<p>The one place DeepSeek deliberately deviated was macroscopic shape, and it is a deviation with FFN consequences. The report is explicit: &ldquo;we expanded the 67B model&rsquo;s parameters in network depth rather than the common practice of widening the intermediate width of FFN layers, aiming for better performance.&rdquo; Where a LLaMA-2-70B-class model spreads 80 layers across a wider trunk, DeepSeek LLM 67B stacks 95 layers on a narrower one, keeping <em>d</em><sub>ff</sub> at (8/3)&middot;8192 = 22,016 rather than pushing it to LLaMA-2&rsquo;s 28,672. Depth buys more sequential refinement steps per token at the same parameter count; width buys more parallel knowledge storage. DeepSeek&rsquo;s bet on depth was a bet that the knowledge-per-parameter curve had not yet flattened at 67B &mdash; a bet the benchmarks (67B outperforming LLaMA-2 70B on code, mathematics and reasoning, with the chat model competing with GPT-3.5) largely vindicated.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Released Nov 2023&ndash;Jan 2024</th><th class="num">Layers</th><th class="num">Hidden <em>d</em></th><th class="num"><em>d</em><sub>ff</sub></th><th>Attention</th><th class="num">Total params</th><th>Corpus</th></tr></thead>
+<tbody>
+<tr><td>DeepSeek Coder 1.3B</td><td class="num">24</td><td class="num">2,048</td><td class="num">5,504</td><td>MHA</td><td class="num">1.3B</td><td>code corpus</td></tr>
+<tr><td>DeepSeek Coder 6.7B</td><td class="num">32</td><td class="num">4,096</td><td class="num">11,008</td><td>MHA</td><td class="num">6.7B</td><td>code corpus</td></tr>
+<tr><td>DeepSeek Coder 33B</td><td class="num">62</td><td class="num">7,168</td><td class="num">19,200</td><td>GQA 56/8</td><td class="num">33.3B</td><td>code corpus</td></tr>
+<tr><td>DeepSeek LLM 7B</td><td class="num">30</td><td class="num">4,096</td><td class="num">11,008</td><td>MHA 32</td><td class="num">6.9B</td><td>2.0T tokens</td></tr>
+<tr><td>DeepSeek LLM 67B</td><td class="num">95</td><td class="num">8,192</td><td class="num">22,016</td><td>GQA 64/8</td><td class="num">67B</td><td>2.0T tokens</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 2.1 &mdash; The dense generation, verified against each checkpoint&rsquo;s config.json. Total params include the 102,400-entry embedding (DeepSeek LLM unties embedding and output head). 1.3B/6.7B rows from the DeepSeek Coder configuration.</div>
+</div>
+
+<p>Two details in that table deserve a second look, because they matter later. First, the <em>(8/3)</em><em>d</em> rule is honored with rounding to multiples of 512: 7B&rsquo;s 11,008 is exactly (8/3)&middot;4,096 rounded up, and 67B&rsquo;s 22,016 is (8/3)&middot;8,192 rounded up &mdash; <em>not</em> LLaMA-2-70B&rsquo;s 28,672, a number frequently mis-cited to DeepSeek in secondary sources. Second, the 7B and 6.7B coder share their FFN geometry exactly (11,008), which means every conclusion drawn about the 7B&rsquo;s feed-forward arithmetic transfers to the coder that shipped alongside it.</p>
+
+<div class="callout ok">
+<span class="lab">Verification note</span>
+<p>Every SwiGLU and dimension figure above can be re-derived from the public configs: <span class="mono">intermediate_size: 11008</span> (7B), <span class="mono">22016</span> (67B), <span class="mono">19200</span> (Coder-33B), each with <span class="mono">hidden_act: "silu"</span> in the activation config &mdash; the silent signature of a gated FFN. The 67B config&rsquo;s <span class="mono">num_key_value_heads: 8</span> confirms GQA. This paper&rsquo;s companion practice of quoting config fields verbatim starts here.</p>
+</div>
+
+<p>Why did a lab that would, within eighteen months, ship the most-copied sparse architecture in open weights start with a by-the-book dense model? The DeepSeek LLM report frames the 7B/67B pair as a scaling-law instrument first and a product second &mdash; a carefully controlled two-point measurement of how batch size, learning rate and data allocation should co-scale, with the models as proof artifacts. That framing matters for the FFN story, because it meant the 67B dense model existed precisely as a calibrated baseline. When DeepSeekMoE arrived in January 2024 claiming to match &ldquo;DeepSeek 67B&rdquo; with a fraction of the computation, it was matching a baseline whose training recipe, tokenizer, corpus pipeline and evaluation harness were all published &mdash; an unusually clean comparison, and one DeepSeek would exploit deliberately in every MoE ablation that followed.</p>
+
+<p>The economics, though, were already terminal. A 67B dense model costs roughly 134 GFLOPs per token at decode &mdash; and every one of those FLOPs was in service of the full 51.4B-parameter FFN stack whether the token needed it or not. Serving cost, KV-cache pressure aside, is a straight multiple of activated parameters, and DeepSeek&rsquo;s own scaling-law projections said the next meaningful capability step lived well past 100B dense-equivalent parameters. Something in the two-thirds had to give. On January 5, 2024, something did.</p>
+<!-- ==================== PART II ==================== -->
+<div class="part-divider">
+  <div class="pd-part">Part II &middot; The Sparsity Invention</div>
+  <h2>Fine-Grained and Shared</h2>
+  <p>January 2024: DeepSeek&rsquo;s two-pronged attack on expert redundancy &mdash; split the experts small, quarantine the common knowledge &mdash; and the May 2024 scale-up that revealed the price.</p>
+</div>
+
+<!-- ==================== CHAPTER 3 ==================== -->
+<h2 class="ch" id="ch3"><span class="chno">03</span>MoE Before DeepSeek</h2>
+<p class="ch-sub">Seven years of conditional computation, from sparsely-gated LSTM layers to Mixtral &mdash; and the specific failure modes DeepSeek set out to fix.</p>
+
+<p>The mixture-of-experts idea is older than the Transformer. Shazeer&rsquo;s 2017 <em>Outrageously Large Neural Networks</em> inserted sparsely-gated MoE layers between LSTM layers: a noisy top-k gate over a pool of expert feed-forward networks, each expert seeing only the tokens it was selected for. The paper demonstrated models up to 137B parameters in an era when 137B dense was unthinkable, and it introduced the two artifacts that would haunt every MoE paper for the next seven years: a load-balancing auxiliary loss, and soft top-k gating whose batch statistics made deployment awkward.</p>
+
+<p>The idea moved into the Transformer era through the machine-translation systems of 2021. GShard replaced every other FFN in an encoder&ndash;decoder translation model with a large pool of experts and top-2 routing, gated by softmax affinities, kept honest by the now-standard auxiliary loss <em>L</em> = &alpha;&middot;&Sigma;<sub>i</sub> <em>f</em><sub>i</sub><em>P</em><sub>i</sub> (the product of each expert&rsquo;s token fraction <em>f</em><sub>i</sub> and average gate probability <em>P</em><sub>i</sub>, minimized at uniform load), and protected at serving time by capacity factors that <em>drop</em> tokens when an expert overfills. Switch Transformer took top-k to its minimal extreme &mdash; top-1 &mdash; and scaled sparse training to trillion-parameter territory on the T5 stack. And the Hash Layer (Roller et al., 2021) removed learning from routing entirely: the expert is chosen by a hash of the token ID, balanced by construction, training-free to route &mdash; and interestingly, this is the idea DeepSeek would revive for V4&rsquo;s first layers in 2026.</p>
+
+<div class="callout info">
+<span class="lab">One paragraph of folklore, corrected</span>
+<p>It is often said that &ldquo;MoE is a 2023 idea.&rdquo; The mechanism is 2017; the Transformer-scale recipes (GShard, Switch, Hash) are 2021; what arrived in December 2023 was the first <em>commercial-grade open weights</em>: Mistral&rsquo;s Mixtral 8x7B, with 46.7B total parameters and 12.9B activated per token &mdash; 8 experts, top-2, no shared experts, a single auxiliary loss. Mixtral matched or beat much larger dense models and made sparse deployment a mainstream engineering problem overnight. DeepSeek&rsquo;s 2024 papers are best read as a systematic audit of Mixtral&rsquo;s design choices.</p>
+</div>
+
+<p>What all of these systems shared was the disease profile of Chapter 1: coarse experts (8&ndash;16 full-size FFNs), balance kept by auxiliary losses whose gradient interference was tolerated as a cost of doing business, and deployment-time mitigations (capacity factors, token dropping, dropless oversubscription) that traded training signal for throughput. What none of them had was a theory of <em>what an expert should be for</em> &mdash; the pool was homogeneous, the routing was uniform over it, and common knowledge was everyone&rsquo;s job, therefore duplicated everywhere.</p>
+
+<p>DeepSeek&rsquo;s January 2024 paper, <em>DeepSeekMoE: Towards Ultimate Expert Specialization in Mixture-of-Experts Language Models</em>, opened with that exact framing: expert specialization was the goal, and the two named obstacles were knowledge redundancy and insufficient specialization. Its diagnosis was that both trace back to <em>expert granularity</em> and <em>expert role</em>. The cure came in two moves, and the paper&rsquo;s abstract states them with unusual economy: &ldquo;(1) finely segmenting the experts into <em>mN</em> ones and activating <em>mK</em> from them, allowing for a more flexible combination of activated experts; (2) isolating <em>K</em><sub>s</sub> experts as shared ones, aiming at capturing common knowledge and mitigating redundancy in routed experts.&rdquo; The next chapter takes those two sentences apart, because they are the load-bearing sentences of every DeepSeek model since.</p>
+
+<!-- ==================== CHAPTER 4 ==================== -->
+<h2 class="ch" id="ch4"><span class="chno">04</span>DeepSeekMoE: Fine &amp; Shared</h2>
+<p class="ch-sub">January 2024, arXiv:2401.06066 &mdash; split the experts small, quarantine the common knowledge, and let the combinatorics do the work.</p>
+
+<h3>4.1 &mdash; The two moves</h3>
+<p><strong>Move one: fine-grained expert segmentation.</strong> Take a conventional MoE layer with <em>N</em> full-size experts and top-<em>K</em> routing. Holding total expert parameters and per-token computation approximately constant, split each expert&rsquo;s FFN intermediate dimension by a factor <em>m</em>: the layer now has <em>mN</em> experts, each 1/<em>m</em> the size, and each token activates <em>mK</em> of them. Nothing about the layer&rsquo;s budget changed &mdash; what changed is the number of <em>distinct subsets</em> of the library a token can consult. The paper&rsquo;s own arithmetic makes the point vividly: a 16-expert top-2 layer offers <em>C</em>(16,2) = 120 possible expert combinations; split each expert four ways and route top-8 over the resulting 64, and the combination space becomes <em>C</em>(64,8) = 4,426,165,368. Knowledge can now be decomposed finely and learned precisely into different experts, each of which stays more specialized because it is small.</p>
+
+<p><strong>Move two: shared expert isolation.</strong> Dedicate <em>K</em><sub>s</sub> experts as <em>always active</em>, outside the routing entirely. Their job is the common knowledge &mdash; the syntax, the function words, the universal structure &mdash; that would otherwise be re-learned by every routed expert that receives a typical token. With common knowledge quarantined, the routed pool is freed to spend its capacity on the unusual, and redundancy among routed experts is mitigated by construction rather than by hope. The shared experts also serve as a floor of dense computation per token, which turns out to matter for training stability at small batch sizes.</p>
+
+<div class="codetitle"><span class="dots">&#9679;&#9679;&#9679;</span><span>the DeepSeekMoE layer &mdash; equations (1)&ndash;(4) of the paper, in code</span></div>
+<pre><code>u      : [d]                             # token representation entering the layer
+e_i    : [d]  for i = 1..N_r             # centroid of routed expert i (learned)
+
+s_{i,t} = Softmax_i( u_t . e_i )         # affinity of token t to each routed expert
+g_{i,t} = s_{i,t}  if  s_{i,t} in Topk(s, K_r)  else  0      # zero out non-selected
+g_{i,t} = g_{i,t} / sum_j g_{j,t}        # renormalize over selected experts
+
+h_t' = u_t + sum_{i=1..N_s} FFN_s_i(u_t)              # shared experts: always on
+             + sum_{i=1..N_r} g_{i,t} * FFN_r_i(u_t)  # routed: gated top-K
+# N_s shared + N_r routed; K_r routed active per token
+# (this is the softmax-affinity form; V3 later swaps Softmax for Sigmoid,
+#  and V4 for Sqrt(Softplus) -- the rest of the recipe survives unchanged)</code></pre>
+
+<figure>
+<div class="flow">
+  <div class="flabel">one DeepSeekMoE layer, one token</div>
+  <div class="fnode"><b>token u</b> &mdash; hidden state [d]</div>
+  <div class="farrow">&#8595;</div>
+  <div class="fdecision"><b>router</b>: dot u with every expert centroid e_i &rarr; softmax &rarr; pick top K_r</div>
+  <div class="farrow">&#8595;</div>
+  <div class="fgrid2">
+    <div class="fnode"><b>2 shared experts</b><br>always computed, weight 1</div>
+    <div class="fnode"><b>6 of 64 routed experts</b><br>computed only if selected, weighted by normalized gate</div>
+  </div>
+  <div class="farrow">&#8595;</div>
+  <div class="fterminal"><b>output</b> = u + shared sum + routed weighted sum<br>(residual carries u through untouched)</div>
+</div>
+<figcaption>Figure 4.1 &mdash; The 16B configuration. In production V3, the same shape becomes 1 shared + 8 of 256; in V4.1-Flash, 1 shared + 6 of 384.</figcaption>
+</figure>
+
+<h3>4.2 &mdash; The evidence ladder: 2B, 16B, 145B</h3>
+<p>DeepSeekMoE&rsquo;s validation strategy is one of the cleanest in the sparse literature, because every experiment is a same-corpus, same-hyperparameter comparison against the dense 67B baseline calibrated a month earlier. Three rungs:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Model</th><th>Experts (shared + routed)</th><th class="num">Active / total</th><th>Routing</th><th>Headline result</th></tr></thead>
+<tbody>
+<tr><td>DeepSeekMoE 2B</td><td>1 + 63, each 0.25&times; standard FFN</td><td class="num">0.3B / 2.0B</td><td>1 shared + 7 of 63</td><td>&ldquo;nearly approaches&rdquo; the dense 2B counterpart &mdash; the MoE upper bound</td></tr>
+<tr><td>DeepSeekMoE 16B</td><td>2 + 64, each 0.25&times;</td><td class="num">2.8B / 16.4B</td><td>2 shared + 6 of 64</td><td>Matches LLaMA2-7B with ~40% of the computations</td></tr>
+<tr><td>DeepSeekMoE 145B</td><td>4 + 128, each 0.125&times;</td><td class="num">22.2B / 144.6B</td><td>4 shared + 12 of 128</td><td>Matches DeepSeek 67B with 28.5% (perhaps 18.2%) of the computations</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 4.1 &mdash; The three validation rungs of arXiv:2401.06066. &ldquo;0.25&times; standard FFN&rdquo; is the paper&rsquo;s own phrasing for expert size; the 2B model&rsquo;s activation (1 shared + 7 of 63) is stated in the paper&rsquo;s specialization analysis (&sect;4.5). At 16B the published config is <span class="mono">moe_intermediate_size: 1408</span> against a 2,048 hidden width.</div>
+</div>
+
+<p>At 2B scale, the comparison set was the 2021 pantheon: Hash Layer, Switch (top-1), and GShard (top-2), all with the same total parameters, GShard matched on activated parameters too. DeepSeekMoE with 1 shared + 63 routed ran away with the comparison and nearly closed the gap to a same-size dense model &mdash; the theoretical ceiling for any sparse layer. At 16B, the stakes became commercial: a 16.4B-total / 2.8B-activated model, 28 layers of 2 shared + 64 routed experts with the first layer left dense (the authors observed load balance converging especially slowly there), trained on 2T tokens, trading blows with LLaMA2-7B &mdash; a model with roughly 2.5&times; the activated parameters. On the Open LLM Leaderboard the 16B sat above the fitted compute&ndash;quality line of every open model in its class.</p>
+
+<p>The 145B rung is the one with the sharpest economic claim, and it deserves to be quoted precisely rather than paraphrased. The paper&rsquo;s abstract: performance &ldquo;comparable with DeepSeek 67B, using only 28.5% (maybe even 18.2%) of computations.&rdquo; That parenthetical is doing real work &mdash; it says the compute-matched frontier of fine-grained MoE had not been found yet, only bounded. DeepSeekMoE 145B was explicitly labeled &ldquo;ongoing&rdquo; in the paper; the release that finished the thought was DeepSeek-V2, four months later.</p>
+
+<h3>4.3 &mdash; Why it worked: the ablations</h3>
+<p>The paper&rsquo;s ablation studies are where the two moves earn their keep separately. Isolating fine-grained segmentation from shared experts and vice versa, at 2B and 16B scale, produced three findings that have held up in every subsequent DeepSeek release:</p>
+
+<ul>
+<li><strong>Shared experts are irreplaceable by routed experts.</strong> Removing the shared experts and adding equivalent routed capacity back degrades the model measurably; the always-on pool is not a routing gimmick but a distinct functional role. The paper&rsquo;s probe: replace shared experts with more routed ones and the model loses, because common knowledge gets re-fragmented across the routing.</li>
+<li><strong>Redundancy among routed experts drops.</strong> Measured by similarity of expert outputs on the same tokens, the routed pool under DeepSeekMoE is significantly more differentiated than a GShard pool &mdash; evidence that the fine grain really is buying specialization, not just parameter slack.</li>
+<li><strong>Knowledge is acquired more accurately.</strong> On factuality-oriented probes, the fine-grained + shared combination beats coarse MoE with identical compute &mdash; the combination space is being used, not merely afforded.</li>
+</ul>
+
+<p>The authors also drew one boundary worth remembering: they did <em>not</em> push segmentation finer at 16B, &ldquo;due to the potential reduction in computational efficiency associated with excessively small expert sizes.&rdquo; Expert granularity is a trade against kernel efficiency and communication fan-out, not a monotone good &mdash; a constraint that reappears every time DeepSeek changes expert counts (64 &rarr; 160 &rarr; 256 &rarr; 384) while keeping experts comfortably above the thousand-parameters-per-dimension floor. One more ratio study fixed the family&rsquo;s shape for its first two years: holding expert count and activation constant, 1, 2, and 4 shared experts scored Pile losses of 1.808, 1.806, and 1.811 &mdash; a wash &mdash; so DeepSeek standardized on <strong>1 shared : 3 activated routed</strong> for scale-ups, which is exactly what 16B (2+6), 145B (4+12) and V2 (2+6) ship. V3 would later depart from the ratio (1 shared : 8 routed), a quiet signal that by 2024 the shared pool&rsquo;s job had narrowed.</p>
+
+<div class="callout ok">
+<span class="lab">What V1 &rarr; DeepSeekMoE actually bought</span>
+<p>Same tokenizer, same corpus pipeline, same evaluation harness as DeepSeek LLM &mdash; and the 67B&rsquo;s library of 95 identical 541M-parameter FFNs was replaced by a pool of small experts from which each token consults a personalized 8-expert subset. Quality held at a quarter of the compute, with the paper&rsquo;s own numbers pointing to potentially one-fifth. This is the invention that everything in Parts III and IV industrializes.</p>
+</div>
+
+<p>One piece of housekeeping before scaling up: DeepSeekMoE&rsquo;s 2B/16B experiments still used the 2021 balance machinery &mdash; an expert-level auxiliary loss, and (at scale) the prospect of token dropping. Scaling the design to 236B parameters with 8-way expert parallelism would force every one of those compromises to be paid in real GPU-hours. Chapter 5 is the bill.</p>
+<!-- ==================== CHAPTER 5 ==================== -->
+<h2 class="ch" id="ch5"><span class="chno">05</span>DeepSeek-V2: Scale &amp; Its Taxes</h2>
+<p class="ch-sub">May 2024, arXiv:2405.04434 &mdash; 236B total, 21B activated, and the first honest accounting of what sparse scale costs in communication and loss-function real estate.</p>
+
+<p>DeepSeek-V2 shipped on May 7, 2024 (with revisions through June 19), and its abstract reads like a bid for a specific title: &ldquo;a strong Mixture-of-Experts language model characterized by economical training and efficient inference&hellip; 236B total parameters, of which 21B are activated for each token.&rdquo; The model that carried that claim was built from two named inventions &mdash; Multi-head Latent Attention on the attention side, DeepSeekMoE on the FFN side &mdash; and the headline economics were quoted against the dense 67B baseline of Chapter 2: <strong>42.5% of training costs saved, 5.76&times; the maximum generation throughput</strong>, and (the MLA side of the ledger, out of scope here) a 93.3% smaller KV cache. The feed-forward half of that bid is the subject of this chapter.</p>
+
+<h3>5.1 &mdash; The configuration, verified</h3>
+<p>V2&rsquo;s MoE layer is DeepSeekMoE&rsquo;s 16B recipe scaled by a factor of 2.5 in expert count. Sixty Transformer layers at hidden width 5,120; the first layer left dense (intermediate width 12,288), the remaining fifty-nine converted to MoE, each holding <strong>2 shared experts + 160 routed experts</strong>, every expert a narrow SwiGLU with intermediate width <strong>1,536</strong>, and each token routed to <strong>6 of the 160</strong> (plus both shared experts). Affinities are softmax, exactly as in the DeepSeekMoE paper. The full specification, cross-checked against the published <span class="mono">config.json</span>:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>DeepSeek-V2 (May 2024)</th><th>Value</th><th>Source</th></tr></thead>
+<tbody>
+<tr><td>Transformer layers</td><td>60</td><td>paper &sect;3.1.2 / config</td></tr>
+<tr><td>Hidden dimension</td><td>5,120</td><td>paper &sect;3.1.2 / config</td></tr>
+<tr><td>Dense FFN layers (first_k_dense_replace)</td><td>1, intermediate 12,288</td><td>config</td></tr>
+<tr><td>Shared experts per MoE layer</td><td>2</td><td>paper / config</td></tr>
+<tr><td>Routed experts per MoE layer</td><td>160</td><td>paper / config</td></tr>
+<tr><td>Expert intermediate width</td><td>1,536</td><td>paper / config</td></tr>
+<tr><td>Activated routed experts per token</td><td>6</td><td>paper / config</td></tr>
+<tr><td>Affinity function</td><td>Softmax over 160 dot products</td><td>paper eq. (22)</td></tr>
+<tr><td>Total / activated parameters</td><td>236B / 21B</td><td>abstract</td></tr>
+<tr><td>Pre-training corpus</td><td>8.1T tokens, batch 9,216, LR 2.4&times;10<sup>&minus;4</sup></td><td>paper &sect;3.1.2</td></tr>
+<tr><td>Parallelism</td><td>16-way zero-bubble PP + 8-way EP + ZeRO-1 (no TP)</td><td>paper &sect;3.1.3</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 5.1 &mdash; The V2 FFN specification. &ldquo;config&rdquo; = deepseek-ai/DeepSeek-V2 config.json: <span class="mono">n_routed_experts: 160, n_shared_experts: 2, num_experts_per_tok: 6, moe_intermediate_size: 1536, first_k_dense_replace: 1</span>.</div>
+</div>
+
+<p>Two structural notes. First, the residual-plus-shared-experts topology means every V2 token executes 8 expert FFNs (2 shared + 6 routed) of width 1,536 at every MoE layer &mdash; roughly 189M FFN parameters activated per layer (derived: 8 &times; 3 &times; 5,120 &times; 1,536), about 90% of what a dense 5,120-wide layer with (8/3) widening would cost &mdash; drawn from a pool of 162 experts holding 3.82B parameters per layer. The activated-FFN budget is deliberately <em>slightly under</em> the equivalent dense model&rsquo;s; the pool it is drawn from is more than an order of magnitude larger. Second, the paper credits an early piece of systems engineering that later releases would build on: &ldquo;we overlap the computation of shared experts with the expert parallel all-to-all communication&rdquo; &mdash; the always-on experts are placed on the computation schedule as free filler for the routing network&rsquo;s communication gaps, the first appearance of a pattern that culminates in DualPipe.</p>
+
+<h3>5.2 &mdash; Device-limited routing: taxing communication down to law</h3>
+<p>Fine-grained experts create a communication problem that coarse MoE never faces. With 160 experts striped across 8 devices per layer (<em>D</em> = 8) under expert parallelism, a token&rsquo;s 6 selected experts can land on up to 6 different GPUs, and every distinct device multiplies the all-to-all traffic that token generates. V2&rsquo;s answer is <em>device-limited routing</em>: after the affinity scores are computed, each token&rsquo;s candidate set is restricted so that its experts span at most <em>M</em> devices, with <em>M</em> = 3 in production. Selection is still affinity-driven &mdash; the constraint just prunes which experts are eligible &mdash; and the paper reports the constraint barely touching model quality while capping each device&rsquo;s outbound transmissions at <em>MT</em> hidden states.</p>
+
+<div class="callout warn">
+<span class="lab">The trade nobody lists on the model card</span>
+<p>Device-limited routing is a quality&ndash;communication compromise <em>baked into the weights</em>: the model learns to route under the constraint, so the trained checkpoint assumes it. Every serving stack for V2 inherits the assumption whether it replicates the constraint or not. DeepSeek kept the pattern (as node-limited routing) through V3 and <em>removed</em> it in V4 &mdash; a quiet signature that the constraint&rsquo;s cost finally exceeded its benefit once cross-node kernels matured.</p>
+</div>
+
+<h3>5.3 &mdash; Three losses and a dropper</h3>
+<p>V2&rsquo;s load-balancing machinery is where the 2021 inheritance is paid in full. Three auxiliary losses run alongside the language-modeling objective, each with its own coefficient, each fighting a different imbalance:</p>
+
+<ul>
+<li><strong>Expert-level balance</strong>, <em>L</em><sub>ExpBal</sub> = &alpha;<sub>1</sub>&middot;&Sigma;<sub>i</sub> <em>f</em><sub>i</sub><em>P</em><sub>i</sub> over the 160 experts, with &alpha;<sub>1</sub> = 0.003 &mdash; the classic GShard/Switch term, defending against routing collapse at the expert level.</li>
+<li><strong>Device-level balance</strong>, <em>L</em><sub>DevBal</sub> = &alpha;<sub>2</sub>&middot;&Sigma;<sub>i</sub> <em>f&prime;</em><sub>i</sub><em>P&prime;</em><sub>i</sub> over the 8 devices (&alpha;<sub>2</sub> = 0.05), computed on device-aggregated expert loads &mdash; keeping the physical placement of experts from going hot and cold.</li>
+<li><strong>Communication balance</strong>, <em>L</em><sub>CommBal</sub> = &alpha;<sub>3</sub>&middot;&Sigma;<sub>i</sub> <em>f&Prime;</em><sub>i</sub><em>P&Prime;</em><sub>i</sub> (&alpha;<sub>3</sub> = 0.02) &mdash; because device-limited routing bounds <em>outbound</em> traffic, this third loss pushes inbound traffic toward uniformity too, so each device both sends and receives around <em>MT</em> hidden states.</li>
+</ul>
+
+<p>And for whatever imbalance survives the three losses, V2 trains with a device-level <strong>token-dropping strategy</strong>: each device&rsquo;s compute budget is fixed at capacity factor 1.0 (the perfectly balanced load), tokens are dropped in order of ascending affinity score until the budget is met, and &mdash; a thoughtful detail &mdash; tokens belonging to roughly 10% of training sequences are marked undroppable so the model never fully unlearns how to process a full-length un-truncated batch. Evaluation runs dropless.</p>
+
+<p>Read as a design document, V2&rsquo;s balance stack is an admission: the price of 21B-activated sparsity in 2024 was three gradient terms fighting the LM objective, plus a training-time data-loss mechanism whose train/inference inconsistency had to be reasoned about. The V2 paper itself flags the tension obliquely by tuning &alpha;<sub>2</sub> an order of magnitude above &alpha;<sub>1</sub> &mdash; balance mattered more than quality loss at the device level, because throughput at 8-way EP was non-negotiable. Chapter 6 is about how DeepSeek deleted this entire stack.</p>
+
+<h3>5.4 &mdash; The family around V2</h3>
+<p>Three siblings completed the 2024 lineup, and all three are FFN-identical to V2, which is itself a datum: the architecture was considered settled at release.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Release</th><th>Date</th><th>Experts / layer</th><th class="num">Total / active</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td>DeepSeek-V2</td><td>May 2024</td><td>2 + 160, top-6</td><td class="num">236B / 21B</td><td>the flagship; 8.1T tokens</td></tr>
+<tr><td>DeepSeek-V2-Lite</td><td>June 2024</td><td>2 + 64, top-6</td><td class="num">15.7B / 2.4B</td><td>27 layers, hidden 2,048; 5.7T tokens; all experts on one device, so only &alpha;<sub>1</sub> = 0.001 applies</td></tr>
+<tr><td>DeepSeek-Coder-V2</td><td>June 2024</td><td>2 + 160, top-6</td><td class="num">236B / 21B</td><td>same skeleton, code+math-heavy continued training; 128K context</td></tr>
+<tr><td>DeepSeek-V2.5</td><td>Sep 5, 2024</td><td>2 + 160, top-6</td><td class="num">236B / 21B</td><td>a post-training merge of DeepSeek-V2-Chat and DeepSeek-Coder-V2-Instruct; zero FFN change</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 5.2 &mdash; The V2 family, all verified by config: V2-Lite (<span class="mono">n_routed_experts: 64, moe_intermediate_size: 1408</span>, 27 layers), Coder-V2 and V2.5 both byte-identical to Table 5.1&rsquo;s MoE fields.</div>
+</div>
+
+<p>V2-Lite is worth a paragraph of respect, because its appendix entry in the V2 paper quietly demonstrates how far the DeepSeekMoE design scales <em>down</em>: 2.4B activated parameters delivering usable 128K-context chat and coding, with the expert pool small enough (64) that expert parallelism is unnecessary and the whole 2021 loss stack collapses to a single &alpha;<sub>1</sub> = 0.001 term. A generation of local-first MoE serving stacks would later grow up around exactly this configuration class.</p>
+
+<div class="callout info">
+<span class="lab">The state of the art at the pivot</span>
+<p>Mid-2024, the fine-grained-plus-shared recipe had been proven at 2B, 16B, and 236B; the throughput economics had been proven in production (5.76&times; generation throughput, 42.5% training savings vs 67B dense); and the costs of the 2021 balancing inheritance had been measured rather than folklore. The next move was not another scale-up. It was a subtraction.</p>
+</div>
+
+<!-- ==================== CHAPTER 6 ==================== -->
+<h2 class="ch" id="ch6"><span class="chno">06</span>Balancing Without the Damage</h2>
+<p class="ch-sub">The auxiliary-loss problem, stated honestly &mdash; and the bias-update idea from Wang et al. (2024) that DeepSeek would ship as V3&rsquo;s routing core and, eventually, as a single config field: <span class="mono">noaux_tc</span>.</p>
+
+<p>Why exactly are auxiliary balance losses a problem, rather than a nuisance? Because they are a gradient-level parasite on the language-modeling objective. The balance term&rsquo;s optimum &mdash; uniform expert load &mdash; is defined over <em>batches</em>, while the LM loss&rsquo;s optimum is defined over <em>the data distribution</em>. Whenever the data genuinely wants concentrated routing (a code document wants code experts), the two objectives issue opposing gradient commands through the same router parameters, and the coefficient &alpha; becomes a permanent dial deciding which command wins on average. V2 ran three of these dials simultaneously (0.003, 0.05, 0.02), and the V3 technical report states the conclusion plainly in its motivation for change: &ldquo;too large an auxiliary loss will impair the model performance.&rdquo;</p>
+
+<p>The alternative DeepSeek adopted had just been published by its own researchers as <em>Auxiliary-Loss-Free Load Balancing Strategy for Mixture-of-Experts</em> (Wang et al., 2024). The idea is disarmingly simple once seen: <strong>stop using gradients to balance load, and use selection arithmetic instead.</strong> Attach a bias <em>b<sub>i</sub></em> to every routed expert. Add the bias to the affinity score <em>only</em> when deciding which experts make the top-K cut. Do <em>not</em> add it to the gate value that scales the expert&rsquo;s output. Then, once per training step, look at which experts actually got overloaded across the batch and nudge their biases:</p>
+
+<div class="codetitle"><span class="dots">&#9679;&#9679;&#9679;</span><span>auxiliary-loss-free routing &mdash; the mechanism that ships in V3, V4, V4.1-Flash</span></div>
+<pre><code># selection (training and inference):
+g_{i,t} = s_{i,t}  if ( s_{i,t} + b_i ) in Topk( s_{j,t} + b_j, K_r )  else 0
+# NOTE: b_i perturbs ONLY the top-k cut. The gate value g_{i,t} uses the raw
+# affinity s_{i,t}, so the model's outputs never see the bias.
+
+# update (once per training step, over the whole batch):
+for expert i:
+    if   expert_load(i) &gt; balanced_level:  b_i -= gamma   # overloaded: harder to select
+    elif expert_load(i) &lt; balanced_level:  b_i += gamma   # underloaded: easier to select
+
+# gamma = "bias update speed". V3: 0.001 for the first 14.3T tokens, then 0.0.
+# No loss term. No gradient. No interference with the LM objective.</code></pre>
+
+<p>The elegance is in what the bias cannot do. Because it never multiplies an expert&rsquo;s output, it cannot distort the function the layer computes &mdash; it only changes which narrow SwiGLU blocks get executed for which tokens, within a model that is free to route anywhere it likes. And because the update is a signed nudge computed from batch statistics, it closes the loop at exactly the timescale (one step) where imbalance actually develops, rather than pulling a gradient average over an entire corpus. Load balancing becomes a control system instead of a taxation scheme.</p>
+
+<div class="callout ok">
+<span class="lab">Lineage of a config field</span>
+<p>Follow this mechanism forward and it never changes shape. V3 (Dec 2024) ships it as the paper&rsquo;s &ldquo;auxiliary-loss-free load balancing&rdquo; with &gamma; = 0.001. The Hugging Face transformers implementation names the method <span class="mono">noaux_tc</span> (&ldquo;no auxiliary loss, top-k correction&rdquo;), and that exact string appears in V4.1-Flash&rsquo;s published config as <span class="mono">"topk_method": "noaux_tc"</span>, alongside <span class="mono">"scoring_func": "sqrtsoftplus"</span>; the bias update speed itself is a training-recipe value, 0.001 in both V3 and V4. Three years of load-balancing research, compressed into two enum fields.</p>
+</div>
+
+<p>One refinement completes the design. The bias operates per training <em>step</em>, across a whole batch &mdash; which leaves a pathological corner case: a single long sequence whose tokens pile into one expert, hidden inside a batch whose global load looks fine. DeepSeek&rsquo;s answer, shipped with V3, is to keep a <em>complementary sequence-wise balance loss</em> with a deliberately tiny coefficient (V3: &alpha; = 0.0001; V4: 0.0001; V4&rsquo;s paper calls its weight &ldquo;slight&rdquo;). The auxiliary-loss era thus ends not with abolition but with demotion: from three dominant gradient terms fighting the objective, to one ghost of a term guarding a corner case the control loop cannot see.</p>
+
+<p>That is the full theory of the modern DeepSeek router. The remaining chapters of Part III are about what the theory bought at frontier scale: a 671B-parameter model trained without a single token dropped, an FFN stack whose 256-expert layers ran on 2048 GPUs in FP8, and a feed-forward side-effect &mdash; Multi-Token Prediction &mdash; that turned out to double as a speculative-decoding engine.</p>
+<!-- ==================== PART III ==================== -->
+<div class="part-divider">
+  <div class="pd-part">Part III &middot; The Industrial MoE</div>
+  <h2>256 Experts, No Losses</h2>
+  <p>December 2024 to December 2025: the aux-loss-free bias, Multi-Token Prediction, FP8 expert training, and the open-sourcing of the expert-parallel machine &mdash; then a full year in which nobody touched the FFN, on purpose.</p>
+</div>
+
+<!-- ==================== CHAPTER 7 ==================== -->
+<h2 class="ch" id="ch7"><span class="chno">07</span>DeepSeek-V3: 256 Experts, No Losses</h2>
+<p class="ch-sub">December 26, 2024, arXiv:2412.19437 &mdash; 671B total, 37B activated, one shared expert, sigmoid affinities, and the first frontier-scale training run with no token ever dropped.</p>
+
+<p>DeepSeek-V3&rsquo;s abstract compresses its FFN story into one clause &mdash; &ldquo;adopts&hellip; DeepSeekMoE architectures, which were thoroughly validated in DeepSeek-V2&rdquo; &mdash; and the compression is honest: the layer-level design is a direct maturation of V2&rsquo;s, not a redesign. What changed is every number around the design, and the deletion of the 2021 inheritance. The specification, again verifiable field by field against the released <span class="mono">config.json</span>:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>DeepSeek-V3 (Dec 2024)</th><th>Value</th><th>V2 (for contrast)</th></tr></thead>
+<tbody>
+<tr><td>Transformer layers</td><td>61</td><td>60</td></tr>
+<tr><td>Hidden dimension</td><td>7,168</td><td>5,120</td></tr>
+<tr><td>Dense FFN layers (first_k_dense_replace)</td><td>3, intermediate 18,432</td><td>1, intermediate 12,288</td></tr>
+<tr><td>Shared experts per MoE layer</td><td><strong>1</strong></td><td>2</td></tr>
+<tr><td>Routed experts per MoE layer</td><td><strong>256</strong></td><td>160</td></tr>
+<tr><td>Expert intermediate width</td><td>2,048</td><td>1,536</td></tr>
+<tr><td>Activated routed experts per token</td><td>8</td><td>6</td></tr>
+<tr><td>Affinity function</td><td><strong>Sigmoid</strong>, renormalized over selected</td><td>Softmax</td></tr>
+<tr><td>Load balancing</td><td><strong>aux-loss-free bias</strong> (&gamma;=0.001&rarr;0.0) + &alpha;=0.0001 sequence-wise</td><td>3 aux losses (0.003/0.05/0.02)</td></tr>
+<tr><td>Token dropping</td><td><strong>none, train or inference</strong></td><td>capacity-factor dropping</td></tr>
+<tr><td>Total / activated parameters</td><td>671B / 37B</td><td>236B / 21B</td></tr>
+<tr><td>Pre-training corpus</td><td>14.8T tokens</td><td>8.1T</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 7.1 &mdash; V3 vs V2, FFN fields only. Config cross-check: <span class="mono">n_routed_experts: 256, n_shared_experts: 1, num_experts_per_tok: 8, moe_intermediate_size: 2048, first_k_dense_replace: 3, intermediate_size: 18432</span>.</div>
+</div>
+
+<p>Each row of that comparison is a deliberate decision, and the paper documents them all. The shared-expert count halving from 2 to 1 is the fine-grained philosophy taken to its conclusion: with 256 narrow experts and 8 activated, common knowledge no longer needs two dedicated reservoirs. The first three layers staying dense (up from one) mirrors the DeepSeekMoE observation that early-layer routing is the slowest to reach balance &mdash; at 61 layers and 671B parameters, the risk is worth three dense layers of insurance. And the affinity switch from softmax to sigmoid is subtle but consequential, stated in exactly one sentence: &ldquo;Slightly different from DeepSeek-V2, DeepSeek-V3 uses the sigmoid function to compute the affinity scores, and applies a normalization among all selected affinity scores to produce the gating values.&rdquo; Softmax forces the 256 affinities to sum to one before selection &mdash; experts compete globally for probability mass. Sigmoid scores each expert independently, so a token can be genuinely hot for many experts (or none), and only the selected 8 are renormalized to become gate values. The router stops allocating a fixed budget and starts making 256 independent yes/no assessments &mdash; the scoring function that best matches a bias-perturbed top-K selection, which is exactly what the aux-loss-free router performs on it.</p>
+
+<h3>7.1 &mdash; The bias, run at scale</h3>
+<p>Chapter 6&rsquo;s mechanism ships here, and the training recipe reveals its operating envelope: &gamma; (bias update speed) set to <strong>0.001 for the first 14.3T tokens, then to 0.0 for the final 500B</strong>. Read that schedule as an engineer: the control loop runs for 96.6% of pre-training, and then DeepSeek simply <em>switches it off</em> &mdash; once load is balanced, the equilibrium holds statically and the biases freeze into constants. The complementary sequence-wise loss runs throughout at &alpha; = 0.0001, three orders of magnitude below V2&rsquo;s dominant device-level coefficient, and the paper&rsquo;s stated role for it is only &ldquo;to avoid extreme imbalance within any single sequence.&rdquo;</p>
+
+<p>The payoff is stated with unusual firmness for a technical report: &ldquo;DeepSeek-V3 does not drop any tokens during training&rdquo; &mdash; and not at inference either, with balance maintained instead by deployment-side expert placement (Chapter 9&rsquo;s EPLB is the open-sourced form of that). The token-dropping era, with its 10% undroppable sequences and train/inference discrepancy, ends in this paragraph of the V3 paper.</p>
+
+<h3>7.2 &mdash; Routing under a communication budget, again</h3>
+<p>Node-limited routing is V2&rsquo;s device-limited routing lifted one level of the hierarchy, because V3&rsquo;s expert parallelism spans nodes: 64-way EP across 8 H800 nodes (2048 GPUs total, 16-way pipeline parallel, ZeRO-1 data parallel, no tensor parallelism). Each token&rsquo;s 8 selected experts must span at most 4 nodes, with the 4 nodes chosen by the sum of each node&rsquo;s top <em>K<sub>r</sub></em>/<em>M</em> (here, top-2) affinity scores among its hosted experts. The paper quantifies the headroom this leaves: tokens average 3.2 experts per visited node, so the model could scale to 13 routed experts per token at the <em>same</em> communication cost &mdash; a number worth remembering when V4 later drops the constraint entirely.</p>
+
+<div class="callout info">
+<span class="lab">The FP8 footnote that matters here</span>
+<p>V3&rsquo;s infrastructure chapter is mostly an attention-and-communication story, but one FFN fact anchors it: this was the first validation of FP8 mixed-precision training at frontier scale, and the biggest beneficiaries of FP8 storage and compute are the expert weight matrices &mdash; 256 experts&rsquo; worth of narrow SwiGLU blocks that dominate HBM occupancy. The FP8 pipeline DeepSeek proved on V3 is the direct ancestor of the FP4 expert quantization that ships in V4 and V4.1-Flash (Chapter 11).</p>
+</div>
+
+<h3>7.3 &mdash; The economics, in the paper&rsquo;s own units</h3>
+<p>V3&rsquo;s cost accounting became the most quoted paragraph in open-model history, and every line of it flows from the sparsity arithmetic of the FFN stack: 2.788M H800 GPU-hours for the complete training run &mdash; 2,664K hours of pre-training (about 180K hours per trillion tokens, 3.7 days per trillion on the 2048-GPU cluster), 119K hours of context extension, 5K hours of post-training &mdash; which the paper prices at $5.576M assuming $2 per GPU-hour. The training ran without a single irrecoverable loss spike or rollback. A 671B-parameter model whose per-token cost is that of a 37B model, trained for the price of a mid-size apartment: the two-thirds problem of Chapter 1, dissolved.</p>
+
+<figure>
+<div class="bar-chart">
+  <div class="bar-row"><div class="lbl">V1 67B dense &mdash; 67B active</div><div class="track"><div class="fill bad" style="width:100%"></div></div><div class="val">100%</div></div>
+  <div class="bar-row"><div class="lbl">V2 &mdash; 21B of 236B</div><div class="track"><div class="fill warn" style="width:31.3%"></div></div><div class="val">8.9%</div></div>
+  <div class="bar-row"><div class="lbl">V3 &mdash; 37B of 671B</div><div class="track"><div class="fill" style="width:55.2%"></div></div><div class="val">5.5%</div></div>
+  <div class="bar-row"><div class="lbl">V4-Flash &mdash; 13B of 284B</div><div class="track"><div class="fill" style="width:19.4%"></div></div><div class="val">4.6%</div></div>
+  <div class="bar-row"><div class="lbl">V4-Pro &mdash; 49B of 1.6T</div><div class="track"><div class="fill" style="width:73.1%"></div></div><div class="val">3.1%</div></div>
+  <div class="bar-row"><div class="lbl">V4.1-Flash prefill &mdash; 8B of 552B</div><div class="track"><div class="fill ok" style="width:11.9%"></div></div><div class="val">1.4%</div></div>
+</div>
+<figcaption>Figure 7.1 &mdash; Activated parameters as a share of total, per release (decode for V4.1-Flash). The width of each track shows active params relative to the dense 67B baseline; the percentage labels are active/total. Bar lengths are proportional to activated parameters (V1 67B = 100%).</figcaption>
+</figure>
+
+<!-- ==================== CHAPTER 8 ==================== -->
+<h2 class="ch" id="ch8"><span class="chno">08</span>MTP: The FFN Plans Ahead</h2>
+<p class="ch-sub">Multi-Token Prediction in V3 &mdash; the training objective that densifies the gradient signal, the modules that implement it, and the 1.8&times; decode speedup they deliver for free at inference.</p>
+
+<p>The second structural novelty V3 shipped is not an MoE mechanism at all, but it lives squarely in FFN territory and its fingerprints are on every later release. Multi-Token Prediction (MTP) extends the training objective from &ldquo;predict token <em>i</em>+1 from the state after token <em>i</em>&rdquo; to &ldquo;also predict <em>i</em>+2, <em>i</em>+3, &hellip; <em>i</em>+1+<em>D</em>&rdquo; &mdash; one shared backbone, several prediction depths. The declared motivations are denser training signal (each position teaches the model <em>D</em>+1 facts instead of one, improving data efficiency) and representational pre-planning: a hidden state that must serve two future predictions must encode more than a state serving one.</p>
+
+<p>V3&rsquo;s implementation is sequential rather than parallel, and the paper draws the design contrast itself. Where Gloeckle et al. (2024) attach <em>D</em> independent output heads predicting in parallel from the same trunk state, DeepSeek keeps &ldquo;the complete causal chain for the prediction of each token at each depth&rdquo;: depth <em>k</em> consumes the representation produced at depth <em>k</em>&minus;1. The machinery per depth is deliberately cheap and deliberately shared-heavy:</p>
+
+<div class="codetitle"><span class="dots">&#9679;&#9679;&#9679;</span><span>the V3 MTP module &mdash; paper &sect;2.2, one module per prediction depth (D = 1 in production)</span></div>
+<pre><code>for depth k = 1..D:                       # V3 ships D = 1: predict exactly 2 tokens per position
+    # combine main-model state with the EMBEDDING of the token being predicted around
+    h'_i^k  = M_k [ RMSNorm( h_i^(k-1) ) ; RMSNorm( Emb( t_{i+k} ) ) ]
+              # M_k in R^{d x 2d}: concatenation [d ; d] projected back to d
+              # k = 1 reads h_i^0 = the main model's output at position i
+
+    h^k     = TRM_k( h'^(k) )            # one Transformer block per depth (own weights)
+    P^k     = OutHead( h^k )             # SHARED with the main model's output head
+
+L_MTP = (lambda / D) * sum_k CrossEntropy( P^k, t_{i+k+1} )   # averaged, weighted by lambda</code></pre>
+
+<p>Every MTP depth adds one Transformer block, one projection matrix <em>M<sub>k</sub></em> &isin; &real;<sup><em>d</em>&times;2<em>d</em></sup>, and nothing else &mdash; the embedding table and the output head, the two most parameter-expensive components of a vocabulary-129,280 model, are shared with the trunk. The loss joins the main objective scaled by <em>&lambda;</em>/<em>D</em>. (V4 would publish its operating point: MTP loss weight 0.3 for most of training, 0.1 at learning-rate decay &mdash; a strong weight, not a garnish.)</p>
+
+<h3>8.1 &mdash; The ablation and the two-mode payoff</h3>
+<p>The V3 paper validates MTP with the same two-scale discipline as its load-balancing ablations: MoE baselines at 15.7B total (1.33T tokens) and 228.7B total (540B tokens), each retrained with a 1-depth MTP module appended, identical data and architecture otherwise. Both scales show the same direction: MTP &ldquo;consistently enhances the model performance on most of the evaluation benchmarks&rdquo; &mdash; and because the MTP modules can simply be discarded at inference, the comparison is exact: same inference cost, better model, the rare ablation with no asterisk.</p>
+
+<div class="callout ok">
+<span class="lab">The second job</span>
+<p>At inference, the paper offers a mode switch that costs nothing to enable: <em>&ldquo;we can also repurpose these MTP modules for speculative decoding to further improve the generation latency.&rdquo;</em> Since the depth-1 module is a complete next-next-token predictor sharing the trunk&rsquo;s vocabulary, it can propose draft tokens for the main model to verify. DeepSeek&rsquo;s measured acceptance rate for the second-token prediction: <strong>85&ndash;90% across generation topics</strong>, delivering <strong>1.8&times; Tokens Per Second</strong> in speculative-decoding mode. One FFN-side training mechanism, two independent payoffs &mdash; better checkpoints, faster serving of them.</p>
+</div>
+
+<p>The speculative-decoding mode is why MTP matters beyond training-quality folklore. A 1.8&times; TPS multiplier stacks multiplicatively with everything else in the serving stack: it compounds with the 5.5% activation ratio of Chapter 7 (compute saved), with the KV-cache compression on the attention side (memory saved), and with the FP4 expert weights of Chapter 11 (bandwidth saved). By the V4 era, MTP modules ship as standard equipment &mdash; the V4 report adopts the V3 strategy &ldquo;without modification,&rdquo; and every serious serving recipe (vLLM, SGLang, LMCache&rsquo;s published V4-Flash configuration) treats the MTP draft head as a first-class component of the deployed model rather than an optional extra.</p>
+
+<p>There is also a quieter reason MTP belongs in an FFN history. The projection <em>M<sub>k</sub></em> and the per-depth Transformer block are feed-forward machinery in the strict sense &mdash; position-wise transformation of concatenated representations &mdash; and the module&rsquo;s design shows the DeepSeek house style applying to a new problem: share the expensive parts (embedding, head), minimize the new parameters, keep the causal chain complete, and make the whole thing optional at deployment. It is the same design grammar as one-shared-expert-plus-256-narrow-ones, transposed from &ldquo;which FFNs run&rdquo; to &ldquo;which tokens get predicted.&rdquo;</p>
+<!-- ==================== CHAPTER 9 ==================== -->
+<h2 class="ch" id="ch9"><span class="chno">09</span>The Expert-Parallel Machine</h2>
+<p class="ch-sub">R1 freezes the weights while RL runs; DeepSeek open-sources the FFN&rsquo;s circulatory system &mdash; DeepEP, EPLB, DualPipe &mdash; in a single February week.</p>
+
+<p>January 20, 2025 brought DeepSeek-R1, and it belongs in this history only as a boundary marker: R1 is V3&rsquo;s FFN stack with the architecture explicitly untouched &mdash; reinforcement learning (GRPO, distilled reasoning data, cold-start SFT) reshaping <em>behavior</em> while the 1-shared-plus-256-routed topology of December 2024 stayed byte-for-byte what it was. The same holds for the year&rsquo;s interim checkpoints: V3-0324 (March 25, 2025) and R1-0528 (May 28, 2025) were post-training and data refreshes. In an architecture history, 2025&rsquo;s first five months are a gap &mdash; and the gap is the point: the feed-forward design of V3 was considered <em>finished</em> enough to leave alone while the lab threw everything at training method and long context.</p>
+
+<p>What DeepSeek did change in that window was the machine <em>around</em> the experts. February 2025&rsquo;s &ldquo;Open Source Week&rdquo; released, one repo per day, the systems that make a 671B sparse model tractable. For the FFN story, three of the days matter:</p>
+
+<div class="tline">
+  <div class="tl-item"><div class="tl-date">2025-02-25 &middot; DAY 2</div><div class="tl-head">DeepEP</div><div class="tl-body">The self-described &ldquo;first open-source EP communication library&rdquo; for MoE training <em>and</em> inference: the dispatch/combine all-to-all kernels that ship token hidden states to whichever of the thousands of experts selected them, and return the weighted results. Optimized for intra-node NVLink and inter-node RDMA paths, with high-throughput kernels for prefill-style batch sizes and low-latency kernels for decode. Every V3-class cluster run since runs on this pattern.</div></div>
+  <div class="tl-item"><div class="tl-date">2025-02-27 &middot; DAY 4</div><div class="tl-head">EPLB &mdash; Expert-Parallelism Load Balancer</div><div class="tl-body">&ldquo;Computes a balanced expert replication and placement plan based on the estimated expert load&rdquo; &mdash; the inference-side counterpart of the training-side bias. Hot experts get <em>replicated</em> onto multiple cards; cold ones share. This is the machinery behind V3&rsquo;s claim that it need not drop tokens at inference either: balance at deployment is achieved by placement, not by gradient.</div></div>
+  <div class="tl-item"><div class="tl-date">2025-02-27 &middot; DAY 4</div><div class="tl-head">DualPipe</div><div class="tl-body">The bidirectional pipeline schedule that overlaps the expert-parallel communication with the expert computation it feeds, shrinking pipeline bubbles toward zero. Its companion insight &mdash; that shared experts make ideal filler for communication gaps &mdash; was already visible in V2&rsquo;s overlap trick; DualPipe generalized it to the whole schedule.</div></div>
+</div>
+
+<p>It is worth pausing on what this release week says about where the FFN lives now. V3&rsquo;s routed stack alone holds, by simple arithmetic, 58 MoE layers &times; 256 routed experts = <strong>14,848 routed experts</strong>, each a 2,048-wide SwiGLU of roughly 44M parameters (3 &times; 7,168 &times; 2,048 = 44.04M &mdash; derived, checkable by hand), for about 654B of the 671B total. That is not a layer anymore; it is a <em>fleet</em>, striped across 8 nodes &times; 8 GPUs, each GPU hosting on the order of 232 experts, every token consulting 8 of 14,848 under a per-node cap of 4. The research problem has moved: routing quality and expert specialization are now inseparable from communication scheduling, placement, and replication. DeepSeek&rsquo;s answer was to open-source all of it &mdash; training libraries, placement algorithms, profiler data &mdash; which is a large part of why the industry&rsquo;s V3-class serving stacks (vLLM&rsquo;s DeepSeek recipes, SGLang&rsquo;s day-0 support, LMCache&rsquo;s offload work) converged so quickly.</p>
+
+<div class="callout info">
+<span class="lab">Why EPLB is the bias&rsquo;s sibling, not its replacement</span>
+<p>During training, the bias <em>b<sub>i</sub></em> rebalances selection over steps, when the weights are plastic and the data distribution shifts slowly. At serving, weights are frozen, traffic is bursty, and per-expert demand is measurable directly &mdash; so control moves to placement: replicate the experts the bias would have suppressed, and the router need never know. One control loop for learning, a different one for deployment, the same objective: every expert&rsquo;s queue the same length.</p>
+</div>
+
+<!-- ==================== CHAPTER 10 ==================== -->
+<h2 class="ch" id="ch10"><span class="chno">10</span>V3.1 &amp; V3.2: The Frozen Backbone</h2>
+<p class="ch-sub">August 2025 to December 2025 &mdash; two flagship releases, one attention revolution, zero FFN changes. What sixteen months of deliberate silence says about a design.</p>
+
+<p>DeepSeek-V3.1 (August 21, 2025) introduced the hybrid-thinking regime &mdash; one checkpoint producing both a thinking and a non-thinking mode, with a long-context curriculum stretching to 128K &mdash; and its architecture chapter is, from this paper&rsquo;s standpoint, a null result: the released config is field-for-field identical to V3&rsquo;s (<span class="mono">n_routed_experts: 256, n_shared_experts: 1, num_experts_per_tok: 8, moe_intermediate_size: 2048, first_k_dense_replace: 3</span>). All of V3.1&rsquo;s budget went into training stages, data, and thinking-mode orchestration. The feed-forward stack had become infrastructure.</p>
+
+<p>DeepSeek-V3.2-Exp (September 29, 2025), and the full V3.2 (December 1, 2025), then staged the year&rsquo;s real revolution &mdash; on the attention side. DeepSeek Sparse Attention (DSA) replaced full attention with a two-stage pipeline: a lightning indexer scoring every cached token cheaply, then fine-grained top-k selection of the entries each query actually attends to. Prefill arithmetic at 128K-plus context collapsed, and the API price followed (DeepSeek&rsquo;s launch announcement led with a 50%+ inference price cut). But the FFN fields in every V3.2-class checkpoint and serving recipe are the same 1 + 256, top-8, 2,048-wide experts: the vLLM recipe page for V3.2 describes it, in one line, as &ldquo;MoE model with MLA attention, sparse attention&rdquo; &mdash; the MoE half of that sentence unchanged since the previous December.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Release</th><th>Date</th><th>FFN topology</th><th>What actually changed</th></tr></thead>
+<tbody>
+<tr><td>DeepSeek-R1</td><td>2025-01-20</td><td>1 + 256, top-8 <span class="tag neutral">unchanged</span></td><td>GRPO reinforcement learning, reasoning data</td></tr>
+<tr><td>V3-0324</td><td>2025-03-25</td><td>1 + 256, top-8 <span class="tag neutral">unchanged</span></td><td>post-training refresh, agent-oriented data</td></tr>
+<tr><td>R1-0528</td><td>2025-05-28</td><td>1 + 256, top-8 <span class="tag neutral">unchanged</span></td><td>thinking depth and data quality updates</td></tr>
+<tr><td>V3.1</td><td>2025-08-21</td><td>1 + 256, top-8 <span class="tag neutral">unchanged</span></td><td>hybrid thinking modes, 128K curriculum</td></tr>
+<tr><td>V3.2-Exp</td><td>2025-09-29</td><td>1 + 256, top-8 <span class="tag neutral">unchanged</span></td><td>DSA: lightning indexer + sparse top-k attention</td></tr>
+<tr><td>V3.2</td><td>2025-12-01</td><td>1 + 256, top-8 <span class="tag neutral">unchanged</span></td><td>DSA at scale, 50%+ API price cut</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 10.1 &mdash; The frozen-backbone year. Dates from DeepSeek&rsquo;s API news changelog; the &ldquo;unchanged&rdquo; column is verified by the released configs where checkpoints are public (V3.1) and by the technical reports and serving-recipe descriptions otherwise.</div>
+</div>
+
+<p>An architecture historian should read that table as a finding, not a lull. Between December 26, 2024 and April 24, 2026 &mdash; sixteen months &mdash; every capability headline DeepSeek shipped (R1&rsquo;s reasoning, V3.1&rsquo;s hybrid thinking, V3.2&rsquo;s long-context economics) was delivered <em>on top of</em> a frozen feed-forward design. The lab&rsquo;s iteration budget flowed to wherever the marginal inference dollar was being spent, and the V3.2-Exp report is explicit that at 128K context the primary bottleneck had become attention&rsquo;s KV traffic, not the experts. Meanwhile the FFN side of the ledger matured quietly in deployment: FP8 serving of the 671B checkpoint became the standard recipe across vLLM and SGLang, and EPLB-style redundant-expert placement became routine at scale.</p>
+
+<div class="callout warn">
+<span class="lab">The stability trap</span>
+<p>There is a counter-reading of the same table: a frozen backbone is only evidence of sufficiency <em>relative to the bottleneck you are attacking</em>. The moment V4&rsquo;s target shifted to million-token contexts and trillion-parameter capacity, the FFN changed again &mdash; affinity function, hash-routed early layers, clamped activations, FP4 weights, and the removal of a routing constraint that had held for two generations. What froze was not the design; it was the design&rsquo;s <em>priority</em>.</p>
+</div>
+
+<p>By the end of 2025, then, the DeepSeekMoE stack had survived its first durability test: three major releases, an RL revolution on top of it, and an attention overhaul beside it, with the 1+256 expert layer as the untouched constant. The next escalation &mdash; a trillion parameters and a million-token context window &mdash; would finally force the feed-forward network itself back onto the workbench. Four changes were waiting: a new affinity, a resurrected 2021 idea, a numerical clamp, and a 4-bit format.</p>
+<!-- ==================== PART IV ==================== -->
+<div class="part-divider">
+  <div class="pd-part">Part IV &middot; The V4 Era &amp; Reference</div>
+  <h2>Trillion-Parameter Sparsity</h2>
+  <p>April 2026 to September 2026: 1.6T parameters with 49B activated, hash-routed early layers, clamped SwiGLU, FP4 expert weights &mdash; and an asymmetric 552B successor with a 196B memory.</p>
+</div>
+
+<!-- ==================== CHAPTER 11 ==================== -->
+<h2 class="ch" id="ch11"><span class="chno">11</span>DeepSeek-V4: Trillion-Parameter Sparsity</h2>
+<p class="ch-sub">April 24, 2026, arXiv:2606.19348 &mdash; the fine-grained recipe at 1.6T, five feed-forward changes big and small, and the training-stability folklore written down.</p>
+
+<p>DeepSeek-V4 arrived as a preview pair: <strong>V4-Pro with 1.6T parameters, 49B activated</strong> and <strong>V4-Flash with 284B parameters, 13B activated</strong>, both with one-million-token context windows. The attention side (hybrid CSA/HCA) took the headlines; this chapter audits the four feed-forward changes that shipped alongside it, plus one piece of training folklore that finally got written into a technical report. The configurations first, both paper- and config-verified:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>DeepSeek-V4 (Apr 2026)</th><th>V4-Flash</th><th>V4-Pro</th></tr></thead>
+<tbody>
+<tr><td>Transformer layers</td><td>43</td><td>61</td></tr>
+<tr><td>Hidden dimension</td><td>4,096</td><td>7,168</td></tr>
+<tr><td>MoE coverage</td><td><strong>all 43 blocks</strong></td><td><strong>all 61 blocks</strong></td></tr>
+<tr><td>First blocks</td><td>first 3 MoE layers hash-routed</td><td>first 3 MoE layers hash-routed</td></tr>
+<tr><td>Shared experts</td><td>1</td><td>1</td></tr>
+<tr><td>Routed experts</td><td>256</td><td>384</td></tr>
+<tr><td>Expert intermediate width</td><td>2,048</td><td>3,072</td></tr>
+<tr><td>Activated routed experts</td><td>6</td><td>6</td></tr>
+<tr><td>Affinity function</td><td colspan="2" style="text-align:center"><strong>Sqrt(Softplus(&middot;))</strong></td></tr>
+<tr><td>Load balancing</td><td colspan="2" style="text-align:center">aux-loss-free bias, &gamma; = 0.001 + sequence-wise &alpha; = 0.0001</td></tr>
+<tr><td>Node routing constraint</td><td colspan="2" style="text-align:center"><strong>removed</strong></td></tr>
+<tr><td>MTP depth</td><td>1</td><td>1</td></tr>
+<tr><td>mHC expansion factor <em>n</em><sub>hc</sub></td><td>4</td><td>4</td></tr>
+<tr><td>Total / activated</td><td class="num">284B / 13B</td><td class="num">1.6T / 49B</td></tr>
+<tr><td>Pre-training tokens</td><td>32T</td><td>33T</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 11.1 &mdash; V4&rsquo;s FFN fields. Config cross-check: V4-Flash <span class="mono">n_routed_experts: 256, n_shared_experts: 1, num_experts_per_tok: 6, moe_intermediate_size: 2048</span>; V4-Pro <span class="mono">384 &hellip; 6 &hellip; 3072</span>. Both from the released configs.</div>
+</div>
+
+<h3>11.1 &mdash; Change one: no dense layers, hash-routed head</h3>
+<p>Every DeepSeek model since DeepSeekMoE 16B had kept at least one dense FFN layer at the stack&rsquo;s entry, for the reason the original paper gave: load balance converges slowest in layer one, and a router that cannot yet route is a liability exactly where every token passes. V4 deletes the exception and converts the first three blocks to <em>MoE with Hash routing</em> (Roller et al., 2021) &mdash; the expert chosen by a predefined hash of the token ID. Hash routing needs no learning, is balanced by construction over a large enough vocabulary, and costs one function call instead of 256 dot products. The 2021 idea that DeepSeek&rsquo;s own 2B ablations beat with learned routing returns, five years later, to solve the one problem learned routing was worst at.</p>
+
+<h3>11.2 &mdash; Change two: the affinity, once more</h3>
+<p>The affinity function mutates for the second time: &ldquo;Different from DeepSeek-V3, we change the activation function that computes the affinity scores from Sigmoid(&middot;) into <strong>Sqrt(Softplus(&middot;))</strong>.&rdquo; The paper states it in one sentence and does not argue for it, which is itself information &mdash; the scoring function is now treated as a tunable, with Softplus supplying an always-positive, smooth, non-saturating score and the square root compressing its dynamic range. In the released configs the lineage is explicit: V4.1-Flash ships <span class="mono">"scoring_func": "sqrtsoftplus"</span>, the third and current entry in a sequence that began with Softmax (V2, 2024), passed through Sigmoid (V3, 2024&ndash;2025), and arrived here (V4, 2026).</p>
+
+<h3>11.3 &mdash; Change three: the constraint comes off</h3>
+<p>V2 capped each token at 3 devices; V3 capped it at 4 nodes; V4 removes the routing constraint entirely &mdash; &ldquo;we remove the constraint on the number of routing target nodes, and carefully redesign the parallelism strategy to maintain training efficiency.&rdquo; The redesign is the paper&rsquo;s infrastructure section 3.1, &ldquo;Fine-Grained Communication-Computation Overlap in Expert Parallelism,&rdquo; which generalizes the V2-era shared-expert-overlap trick into a full overlap discipline for the all-to-all traffic. The trade documented in Chapter 5 &mdash; selection freedom vs communication fan-out, <em>baked into the weights</em> &mdash; was finally retired in favor of spending kernel engineering instead of model quality.</p>
+
+<h3>11.4 &mdash; Change four: clamping the gate</h3>
+<p>The most unexpectedly valuable paragraph in the V4 report, for anyone who trains large MoE, is &sect;4.2.3, &ldquo;Mitigating Training Instability.&rdquo; Its diagnosis first: loss spikes at trillion scale were &ldquo;consistently tied to outliers in the MoE layers, and the routing mechanism itself appears to exacerbate the emergence of these outliers&rdquo; &mdash; a vicious cycle where outlier activations attract routing, which concentrates gradients, which grows outliers. Its two cures, offered &ldquo;openly&rdquo; and explicitly without theory:</p>
+
+<ul>
+<li><strong>SwiGLU Clamping.</strong> Through the entire training of both V4 models, the linear (value) component of every SwiGLU was clamped to [&minus;10, 10] and the gate component capped above at 10. Clamping as a numerical tool goes back years (the report cites Bello et al., 2017 and Riviere et al., 2024), and DeepSeek credits contemporary practice (OpenAI, 2025) &mdash; but this is the first frontier-scale public confirmation that it works on the full loss curve of a trillion-parameter MoE, and V4.1-Flash later ships it as the config field <span class="mono">"swiglu_limit": 10.0</span>.</li>
+<li><strong>Anticipatory Routing.</strong> At step <em>t</em>, compute features with current parameters &theta;<sub>t</sub>, but compute and apply the routing indices using historical parameters &theta;<sub>t&minus;&Delta;t</sub> &mdash; fetched one step ahead and cached. Decoupling the router&rsquo;s update from the backbone&rsquo;s breaks the outlier cycle at its source. The overhead is bounded to roughly 20% wall-clock when active, and in practice the mechanism is <em>triggered automatically on loss spikes</em> (with a short rollback), run for a while, and switched off &mdash; a safety system, not a permanent tax.</li>
+</ul>
+
+<h3>11.5 &mdash; The supporting cast: mHC and Muon</h3>
+<p>Two V4 subsystems are not FFN mechanisms but change the FFN&rsquo;s operating conditions. <strong>Manifold-Constrained Hyper-Connections (mHC)</strong> widen the residual stream that feeds every expert layer by a factor <em>n</em><sub>hc</sub> = 4, replacing the fixed skip connection with a per-layer mixing matrix <em>B<sub>l</sub></em> constrained to the Birkhoff polytope of doubly stochastic matrices &mdash; guaranteeing &Vert;<em>B<sub>l</sub></em>&Vert;<sub>2</sub> &le; 1, i.e., a non-expansive residual map that will not amplify activations across 61 stacked layers. (Unconstrained Hyper-Connections, the report notes, &ldquo;frequently exhibit numerical instability when stacking multiple layers&rdquo; &mdash; the constraint is what makes the depth safe. The projection onto the polytope uses 20 Sinkhorn&ndash;Knopp iterations.) <strong>Muon</strong>, the orthogonalized-momentum optimizer, takes the majority of parameters while AdamW keeps the embedding, the output head, and all RMSNorm weights; V4 is its first frontier-scale deployment, and the report credits it (with the MoE overlap engineering) for the throughput that made 32&ndash;33T-token pre-training affordable.</p>
+
+<div class="callout warn">
+<span class="lab">Training recipe, quoted for the record</span>
+<p>Flash trains 32T tokens at peak batch 75.5M with LR 2.7&times;10<sup>&minus;4</sup>; Pro, 33T at 94.4M with 2.0&times;10<sup>&minus;4</sup>; both ramp sequence length 4K &rarr; 16K &rarr; 64K &rarr; 1M, and both train with <em>dense</em> attention for the first 1T tokens before sparsity switches on at the 64K stage &mdash; the experts themselves are stable from step zero; it is the attention that needs the warm-up. MTP loss weight: 0.3, dropping to 0.1 at LR decay. Bias update speed: 0.001, both models. Every number is from &sect;4.2 of the report.</p>
+</div>
+
+<h3>11.6 &mdash; FP4: the experts go to four bits</h3>
+<p>V4&rsquo;s post-training stage introduced the change with the largest <em>serving</em> consequence: quantization-aware training to FP4, in the OCP MXFP4 format, applied to two components &mdash; <strong>MoE expert weights</strong>, &ldquo;which are a major source of GPU memory occupancy,&rdquo; and the attention indexer&rsquo;s query&ndash;key path. The scheme is more elegant than a naive 4-bit cast: FP32 master weights are quantized to FP4 (E2M1) in 1&times;32 sub-blocks, then <em>dequantized back to FP8</em> (E4M3) in 128&times;128 blocks for computation &mdash; and the report proves the round trip is lossless, because E4M3&rsquo;s two extra exponent bits can absorb the sub-block scale ratios as long as those ratios stay within a verified bound. Gradients flow through the same FP8 weights via a straight-through estimator, the existing FP8 training framework is reused without modification, and during inference and RL rollouts the model runs <em>native</em> FP4 weights, halving memory traffic on the expert matrices relative to FP8. The released instruct checkpoints make the policy public: FP4 for expert weights, FP8 for everything else, in both Pro and Flash.</p>
+
+<div class="callout ok">
+<span class="lab">The arithmetic of the 1.6T model</span>
+<p>V4-Pro&rsquo;s expert fleet: 61 layers &times; 384 routed experts = <strong>23,424 routed experts</strong> of 3,072 width &mdash; each roughly 66M parameters (3 &times; 7,168 &times; 3,072), about 1.55T of the 1.6T total, i.e. <strong>roughly 97% of the model lives in the routed FFN stack</strong>, and every one of those parameters ships in FP4. The &ldquo;feed-forward network&rdquo; is no longer a layer of the model; statistically, it <em>is</em> the model. (Derived arithmetic; check with a calculator.)</p>
+</div>
+
+<p>The economic close-out of the V4 chapter is attention-dominated (at one million tokens, V4-Pro runs at 27% of V3.2&rsquo;s single-token FLOPs and 10% of its KV size; Flash, 10% and 7%) &mdash; but the FFN&rsquo;s contribution is structural: a 49B-activated budget carrying 1.6T parameters of knowledge, with 4-bit expert weights making the fleet fit in a servable footprint. The pre-training recipe that produced it &mdash; Muon, mHC, clamped gates, anticipatory routing &mdash; is the accumulated folklore of Parts II and III, finally written down as configuration.</p>
+
+<!-- ==================== CHAPTER 12 ==================== -->
+<h2 class="ch" id="ch12"><span class="chno">12</span>V4-Pro GA &amp; the Flash Lineage</h2>
+<p class="ch-sub">August 2026 &mdash; the preview becomes a product line: general availability, a vision-capable Flash, and the pricing that reveals what 4.6% activation buys.</p>
+
+<p>For four months after the April preview, the V4 series soaked in external deployment. On <strong>August 13, 2026</strong>, DeepSeek-V4-Pro went to general availability as the flagship: the 1.6T/49B checkpoint with million-token context, the FP4-expert instruct build, and the &ldquo;Pro-Max&rdquo; maximum-reasoning-effort mode first named in the preview paper. A week later, <strong>August 21, 2026</strong>, V4-Flash-Vision-Exp added native visual understanding to the 284B/13B line. The release cadence &mdash; preview, GA, vision variant &mdash; tracks the same maturation curve V3 followed, with one difference: this time the entire expert stack ships pre-quantized, because by 2026 FP4 experts stopped being a deployment option and became the release format.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>V4 family</th><th>Date</th><th class="num">Total / active</th><th>Experts</th><th>Release form</th></tr></thead>
+<tbody>
+<tr><td>DeepSeek-V4 (preview)</td><td>2026-04-24</td><td class="num">1.6T / 49B &middot; 284B / 13B</td><td>384+1 &middot; 256+1</td><td>base + instruct, FP8 (base) / FP4 experts (instruct)</td></tr>
+<tr><td>DeepSeek-V4-Pro (GA)</td><td>2026-08-13</td><td class="num">1.6T / 49B</td><td>384 + 1, top-6</td><td>API flagship, 1M context</td></tr>
+<tr><td>V4-Flash-Vision-Exp</td><td>2026-08-21</td><td class="num">284B / 13B</td><td>256 + 1, top-6</td><td>vision-enabled Flash experiment</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 12.1 &mdash; The V4 rollout. Dates from DeepSeek&rsquo;s API news changelog; expert fields from the released configs; the FP4/FP8 checkpoint split from the Hugging Face release notes.</div>
+</div>
+
+<p>Serving-side, the V4 generation entrenched two FFN-specific practices. First, <strong>MTP became standard deployment equipment</strong>: the published serving recipes for V4-Flash (vLLM and LMCache&rsquo;s configuration guides) wire the MTP module in as the speculative-decoding draft head by default, treating the 1.8&times;-class decode multiplier as part of the model rather than an optimization. Second, <strong>expert-parallel serving became the assumed topology</strong>: with 23,424 experts in the Pro model, no single host holds the fleet, and the same DeepEP-style dispatch/combine patterns open-sourced in February 2025 graduated from training infrastructure to inference infrastructure.</p>
+
+<p>The pricing tells the capacity-vs-compute story in the fewest words. At GA, V4-Pro&rsquo;s API listed at roughly $1.32 per million input tokens ($0.044 on cache hits) and $3.96 per million output tokens &mdash; flagship pricing, not budget pricing, because 49B activated is still 49B. The Flash line carried the low end. And then, twenty-eight days after GA, DeepSeek shipped a model that made both of those price points look transitional: a 552B-parameter MoE that runs its prefill at 8B activated parameters &mdash; the per-token compute budget of DeepSeek&rsquo;s own 2023 dense 7B &mdash; and its decode at 16B.</p>
+<!-- ==================== CHAPTER 13 ==================== -->
+<h2 class="ch" id="ch13"><span class="chno">13</span>V4.1-Flash: Asymmetry &amp; Engram</h2>
+<p class="ch-sub">September 10, 2026 &mdash; a 552B multimodal MoE whose feed-forward budget depends on which half of the network a token is in: 8B activated for prefill, 16B for decode, plus a 196B conditional memory called Engram.</p>
+
+<p>DeepSeek-V4.1-Flash was announced as &ldquo;the smallest model in our new architecture family&rdquo; &mdash; a phrase worth reading twice, because 552B backbone parameters is only &ldquo;smallest&rdquo; inside a family whose next members are expected to scale up from this template, with native multimodality (a vision token vocabulary, image tokens at token id 129,264) and million-token context built in. What makes it a new architecture family rather than an incremental V4 is a single structural split with direct FFN consequences: the <strong>Causal Encoder&ndash;Decoder (CED)</strong> layout. The backbone&rsquo;s 40 Transformer layers divide into a 20-layer encoder and a 20-layer decoder; the decoder&rsquo;s global attention reads KV entries projected directly from the encoder&rsquo;s final hidden state <em>H</em><sub>L/2</sub> rather than recomputing them per decoder layer. The design cites its inspiration openly &mdash; <em>You Only Cache Once: Decoder-decoder Architectures for Language Models</em> (Sun et al.) &mdash; and its arithmetic is workload-aware: standard prefill costs <em>O</em>(<em>N&middot;L</em>); CED reduces it to roughly <em>O</em>(<em>N&middot;L</em>/2 + <em>n</em><sub>win</sub>&middot;<em>L</em>/2), nearly halving the cost of processing long inputs.</p>
+
+<p>For the feed-forward stack, the CED split enables the headline asymmetry, quoted from the launch materials in both formulations: the model &ldquo;activates 16B parameters per token during decode but only 8B parameters during prefill&rdquo; &mdash; or in the announcement&rsquo;s phrasing, &ldquo;just 8B active parameters for input, 16B for output.&rdquo; The workload logic is agentic: an agent reads a million tokens and writes a few thousand, so the read side (encoder) gets the sparser budget &mdash; 8B activated, a per-token compute budget on par with the dense DeepSeek LLM 7B of 2023 &mdash; while the generation side (decoder), where each token&rsquo;s quality is paramount and the batch is small, runs at 16B. Compute is allocated by <em>phase</em>, not just by expert; the sparse-activation principle of DeepSeekMoE, which allocates compute per token, gains a second axis that allocates it per workload stage.</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>DeepSeek-V4.1-Flash (Sep 2026)</th><th>Value</th><th>Field in config.json</th></tr></thead>
+<tbody>
+<tr><td>Transformer layers (CED)</td><td>40 = 20 encoder + 20 decoder</td><td><span class="mono">num_hidden_layers: 40</span></td></tr>
+<tr><td>Hidden dimension</td><td>5,120</td><td><span class="mono">hidden_size: 5120</span></td></tr>
+<tr><td>Routed experts / layer</td><td><strong>384</strong></td><td><span class="mono">n_routed_experts: 384</span></td></tr>
+<tr><td>Shared experts / layer</td><td>1</td><td><span class="mono">n_shared_experts: 1</span></td></tr>
+<tr><td>Activated routed experts</td><td>6</td><td><span class="mono">num_experts_per_tok: 6</span></td></tr>
+<tr><td>Expert intermediate width</td><td><strong>2,304</strong></td><td><span class="mono">moe_intermediate_size: 2304</span></td></tr>
+<tr><td>Affinity function</td><td>Sqrt(Softplus) &mdash; inherited from V4</td><td><span class="mono">scoring_func: "sqrtsoftplus"</span></td></tr>
+<tr><td>Load balancing</td><td>aux-loss-free bias top-k</td><td><span class="mono">topk_method: "noaux_tc"</span></td></tr>
+<tr><td>Gate normalization &amp; scaling</td><td>normalize selected gates, scale &times;1.5</td><td><span class="mono">norm_topk_prob: true, routed_scaling_factor: 1.5</span></td></tr>
+<tr><td>Activation</td><td>SiLU (gated FFN)</td><td><span class="mono">hidden_act: "silu"</span></td></tr>
+<tr><td>SwiGLU clamp</td><td>&plusmn;10 (linear), 10 (gate)</td><td><span class="mono">swiglu_limit: 10.0</span></td></tr>
+<tr><td>Checkpoint format</td><td>FP8, experts in FP4 (32&times;32 blocks, UE8M0 scales)</td><td><span class="mono">quantization_config &hellip; expert_dtype: "fp4"</span></td></tr>
+<tr><td>Activated parameters</td><td>8B (prefill) / 16B (decode) of 552B</td><td>launch materials</td></tr>
+<tr><td>Max context</td><td>1,048,576 (YaRN, factor 16)</td><td><span class="mono">max_position_embeddings: 1048576</span></td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 13.1 &mdash; V4.1-Flash&rsquo;s feed-forward specification, every row quoted from the released config and launch materials. The routed-scaling factor of 1.5 (a gate-magnitude boost on the selected experts, compensating for the renormalized mixture) is a small but new tuning relative to V4.</div>
+</div>
+
+<p>Read down that table and the continuity is the story: the same one-shared-plus-many-routed shape DeepSeekMoE proposed in January 2024, the same aux-loss-free selection V3 pioneered, the same Sqrt(Softplus) affinity and SwiGLU clamp V4 introduced &mdash; each mechanism surviving its third or fourth generation, now expressed as fifteen lines of a JSON file. What is genuinely new sits outside that table, in a module the family is named for.</p>
+
+<h3>13.1 &mdash; Engram: conditional memory, 196B parameters</h3>
+<p>V4.1-Flash ships an <strong>Engram module: a 196B-parameter conditional memory</strong>. The technical report&rsquo;s description is precise about mechanism and purpose: &ldquo;multi-head hashing and context-aware gating to store and retrieve information efficiently without significantly increasing the activated parameter count per token&hellip; helps the model manage vast amounts of knowledge while maintaining a compact runtime footprint.&rdquo; Its intellectual provenance is cited directly &mdash; <em>Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models</em> &mdash; and the training infrastructure adapted to it is documented too: the Engram&rsquo;s (large) embedding tables train with <em>Sinkhorn-Balanced Updates</em> &mdash; momentum updates followed by Sinkhorn balancing to equalize magnitude across the update matrix, saving optimizer-state memory &mdash; while the backbone uses a head-wise Muon.</p>
+
+<p>In the frame of this history, Engram is not a departure from the DeepSeekMoE program &mdash; it is the program&rsquo;s completion. The 2024 insight was that knowledge capacity and per-token compute could be decoupled by routing tokens to small experts. Engram decouples them further, along two new axes: <em>lookup</em> (multi-head hashing selects which memory rows a token consults &mdash; the Hash Layer&rsquo;s 2021 idea, promoted from a whole-layer router to a memory index) and <em>context</em> (gating decides how much of the retrieved memory actually flows into the residual stream). Two hundred billion parameters of knowledge that cost, per token, only what the hash and the gates select. The feed-forward network has finally stopped being a layer at all and become an <em>addressable library</em>.</p>
+
+<div class="callout ok">
+<span class="lab">The family thesis, stated by the source</span>
+<p>The launch thread calls V4.1-Flash &ldquo;designed for greater capability, faster inference, higher throughput, and scaling to larger models,&rdquo; and the report closes on deployment economics. Combined with the retirement schedule &mdash; V4-Flash and V4-Flash-Vision-Exp retired at launch, V4-Pro requests routed to V4.1-Flash from September 14, 2026 &mdash; the message is that the CED + Engram template is now the base the next flagships scale from. The 552B/8B-prefill configuration is the <em>floor</em>.</p>
+</div>
+
+<h3>13.2 &mdash; The rest of the generation</h3>
+<p>Three more V4.1 mechanisms complete the picture, each touching the FFN&rsquo;s operating conditions. <strong>Single-Pass mHC</strong> revises the V4 residual-stream mixing so it can be kernel-fused &mdash; the &ldquo;Mega-mHC&rdquo; kernel reduces activation-memory traffic to (2<em>n</em>+2)<em>d</em> reads and writes, halving it; the residual path that feeds every expert layer got cheaper. <strong>Training scale</strong> reached 45T multimodal tokens across the pre-training curriculum, with RL post-training including the family&rsquo;s novel <em>Controllable Reasoning Effort</em>: a scalar 1&ndash;100 in the system prompt trading cost for accuracy, enforced during RL by an exponential token-penalty reward <em>k</em>(<em>b</em>) = <em>k</em><sub>0</sub>&middot;exp(&minus;(<em>b</em>&minus;<em>b</em><sub>min</sub>)/&tau;) &mdash; effort made a first-class, billable axis of the model. And <strong>quantization</strong> shipped as release format: FP8 storage with 32&times;32 blocks and UE8M0 scales, experts in FP4 &mdash; the V4 QAT policy, now the default rather than an instruct-branch option.</p>
+
+<p>The reported results close the loop on the economics that opened this paper: benchmark performance ahead of V4-Pro (the launch cites independent tests placing it ahead on performance, cost, speed and total runtime), agentic coding results including DeepSWE 74.2% and Terminal-Bench 2.1 at 90.6 (V4-Pro: 82.7), and a Codeforces rating of 3471 &mdash; from a model whose <em>prefill</em> compute matches the 2023 dense 7B baseline this history started with. The two-thirds problem of Chapter 1, measured against that baseline, is now a <em>69&times;-capacity-per-prefill-FLOP</em> separation: 552B of knowledge consulted at 8B of activation, gated by hashes, biases, and gates.</p>
+
+<!-- ==================== CHAPTER 14 ==================== -->
+<h2 class="ch" id="ch14"><span class="chno">14</span>Compiled Evidence &amp; Timeline</h2>
+<p class="ch-sub">Every feed-forward configuration in the DeepSeek line, one table at a time &mdash; then the complete release timeline, and the five generational moves in summary form.</p>
+
+<h3>14.1 &mdash; The master configuration table</h3>
+<div class="tblwrap">
+<table>
+<thead><tr><th>Model (date)</th><th class="num">Layers</th><th class="num">Hidden</th><th>FFN / experts</th><th class="num">Total</th><th class="num">Active</th><th>Affinity &amp; balance</th></tr></thead>
+<tbody>
+<tr><td>DeepSeek LLM 7B (Nov 2023)</td><td class="num">30</td><td class="num">4,096</td><td>dense SwiGLU, 11,008</td><td class="num">6.9B</td><td class="num">6.9B</td><td>&mdash;</td></tr>
+<tr><td>DeepSeek LLM 67B (Nov 2023)</td><td class="num">95</td><td class="num">8,192</td><td>dense SwiGLU, 22,016</td><td class="num">67B</td><td class="num">67B</td><td>&mdash;</td></tr>
+<tr><td>DeepSeekMoE 16B (Jan 2024)</td><td class="num">28</td><td class="num">2,048</td><td>2+64, top-6, w 1,408</td><td class="num">16.4B</td><td class="num">2.8B</td><td>softmax + aux loss</td></tr>
+<tr><td>DeepSeek-V2 (May 2024)</td><td class="num">60</td><td class="num">5,120</td><td>2+160, top-6, w 1,536</td><td class="num">236B</td><td class="num">21B</td><td>softmax + 3 aux losses</td></tr>
+<tr><td>V2-Lite (Jun 2024)</td><td class="num">27</td><td class="num">2,048</td><td>2+64, top-6, w 1,408</td><td class="num">15.7B</td><td class="num">2.4B</td><td>softmax + 1 aux loss</td></tr>
+<tr><td>DeepSeek-V3 (Dec 2024)</td><td class="num">61</td><td class="num">7,168</td><td>1+256, top-8, w 2,048</td><td class="num">671B</td><td class="num">37B</td><td>sigmoid + aux-free bias</td></tr>
+<tr><td>V3.1 / V3.2 (2025)</td><td class="num">61</td><td class="num">7,168</td><td>1+256, top-8, w 2,048</td><td class="num">671B</td><td class="num">37B</td><td>identical (frozen)</td></tr>
+<tr><td>V4-Flash (Apr 2026)</td><td class="num">43</td><td class="num">4,096</td><td>1+256, top-6, w 2,048, all-MoE, first 3 hash</td><td class="num">284B</td><td class="num">13B</td><td>sqrtsoftplus + bias</td></tr>
+<tr><td>V4-Pro (Apr 2026)</td><td class="num">61</td><td class="num">7,168</td><td>1+384, top-6, w 3,072, all-MoE, first 3 hash</td><td class="num">1.6T</td><td class="num">49B</td><td>sqrtsoftplus + bias</td></tr>
+<tr><td>V4.1-Flash (Sep 2026)</td><td class="num">40</td><td class="num">5,120</td><td>1+384, top-6, w 2,304, CED, + Engram 196B</td><td class="num">552B</td><td class="num">8B / 16B</td><td>sqrtsoftplus + noaux_tc</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 14.1 &mdash; The complete FFN lineage. &ldquo;w&rdquo; = expert intermediate width; &ldquo;2+64, top-6&rdquo; = 2 shared + 64 routed experts, 6 activated per token. Dense-model &ldquo;active&rdquo; = total (dense computes everything). V2.5, Coder-V2, R1 and interim 2025 checkpoints are config-identical to their base rows. Sources: technical reports and released config.json for every row.</div>
+</div>
+
+<h3>14.2 &mdash; The economic claims, as published</h3>
+<div class="tblwrap">
+<table>
+<thead><tr><th>Claim</th><th>Value</th><th>Source &amp; comparison</th></tr></thead>
+<tbody>
+<tr><td>DeepSeekMoE 16B &asymp; LLaMA2-7B</td><td class="num">~40% of the computation</td><td>DeepSeekMoE abstract, vs 2.5&times; activated params</td></tr>
+<tr><td>DeepSeekMoE 145B &asymp; DeepSeek 67B</td><td class="num">28.5% (perhaps 18.2%)</td><td>DeepSeekMoE abstract &mdash; the paper&rsquo;s own parenthetical</td></tr>
+<tr><td>V2 training cost vs DeepSeek 67B</td><td class="num">42.5% saved</td><td>V2 abstract</td></tr>
+<tr><td>V2 max generation throughput</td><td class="num">5.76&times;</td><td>V2 abstract, vs DeepSeek 67B</td></tr>
+<tr><td>V3 full training cost</td><td class="num">2.788M H800 GPU-h (&asymp;$5.576M)</td><td>V3 &sect;4.1, at $2/GPU-hour</td></tr>
+<tr><td>V3 spec-decode speedup (MTP)</td><td class="num">1.8&times; TPS</td><td>V3 &sect;5.4.3, 85&ndash;90% acceptance</td></tr>
+<tr><td>V4-Pro @1M ctx vs V3.2</td><td class="num">27% FLOPs, 10% KV</td><td>V4 abstract (Flash: 10%, 7%)</td></tr>
+<tr><td>V4.1-Flash prefill activation</td><td class="num">8B of 552B</td><td>V4.1 launch/report</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 14.2 &mdash; The lineage&rsquo;s published economics. Every row is a quotation, not an estimate; the comparison baseline is named in each case.</div>
+</div>
+
+<h3>14.3 &mdash; The complete timeline</h3>
+<div class="tline">
+  <div class="tl-item"><div class="tl-date">2023-11</div><div class="tl-head">DeepSeek Coder &amp; DeepSeek LLM</div><div class="tl-body">Dense SwiGLU FFNs, LLaMA-style; 7B (30L, w 11,008) and 67B (95L, w 22,016); Coder 1.3B&ndash;33B alongside.</div></div>
+  <div class="tl-item"><div class="tl-date">2024-01-05</div><div class="tl-head">DeepSeekMoE (arXiv:2401.06066)</div><div class="tl-body">Fine-grained expert segmentation + shared expert isolation; 2B/16B/145B evidence ladder; 16.4B/2.8B matches LLaMA2-7B at ~40% compute.</div></div>
+  <div class="tl-item"><div class="tl-date">2024-05-07</div><div class="tl-head">DeepSeek-V2</div><div class="tl-body">236B/21B; 2+160, top-6; device-limited routing (M=3); three auxiliary losses; token dropping; 42.5% training savings vs 67B.</div></div>
+  <div class="tl-item"><div class="tl-date">2024-06</div><div class="tl-head">V2-Lite &amp; Coder-V2</div><div class="tl-body">15.7B/2.4B with 64 experts for local serving; Coder-V2 reuses the 236B skeleton; the FFN design is stable enough to clone.</div></div>
+  <div class="tl-item"><div class="tl-date">2024-09-05</div><div class="tl-head">DeepSeek-V2.5</div><div class="tl-body">Post-training merge of V2-Chat and Coder-V2-Instruct; zero FFN change.</div></div>
+  <div class="tl-item"><div class="tl-date">2024-12-26</div><div class="tl-head">DeepSeek-V3</div><div class="tl-body">671B/37B; 1+256, top-8, sigmoid affinities; auxiliary-loss-free bias (&gamma;=0.001&rarr;0); no token dropping; MTP; FP8; 14.8T tokens for 2.788M H800 GPU-h.</div></div>
+  <div class="tl-item"><div class="tl-date">2025-01-20</div><div class="tl-head">DeepSeek-R1</div><div class="tl-body">RL on the frozen V3 FFN stack; architecture untouched.</div></div>
+  <div class="tl-item"><div class="tl-date">2025-02-25 &rarr; 27</div><div class="tl-head">Open Source Week: DeepEP, EPLB, DualPipe</div><div class="tl-body">The expert-parallel machine goes public: dispatch/combine kernels, expert replication-and-placement balancing, overlap scheduling.</div></div>
+  <div class="tl-item"><div class="tl-date">2025-03-25 / 05-28</div><div class="tl-head">V3-0324 &amp; R1-0528</div><div class="tl-body">Post-training refreshes; FFN frozen.</div></div>
+  <div class="tl-item"><div class="tl-date">2025-08-21</div><div class="tl-head">DeepSeek-V3.1</div><div class="tl-body">Hybrid thinking; config field-for-field identical to V3&rsquo;s FFN.</div></div>
+  <div class="tl-item"><div class="tl-date">2025-09-29 / 12-01</div><div class="tl-head">V3.2-Exp &amp; V3.2</div><div class="tl-body">DSA attention; MoE half untouched through the year&rsquo;s biggest efficiency release.</div></div>
+  <div class="tl-item"><div class="tl-date">2026-04-24</div><div class="tl-head">DeepSeek-V4 (preview)</div><div class="tl-body">1.6T/49B and 284B/13B; all blocks MoE, first 3 hash-routed; Sqrt(Softplus); node limit removed; SwiGLU clamping; anticipatory routing; Muon; mHC; FP4 QAT experts.</div></div>
+  <div class="tl-item"><div class="tl-date">2026-08-13 / 08-21</div><div class="tl-head">V4-Pro GA &amp; V4-Flash-Vision-Exp</div><div class="tl-body">Flagship GA at $1.32/M input; vision-capable Flash; FP4 experts as release format.</div></div>
+  <div class="tl-item"><div class="tl-date">2026-09-10</div><div class="tl-head">DeepSeek-V4.1-Flash</div><div class="tl-body">552B multimodal MoE; CED 20+20 with 8B prefill / 16B decode activation; 384+1 experts, noaux_tc, swiglu_limit; Engram 196B conditional memory; FP4 experts; retires V4-Pro routing on Sept 14.</div></div>
+</div>
+
+<h3>14.4 &mdash; Five moves, one grammar</h3>
+<p>Compress the three years into the changes that mattered and the sequence is almost didactic:</p>
+<ol>
+<li><strong>Split and quarantine (2024).</strong> Many small experts for specialization, shared experts for common knowledge &mdash; the combinatorial library replaces the monolith.</li>
+<li><strong>Scale and pay (2024).</strong> 236B/21B buys frontier-adjacent quality, paid for in three auxiliary losses, device constraints, and dropped tokens.</li>
+<li><strong>Delete the taxes (2024&ndash;2025).</strong> The aux-loss-free bias replaces gradient interference; no tokens drop; sigmoid affinities fit the selector; MTP makes the FFN stack train better and serve faster.</li>
+<li><strong>Industrialize (2025).</strong> FP8, DeepEP, EPLB, DualPipe: the expert fleet becomes first-class systems infrastructure, open-sourced.</li>
+<li><strong>Push the axes (2026).</strong> More experts (384), fewer activated (6, then 4 phases of asymmetry), coarser precision (FP4), earlier conditional computation (hash routing), and conditional memory (Engram) &mdash; capacity per activated parameter, chased along every axis the architecture offers.</li>
+</ol>
+<!-- ==================== CHAPTER 15 ==================== -->
+<h2 class="ch" id="ch15"><span class="chno">15</span>The Rivals: A DeepSeek-fied World</h2>
+<p class="ch-sub">What Mixtral, Qwen, Kimi, GLM and Llama learned from the lineage &mdash; and which of DeepSeek&rsquo;s bets each of them copied or declined.</p>
+
+<p>By 2025, the fine-grained-plus-shared recipe was no longer DeepSeek&rsquo;s trade secret; it was the default grammar of open-weight frontier models. The clearest way to see it is a table &mdash; every entry below is verified against the vendor&rsquo;s model card or technical report:</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Model (date)</th><th class="num">Total / active</th><th>Experts / layer</th><th>Top-k</th><th>Shared experts</th><th>DeepSeek lineage visible</th></tr></thead>
+<tbody>
+<tr><td>Mixtral 8x7B (Dec 2023)</td><td class="num">46.7B / 12.9B</td><td>8</td><td>2</td><td>none</td><td>the pre-DeepSeek baseline: coarse, no shared pool</td></tr>
+<tr><td>DBRX (Mar 2024)</td><td class="num">132B / 36B</td><td>16</td><td>4</td><td>none</td><td>first major fine-grained move (mid-2023 lineage, pre-print)</td></tr>
+<tr><td>OLMoE (Aug 2024)</td><td class="num">7B / 1B</td><td>64</td><td>8</td><td>none</td><td>fine-grained at small scale; its paper benchmarks against DeepSeekMoE-16B</td></tr>
+<tr><td>Qwen3-235B-A22B (Apr 2025)</td><td class="num">235B / 22B</td><td>128</td><td>8</td><td>none</td><td>fine-grained at 100B+ scale</td></tr>
+<tr><td>Llama 4 Scout (Apr 2025)</td><td class="num">109B / 17B</td><td>16</td><td>1</td><td><strong>1</strong></td><td>shared-expert idea adopted; extreme sparsity (top-1)</td></tr>
+<tr><td>Llama 4 Maverick (Apr 2025)</td><td class="num">400B / 17B</td><td>128</td><td>1</td><td><strong>1</strong></td><td>same recipe at 400B, still 17B activated</td></tr>
+<tr><td>Kimi K2 (Jul 2025)</td><td class="num">1T / 32B</td><td>384</td><td>8</td><td><strong>1</strong></td><td>the DeepSeek shape, whole: 384+1, fine-grained, trillion-scale</td></tr>
+<tr><td>GLM-4.5 (Jul 2025)</td><td class="num">355B / 32B</td><td>160</td><td>8</td><td>none (routed scaling 2.5&times;)</td><td>fine-grained with renormalized gates, scaled mixture output</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 15.1 &mdash; Open-weight MoE landscape, 2023&ndash;2025. Sources: Mistral launch post (46.7B/12.9B), DBRX/OLMoE/Qwen3/Llama 4/Kimi K2/GLM-4.5 model cards and technical reports. Kimi K2&rsquo;s simplismart deployment notes: &ldquo;384 experts (8 selected per token + 1 shared).&rdquo;</div>
+</div>
+
+<figure>
+<div class="bar-chart">
+  <div class="bar-row"><div class="lbl">Mixtral 8x7B (2023)</div><div class="track"><div class="fill warn" style="width:2.1%"></div></div><div class="val">8</div></div>
+  <div class="bar-row"><div class="lbl">DBRX (2024)</div><div class="track"><div class="fill warn" style="width:4.2%"></div></div><div class="val">16</div></div>
+  <div class="bar-row"><div class="lbl">OLMoE 1B-7B (2024)</div><div class="track"><div class="fill warn" style="width:16.7%"></div></div><div class="val">64</div></div>
+  <div class="bar-row"><div class="lbl">Llama 4 Maverick (2025)</div><div class="track"><div class="fill" style="width:33.3%"></div></div><div class="val">128</div></div>
+  <div class="bar-row"><div class="lbl">Qwen3-235B (2025)</div><div class="track"><div class="fill" style="width:33.3%"></div></div><div class="val">128</div></div>
+  <div class="bar-row"><div class="lbl">GLM-4.5 (2025)</div><div class="track"><div class="fill" style="width:41.7%"></div></div><div class="val">160</div></div>
+  <div class="bar-row"><div class="lbl">DeepSeek-V3 (2024)</div><div class="track"><div class="fill" style="width:66.7%"></div></div><div class="val">256</div></div>
+  <div class="bar-row"><div class="lbl">Kimi K2 (2025)</div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">384</div></div>
+  <div class="bar-row"><div class="lbl">DeepSeek-V4-Pro / V4.1-Flash (2026)</div><div class="track"><div class="fill ok" style="width:100%"></div></div><div class="val">384</div></div>
+</div>
+<figcaption>Figure 15.1 &mdash; Routed experts per layer across the open-weight frontier. Track lengths are proportional to expert count (384 = full width). The industry climbed the fine-grained ladder two rungs behind DeepSeek.</figcaption>
+</figure>
+
+<p>Three adoption patterns stand out. <strong>First, expert granularity converged upward</strong> &mdash; 8 &rarr; 16 &rarr; 64 &rarr; 128 &rarr; 384 &mdash; exactly the direction DeepSeekMoE&rsquo;s combinatorics argument predicted, with Kimi K2 adopting DeepSeek&rsquo;s literal 384+1 shape for its trillion-parameter model. <strong>Second, the shared expert spread selectively.</strong> Meta adopted it for Llama 4 (one shared expert, top-1 routed sparsity); Kimi kept it; Qwen and GLM declined it, relying instead on renormalized gates and routed-scaling factors in the same design space. <strong>Third, load balancing quietly de-taxed.</strong> The 2024-era papers still leaned on auxiliary losses; by 2025&rsquo;s big releases, bias-based or otherwise loss-minimal balancing is the norm, and deployment-side replication (the EPLB pattern) is standard practice &mdash; Kimi&rsquo;s own deployment notes describe redundant experts on decode nodes to balance routing, precisely the EPLB trick.</p>
+
+<p>What has <em>not</em> been copied, so far, is the part of the lineage that postdates V3: hash-routed early layers, the CED encoder&ndash;decoder split with per-phase activation budgets, and Engram-style conditional memory remain DeepSeek-only as of this writing. (OpenAI&rsquo;s gpt-oss releases did adopt MXFP4-quantized MoE weights, converging with DeepSeek&rsquo;s FP4-expert policy from the other direction &mdash; a notable meeting of the roads on precision.) The honest reading of Table 15.1 is that the industry absorbed DeepSeek&rsquo;s 2024 ideas within about eighteen months, and is still digesting 2026&rsquo;s.</p>
+
+<div class="callout info">
+<span class="lab">The combination-space view</span>
+<p>Why more experts, mathematically? A top-2-of-8 Mixtral layer offers <em>C</em>(8,2) = 28 possible expert subsets per token. V3&rsquo;s top-8-of-256 offers <em>C</em>(256,8) &asymp; 4.1&times;10<sup>14</sup>. Every additional expert multiplies the knowledge-addressable combinations, and &mdash; as DeepSeekMoE&rsquo;s ablation argued &mdash; smaller experts specialize harder, so the combinations mean more. The whole industry&rsquo;s climb in Figure 15.1 is a climb up this curve.</p>
+</div>
+
+<!-- ==================== CHAPTER 16 ==================== -->
+<h2 class="ch" id="ch16"><span class="chno">16</span>Field Guide: Serving the Beast</h2>
+<p class="ch-sub">Sizing, serving, and offloading a DeepSeek-class MoE &mdash; then the glossary and the sources.</p>
+
+<h3>16.1 &mdash; Sizing: the experts are the model</h3>
+<p>Every practical decision about serving a DeepSeek model follows from one arithmetic fact established in Chapter 9: roughly 97% of the parameters live in the routed expert stack. Weight the memory budget accordingly (derived arithmetic, BF16 = 2 bytes/param, FP8 = 1, FP4 = 0.5):</p>
+
+<div class="tblwrap">
+<table>
+<thead><tr><th>Checkpoint</th><th class="num">BF16</th><th class="num">FP8</th><th class="num">FP4 experts + FP8 rest</th><th>Servable on</th></tr></thead>
+<tbody>
+<tr><td>DeepSeek-V3 / R1 (671B)</td><td class="num">~1.34 TB</td><td class="num">~671 GB</td><td class="num">~344 GB (quantized builds)</td><td>8&times;H200/B200 class, or 16 GPUs at TP8+EP</td></tr>
+<tr><td>V2-Lite / MoE-16B class (~16B)</td><td class="num">~32 GB</td><td class="num">~16 GB</td><td class="num">&mdash;</td><td>single 24 GB GPU</td></tr>
+<tr><td>V4-Flash (284B)</td><td class="num">~568 GB</td><td class="num">~284 GB</td><td class="num">~145 GB</td><td>4&times;H200 class at FP4</td></tr>
+<tr><td>V4-Pro (1.6T)</td><td class="num">~3.2 TB</td><td class="num">~1.6 TB</td><td class="num">~830 GB</td><td>multi-node EP as a design assumption</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 16.1 &mdash; Weight-memory envelopes (weights only; add KV cache and activations per Chapter 7&rsquo;s companion volume). The FP4 column assumes the release policy of FP4 experts + FP8 everything-else, which is how V4 instruct and V4.1 checkpoints ship.</div>
+</div>
+
+<h3>16.2 &mdash; The three serving patterns</h3>
+<p><strong>Pattern one: expert parallelism on a cluster.</strong> The production pattern for the big checkpoints &mdash; vLLM and SGLang both expose it (<span class="mono">--enable-expert-parallel</span> in vLLM, combined with tensor parallelism across enough GPUs to hold the fleet; the official DeepSeek recipes pages document per-model topologies). The dispatch/combine traffic between GPUs is the DeepEP pattern, and redundant-expert placement (EPLB-style) is the standard answer to hot experts at decode. For V4-class models the published recipes (vLLM&rsquo;s and LMCache&rsquo;s V4-Flash guide) also wire in the MTP draft head for speculative decoding and the FP8 KV format &mdash; treat the model&rsquo;s own recipe page as the source of truth for flags, since they move release by release.</p>
+
+<div class="codetitle"><span class="dots">&#9679;&#9679;&#9679;</span><span>cluster serving, pattern sketch (flags per vLLM&rsquo;s DeepSeek recipes; verify against current docs)</span></div>
+<pre><code># V3-class, FP8, 8-way (H200/B200 class node):
+vllm serve deepseek-ai/DeepSeek-V3 \
+    --tensor-parallel-size 8 \
+    --enable-expert-parallel
+
+# add MTP speculative decoding where the recipe supports it:
+#   --speculative-config '{"method": "deepseek_mtp", "num_speculative_tokens": 1}'
+# (acceptance ~85-90% on V3-family drafts; expect ~1.8x TPS)
+
+# SGLang equivalent:
+python -m sglang.launch_server --model deepseek-ai/DeepSeek-V3 --tp 8</code></pre>
+
+<p><strong>Pattern two: CPU-offloaded experts.</strong> The DeepSeekMoE structure makes MoE models unusually friendly to hybrid CPU+GPU serving, because 6&ndash;8 active experts per token means the hot working set is small relative to the fleet. llama.cpp&rsquo;s override-tensor mechanism lets you park the entire expert stack in host RAM and keep attention/shared/dense weights on the GPU with one regex:</p>
+
+<div class="codetitle"><span class="dots">&#9679;&#9679;&#9679;</span><span>local serving, llama.cpp expert offload (the community-standard pattern)</span></div>
+<pre><code># offload every MoE expert tensor to CPU, keep the rest on GPU:
+./llama-server -m DeepSeek-V3-Q4_K_M.gguf \
+    -ngl 99 -ot ".ffn_.*_exps.=CPU"
+
+# the active 8-of-256 experts per token stream from RAM each step;
+# shared experts + attention stay hot in VRAM. Works for V3/V3.1-class
+# quantized builds on a single 24 GB GPU + large system RAM.</code></pre>
+
+<p><strong>Pattern three: KTransformers.</strong> The Tsinghua MADSys project formalizes pattern two into a full inference system for ultra-large MoE &mdash; DeepSeek V3/R1-class models on a single GPU with the expert fleet in CPU memory, with amplitudes of speedup that made it the standard desktop recipe for 671B-class checkpoints, and follow-on support for fine-tuning MoE models under memory constraints (its documentation claims 6&ndash;12&times; faster offload-tuning than ZeRO-Offload-style baselines). SGLang&rsquo;s hybrid CPU/GPU MoE path covers the same idea at server scale. The common thread is architectural: <em>fine-grained sparsity is what makes offloading work</em> &mdash; a dense 671B has no small working set to exploit.</p>
+
+<div class="callout warn">
+<span class="lab">The recipe moves; the physics doesn&rsquo;t</span>
+<p>Serving flags change release to release (V4-Flash&rsquo;s recipe needed a dev branch at launch and a custom tokenizer mode; V4.1-Flash renamed the model family&rsquo;s architecture class again). Budget your integration time for the recipe page, but your hardware for the arithmetic in Table 16.1 &mdash; the second is stable across releases, because it follows from the expert counts, which are published in every config.</p>
+</div>
+
+<h3>16.3 &mdash; Glossary</h3>
+<div class="tblwrap">
+<table>
+<thead><tr><th style="width:170px">Term</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td><strong>FFN / SwiGLU</strong></td><td>Position-wise feed-forward block; SwiGLU = gated variant with value and gate branches (SiLU gate) and three weight matrices.</td></tr>
+<tr><td><strong>MoE layer</strong></td><td>FFN replaced by a pool of expert FFNs plus a router selecting a few per token.</td></tr>
+<tr><td><strong>Fine-grained experts</strong></td><td>DeepSeekMoE strategy: many small experts (splitting the intermediate dimension) with more activated, multiplying expert combinations.</td></tr>
+<tr><td><strong>Shared experts</strong></td><td>Always-activated experts quarantining common knowledge, mitigating routed redundancy (2 in V2, 1 from V3 on).</td></tr>
+<tr><td><strong>Affinity / gate</strong></td><td>Router score <em>s<sub>i,t</sub></em> (Softmax in V2, Sigmoid in V3, Sqrt(Softplus) in V4+) and the normalized output weight of a selected expert.</td></tr>
+<tr><td><strong>Auxiliary-loss-free / noaux_tc</strong></td><td>Load balancing by a selection-only bias updated from batch statistics; the transformers config enum for it.</td></tr>
+<tr><td><strong>Bias update speed &gamma;</strong></td><td>Nudge size for the bias (V3: 0.001, then 0; V4: 0.001). No gradient involvement.</td></tr>
+<tr><td><strong>Device/node-limited routing</strong></td><td>Capping how many devices (V2: 3) or nodes (V3: 4) a token&rsquo;s experts may span; removed in V4.</td></tr>
+<tr><td><strong>Token dropping</strong></td><td>2021-era overflow handling (V2: capacity factor 1.0, 10% undroppable sequences); abolished in V3.</td></tr>
+<tr><td><strong>MTP</strong></td><td>Multi-Token Prediction: per-depth Transformer blocks with shared embedding/head predict extra future tokens during training; reusable as a speculative-decoding draft head.</td></tr>
+<tr><td><strong>DeepEP / EPLB / DualPipe</strong></td><td>Open-sourced Feb 2025: expert-parallel communication kernels; expert replication/placement balancing; overlapped pipeline scheduling.</td></tr>
+<tr><td><strong>Hash routing</strong></td><td>Expert selection by token-ID hash (Roller 2021); used for V4&rsquo;s first three MoE layers.</td></tr>
+<tr><td><strong>mHC</strong></td><td>Manifold-Constrained Hyper-Connections: residual stream widened 4&times;, mixing matrix constrained to doubly-stochastic (Birkhoff) manifold for stable depth.</td></tr>
+<tr><td><strong>Muon</strong></td><td>Orthogonalized-momentum optimizer used for most V4/V4.1 parameters (AdamW keeps embeddings, heads, norms).</td></tr>
+<tr><td><strong>FP8 / FP4 / MXFP4</strong></td><td>Weight formats: 1-byte and OCP 4-bit block-scaled; applied to expert weights via QAT in V4/V4.1 (&ldquo;expert_dtype: fp4&rdquo;).</td></tr>
+<tr><td><strong>CED</strong></td><td>Causal Encoder&ndash;Decoder: 20+20 layer split; decoder KV projected from encoder&rsquo;s final state; enables 8B-prefill / 16B-decode activation asymmetry.</td></tr>
+<tr><td><strong>Engram</strong></td><td>V4.1&rsquo;s 196B conditional memory module: multi-head hashing + context-aware gating; knowledge in weights, selected by lookup.</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Table 16.2 &mdash; The seventeen terms that unlock every DeepSeek FFN discussion since 2024.</div>
+</div>
+
+<h3>16.4 &mdash; Sources</h3>
+
+<div class="src-block">
+<strong>DeepSeek technical reports and official materials</strong><br>
+DeepSeek-V4.1-Flash technical report and launch materials (HF: deepseek-ai/DeepSeek-V4.1-Flash and deepseek.com news, Sept 10, 2026) &middot; DeepSeek-V4 technical report (arXiv:2606.19348, Apr 24, 2026) &middot; Hugging Face blog, &ldquo;DeepSeek-V4: a million-token context that agents can actually use&rdquo; (Apr 24, 2026) &middot; DeepSeek-V3.2 technical report and vLLM recipe page (Dec 2025) &middot; DeepSeek-V3.1 release notes (Aug 21, 2025) &middot; DeepSeek-V3 Technical Report (arXiv:2412.19437, Dec 26, 2024) &middot; DeepSeek-V2 (arXiv:2405.04434, May 2024) &middot; DeepSeekMoE (arXiv:2401.06066, Jan 2024) &middot; DeepSeek LLM (arXiv:2401.02954, Jan 2024) &middot; Wang et al., &ldquo;Auxiliary-Loss-Free Load Balancing Strategy for MoE&rdquo; (2024) &middot; DeepEP, EPLB and DualPipe repositories (github.com/deepseek-ai, Feb 2025) &middot; API news changelog for all release dates (api-docs.deepseek.com, 2024&ndash;2026)
+</div>
+
+<div class="src-block">
+<strong>Configurations, verified field by field</strong><br>
+config.json of: deepseek-ai/deepseek-llm-7b-base, deepseek-llm-67b-base, deepseek-coder-33b-base, deepseek-moe-16b-base, DeepSeek-V2, DeepSeek-V2-Lite, DeepSeek-Coder-V2-Instruct, DeepSeek-V3, DeepSeek-V3.1, DeepSeek-V4-Flash, DeepSeek-V4-Pro, DeepSeek-V4.1-Flash (huggingface.co, retrieved Sept 2026 &mdash; the <span class="mono">n_routed_experts</span>/<span class="mono">num_experts_per_tok</span>/<span class="mono">moe_intermediate_size</span>/<span class="mono">scoring_func</span>/<span class="mono">topk_method</span>/<span class="mono">swiglu_limit</span> fields quoted throughout this paper are from these files)
+</div>
+
+<div class="src-block">
+<strong>Independent verification and context</strong><br>
+Andrey Lukyanenko, &ldquo;DeepSeek-V4 Review&rdquo; (Apr 24, 2026 &mdash; V4 expert counts, stability techniques, OPD) &middot; alphaXiv digest of the V4.1-Flash report (Sept 2026 &mdash; CED, Engram, Single-Pass mHC) &middot; Mistral AI, &ldquo;Mixtral of Experts&rdquo; (Dec 11, 2023 &mdash; 46.7B/12.9B) &middot; Qwen3 release post (Apr 29, 2025) and HF card (128 experts, 8 active) &middot; Meta Llama 4 announcement (Apr 5, 2025 &mdash; Scout 16 experts, Maverick 128 routed + shared, 17B active) &middot; Kimi K2 technical report (arXiv, Jul 2025 &mdash; 1T/32B, 384 experts) and simplismart/lmsys deployment notes &middot; NVIDIA Megatron-Bridge GLM-4.5 page (160 experts, top-8, 2.5&times; scaling) &middot; KTransformers documentation and GoPenAI review (Oct 2025) &middot; Unsloth local-deployment guides (llama.cpp <span class="mono">-ot ".ffn_.*_exps.=CPU"</span> pattern) &middot; vLLM DeepSeek recipe pages (recipes.vllm.ai)
+</div>
+
+<p>One closing observation, offered as engineering rather than sentiment. The dense FFN of 2023 was a monument: every parameter sacred, every token taxed for all of them, capacity and compute the same number. DeepSeek&rsquo;s three-year project was to take that monument apart &mdash; first into 64 experts, then 160, then 256, then 384, each smaller, each more specialized, the common knowledge quarantined, the load balanced first by gradients and then by arithmetic, the weights shrinking from sixteen bits to eight to four, until by September 2026 the &ldquo;feed-forward layer&rdquo; is a 552B-parameter library entered through hashes and gates, consulted at the cost of a 2023 toy model. The pattern is the same one the KV-cache history revealed, aimed at a different two-thirds of the network: <strong>find the multiplication nobody is attacking, and attack it for three consecutive years</strong>. The experts are still multiplying.</p>
+
+<div class="footref">
+Compiled September 2026 &middot; Single-file HTML &middot; All figures cited inline &middot; Independent technical analysis; not affiliated with or endorsed by DeepSeek. Configs, papers, and pricing verified against primary sources at compilation time; check the official documentation before making deployment or purchasing decisions.
+</div>
+
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<!-- ==================== RELATED POSTS ==================== -->
+<section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
+  <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
+    <a href="deepseek-kv-cache-optimization-research-paper.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">From 390 KB to 890 Bytes</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The companion paper: DeepSeek's complete three-year KV-cache lineage &mdash; the other two-thirds of the inference bill.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="deepseek-v4-1-flash-deep-dive.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">DeepSeek V4.1 Flash: Architecture Deep Dive</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The full architecture breakdown of the model whose asymmetric CED MoE and Engram memory close this paper.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="deepseek-v4-flash-deep-dive.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">DeepSeek V4 Flash Deep Dive</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The 284B/13B active MoE with MLA attention &mdash; the generation that precedes V4.1's expert redesign.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+  </div>
+</section>
+
+<button class="btn-top" id="btnTop" aria-label="Back to top" title="Back to top">&#8593;</button>
+
+<script>
+(function(){
+  // ---- theme toggle ----
+  var btn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('ffn-paper-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+  } catch(e) {}
+  if (btn) btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.innerHTML = '&#9788;'; }
+    else { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+    try { localStorage.setItem('ffn-paper-theme', dark ? 'light' : 'dark'); } catch(e) {}
+  });
+
+  // ---- TOC active-section tracking ----
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var map = {};
+  links.forEach(function(l){ var h = l.getAttribute('href').slice(1); map[h] = l; });
+  var targets = Object.keys(map).map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  function onScroll(){
+    var pos = window.scrollY + 140, current = null;
+    targets.forEach(function(t){ if (t.offsetTop <= pos) current = t.id; });
+    links.forEach(function(l){ l.classList.remove('active'); });
+    if (current && map[current]) map[current].classList.add('active');
+    var b = document.getElementById('btnTop');
+    if (b) b.classList.toggle('show', window.scrollY > 900);
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function(){
+    if (!ticking){ requestAnimationFrame(function(){ onScroll(); ticking = false; }); ticking = true; }
+  }, {passive:true});
+  onScroll();
+
+  // ---- back to top ----
+  var topBtn = document.getElementById('btnTop');
+  if (topBtn) topBtn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+
+  // ---- lightweight code-comment highlighting ----
+  document.querySelectorAll('pre code').forEach(function(code){
+    var html = code.innerHTML;
+    var spans = [];
+    html = html.replace(/<span class="c">[\s\S]*?<\/span>/g, function(m){
+      spans.push(m); return '\u0000' + (spans.length-1) + '\u0000';
+    });
+    html = html.split('\n').map(function(line){
+      var t = line.replace(/^(\s*)/, '');
+      if (t.charAt(0) === '#') {
+        return line.replace(/^(\s*)(#.*)$/, '$1<span class="c">$2</span>');
+      }
+      var idx = line.indexOf(' #');
+      if (idx > -1 && line.indexOf('"') === -1 && line.indexOf("'") === -1) {
+        return line.slice(0, idx) + '<span class="c">' + line.slice(idx) + '</span>';
+      }
+      return line;
+    }).join('\n');
+    html = html.replace(/\u0000(\d+)\u0000/g, function(m, i){ return spans[+i]; });
+    code.innerHTML = html;
+  });
+})();
+</script>
+<script src="../js/theme-switcher.js"></script>
+</body>
+</html>

@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Context Management in Agent Loops — The Research, the Architectures, and DeepSeek's Late-2026 Answer</title>
+<meta name="description" content="A book-length research paper on context management for AI agent loops: why context rots, how the research evolved from MemGPT to Mem0, A-MEM, MemOS, Zep, Letta, Anthropic's context engineering, Manus's KV-cache lessons, and the benchmark wars — and how DeepSeek engineered context management across its own stack, from MLA and context caching (2024) through DSA (2025), the thinking-context-management rules of V3.2, the 1M-token agent context of V4, to the Engram conditional-memory module of V4.1-Flash (September 2026). Every claim is cited to primary sources.">
+<meta name="keywords" content="context management, agent loops, context engineering, AI agents, LLM, context rot, KV cache, prefix caching, compaction, MemGPT, Letta, Mem0, A-MEM, MemOS, Zep, Graphiti, LoCoMo, LongMemEval, BEAM, DeepSeek, DeepSeek V3.2, DeepSeek V4, V4.1-Flash, Engram, DSA, MLA, interleaved thinking, reasoning_content, 2026">
+<meta name="author" content="Agent Systems Research Series">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Context Management in Agent Loops — The Research, the Architectures, and DeepSeek's Late-2026 Answer",
+  "alternativeHeadline": "A book-length research paper on the science of managing context in agentic loops, and DeepSeek's engineering of it",
+  "description": "From context rot and the 100:1 prefill-decode economics of agent loops, through MemGPT, Mem0, A-MEM, MemOS, Zep, Letta, Anthropic's context engineering, and the Manus KV-cache lessons, to DeepSeek's own arc: MLA, disk context caching, DSA sparse attention, V3.2's thinking context management, V4's million-token agent context, and V4.1-Flash's Engram conditional memory (September 2026).",
+  "author": {
+    "@type": "Organization",
+    "name": "Agent Systems Research Series"
+  },
+  "datePublished": "2026-09-13T00:00:00Z",
+  "dateModified": "2026-09-26T00:00:00Z",
+  "keywords": "context management, agent loops, context engineering, context rot, KV cache, MemGPT, Mem0, DeepSeek, Engram, V4.1-Flash, 2026",
+  "articleSection": "Research Paper",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 17000,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Local AI Zone",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://local-ai-zone.github.io/logo.svg"
+    }
+  },
+  "about": [
+    {"@type": "Thing", "name": "Context management"},
+    {"@type": "Thing", "name": "AI agents"},
+    {"@type": "Thing", "name": "KV cache"},
+    {"@type": "Thing", "name": "Context engineering"},
+    {"@type": "Thing", "name": "DeepSeek"},
+    {"@type": "Thing", "name": "Engram"}
+  ],
+  "isPartOf": {
+    "@type": "Blog",
+    "name": "Local AI Zone — Blog",
+    "url": "https://local-ai-zone.github.io/blog.html"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://local-ai-zone.github.io/og-image.png",
+    "width": 1200,
+    "height": 630
+  },
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": ["h1", ".cover .sub"]
+  }
+}
+</script>
+<!-- ==================== SEO ==================== -->
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow">
+<meta name="bingbot" content="index, follow">
+<meta name="rating" content="general">
+<meta name="revisit-after" content="7 days">
+<meta name="theme-color" content="#4f46e5">
+<meta name="creator" content="Local AI Zone">
+<meta name="publisher" content="Local AI Zone">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:title" content="Context Management in Agent Loops — The Research, the Architectures, and DeepSeek's Late-2026 Answer">
+<meta property="og:description" content="A citation-driven research paper on context management for agent loops: why context rots, the memory-layer research from MemGPT and Mem0 to Anthropic's context engineering, the benchmark wars, and how DeepSeek engineered context management from MLA (2024) to V4.1-Flash's 196B Engram conditional memory (2026).">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Context Management in Agent Loops — DeepSeek Late-2026 Research Paper">
+<meta property="article:author" content="Hussain Nazary">
+<meta property="article:published_time" content="2026-09-13T00:00:00Z">
+<meta property="article:modified_time" content="2026-09-26T00:00:00Z">
+<meta property="article:section" content="Research Paper">
+<meta property="article:tag" content="AI Agents">
+<meta property="article:tag" content="Context Management">
+<meta property="article:tag" content="Context Engineering">
+<meta property="article:tag" content="KV Cache">
+<meta property="article:tag" content="DeepSeek">
+<meta property="article:tag" content="Agent Loops">
+<meta property="article:tag" content="Memory">
+<meta property="article:tag" content="DeepSeek V4.1 Flash">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@localaizone">
+<meta name="twitter:creator" content="@hussainnazary">
+<meta name="twitter:title" content="Context Management in Agent Loops — The Full Research">
+<meta name="twitter:description" content="16 chapters on agent context: context rot, MemGPT to MemOS, the Manus KV-cache lessons, and DeepSeek's stack from MLA and context caching to V4's 1M tokens and Engram.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta name="twitter:image:alt" content="Context Management in Agent Loops — DeepSeek Late-2026 Research Paper">
+
+<!-- FAQ Schema (AEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is context rot in AI agents?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Context rot is the degradation in model quality as a context window fills. Agent loops hit it harder than chat because every tool call appends results, so a run can accumulate tens of thousands of tokens of low-signal text that dilutes the instructions the model is trying to follow."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is the difference between context management, memory and context engineering?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Context management covers decisions about what occupies the live window within a single session. Memory is what persists across sessions or beyond the window. Context engineering is the umbrella discipline covering both, plus system prompts, tool schemas and retrieval policy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What did MemGPT introduce?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MemGPT (2023) introduced the operating-system metaphor for context: treat the context window as fast main memory and page information in and out of an external store, so the model manages its own context the way an OS manages virtual memory."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does DeepSeek manage context for agents?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "DeepSeek engineered context management at every layer: MLA and disk-based context caching (2024), DeepSeek Sparse Attention for cheap long context (2025), the thinking-context-management rules of V3.2, the million-token agent context of V4, and the 196B-parameter Engram conditional-memory module of V4.1-Flash (September 2026)."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is Engram conditional memory?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Engram is DeepSeek's conditional-memory module, described in 'Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models' (January 2026). It is addressed by the input's local n-gram context with O(1) deterministic lookup, adding a knowledge-lookup primitive alongside MoE's conditional computation."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Breadcrumb Schema (GEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+    {"@type": "ListItem", "position": 3, "name": "Context Management in Agent Loops Research Paper", "item": "https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html"}
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<style>
+:root {
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#1a2233; --ink-soft:#46506a; --ink-faint:#7c86a0;
+  --line:#e3e7ee; --accent:#4f46e5; --accent-soft:#eef2ff; --accent-2:#0d9488;
+  --warn-bg:#fff7ed; --warn-line:#fdba74; --warn-ink:#9a3412;
+  --ok-bg:#f0fdf4; --ok-line:#86efac; --ok-ink:#166534;
+  --info-bg:#eff6ff; --info-line:#93c5fd; --info-ink:#1e3a8a;
+  --danger-bg:#fef2f2; --danger-line:#fca5a5; --danger-ink:#991b1b;
+  --code-bg:#0d1117; --code-ink:#d7dde7; --code-cmt:#7d8799; --code-head:#79c0ff; --code-key:#ff7b72; --code-str:#a5d6a7;
+  --side-bg:#0e1526; --side-ink:#aab6cf; --side-hover:#1b2540; --side-active:#4f46e5;
+  --mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,'Liberation Mono',monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif;
+}
+html[data-theme='dark'] {
+  --bg:#0b0f1a; --paper:#111827; --ink:#e5e9f2; --ink-soft:#b8c2d9; --ink-faint:#7c8aa5;
+  --line:#242f47; --accent:#818cf8; --accent-soft:#1e2440; --accent-2:#2dd4bf;
+  --warn-bg:#2a1c0e; --warn-line:#9a5b21; --warn-ink:#fdba74;
+  --ok-bg:#0d2418; --ok-line:#2f7a4f; --ok-ink:#86efac;
+  --info-bg:#101d33; --info-line:#2b4d8a; --info-ink:#93c5fd;
+  --danger-bg:#2a1214; --danger-line:#8a3a3f; --danger-ink:#fca5a5;
+  --side-bg:#0a0f1e; --side-ink:#aab6cf; --side-hover:#1b2540; --side-active:#6366f1;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+/* ============ LAYOUT ============ */
+.shell{display:flex;min-height:100vh}
+aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
+main{flex:1;min-width:0;display:flex;justify-content:center}
+.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
+/* ============ SIDEBAR TOC ============ */
+#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
+#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35;letter-spacing:.2px}
+#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
+#toc nav a{display:block;padding:5px 22px 5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
+#toc nav a:hover{background:var(--side-hover);color:#fff}
+#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
+#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
+#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
+#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
+/* ============ THEME TOGGLE ============ */
+.theme-btn{position:fixed;top:16px;right:20px;z-index:80;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:17px;line-height:1;box-shadow:0 2px 10px rgba(15,23,42,.12);transition:transform .15s}
+.theme-btn:hover{transform:scale(1.07)}
+/* ============ TYPOGRAPHY ============ */
+h1,h2,h3,h4{font-family:var(--sans);line-height:1.25;color:var(--ink)}
+.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
+.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
+.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px;letter-spacing:-.2px}
+.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
+.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--ink-soft)}
+p{margin:0 0 18px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid #c7d2fe}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:700;color:var(--ink)}
+em{font-style:italic}
+ul,ol{margin:0 0 18px;padding-left:26px}
+li{margin-bottom:7px}
+li::marker{color:var(--accent);font-weight:600}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+.small{font-size:13.5px;color:var(--ink-soft)}
+.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#3730a3;overflow-wrap:anywhere}
+html[data-theme='dark'] .mono, html[data-theme='dark'] code:not(pre code){background:#1c2438;border-color:#2c3752;color:#a5b4fc}
+/* ============ COVER ============ */
+.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
+.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
+.cover h1 .thin{color:var(--accent)}
+.cover .sub{font-size:19px;color:var(--ink-soft);max-width:640px;line-height:1.6;margin:0 0 30px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
+.cover .meta b{color:var(--ink-soft);font-weight:600}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:34px 0 8px}
+.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+html[data-theme='dark'] .statgrid .cell{background:linear-gradient(180deg,#141b2e,#10162a)}
+.statgrid .cell .v{font-size:24px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+/* ============ CALLOUTS ============ */
+.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
+.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
+.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
+.callout p:last-child{margin-bottom:0}
+.callout p{margin-bottom:8px}
+/* ============ TABLES ============ */
+.tblwrap{overflow-x:auto;margin:24px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;background:var(--paper)}
+thead th{background:#f1f3f8;text-align:left;font-weight:700;color:#2b3550;font-size:12.5px;letter-spacing:.4px;text-transform:uppercase;padding:10px 14px;border-bottom:2px solid var(--line);white-space:nowrap}
+html[data-theme='dark'] thead th{background:#1a2338;color:#c7d0e8}
+tbody td{padding:9px 14px;border-bottom:1px solid #edf0f5;vertical-align:top}
+html[data-theme='dark'] tbody td{border-bottom-color:#202a42}
+tbody tr:nth-child(even){background:#fafbfd}
+html[data-theme='dark'] tbody tr:nth-child(even){background:#131a2c}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .tag{display:inline-block;font-size:11px;font-weight:700;padding:1.5px 8px;border-radius:99px;letter-spacing:.3px}
+.tag.good{background:var(--ok-bg);color:var(--ok-ink);border:1px solid var(--ok-line)}
+.tag.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.tag.bad{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line)}
+.tag.neutral{background:#eef1f6;color:#3f4a63;border:1px solid #d8dee9}
+html[data-theme='dark'] .tag.neutral{background:#1c2438;color:#b8c2d9;border-color:#2c3752}
+.tblfoot{font-size:12.5px;color:var(--ink-faint);padding:8px 14px;background:#fafbfd;border-top:1px solid var(--line)}
+html[data-theme='dark'] .tblfoot{background:#131a2c}
+/* ============ CODE ============ */
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:22px 0;font-family:var(--mono);font-size:13.2px;line-height:1.62}
+pre code{font-family:inherit;background:none;border:none;padding:0;color:inherit;white-space:pre}
+pre .c{color:var(--code-cmt);font-style:italic}
+pre .h{color:var(--code-head)}
+pre .k{color:var(--code-key)}
+pre .s{color:var(--code-str)}
+pre .d{color:#e3b341}
+.codetitle{display:flex;justify-content:space-between;align-items:center;background:#161b22;border:1px solid #30363d;border-bottom:none;border-radius:12px 12px 0 0;padding:8px 16px;font-family:var(--mono);font-size:11.5px;color:#8b98ab;margin:22px 0 0}
+.codetitle .dots{color:#444d58;letter-spacing:2px}
+.codetitle + pre{margin-top:0;border-radius:0 0 12px 12px}
+/* ============ FIGURES / DIAGRAMS ============ */
+figure{margin:28px 0}
+figcaption{font-size:13px;color:var(--ink-faint);margin-top:10px;text-align:center}
+.flow{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:22px;font-size:14px}
+html[data-theme='dark'] .flow{background:#101728}
+.flow .fnode{background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;line-height:1.5;box-shadow:0 1px 2px rgba(16,24,40,.05)}
+.flow .fnode b{color:var(--ink)}
+.flow .fdecision{background:var(--accent-soft);border:1.5px solid #c7d2fe;border-radius:9px;padding:10px 14px;line-height:1.5}
+html[data-theme='dark'] .flow .fdecision{border-color:#39406b}
+.flow .fterminal{background:#ecfdf5;border:1.5px solid #a7f3d0;border-radius:9px;padding:10px 14px;line-height:1.5}
+html[data-theme='dark'] .flow .fterminal{background:#0d2418;border-color:#2f7a4f}
+.flow .fterminal b{color:#065f46}
+html[data-theme='dark'] .flow .fterminal b{color:#86efac}
+.flow .farrow{color:var(--ink-faint);text-align:center;font-size:15px;padding:2px 0;line-height:1}
+.flow .flabel{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--accent);text-align:center;padding:1px 0 2px}
+.flow .fgrid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.flow .fgrid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+@media (max-width:760px){.flow .fgrid2,.flow .fgrid3{grid-template-columns:1fr}}
+.bar-chart{display:grid;gap:7px;margin:18px 0}
+.bar-row{display:grid;grid-template-columns:210px 1fr 86px;gap:12px;align-items:center;font-size:13px}
+.bar-row .lbl{text-align:right;color:var(--ink-soft)}
+.bar-row .track{background:#eef0f5;border-radius:5px;height:20px;position:relative;overflow:hidden}
+html[data-theme='dark'] .bar-row .track{background:#1c2438}
+.bar-row .fill{height:100%;border-radius:5px 0 0 5px;background:linear-gradient(90deg,#6366f1,#4f46e5)}
+.bar-row .fill.warn{background:linear-gradient(90deg,#fb923c,#ea580c)}
+.bar-row .fill.bad{background:linear-gradient(90deg,#f87171,#dc2626)}
+.bar-row .fill.ok{background:linear-gradient(90deg,#34d399,#059669)}
+.bar-row .val{font-variant-numeric:tabular-nums;font-weight:600;color:var(--ink-soft)}
+/* ============ TIMELINE ============ */
+.tline{margin:26px 0;border-left:3px solid var(--line);padding-left:26px}
+.tline .tl-item{position:relative;margin-bottom:26px}
+.tline .tl-item::before{content:"";position:absolute;left:-35.5px;top:5px;width:15px;height:15px;border-radius:99px;background:var(--accent);border:3px solid var(--paper);box-shadow:0 0 0 2px var(--accent-soft)}
+.tline .tl-item .tl-date{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent);letter-spacing:.5px}
+.tline .tl-item .tl-head{font-weight:750;font-size:16.5px;color:var(--ink);margin:2px 0 4px}
+.tline .tl-item .tl-body{font-size:14.5px;color:var(--ink-soft);line-height:1.6}
+/* ============ MISC ============ */
+.part-divider{margin:80px 0 60px;padding:44px 40px;background:linear-gradient(135deg,#111a33,#0e1526);border-radius:16px;color:#fff;position:relative;overflow:hidden}
+.part-divider .pd-part{font-size:11.5px;font-weight:800;letter-spacing:2.5px;color:#818cf8;text-transform:uppercase;margin-bottom:10px}
+.part-divider h2{color:#fff;font-size:33px;font-weight:800;letter-spacing:-.8px;margin:0 0 12px}
+.part-divider p{color:#aab6cf;font-size:15.5px;margin:0;max-width:560px;line-height:1.7}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 26px}
+.chip{font-size:12.5px;font-weight:600;padding:5px 13px;border-radius:99px;border:1px solid var(--line);background:#fafbfd;color:var(--ink-soft)}
+html[data-theme='dark'] .chip{background:#131a2c}
+.kbd{font-family:var(--mono);font-size:.82em;border:1px solid #cbd3e1;border-bottom-width:2.5px;border-radius:6px;padding:1px 7px;background:#f8fafc;color:#3b475f}
+.footref{font-size:13px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:56px;padding-top:18px}
+.btn-top{position:fixed;right:26px;bottom:26px;width:44px;height:44px;border-radius:99px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 6px 20px rgba(79,70,229,.42);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;border:none;z-index:60}
+.btn-top.show{opacity:1;pointer-events:auto}
+.src-block{margin:18px 0;padding:14px 18px;border:1px dashed var(--line);border-radius:10px;font-size:14px;color:var(--ink-soft);background:#fbfcfe}
+html[data-theme='dark'] .src-block{background:#101728}
+@media (max-width:1100px){
+  .shell{display:block}
+  aside#toc{position:static;width:100%;height:auto;flex:none}
+  .page{padding:0 26px 90px}
+  .cover h1{font-size:36px}
+  .bar-row{grid-template-columns:130px 1fr 70px}
+}
+@media print{
+  aside#toc,.btn-top,.theme-btn{display:none}
+  body{background:#fff}
+  .page{box-shadow:none;max-width:100%;padding:0 6mm}
+  .part-divider{background:#1e293b !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre{white-space:pre-wrap}
+}
+/* ============ INTEGRATED SITE HEADER ============ */
+.premium-header{position:static !important}
+.theme-btn{display:none !important}
+</style>
+</head>
+<body>
+<!-- ==================== SITE HEADER ==================== -->
+<header class="premium-header blog-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-brand">
+                    <div class="header-logo-section">
+                        <div class="header-logo" onclick="window.location.href='../index.html'">
+                            <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="logo-fallback" style="display: none;">
+                                <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <div class="brand-title">GGUF Discovery</div>
+                            <p class="brand-subtitle">Blog &amp; Guides</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <nav class="blog-nav" aria-label="Main navigation">
+                    <a href="../index.html">Home</a>
+                    <a href="../about.html">About</a>
+                    <a href="../services.html">Need Help?</a>
+                    <a href="../blog.html" class="active">Blog</a>
+                </nav>
+                <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                    <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                    <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                    <span class="theme-label light-label">Light</span>
+                    <span class="theme-label dark-label">Dark</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<button class="theme-btn" id="themeBtn" aria-label="Toggle light/dark theme" title="Toggle theme">&#9788;</button>
+<div class="shell">
+
+<!-- ==================== SIDEBAR TOC ==================== -->
+<aside id="toc">
+  <div class="brand">
+    <div class="t">Context Management in Agent Loops</div>
+    <div class="s">Research Paper &middot; DeepSeek Late-2026 Edition</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Front Matter</div>
+    <a href="#abstract"><span class="num">&sect;</span>Abstract &amp; How to Read</a>
+    <div class="part">Part I &mdash; The Problem: The Loop Eats Itself</div>
+    <a href="#ch1"><span class="num">1</span>Anatomy of an Agent-Loop Context</a>
+    <a href="#ch2"><span class="num">2</span>Why Naive Context Fails</a>
+    <a href="#ch3"><span class="num">3</span>The Economics of the Loop</a>
+    <div class="part">Part II &mdash; The Research Landscape (2023&ndash;2026)</div>
+    <a href="#ch4"><span class="num">4</span>Foundations &amp; the OS Metaphor</a>
+    <a href="#ch5"><span class="num">5</span>The Memory-Layer Explosion</a>
+    <a href="#ch6"><span class="num">6</span>Retrieval Rethought</a>
+    <a href="#ch7"><span class="num">7</span>Context Engineering Grows Up</a>
+    <a href="#ch8"><span class="num">8</span>The Benchmark Wars</a>
+    <div class="part">Part III &mdash; DeepSeek's Work (2023 &rarr; Late 2026)</div>
+    <a href="#ch9"><span class="num">9</span>Baseline Era: MLA &amp; Context Caching</a>
+    <a href="#ch10"><span class="num">10</span>V3.2-Exp: DSA, the Cheap Long Context</a>
+    <a href="#ch11"><span class="num">11</span>V3.2: Thinking Context Management</a>
+    <a href="#ch12"><span class="num">12</span>V4: A Million Tokens for Agents</a>
+    <a href="#ch13"><span class="num">13</span>Engram &amp; V4.1-Flash</a>
+    <a href="#ch14"><span class="num">14</span>The DeepSeek Playbook</a>
+    <div class="part">Part IV &mdash; Architectures &amp; the Playbook</div>
+    <a href="#ch15"><span class="num">15</span>The Pattern Catalog</a>
+    <a href="#ch16"><span class="num">16</span>Recipes, Checklists &amp; Outlook</a>
+  </nav>
+  <div class="toc-foot">Compiled September 2026 &middot; Single-file HTML &middot; Every claim cited to a primary source</div>
+</aside>
+
+<!-- ==================== MAIN ==================== -->
+<main>
+<div class="page">
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <span class="kicker">Systems Research Paper &middot; Agentic LLM Engineering</span>
+  <h1>Context Management in <span class="thin">Agent Loops</span></h1>
+  <p class="sub">A complete, citation-driven account of the science of managing context inside agentic loops &mdash; why context rots, what the research actually established from MemGPT and Mem0 to Anthropic's context engineering and the Manus KV-cache lessons, how the benchmark wars mislead, and how DeepSeek quietly engineered context management into every layer of its own stack: from MLA and disk-based context caching (2024), through DeepSeek Sparse Attention (2025) and the thinking-context-management rules of V3.2, to the million-token agent context of V4 and the 196B-parameter Engram conditional-memory module of DeepSeek-V4.1-Flash, released September 10, 2026.</p>
+  <div class="statgrid">
+    <div class="cell"><div class="v">100:1</div><div class="k">Input-to-output token ratio, Manus agent loops</div></div>
+    <div class="cell"><div class="v">51.4 &rarr; 67.6</div><div class="k">BrowseComp, V3.2 with context management</div></div>
+    <div class="cell"><div class="v">84.2 &rarr; 97.0</div><div class="k">Multi-Query NIAH with Engram conditional memory</div></div>
+    <div class="cell"><div class="v">890 B</div><div class="k">Global KV bytes per token, V4.1-Flash (438&times; below V1)</div></div>
+  </div>
+  <div class="meta">
+    <span><b>Scope:</b> Research landscape 2023&ndash;2026 &middot; DeepSeek stack 2024&ndash;2026 &middot; Architecture patterns</span>
+    <span><b>Method:</b> every number traced to a paper, official blog, or API document</span>
+    <span><b>Read time:</b> ~65 minutes</span>
+  </div>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<h2 class="ch" id="abstract"><span class="chno">&sect;</span> Abstract &amp; How to Read This Paper</h2>
+<p class="ch-sub">What this paper claims, what it deliberately does not claim, and how the evidence is organized.</p>
+
+<p>An agent, in the definition Anthropic's applied AI team settled on in late 2025, is an <em>LLM autonomously using tools in a loop</em>. That definition has an uncomfortable corollary: the loop is a context-generating machine. Every planning step, every tool call, every raw JSON blob a tool returns, every reasoning trace a thinking model emits lands in the same finite window that must also hold the system prompt and the tool schemas. The window refills on every single call, because the model itself is stateless &mdash; each inference starts from zero, and only whatever the harness feeds back persists. Managing that feedback stream is now the difference between an agent that survives fifty turns and one that quietly degrades into a very confident, very expensive random walk.</p>
+
+<p>This paper is written in September 2026, and it covers two intertwined stories. The first is the research landscape: the emergence of <em>context rot</em> as a measured phenomenon, the operating-system metaphor of MemGPT and its descendants (Letta, Mem0, A-MEM, MemOS, Zep), the retrieval rethink that replaced pre-fetching with just-in-time context and direct corpus interaction, the codification of the discipline by Anthropic, LangChain, and the practitioners at Manus, and the benchmark wars on LoCoMo, LongMemEval, BEAM, and DMR &mdash; including the uncomfortable fact that most head-to-head numbers in this field are published by the vendors being ranked. The second story is DeepSeek's, because no other lab has pushed context management as deeply into the <em>model itself</em> rather than the harness around it: Multi-head Latent Attention collapsed the KV cache by 93.3% in 2024, disk-based context caching made multi-turn agents dramatically cheaper the same year, DeepSeek Sparse Attention cut long-context attention to <em>O(L&middot;k)</em> in 2025, V3.2 shipped explicit thinking-context-management rules for tool loops and published a controlled study of compaction strategies on BrowseComp, V4 grew the window to one million tokens with reasoning persistence across user turns, and V4.1-Flash (September 10, 2026) added a 196-billion-parameter <em>Engram</em> module that stores knowledge outside the attention stream and retrieves it with O(1) lookups &mdash; a memory system trained into the weights rather than bolted on as a retrieval tool.</p>
+
+<div class="callout info"><span class="lab">Accuracy discipline</span>
+<p>Every quantitative claim in this paper is traceable to a primary source: an arXiv paper, an official model release note, an API document, or a first-party engineering blog, all current as of September 13, 2026. Where different labs publish conflicting numbers about the same benchmark &mdash; and in the memory field they do, constantly &mdash; we present each claim with its source and flag the conflict rather than averaging it away. Where a technique is a design pattern rather than a measured result, it is labeled as such. The sources list at the end catalogues all forty-odd references.</p></div>
+
+<h3>How the paper is organized</h3>
+<p><strong>Part I</strong> dissects the problem: what actually fills an agent-loop context, why quality degrades as the window fills (context rot, NoLiMa, lost-in-the-middle), and the economics of prefill-heavy loops, where prefix caching is not an optimization but the business model. <strong>Part II</strong> maps the research landscape from the 2023 foundations through the 2025&ndash;2026 memory-layer explosion and the codification of context engineering as a discipline. <strong>Part III</strong> is the DeepSeek deep-dive the title promises: version by version, from the dense 4K-context baseline of late 2023 to the Engram architecture of September 2026, with the exact context-management semantics of each release. <strong>Part IV</strong> assembles the practical payoff: a nine-pattern architecture catalog with trade-offs, a decision framework keyed to named constraints, and production recipes &mdash; including working code for the DeepSeek reasoning-retention loop that the V3.2 API contract makes mandatory.</p>
+
+<p>Three audiences were kept in mind while writing. If you build agent harnesses, Parts I, II and IV are your material and Part III is the reference you will cite in design docs. If you train or serve models, Part III is the core and the benchmark chapters will save you from re-running settled arguments. If you are evaluating vendor claims about memory products, Chapter 8 is written specifically for you &mdash; it is a field guide to reading benchmark tables whose publishers have skin in the game.</p>
+
+<div class="src-block"><strong>Terminology used throughout.</strong> <em>Context management</em> = decisions about what occupies the live window within one session. <em>Memory</em> = what persists across sessions or beyond the window. <em>Context engineering</em> = the discipline covering both, plus system prompts, tool schemas, and retrieval policy. <em>KV cache</em> = the attention key/value state a serving stack computes for a prefix and can reuse when the next call shares that prefix. <em>Reasoning trace</em> / <em>CoT</em> = the thinking tokens a reasoning model emits before its answer, returned by the DeepSeek API as <code>reasoning_content</code>.</div>
+<!-- ==================== PART I ==================== -->
+<div class="part-divider" id="part1">
+  <div class="pd-part">Part I &middot; Chapters 1&ndash;3</div>
+  <h2>The Problem: The Loop Eats Itself</h2>
+  <p>What actually fills an agent's context window, why more tokens make agents worse, and why the economics of the loop are decided at the KV cache rather than the context window's advertised size.</p>
+</div>
+
+<h2 class="ch" id="ch1"><span class="chno">1</span> Anatomy of an Agent-Loop Context</h2>
+<p class="ch-sub">The loop, the stateless model, and the five freight cars that fill the window on every single call.</p>
+
+<h3>1.1 The loop, and the model that forgets</h3>
+<p>Strip away the frameworks and every agentic system in production today is the same eight lines of pseudocode: give the model a goal and a set of tools; let it emit either an answer or a tool call; execute the call in some environment; append the result; repeat. Anthropic's engineering essay on context engineering &mdash; the one that fixed the vocabulary for the whole industry in September 2025 &mdash; compresses this to a definition the field has largely converged on: agents are <em>LLMs autonomously using tools in a loop</em>. The loop is the easy part. The hard part is what the loop does to the model's context, because a transformer holds no state between invocations. Every pass through the loop re-sends everything the model has ever seen in the session: instructions, tool definitions, prior reasoning, prior observations. The model is stateless; the harness is the only memory it has.</p>
+
+<p>This statelessness is the single most important architectural fact in agent engineering, and it was stated plainly by Louis-Fran&ccedil;ois Bouchard's team at Towards AI after running instrumented experiments on their open-source AI tutor in 2026: <em>within a session you have context management; across sessions you have memory; and you cannot have good multi-session memory if a single session is already falling apart</em>. The first half of that sentence is this Part I. The second half organizes the entire research field of Part II. Notice what the split implies: the "memory problem" that vendors sell products for is downstream of a more basic engineering discipline &mdash; deciding, at every call, which tokens earn their place in the window.</p>
+
+<h3>1.2 The five freight cars</h3>
+<p>Concretely, a production agent-loop call in 2026 typically carries five categories of content, and each has a different growth profile. The table below assembles a realistic accounting from the token budgets published in 2026 retrospectives by the Crux Digits engineering team and the Towards AI tutor experiments.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Segment</th><th class="num">Typical size</th><th>Growth behavior</th><th>Dominant failure mode</th></tr></thead>
+<tbody>
+<tr><td><strong>System prompt</strong></td><td class="num">2,000&ndash;6,000 tok</td><td>Flat, but grows every sprint as rules accrete</td><td>Bloat; brittle hardcoded logic</td></tr>
+<tr><td><strong>Tool schemas</strong></td><td class="num">1,000&ndash;4,000+ tok</td><td>Flat per call; explodes with MCP tool sprawl</td><td>Wrong-tool selection, schema violations</td></tr>
+<tr><td><strong>Message history</strong></td><td class="num">500&ndash;2,000 tok / turn</td><td>Linear in turns; compounding across a ticket</td><td>Rarely trimmed even when resolved</td></tr>
+<tr><td><strong>Tool outputs</strong></td><td class="num">500&ndash;3,000 tok / call</td><td>Linear in calls; raw JSON pasted unparsed</td><td>The least-examined, most bloated segment</td></tr>
+<tr><td><strong>Retrieved context</strong></td><td class="num">2,000&ndash;100,000 tok</td><td>Bursty; pipeline-dependent</td><td>Unfiltered chunk dumps bury the answer</td></tr>
+</tbody><div class="tblfoot">Sizes compiled from Crux Digits, "Context Engineering: The 2026 Playbook for AI Agents" (July 2026) and Towards AI's tutor instrumentation (August 2026). A "modest version of each" &mdash; 5,000 tools + 3,000 retrieval + 4,000 history + three 1,500-token tool results &mdash; already totals ~16,500 tokens of working context for one support ticket.</div></table></div>
+
+<p>The surprising empirical finding, reported by the Towards AI team after instrumenting their tutor, is that the segment everyone instinctively trims &mdash; chat history &mdash; is usually the smallest offender. In their system, each call could pull up to 100K tokens of retrieved course material, and turns were landing around 200K input tokens; <em>the retrieval payloads, not the conversation, dominated the input</em>. Most advice about long agent sessions aims at trimming dialogue; in a retrieval-heavy agent, dialogue is rounding error. This single observation reshapes where engineering effort belongs: at the tool-output boundary and the retrieval filter, not at the transcript.</p>
+
+<h3>1.3 The skew: prefill-heavy, decode-light</h3>
+<p>Chatbot traffic is roughly symmetric &mdash; a human types a sentence, the model writes a paragraph. Agent traffic is not. Manus, whose engineering blog in July 2025 became the reference on this, measured their production agents at an <strong>average input-to-output token ratio of about 100:1</strong>. A typical task takes around <strong>50 tool calls</strong>, each of which re-sends the entire accumulated trajectory so that the model can emit a few hundred tokens of structured function call. One consequence is immediate: the cost and latency of an agent is dominated by <em>prefill</em> &mdash; the recomputation of everything already known &mdash; not by generation. Another consequence is subtler and is the subject of Chapter 3: because each loop iteration shares a prefix with the previous one, the KV cache transforms agent economics from "pay for the whole window every turn" to "pay for the delta," and anything that breaks prefix sharing (a timestamp in the system prompt, a reordered JSON key, a mid-session tool-set change) silently re-inflates the bill by an order of magnitude.</p>
+
+<figure><div class="flow">
+  <div class="flabel">The agent loop as a context-generating machine</div>
+  <div class="fnode"><b>User goal + system prompt + tool schemas</b> &mdash; the static prefix (keep stable for cache hits)</div>
+  <div class="farrow">&darr;</div>
+  <div class="fnode"><b>Model call #n</b> &mdash; re-prefills everything; emits thought + tool call (or final answer)</div>
+  <div class="farrow">&darr;</div>
+  <div class="fnode"><b>Environment / sandbox</b> &mdash; executes the action, returns an observation (often the largest token mass in the turn)</div>
+  <div class="farrow">&darr;</div>
+  <div class="fdecision"><b>Append thought + action + observation to context</b> &mdash; the trajectory grows monotonically; nothing is free to re-derive</div>
+  <div class="farrow">&#8635; repeat until done (or until the window, the budget, or the model's attention gives out)</div>
+</div><figcaption>Fig 1.1 &mdash; The loop. Every arrow that points down adds tokens that must be re-prefilled on the next pass. DeepSeek's V3.2, V4, and V4.1-Flash releases each attack a different part of this cycle &mdash; reasoning-trace retention (&sect;11), KV-cache size (&sect;13), and prefix reuse (&sect;12) respectively.</figcaption></figure>
+
+<h3>1.4 What "context management" therefore means</h3>
+<p>Across every paper surveyed in Part II, the working definition that survives is negative: context management is the set of mechanisms that keep the <em>effective</em> context &mdash; the tokens the model actually re-reads &mdash; small, high-signal, and cache-stable, while the <em>logical</em> context &mdash; everything the session has ever produced &mdash; grows without bound. The mechanisms differ wildly in where they live: in the harness (compaction, note files, sub-agents), in the retrieval layer (just-in-time loading, corpus search), in the serving stack (prefix caching, KV compression), or in the model itself (attention sparsity, trained memory modules). The field's three-year history, traced in Part II, is essentially the migration of these mechanisms from the harness downward into the model. DeepSeek's late-2026 position &mdash; the focus of Part III &mdash; is the extreme end of that migration: at V4.1-Flash, every layer of the stack participates in context management, and the model itself now carries a dedicated 196B-parameter memory module.</p>
+<h2 class="ch" id="ch2"><span class="chno">2</span> Why Naive Context Fails</h2>
+<p class="ch-sub">Context rot, the 32K cliff, lost-in-the-middle, and the attention budget: why bigger windows did not solve the problem.</p>
+
+<h3>2.1 Lost in the middle: the 2023 warning shot</h3>
+<p>The first systematic evidence that long contexts degrade non-uniformly predates the agent era entirely. Liu et al.'s <em>Lost in the Middle</em> study (2023) showed that a model's ability to use a document placed in the middle of a long context drops sharply relative to the same document placed at the beginning or end &mdash; a U-shaped positional performance curve. For agent builders the implication was blunt: the trajectory an agent appends turn after turn is, by construction, a pile of information drifting steadily toward the middle of the window, exactly where models read worst. Manus's engineers later turned this observation into an explicit design pattern &mdash; their agent rewrites its <code>todo.md</code> every few steps precisely to "recite" the plan into the end of the context, where attention is strongest (&sect;7.6). The fix, in other words, was known before the disease was named.</p>
+
+<h3>2.2 Context rot: the 2025 measurement</h3>
+<p>By 2025, model vendors were shipping million-token windows, and it was tempting to declare the problem solved by brute force. Chroma Research's <em>Context Rot</em> study (July 2025) ended that temptation. The team tested <strong>18 frontier models</strong> &mdash; including GPT-4.1, Claude 4, and Gemini 2.5 &mdash; on deliberately simple retrieval and replication tasks, and found that <em>every single model degraded as input length grew</em>, with accuracy cliffs arriving well before the advertised window limit. A 200K-token window could show serious accuracy loss by 50K tokens of input. Positional effects were severe: placing the relevant fact at positions 5&ndash;15 of a twenty-document context cost some models <strong>more than 30 accuracy points</strong> compared to placing it first or last.</p>
+
+<p>Anthropic's engineering essay, published two months later, gave the phenomenon its working explanation and its budget metaphor. The transformer computes attention over <em>n&sup2;</em> pairwise token relationships; as context grows, "the model's ability to capture these pairwise relationships gets stretched thin." Models also train mostly on shorter sequences, leaving them under-adapted to context-wide dependencies. The result is "a performance gradient rather than a hard cliff" &mdash; and a finite <strong>attention budget</strong> that every additional token depletes. Context, in the essay's formulation, must be treated as a resource with diminishing marginal returns, like working memory in humans. The engineering consequence: <em>the smallest set of high-signal tokens that maximizes the likelihood of the desired outcome</em> is the optimization target &mdash; not the largest window you can afford.</p>
+
+<h3>2.3 NoLiMa: the 32K cliff, measured</h3>
+<p>The same quarter, Modarressi et al. published <em>NoLiMa</em> ("Long-Context Evaluation Beyond Literal Matching"), a benchmark that tests whether models can answer questions whose wording has <em>minimal lexical overlap</em> with the passage containing the answer &mdash; requiring latent, associative inference rather than literal string matching, which standard NIAH tests let models exploit. The result that agent engineers should memorize: across <strong>13 models that all claim 128K+ context support</strong>, performance in short contexts (under 1K) was strong, but <strong>at 32K, eleven of the thirteen dropped below 50%</strong> of their own short-context baselines. Even GPT-4o &mdash; one of the top-performing exceptions &mdash; fell from an almost-perfect <strong>99.3% baseline to 69.7%</strong>.</p>
+
+<div class="callout warn"><span class="lab">Why this matters for agent loops specifically</span>
+<p>Agentic work is associative by construction. A coding agent must connect an error message in tool output #3 with a variable name introduced in its own reasoning trace from step #17 with a constraint from the original user request &mdash; none of which literally match each other. NoLiMa measures exactly the capability that long tool trajectories erode first. A model that holds 99.3% at short range and 69.7% at 32K on associative recall is not "a 128K model"; it is a short-context model with a 128K marketing budget. DeepSeek's response to this class of evidence was architectural rather than rhetorical: the V4 technical report frames its million-token push explicitly around "agentic workflows" needing <em>efficient</em> ultra-long context, not merely nominal support (&sect;12).</p></div>
+
+<h3>2.4 The compounding loop failure</h3>
+<p>Put the three findings together and the agent-loop failure mode emerges with uncomfortable clarity. An agent accumulates search results, tool outputs, and abandoned reasoning paths as it works. That accumulated noise degrades every <em>subsequent</em> step, not just the final answer &mdash; each new decision is made inside a context that is longer, more middle-heavy, and more associatively demanding than the last. The 2026 retrospectives converge on the same production observation: a ticket that reaches turn ten with an untrimmed transcript is simultaneously the most likely to hallucinate and the most expensive call of the conversation to run. Quality and cost fail together, on the same curve, because they share a cause. This is why the field stopped treating "context window size" as the headline specification and started treating context <em>management</em> as the discipline &mdash; and it is why every pattern in Part IV exists.</p>
+
+<h2 class="ch" id="ch3"><span class="chno">3</span> The Economics of the Loop</h2>
+<p class="ch-sub">Prefix caching, the 10&times; cached-input discount, and why 2026's compaction debate is decided by cache arithmetic, not sentiment.</p>
+
+<h3>3.1 The cache is the business model</h3>
+<p>Because agent loops re-send an almost-identical prefix every turn, inference providers let you pay once for it. Anthropic's prompt caching prices Claude Sonnet's cached input tokens at <strong>$0.30 per million versus $3.00 uncached &mdash; a 10&times; difference</strong>, the exact figure Manus cites when it argues that <em>the KV-cache hit rate is the single most important metric for a production-stage AI agent</em>, directly driving both latency and cost. DeepSeek has operated the same bargain since August 2, 2024, when its <em>Context Caching</em> service launched as a disk-based, automatic feature: cache hits billed at $0.014 per million tokens against $0.14 for a miss &mdash; the same 90% discount, available two years before most of the industry's agent frameworks had a caching story. By September 2026, the V4.1-Flash release note states the stakes in one sentence: <em>"Cache-hit charges often account for a large share of agent costs. Compressing the cache cuts those costs significantly."</em></p>
+
+<p>The mechanics deserve precision, because the engineering rules fall straight out of them. An autoregressive transformer computes attention keys and values (the KV cache) for every token of the prefix; if the next request's prefix is byte-identical up to a point, the serving stack can skip recomputation and bill the reused span at the discounted rate. A single-token difference invalidates everything from that token onward. This yields the rule set Manus published: keep the prompt prefix stable (no second-precision timestamps at the top of the system prompt); make the context append-only; ensure deterministic serialization (many JSON libraries do not guarantee stable key ordering, which silently breaks caches); mark cache breakpoints explicitly where the provider requires them; and if self-hosting on vLLM, enable prefix caching and route requests to consistent workers with session identifiers.</p>
+
+<h3>3.2 The 2026 twist: caching inverted the compaction calculus</h3>
+<p>Compaction &mdash; summarizing a conversation as it nears the window limit &mdash; has been the reflex answer to long sessions since 2024. In August 2026, the Towards AI team published the measurement that broke the reflex: on their production tutor, evaluated with blind-graded memory probes, <strong>under modern prompt caching, keeping the full history beat every summarization strategy they tested on cost, latency, and memory recall simultaneously</strong>. The reason is cache arithmetic, not model quality: a summary rewrites the prefix, so you pay full price to recompute everything you just tried to save, and you lose the recall of the exact tokens you discarded. Their production defaults &mdash; which looked reasonable &mdash; scored 38% on memory probes and cost twice as much as doing nothing, while still producing answers a blind judge rated as good; their conclusion was that this combination is precisely why you cannot eyeball context strategy and must measure it.</p>
+
+<p>What did pay, in the same experiments, was the cheap tier of compaction: <strong>capping every tool output at a stable size cut their cost per turn by 38%</strong> with no measurable loss in memory recall, because it shrinks the context without rewriting the prefix the cache depends on. The decision rule the team distilled: name your constraint before choosing a strategy &mdash; a window that genuinely does not fit, a cached input price above roughly <strong>$0.55 per million tokens</strong>, or measured quality rot. Each points to a different fix, and only the first one is "summarize."</p>
+
+<div class="callout info"><span class="lab">The DeepSeek angle</span>
+<p>DeepSeek's pricing sits far on the favorable side of that $0.55 threshold &mdash; V4.1-Flash cache hits are billed at $0.006 per million tokens (peak), roughly a 50&times; discount on the $0.30 miss price &mdash; which makes the keep-everything strategy even more economical on its stack, for loops whose static prefix stays stable. The flip side: at 100:1 input skew, the miss price and the cache-hit <em>rate</em> dominate total agent spend, which is why DeepSeek has spent 2024&ndash;2026 compressing the cache itself (MLA, DSA, CSA2, FP4 keys &mdash; Part III) rather than only discounting it.</p></div>
+
+<h3>3.3 The three-way trade</h3>
+<p>Every context-management decision in an agent loop trades three currencies against each other, and the research of 2025&ndash;2026 is best read as the systematic exploration of that trade space.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Currency</th><th>What drives it</th><th>Who attacked it in 2025&ndash;2026</th></tr></thead>
+<tbody>
+<tr><td><strong>Cost</strong></td><td>Prefill tokens &times; price; cache-hit rate; window size</td><td>Manus (prefix stability), DeepSeek (MLA/DSA/CSA2, caching), Towards AI (output caps)</td></tr>
+<tr><td><strong>Latency</strong></td><td>TTFT on re-prefill; retrieval round-trips; memory writes</td><td>DeepSeek Quick Instruction (&sect;12.4), Mem0 (91% lower p95 vs full-context), Zep (90% latency reduction claim)</td></tr>
+<tr><td><strong>Quality</strong></td><td>Effective context size, position, and signal density</td><td>Anthropic (attention budget), Chroma/NoLiMa (measurement), Letta (filesystem beats retrieval tools), DeepSeek V3.2 (reasoning retention)</td></tr>
+</tbody><div class="tblfoot">The three currencies fail together in unmanaged loops (&sect;2.4) and are optimized together by every serious pattern in Part IV.</div></table></div>
+
+<p>The rest of this paper is the story of how the field explored that trade space. Part II covers the research; Part III covers the one lab that pushed the frontier into the weights themselves; Part IV assembles the patterns into something you can deploy this week.</p>
+<!-- ==================== PART II ==================== -->
+<div class="part-divider" id="part2">
+  <div class="pd-part">Part II &middot; Chapters 4&ndash;8</div>
+  <h2>The Research Landscape (2023&ndash;2026)</h2>
+  <p>How the field moved context management from an afterthought to its own benchmarked research layer: the OS metaphor, the memory-layer explosion, the retrieval rethink, the codification by Anthropic and the practitioner blogs, and the benchmark wars that every vendor fights on its own turf.</p>
+</div>
+
+<h2 class="ch" id="ch4"><span class="chno">4</span> Foundations &amp; the Operating-System Metaphor</h2>
+<p class="ch-sub">Memory streams, reflection, skill libraries &mdash; and MemGPT's 2023 bet that an LLM could manage its own memory like an OS manages RAM.</p>
+
+<h3>4.1 The pre-history: cognitive architectures on GPT-3.5</h3>
+<p>Before "agent" was an infrastructure category, three 2023 systems established that what you put around the model matters as much as the model. <em>Generative Agents</em> (Park et al., 2023) gave 25 LLM-powered agents a persistent <strong>memory stream</strong> and a retrieval score computed as a weighted blend of <strong>recency, importance, and relevance</strong> &mdash; plus a <em>reflection</em> mechanism that periodically distilled the stream into higher-level observations. That scoring formula is still the skeleton inside most "agentic memory" products sold in 2026. <em>Reflexion</em> (Shinn et al., 2023) demonstrated verbal self-improvement: an agent that stores its own failure analyses as episodic memory and re-reads them on retry outperforms the same agent without that verbal loop &mdash; an early proof that <em>what an agent writes down about its own trajectory changes its future behavior</em>. <em>Voyager</em> (Wang et al., 2023) externalized <strong>procedural memory</strong> as a growing skill library of verified code, showing that a file-shaped memory an agent both writes and retrieves beats any amount of in-context rehearsal for long-horizon competence. All three prefigure the 2026 consensus patterns: write state down, score it, retrieve it just in time, and reflect on it offline.</p>
+
+<h3>4.2 MemGPT: virtual context management (October 2023)</h3>
+<p>The paper that named the field arrived from UC Berkeley in October 2023. Packer et al.'s <em>MemGPT: Towards LLMs as Operating Systems</em> proposed <strong>virtual context management</strong>: treat the fixed context window as a limited quantity of <em>main memory</em>, and manage a much larger <em>external context</em> (conversational archives, raw documents) through explicit paging operations &mdash; evictions, fetches, and writes that the LLM itself triggers <em>by calling functions</em>. The OS analogy is precise and was meant to be: just as an operating system gives each process the illusion of unlimited RAM by paging to disk, MemGPT gives the model the illusion of unlimited context by paging between the window and external stores, with the model acting as its own memory manager via self-editing function calls.</p>
+
+<p>Two design commitments in the original system matter for everything downstream. First, memory is <em>structured by role</em>, not one undifferentiated log &mdash; the system splits a persistent in-window region (core memory, including editable "blocks" like persona and human descriptions) from paged regions (recall storage for conversation history, archival storage for documents). Second, memory operations are <em>agentic</em>: rather than a fixed summarizer running on a timer, the model invokes memory-editing functions when it judges them necessary. Both commitments survive intact in Letta &mdash; the company built by the MemGPT team &mdash; and in every system that copied the design. The 2025&ndash;2026 memory-layer products of Chapter 5 are, to first order, competing answers to one question MemGPT posed: <em>who decides what gets paged &mdash; the model, the pipeline, or the graph?</em></p>
+
+<h3>4.3 Letta: blocks, filesystems, and sleep-time compute</h3>
+<p>Letta, the continuation of MemGPT by its original team, contributed three developments that anchor the "agentic memory" wing of the field. <strong>Memory blocks</strong> (2025) formalized the in-window core memory as typed, editable, shareable segments &mdash; a persona block, a project block, a human block &mdash; that the agent rewrites through tool calls and that multiple agents can share, making memory a first-class interface rather than a prompt appendix. <strong>Sleep-time compute</strong> (arXiv 2504.13171, April 2025) introduced the idea that an agent can <em>think offline about its context between queries</em>: anticipating likely future questions and reorganizing its own memory during idle time, converting wall-clock that used to be wasted into retrieval quality at query time. It is the direct descendant of Generative Agents' reflection, industrialized.</p>
+
+<p>The third contribution is the 2025 benchmark counter-attack. In <em>Benchmarking AI Agent Memory: Is a Filesystem All You Need?</em> (August 12, 2025), Letta attached LoCoMo conversation histories to agents as <strong>plain files</strong> navigable with <code>grep</code>, <code>search_files</code>, <code>open</code>, and <code>close</code> tools &mdash; no memory product at all &mdash; and scored <strong>74.0% on LoCoMo with GPT-4o-mini</strong>, above the 68.5% Letta cites for the top graph variant in Mem0's own published results. Their conclusion cuts the legs out from under half the memory market: <em>agents are highly effective at filesystem tools (because those are in their training data), so the binding constraint is the agent's ability to manage context, not the sophistication of the retrieval mechanism</em>. Comparing frameworks-and-tools mixes is apples-to-oranges; the Letta Memory Benchmark therefore holds the harness constant and varies the model. The blog also documents a reproducibility dispute worth remembering when reading vendor tables: the MemGPT team could not reconstruct how Mem0's paper produced its MemGPT baseline numbers, and Mem0 did not respond to clarification requests &mdash; a preview of Chapter 8's broader lesson.</p>
+
+<div class="callout ok"><span class="lab">The durable finding</span>
+<p>Across three years and dozens of systems, one result keeps replicating in different costumes: <strong>simple, model-familiar interfaces (files, search, self-editing blocks) beat elaborate specialized retrieval machinery for agent memory</strong>, because the model's tool-use competence is the scarce resource. The 2026 "direct corpus interaction" result (&sect;6.2) and the Anthropic just-in-time doctrine (&sect;6.1) are the same discovery arriving from three directions &mdash; and DeepSeek's Engram (&sect;13) is its architectural extreme: make the lookup so primitive the model does not need a tool at all.</p></div>
+<h2 class="ch" id="ch5"><span class="chno">5</span> The Memory-Layer Explosion</h2>
+<p class="ch-sub">Mem0, A-MEM, MemOS, Zep: four 2025 answers to MemGPT's question, and what each actually demonstrated.</p>
+
+<h3>5.1 Mem0: extraction pipelines as a managed service</h3>
+<p>Mem0 (Chhikara et al., arXiv 2504.19413, published at ECAI 2025) is the industrial wing of the memory movement. Its architecture is a two-phase pipeline rather than an agentic loop: an <strong>extraction phase</strong> that pulls salient facts from each conversational turn, and an <strong>update phase</strong> that resolves each new fact against the store with four operations &mdash; ADD, UPDATE, DELETE, and NOOP. The paper's headline results on LoCoMo: a <strong>26% relative improvement in the LLM-as-a-Judge metric over OpenAI Memory</strong>; a graph-memory variant scoring around 2% higher than the base configuration; <strong>91% lower p95 latency and more than 90% token-cost savings</strong> versus a full-context baseline that dumps the whole history into the window. The token-savings figure is the strategically important one: it is the same economics as Chapter 3's caching argument, achieved by not re-sending history at all.</p>
+
+<p>In April 2026, Mem0's engineering team published a <em>State of AI Agent Memory</em> report introducing a redesigned algorithm &mdash; single-pass hierarchical extraction with ADD-only storage, plus multi-signal retrieval that fuses semantic, keyword, and entity matching in parallel &mdash; and new numbers: <strong>92.5 on LoCoMo at ~6,956 tokens per query, 94.4 on LongMemEval at ~6,787, 64.1 on BEAM (1M scale) and 48.6 on BEAM (10M scale)</strong>, with the largest category gains on temporal reasoning (+29.6 points) and multi-hop (+23.1). The report is also a useful market document: Gartner's projection that <strong>40% of enterprise applications will integrate task-specific AI agents by end of 2026 (from under 5% in 2025)</strong> sits alongside McKinsey's more measured 2025 survey finding (23% of organizations scaling agentic AI, 39% experimenting), and its own integration census &mdash; 21 agent frameworks, 20 vector-store backends &mdash; maps the ecosystem's fragmentation better than any academic survey could. Its stated open problems (cross-session identity, temporal abstraction at scale, memory staleness) are reproduced in Chapter 16's outlook.</p>
+
+<h3>5.2 A-MEM: Zettelkasten notebooks that organize themselves</h3>
+<p>A-MEM (Xu et al., arXiv 2502.12110, February 2025, NeurIPS 2025) answers MemGPT's question with <em>the model, fully</em>. Its design borrows the Zettelkasten note-taking method: every memory is a structured note (content, keywords, tags, a contextual description generated at insertion time); an <strong>evolution mechanism</strong> then dynamically generates links between notes and, when a new note arrives, may trigger the re-organization of existing neighbors &mdash; memory that restructures itself as evidence accumulates, rather than a store that merely grows. The system demonstrated that dynamically organized, self-linking memories outperform static alternatives on long-horizon conversational QA, and its construction&ndash;link&ndash;evolve pipeline became the template for the "agentic memory" product category that followed it. Conceptually, A-MEM is the retrieval graph the Mem0 graph variant buys, minus the pipeline &mdash; the agent is the pipeline.</p>
+
+<h3>5.3 MemOS: memory as a schedulable resource</h3>
+<p>MemOS (Li et al., arXiv 2507.03724, 2025) pushes the operating-system metaphor past paging into scheduling. Its core abstraction, the <strong>MemCube</strong>, unifies three kinds of memory under one management layer: <em>plaintext</em> memory (facts and text, as every other system stores), <em>activation</em> memory (KV caches retained and reused across calls), and parametric <em>model</em> memory &mdash; with the system deciding transformations between them, scheduling when each tier is consulted, and treating memory as a first-class system resource with its own governance. The ambition is to make "memory management" a systems discipline with the same rigor as memory management in an OS: admission policies, tiering, and lifecycle management rather than a pile of vectors. The KV-cache-as-memory move is the one with teeth &mdash; it is the same insight DeepSeek industrialized at the serving layer (Part III), and that production stacks like LMCache pursue for open-weight models.</p>
+
+<h3>5.4 Zep: the temporal knowledge graph</h3>
+<p>Zep (arXiv 2501.13956, January 2025) rejects the vector store and the flat note alike, organizing memory as a <strong>temporally-aware knowledge graph</strong> built by its engine, Graphiti. Episodes, entities, and relations are extracted from conversations and business data as they stream in; each fact carries validity intervals, so the graph knows <em>when</em> something was true &mdash; the mechanism NoLiMa showed literal-matching systems lack, applied to memory rather than windows. The paper's reported results: <strong>94.8% accuracy on the DMR benchmark, beating MemGPT's 93.4%</strong> (a benchmark the MemGPT team itself created), and on LongMemEval, <strong>accuracy improvements of up to 18.5% with response latency reduced by 90%</strong> versus full-context baselines. Zep's team also published the field's most aggressive counter-benchmarking: a May 2025 blog arguing Mem0's SOTA claim didn't hold under re-testing, reporting Zep outperforming Mem0 by 24% on DMR &mdash; while Mem0's 2026 report returns fire with LoCoMo configurations where Zep scores 80.32&ndash;83% against Mem0's 92.5. Chapter 8 treats this crossfire as data, not noise.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>System</th><th>Memory abstraction</th><th>Who manages memory</th><th>Signature reported result</th></tr></thead>
+<tbody>
+<tr><td><strong>MemGPT / Letta</strong> (2023&ndash;25)</td><td>Hierarchy: in-window blocks + paged archives</td><td>The model, via self-editing tools</td><td>Unbounded-context design; filesystem-only agents hit 74.0% LoCoMo (GPT-4o-mini)</td></tr>
+<tr><td><strong>Mem0</strong> (2025)</td><td>Fact store + optional graph</td><td>Extraction/update pipeline</td><td>+26% vs OpenAI Memory (LLM-judge, LoCoMo); &gt;90% token savings vs full-context; 92.5 LoCoMo (2026 alg.)</td></tr>
+<tr><td><strong>A-MEM</strong> (2025)</td><td>Self-linking Zettelkasten notes</td><td>The model (note construction, linking, evolution)</td><td>Dynamic organization beats static stores on long-horizon QA</td></tr>
+<tr><td><strong>MemOS</strong> (2025)</td><td>MemCube: plaintext + activation (KV) + parametric</td><td>OS-style scheduler</td><td>Unified lifecycle management across three memory tiers</td></tr>
+<tr><td><strong>Zep / Graphiti</strong> (2025)</td><td>Bi-temporal knowledge graph</td><td>Graph extraction engine</td><td>94.8% DMR (vs MemGPT 93.4%); LongMemEval +18.5% at &minus;90% latency</td></tr>
+</tbody><div class="tblfoot">All figures as reported by each system's own paper or blog; see &sect;8.3 before quoting any of them in a purchase decision.</div></table></div>
+
+<h2 class="ch" id="ch6"><span class="chno">6</span> Retrieval Rethought</h2>
+<p class="ch-sub">From pre-fetching everything to just-in-time loading, direct corpus interaction, and quarantined sub-agent contexts.</p>
+
+<h3>6.1 Just-in-time context: the Anthropic doctrine</h3>
+<p>The dominant retrieval pattern of the RAG era was pre-inference: embed everything, fetch the top-k chunks, stuff them into the prompt before the model thinks. Anthropic's September 2025 essay documented the shift the field was already making: agents that maintain <strong>lightweight identifiers</strong> &mdash; file paths, stored queries, web links &mdash; and pull the referenced data into context <em>at runtime, only when needed</em>. Claude Code is the flagship example: it performs complex analysis over large databases by writing targeted queries, storing results, and using <code>head</code> and <code>tail</code> over files &mdash; never loading the full data objects into the window. The essay frames this as cognitively honest ("we don't memorize corpuses; we build filing systems") and operationally superior: the <em>metadata of a reference</em> (a file's name, its directory, its timestamp) carries signal that a stuffed chunk does not, and the agent's exploration becomes progressively disclosing &mdash; each read informs the next query.</p>
+
+<h3>6.2 Direct corpus interaction: agents grep better than embeddings rank</h3>
+<p>The 2026 research result that formalized the pattern is <em>Beyond Semantic Similarity: Rethinking Retrieval for Agentic Search via Direct Corpus Interaction</em> (arXiv 2605.05242, May 2026). Its proposal, DCI, gives the language agent an interface to <strong>query raw text directly</strong> &mdash; search, filter, and read over the corpus itself &mdash; instead of consuming a pre-ranked embedding shortlist. The empirical finding: agents using DCI outperform traditional similarity-based retrieval pipelines on agentic search tasks, because the agent can <em>reformulate</em> its queries mid-search (the same competence Letta's filesystem experiment isolated) while embedding pipelines rank once, blind to what the agent has since learned. Combined with Letta's 74.0% filesystem result, the 2026 picture is coherent: retrieval is no longer a pre-processing stage but an <em>agentic behavior</em>, and the corpus interface &mdash; files and grep &mdash; is the one models already know from their coding post-training.</p>
+
+<h3>6.3 Sub-agent architectures: isolation as a context strategy</h3>
+<p>The third retrieval-side pattern is not retrieval at all: it is <strong>context quarantine</strong>. Anthropic's essay describes the orchestrator-worker design in which specialized sub-agents take focused questions into clean windows, explore exhaustively (tens of thousands of tokens each), and return <strong>condensed summaries of 1,000&ndash;2,000 tokens</strong> to the lead agent, which thereby never sees the noise. Their multi-agent research system is the reference deployment. The warning label comes from the practitioner side: Philipp Schmid's December 2025 retrospective names the failure mode <em>context pollution</em> &mdash; when sub-agents share one context, you pay the KV-cache penalty anyway <em>and</em> the shared noise confuses every model reading it. Isolation only pays when the boundary is real: fresh window per sub-agent, distilled handoff at the seam. DeepSeek's V4 harness takes the same discipline to training time, with the DSec sandbox platform evaluating agentic rollouts in isolated execution environments (&sect;12.5).</p>
+
+<h3>6.4 The four levers: LangChain's consolidation</h3>
+<p>LangChain's engineering team consolidated the whole design space into four verbs that now organize most production agent frameworks: <strong>Write</strong> (persist context outside the window &mdash; scratchpads, memory files, running plans), <strong>Select</strong> (pull the right information in at the right moment &mdash; tools, retrieval, file reads), <strong>Compress</strong> (reduce what is already in the window &mdash; summarize resolved turns, trim tool outputs), and <strong>Isolate</strong> (split work across separate windows &mdash; sub-agents, sandboxed steps). Their January 2026 "Context Management for Deep Agents" post describes the Deep Agents SDK implementing exactly these through <em>offloading, summarization, and filesystem abstraction</em>, and LangGraph's checkpointed state graphs became the 2026 default substrate for auditable long-running agents because the four operations map onto first-class graph constructs. The four-lever frame is the taxonomy Part IV's pattern catalog is organized around &mdash; it is descriptive, not competitive, and nothing in the catalog falls outside it.</p>
+<h2 class="ch" id="ch7"><span class="chno">7</span> Context Engineering Grows Up</h2>
+<p class="ch-sub">Karpathy names it, Anthropic codifies it, ACE makes it self-improving, and Manus ships the production field manual.</p>
+
+<h3>7.1 From prompt engineering to context engineering</h3>
+<p>On June 25, 2025, Andrej Karpathy posted the tweet that renamed the discipline: <em>"+1 for 'context engineering' over 'prompt engineering'&hellip; the delicate art and science of filling the context window with just the right information for the next step."</em> The renaming mattered because it relocated the engineering problem. Prompt engineering optimizes one static instruction; context engineering manages the <em>full, changing set</em> of information an agent sees at every step of a multi-turn task &mdash; system prompt, tools, examples, memory, history, runtime data &mdash; as one curated, dynamically assembled artifact. Anthropic's essay adopted the frame in September 2025 and gave it the working definition used throughout this paper: the set of strategies for curating and maintaining the optimal set of tokens during inference, iteratively, on every call.</p>
+
+<h3>7.2 Compaction, done carefully</h3>
+<p>Anthropic's essay treats <strong>compaction</strong> as the first lever of long-horizon coherence: as a conversation nears the window limit, summarize its contents and reinitiate a new context from the summary. The Claude Code recipe is concrete enough to implement verbatim: pass the message history to the model to summarize, <em>preserving architectural decisions, unresolved bugs, and implementation details while discarding redundant tool outputs and messages</em>, then continue with the compressed context <em>plus the five most recently accessed files</em>. The essay is equally explicit about the risk: overly aggressive compaction loses "subtle but critical context whose importance only becomes apparent later," and the recommended tuning order is recall-first (capture everything relevant), then precision (eliminate the superfluous). The lightest-touch form &mdash; <strong>tool result clearing</strong>, deleting the raw payload of deep-history tool calls whose fact has already been absorbed &mdash; shipped as a platform feature on the Claude Developer Platform in September 2025 (with the documented caveat that cleared spans invalidate the corresponding cached prefix). DeepSeek's V3.2 ran the same play at the model level, discarding reasoning traces at user-turn boundaries while preserving tool-call history &mdash; and then benchmarked the alternatives on BrowseComp; both stories appear in Chapter 11.</p>
+
+<h3>7.3 Structured note-taking: the NOTES.md pattern</h3>
+<p>The essay's second pattern is <strong>structured note-taking</strong>, or agentic memory: the agent regularly writes notes to files outside the window and pulls them back in later &mdash; a to-do list in Claude Code, a <code>NOTES.md</code> in a custom agent &mdash; "tracking progress across complex tasks, maintaining critical context and dependencies that would otherwise be lost across dozens of tool calls." The demonstration that convinced the skeptics is Claude playing Pok&eacute;mon: with no prescribed memory format, the agent maintained precise tallies over <em>thousands</em> of game steps ("for the last 1,234 steps I've been training my Pok&eacute;mon in Route 1, Pikachu has gained 8 levels toward the target of 10"), drew maps of explored regions, and recorded combat strategies; after context resets it re-read its own notes and resumed multi-hour objectives. The production version is Anthropic's <strong>memory tool</strong> (public beta since the Sonnet 4.5 launch): a file-based system that lets agents build knowledge bases over time and reference previous work without keeping it all in context.</p>
+
+<h3>7.4 Agentic Context Engineering: the playbook that rewrites itself</h3>
+<p>The most conceptually aggressive 2025 research result is <strong>ACE</strong> (Zhang et al., arXiv 2510.04618, October 2025; Stanford, SambaNova, UC Berkeley). ACE splits the context-improvement job across three roles: a <strong>Generator</strong> produces task trajectories; a <strong>Reflector</strong> distills concrete lessons from what worked and what failed; and a <strong>Curator</strong> folds those lessons back into a structured, evolving <em>context playbook</em> &mdash; the system prompt stops being a static artifact written once by an engineer and becomes a self-improving artifact maintained by the system. On their evaluations, ACE-managed contexts beat strong static baselines <strong>without a single gradient update</strong>: +10.6% on agent tasks and +8.6% on financial-analysis tasks. The model did not get smarter; its context did. ACE is the bridge between this chapter and Part III: it treats context itself as trainable state &mdash; the same philosophical move DeepSeek made when it trained a 196B-parameter memory module into the weights (&sect;13).</p>
+
+<h3>7.5 Model-native features: the provider layer joins in</h3>
+<p>By late 2025, context management had stopped being purely a harness discipline: the model APIs themselves began shipping native mechanisms. Anthropic's September 2025 release wave brought the context-editing capability set &mdash; tool result clearing and thinking-block clearing with cache-interaction semantics documented in the platform's context-window guide &mdash; alongside the memory tool. The platform docs formalized the full accounting: everything in the request counts toward the window, including tool definitions and thinking tokens, with cache reads split out in the usage field. Claude's chat interface manages the window on a rolling first-in-first-out basis &mdash; the interface-level version of truncation. The significance for architects: the boundary between "harness pattern" and "model feature" is dissolving, and procurement decisions now include <em>which native context primitives a provider exposes</em> alongside price and quality. DeepSeek's reasoning-retention contract (&sect;11.3) is exactly such a primitive &mdash; an API-level context policy with an error code attached.</p>
+
+<h3>7.6 The Manus field manual: seven rules from production</h3>
+<p>The single most-cited practitioner document of the era is the Manus engineering blog, "Context Engineering for AI Agents: Lessons from Building Manus" (Yichao 'Peak' Ji, July 18, 2025). Its rules deserve quoting in structure, because each one encodes a failure their team hit in production:</p>
+
+<ul>
+<li><strong>Design around the KV-cache.</strong> The hit rate is the number-one production metric; keep the prefix stable, the context append-only, serialization deterministic; set explicit cache breakpoints; use consistent session routing. (The 100:1 ratio and the 10&times; cached-input price from Chapter 3 are this rule's economic foundation.)</li>
+<li><strong>Mask, don't remove.</strong> Dynamically adding or removing tools mid-loop invalidates the cache from the tool-definition position and strands history that references now-undefined tools, producing schema violations and hallucinated calls. Instead, Manus constrains the action space at decode time &mdash; a context-aware state machine that masks tool logits via response prefill, exploiting the three standard function-calling modes (auto / required / specified), plus naming conventions (<code>browser_*</code>, <code>shell_*</code>) that make group constraints mechanical.</li>
+<li><strong>Use the file system as context.</strong> Observations can be huge; performance degrades with length; long inputs are expensive even cached. So: "the file system as the ultimate context &mdash; unlimited in size, persistent by nature, and directly operable by the agent itself," with compression always <em>restorable</em> (drop the web page, keep the URL; drop the document, keep the path).</li>
+<li><strong>Manipulate attention through recitation.</strong> The <code>todo.md</code> behavior is deliberate: by rewriting the task list every few steps, the agent "recites" its objectives into the end of the context &mdash; recent positions, where attention is strongest &mdash; countering lost-in-the-middle and goal drift across ~50-tool-call trajectories.</li>
+<li><strong>Keep the wrong stuff in.</strong> Erasing failures removes the evidence the model needs to update its beliefs away from the failed action; error recovery is treated as a marker of genuinely agentic behavior. (Contrast the common instinct to hide errors and retry "clean.")</li>
+<li><strong>Don't get few-shotted.</strong> A context full of near-identical action&ndash;observation pairs teaches the model to imitate the pattern even when it is no longer optimal; Manus injects structured variation (serialization templates, phrasing, ordering) to break the mimicry.</li>
+<li><strong>Expect to rebuild.</strong> Their agent framework was rebuilt four times as better context shapes emerged &mdash; their name for the process, "Stochastic Graduate Descent," is the field's most honest methodology statement.</li>
+</ul>
+
+<div class="callout warn"><span class="lab">One caution inside the manual</span>
+<p>Manus's logit-masking recipe assumes control of the decoding loop (self-hosted or prefill-friendly providers) and their file-system doctrine assumes a sandbox with real storage. Both hold for their product. In a managed-API setting, the equivalents are weaker: tool-set stability plus provider-native clearing features, and object-store references instead of a live filesystem. The rules survive the translation; the mechanisms do not.</p></div>
+
+<h2 class="ch" id="ch8"><span class="chno">8</span> The Benchmark Wars</h2>
+<p class="ch-sub">LoCoMo, LongMemEval, BEAM, DMR: what each benchmark actually measures, and how to read vendor tables whose publishers are also contestants.</p>
+
+<h3>8.1 What the four benchmarks measure</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>Benchmark</th><th>Scale</th><th>What it tests</th><th>Introduced by</th></tr></thead>
+<tbody>
+<tr><td><strong>LoCoMo</strong></td><td>1,540 questions, 4 categories</td><td>Recall from multi-session conversations: single-hop, multi-hop, open-domain, temporal</td><td>Academic (2024); adopted as the memory default</td></tr>
+<tr><td><strong>LongMemEval</strong></td><td>500 questions, 6 categories</td><td>Single-session user/assistant/preference recall, knowledge update, temporal reasoning, multi-session</td><td>Academic (2024); enterprise-oriented</td></tr>
+<tr><td><strong>BEAM</strong></td><td>1M and 10M token scales</td><td>Ten categories including abstention and contradiction resolution, at corpus scales no window solves</td><td>2025-era; the production-scale test</td></tr>
+<tr><td><strong>DMR</strong></td><td>HotpotQA-derived multi-session</td><td>Deep memory retrieval in conversational form; the MemGPT/Letta lineage's home benchmark</td><td>Letta (MemGPT team)</td></tr>
+</tbody><div class="tblfoot">Category counts as reported in Mem0's 2026 state-of-memory report and the original papers.</div></table></div>
+
+<p>The evaluation stack that consolidated around these benchmarks combines five dimensions &mdash; BLEU, F1, an LLM-judge score, tokens consumed per query, and wall-clock latency &mdash; precisely so that a system cannot win on accuracy while quietly spending 26,000 tokens per question. The discipline of reporting token consumption per query is the benchmark suite's most useful product: it is the Chapter 3 economics, instrumented.</p>
+
+<h3>8.2 The crossfire, documented</h3>
+<p>Here is the same field as reported by its contestants, side by side, with sources named. The numbers are all real; the configurations are not comparable; that is the point.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Claim</th><th>Reported number</th><th>Published by</th><th>The counter-claim</th></tr></thead>
+<tbody>
+<tr><td>Mem0 is SOTA on LoCoMo</td><td>92.5 (2026 algorithm, ~6.9K tok/query); +26% vs OpenAI Memory (2025 paper)</td><td>Mem0 paper &amp; 2026 report</td><td>Zep's blog: Mem0's numbers don't hold under re-test; Zep +24% on DMR (May 2025)</td></tr>
+<tr><td>Zep leads DMR and LongMemEval</td><td>94.8% DMR; LongMemEval +18.5%, &minus;90% latency</td><td>Zep paper (Jan 2025)</td><td>Mem0's 2026 table: Zep at 80.32&ndash;83% LoCoMo (config-dependent), 71.2 LongMemEval (GPT-4o)</td></tr>
+<tr><td>A filesystem beats memory tools</td><td>74.0% LoCoMo, GPT-4o-mini, no memory product</td><td>Letta (Aug 2025)</td><td>Also documents that MemGPT baselines in Mem0's paper were not reproducible; clarification requests unanswered</td></tr>
+<tr><td>OpenAI Memory</td><td>52.9 LoCoMo</td><td>Carried in Mem0's tables</td><td>Mem0's own 2026 report flags it: "not independently confirmed for this report&hellip; confirm sourcing before publishing"</td></tr>
+</tbody><div class="tblfoot">Every cell is a first-party publication about a market they sell into. The variance between "92.5" and "74.0" for overlapping systems is mostly model choice, judge model, retrieval configuration, and units (per-conversation vs per-query tokens).</div></table></div>
+
+<h3>8.3 How to read a memory benchmark in 2026</h3>
+<p>The wars teach a reading protocol that costs nothing and prevents most expensive mistakes. <strong>Check the model under the harness.</strong> LoCoMo scores move tens of points with the driver model (Letta's 74.0 was deliberately run on GPT-4o-mini to match a disputed baseline; Mem0's 92.5 runs on a frontier stack). <strong>Check the judge.</strong> LLM-as-a-Judge scores inherit the judge's biases, and different papers use different judges. <strong>Check the units.</strong> Mem0's 2025 paper reported tokens per conversation (~26,000 for full-context) while the 2026 algorithm reports tokens per retrieval call (~6,956) &mdash; "different units measuring the same underlying efficiency," in their own footnote. <strong>Check who ran it.</strong> The three most-cited head-to-head tables in the field were published by Mem0, Zep, and Letta, each of which sells the winner. <strong>Prefer dynamic and holistic evaluation.</strong> Letta's Memory Benchmark creates memory interactions on the fly (defeating training-set contamination and testing management, not just retrieval), and Terminal-Bench-style task benchmarks measure memory as it actually manifests: an agent holding task state across a long-running job. And when a vendor's number matters to a decision, <em>re-run it</em> &mdash; Mem0 open-sourced its benchmark suite (github.com/mem0ai/memory-benchmarks) for exactly this reason, and the Towards AI team's 2026 finding that their own production defaults looked fine and measured badly is the cautionary tale for skipping the step.</p>
+<!-- ==================== PART III ==================== -->
+<div class="part-divider" id="part3">
+  <div class="pd-part">Part III &middot; Chapters 9&ndash;14</div>
+  <h2>DeepSeek's Work (2023 &rarr; Late 2026)</h2>
+  <p>One lab's version-by-version engineering of context management into the model itself: MLA and disk caching in 2024, DeepSeek Sparse Attention and thinking-context-management rules in 2025, the million-token agent context of V4 in April 2026, and the Engram conditional-memory module of V4.1-Flash in September 2026.</p>
+</div>
+
+<h2 class="ch" id="ch9"><span class="chno">9</span> Baseline Era: MLA &amp; Context Caching</h2>
+<p class="ch-sub">2023&ndash;2024: the dense 4K-context starting point, the 93.3% KV compression that made long context affordable, and the disk cache that made agent loops cheap.</p>
+
+<h3>9.1 The 2023 baseline: no context management at all</h3>
+<p>DeepSeek LLM 7B and 67B (November 2023) are the honest baseline for this history: dense transformers with standard attention (MHA in the 7B, grouped-query attention in the 67B), a <strong>4K-token context window</strong>, and not a single mechanism aimed at context management. Every problem documented in Part I existed here in its purest form: a multi-turn tool loop hit the window after a handful of observations; attention cost grew quadratically with the trajectory; the only available strategies were truncation and hope. The line matters because the rest of this Part is measured against it: the V4.1-Flash release materials compute their KV-cache footprint against a "~390,000 bytes per token" figure that corresponds to this era's full-precision multi-head attention across a deep stack &mdash; a 438&times; gap that closed in under three years (&sect;13.4).</p>
+
+<h3>9.2 V2 (May 2024): MLA makes the KV cache 93.3% smaller</h3>
+<p>DeepSeek-V2 introduced <strong>Multi-head Latent Attention (MLA)</strong>, the first architectural bet that context economics belong inside the model. MLA jointly compresses the keys and values of every attention head into a small latent vector cached per token, decompressing them on the fly during attention; the RoPE positions ride in a small decoupled stream. The paper's own headline numbers: a <strong>93.3% reduction in KV-cache size</strong> relative to the 67B dense baseline's attention, a <strong>5.76&times; maximum decoding throughput</strong> improvement under cache-bound serving, and <strong>42.5% lower training cost</strong> for comparable generation quality. In V3's 61-layer configuration, the per-token KV footprint works out to roughly 70 KB in bf16, against ~500 KB for an 8-group GQA and ~4 MB for full MHA &mdash; the compression that made "re-prefill the whole trajectory every turn" survivable at all. The window was already there &mdash; V2 itself supported 128K context, YaRN-extended from the 4K pre-training length with NIAH results reported clean across the range &mdash; so MLA's decisive contribution was not the window but the <em>cost curve</em> of filling it. Every model in the V3 line inherited the mechanism (the V4 generation replaced it with its hybrid compressed-attention stack, &sect;12), and every serving stack that runs open-weight agents at scale &mdash; vLLM, SGLang, LMCache offloading &mdash; is built around MLA-shaped caches.</p>
+
+<h3>9.3 Context Caching (August 2024): the agent-loop business model, shipped</h3>
+<p>On August 2, 2024, DeepSeek's API launched <em>Context Caching</em>: a disk-based, automatic cache of KV states for previously seen prefixes, billed at <strong>$0.014 per million tokens on hits against $0.14 on misses &mdash; the 90% discount</strong> that Chapter 3 established as the economic core of agentic inference. The engineering choice to make it automatic is worth pausing on: with no cache breakpoints to manage and no manual invalidation API, every multi-turn conversation and every agent loop with a stable prefix benefits by default, which is precisely the population Manus later identified as the ones whose cost is decided by hit rate. Two years on, the pricing page has only sharpened the bargain &mdash; V4.1-Flash cache hits are $0.006 per million tokens at peak &mdash; and the release note for V4.1-Flash explains why the discount keeps deepening: <em>cache-hit charges often account for a large share of agent costs, and compressing the cache cuts those costs</em>. The compression is the next chapter.</p>
+
+<h3>9.4 V3 and R1: the window grows, and reasoning makes context heavier</h3>
+<p>DeepSeek-V3 (December 2024) kept the 128K context and added Multi-Token Prediction &mdash; which sped decode (1.8&times; tokens-per-second with the MTP module as a speculative decoder at an 85&ndash;90% acceptance rate) but left context management to the harness, as before. R1 (January 2025) then changed the problem's shape: a reasoning model emits long chain-of-thought before every answer, and in agent loops that reasoning lands in the window alongside tool outputs. The R1-era serving contract was the blunt one: <strong>reasoning content was discarded at each new user message</strong>. The V3.2 paper later named the cost of that policy precisely &mdash; "the model is forced to redundantly re-reason through the entire problem for each subsequent tool call" (&sect;11.1) &mdash; making R1's contract the explicit baseline that DeepSeek's next two releases would be engineered against. The lesson generalizes: <em>reasoning traces are context freight, and a context-management story that ignores them is already obsolete</em>.</p>
+
+<h2 class="ch" id="ch10"><span class="chno">10</span> V3.2-Exp: DSA, the Cheap Long Context</h2>
+<p class="ch-sub">September 2025: the lightning indexer, O(L&middot;k) attention, a 5&times; decode-cache cut at 131K, and a 50%+ price drop &mdash; the substrate every later context feature stands on.</p>
+
+<h3>10.1 The attention tax, and how DSA removes it</h3>
+<p>The V3.2 release line began with DeepSeek-V3.2-Exp on September 29, 2025, carrying <strong>DeepSeek Sparse Attention (DSA)</strong>. Vanilla attention scores every query against every key &mdash; O(L&sup2;) in sequence length &mdash; which is exactly the tax an agent's growing trajectory pays on every turn. DSA adds a <strong>lightning indexer</strong>: a tiny, FP8-quantized scoring network (64 shared heads of 128 dimensions, ReLU-activated) that computes a cheap relevance score between every query and every key, after which each query attends only to its <strong>top-k keys (k = 2048)</strong> &mdash; cutting the main model's attention complexity from O(L&sup2;) to <strong>O(L&middot;k)</strong>, with k independent of context length. The indexer itself still scans the sequence, but at a fraction of the main model's per-pair cost, and it runs in a masked-MHA shortcut regime for short prompts where full attention is cheaper than selection.</p>
+
+<h3>10.2 The cache arithmetic, in bytes</h3>
+<p>For serving, DSA split the KV budget in two: the compressed MLA entries (which the paper's deployment numbers put at ~656 bytes per token per layer in the production stack: 512 bytes of FP8 latent plus scales, and 128 bytes of bf16 RoPE keys) and the indexer scores, which are small enough to store at <strong>~132 bytes per token per layer</strong> (128 bytes FP8 + scale). Because only the top-k entries are needed at decode, the working set at a 131K-token context shrinks from ~5.2 GB to ~1.1 GB per batch element in the deployment's accounting &mdash; <strong>a ~5&times; reduction in decode-time cache traffic</strong>, delivered by DeepGEMM's <code>fp8_mqa_logits</code> indexer kernels and a sparse FlashMLA attention kernel. Independent long-context evaluations after release (Artificial Analysis' long-context reasoning suite) put V3.2-Exp four points above V3.1-Terminus in reasoning mode &mdash; evidence that the sparsity did not trade quality for the efficiency. The pricing followed the cost: input and output prices dropped by more than 50% (output to $0.28 per million tokens), the first time a DeepSeek architecture release was explicitly priced as an agent-infrastructure event.</p>
+
+<div class="callout info"><span class="lab">Why an efficiency chapter belongs in a context-management paper</span>
+<p>DSA is not a "context strategy" in the harness sense &mdash; nothing is summarized, dropped, or retrieved. It belongs here because it changes the <em>exchange rate</em> of every strategy that is: after DSA, an extra 100K tokens of retained trajectory cost O(k) additional attention rather than O(L), and the persistent cache costs bytes rather than DRAM budgets. DeepSeek's context-management decisions from here on &mdash; retaining reasoning traces (V3.2), never dropping anything (V4), paging KV to SSD with bounded replay (V4.1-Flash) &mdash; are only rational because the substrate became this cheap. Efficiency <em>is</em> a context-management strategy when the context is the cost.</p></div>
+<h2 class="ch" id="ch11"><span class="chno">11</span> V3.2: Thinking Context Management</h2>
+<p class="ch-sub">December 2025: the first model with an explicit context-management policy for tool loops, an API contract with a 400 error attached, and a controlled study of compaction strategies on BrowseComp.</p>
+
+<h3>11.1 The policy: retain reasoning across tool calls, discard on user turns</h3>
+<p>DeepSeek-V3.2 (December 1, 2025; arXiv 2512.02556) is, by its own framing, a "reasoning-first model built for agents," and its signature context-management contribution is Section 3.2.1, <em>Thinking Context Management</em>. The reasoning is stated as a rejection of the R1 baseline: discarding reasoning content whenever a new round of messages arrives "results in significant token inefficiency," forcing the model to "redundantly re-reason through the entire problem for each subsequent tool call." The replacement policy, tuned specifically for tool-calling scenarios, has three rules:</p>
+
+<ul>
+<li><strong>Rule 1 &mdash; tool outputs do not wipe reasoning.</strong> Historical reasoning content is discarded only when a <em>new user message</em> enters the conversation. If only tool-related messages (e.g., tool outputs) are appended, the reasoning content is retained throughout the interaction.</li>
+<li><strong>Rule 2 &mdash; user turns are the reset boundary.</strong> When reasoning traces are removed (at a genuine user turn), the removal is wholesale: the model re-reasons for the new request.</li>
+<li><strong>Rule 3 &mdash; tool history outlives reasoning.</strong> When reasoning traces are removed, the history of tool calls and their results remains preserved in the context.</li>
+</ul>
+
+<p>The paper is candid about the boundary condition: agent frameworks that <em>simulate</em> tool interactions via user messages &mdash; it names Roo Code and Terminus &mdash; may not trigger the tool-calling path and therefore "may not fully benefit from our enhanced reasoning persistence"; for such architectures DeepSeek explicitly recommends non-thinking models. This is a documentable, testable semantic, and it is the first time a frontier lab shipped a context-management policy as a <em>model behavior</em> rather than a framework convention.</p>
+
+<h3>11.2 Training the behavior in</h3>
+<p>The policy is not a post-hoc serving trick; it is trained. V3.2's post-training unified reasoning and tool-use in single trajectories, starting from a cold-start that prompted a V3-style model to interleave multiple tool calls inside its reasoning, then scaling through reinforcement learning on <strong>synthesized agentic tasks: over 1,800 distinct environments and 85,000 complex instructions</strong>, spanning search, code-engineering, and code-interpretation tasks. The release notes headline it as "our first model to integrate thinking directly into tool-use," supporting tool-use in both thinking and non-thinking modes. The high-compute sibling of the release, V3.2-Speciale, deliberately omitted tool use (API-only, at the time) to push reasoning benchmarks to gold-medal level &mdash; the split itself illustrating that agentic context behavior and pure reasoning length were being optimized as separate axes. On the agentic side of that split, V3.2's reported scores include <strong>Terminal-Bench 2.0 at 46.4</strong> (against Claude-4.5-Sonnet's 42.8, GPT-5's 35.2, and Gemini-3.0-Pro's 54.2 in the same table), SWE-Verified at 73.1, and &tau;&sup2;-Bench at 80.3 &mdash; with the paper's framing that V3.2 "significantly advances the agentic capabilities of open models" while remaining "a highly cost-efficient alternative in agent scenarios."</p>
+
+<h3>11.3 The API contract: <code>reasoning_content</code> is mandatory in tool loops</h3>
+<p>The same policy is enforced at the API surface, in DeepSeek's thinking-mode guide. In thinking mode the model's chain-of-thought is returned as <code>reasoning_content</code>, a sibling of <code>content</code>. Whether it persists into the next request's context depends on the request's shape:</p>
+
+<ul>
+<li><strong>With the <code>tools</code> parameter present (agent loops):</strong> the <code>reasoning_content</code> of <em>all</em> previous turns <em>must</em> be passed back &mdash; even for turns where the model performed no tool call. If the harness drops it, the API returns a <strong>400 error</strong>.</li>
+<li><strong>Without <code>tools</code> (plain chat):</strong> the reasoning content of prior turns is ignored even if passed &mdash; the chat-side discard rule, applied server-side.</li>
+</ul>
+
+<p>This is the cleanest instance in the industry of context management as a <em>contractual API primitive</em>: the retention policy from Section 3.2.1, expressed as request-validation semantics with an error code. Chapter 16's recipe implements the compliant loop.</p>
+
+<h3>11.4 The experiment: compaction strategies under a compute budget</h3>
+<p>Section 4.4 of the V3.2 paper &mdash; <em>Context Management of Search Agent</em> &mdash; is the part agent architects should read twice, because it is the one controlled, published comparison of harness-level context strategies from a frontier lab. The motivation: even at 128K, agentic search workflows "frequently encounter maximum length limitations that prematurely truncate the reasoning process," capping test-time compute. The intervention, triggered when token usage exceeds <strong>80% of the context window</strong>:</p>
+
+<ul>
+<li><strong>Summary</strong> &mdash; summarize the overflowed trajectory and re-initiate the rollout. Measured effect: average steps extended to <strong>364</strong>, with performance improving to up to <strong>60.2</strong> on BrowseComp &mdash; effective but token-expensive relative to its gains.</li>
+<li><strong>Discard-75%</strong> &mdash; drop the first 75% of the tool-call history to free space.</li>
+<li><strong>Discard-all</strong> &mdash; reset the context by discarding all previous tool-call history; the paper notes the similarity to the new-context tool Anthropic shipped in 2025. Despite its brutality, it "performs well in both efficiency and scalability," reaching <strong>67.6</strong> on BrowseComp with significantly fewer steps than the parallel baseline.</li>
+<li><strong>Parallel-fewest-step</strong> (the comparison baseline) &mdash; sample N independent trajectories and keep the one that finishes in the fewest steps.</li>
+</ul>
+
+<p>Two results deserve emphasis. First, the headline: DeepSeek-V3.2's BrowseComp moves from <strong>51.4 to 67.6</strong> when context management is applied (the table's asterisked number; the same table lists Kimi-K2-Thinking with 60.2 under its own context management). Context management is not an operational nicety &mdash; on this benchmark it is worth <strong>+16.2 points</strong>, a bigger jump than most model-generation improvements deliver. Second, the counter-intuitive ordering: <em>the crudest strategy beat the sophisticated one</em>. Discard-all (67.6) outscored Summary (60.2) while using far fewer tokens, "comparable to parallel scaling while using significantly fewer steps." The paper's own conclusion frames the design space: test-time compute can scale <em>serially through context management or in parallel</em>, and "finding the optimal combination of serial and parallel scaling&hellip; remains a crucial direction for future work."</p>
+
+<div class="callout warn"><span class="lab">Do not over-generalize the Discard-all win</span>
+<p>The experiment is scoped to search agents on BrowseComp, where early tool calls (search results long superseded) are close to pure noise &mdash; the regime where aggressive dropping provably helps. A coding agent's early tool calls (the failing test it must keep in view) are the opposite regime; Manus's "keep the wrong stuff in" rule (&sect;7.6) exists precisely for it. The transferable finding is not "discard everything"; it is <em>measure the strategies under your own compute budget, because the ordering is task-dependent and the naive orderings are wrong</em>.</p></div>
+
+<h2 class="ch" id="ch12"><span class="chno">12</span> V4: A Million Tokens Built for Agent Loops</h2>
+<p class="ch-sub">April 2026: the preview that reframed context as the product &mdash; reasoning persistence across user turns, CSA+HCA hybrid attention, Quick Instruction's cache-native auxiliary tasks, and a 500-step/512K agent harness.</p>
+
+<h3>12.1 The reframing: "a million-token context that agents can actually use"</h3>
+<p>DeepSeek-V4 arrived as a preview on April 24, 2026 (technical report arXiv 2606.19348) in two configurations &mdash; V4-Pro at 1.6T total parameters (49B activated) and V4-Flash at 284B (13B activated) &mdash; and with a framing that is itself a data point for this paper's thesis: the Hugging Face announcement titled it <em>"a million-token context that agents can actually use."</em> The efficiency claims that justify the phrasing, at one million tokens of context: V4-Pro requires <strong>27% of the single-token inference FLOPs and 10% of the KV cache</strong> that DeepSeek-V3.2 would need; V4-Flash runs at 10% and 7% respectively. The report's comparison table scores the V4-Pro-Max configuration at <strong>83.5 MMR on Long-MRCR-1M and 62.0 ACC on CorpusQA-1M</strong> &mdash; trailing Opus-4.6 (92.9 and 71.7) but demonstrating retrieval that still functions at the 1M scale: the quality-side evidence that the million tokens are <em>usable</em>, not nominal. The architecture behind the numbers is a hybrid attention stack (Compressed Sparse Attention interleaved with a Heavily Compressed Attention) whose details are documented in the V4 report's architecture chapter; for this paper, the relevant point is what the efficiency buys: enough headroom to <em>stop discarding context</em>.</p>
+
+<h3>12.2 Interleaved thinking, refined for agents</h3>
+<p>Chapter 11 documented V3.2's policy: reasoning persists across tool calls but is flushed at user-message boundaries &mdash; which, the V4 report notes, "still caused unnecessary token waste in complex agentic workflows: each new user turn would flush all accumulated reasoning content, forcing the model to reconstruct its problem-solving state from scratch." V4's refinement splits the semantics by scenario:</p>
+
+<ul>
+<li><strong>Tool-calling scenarios:</strong> <em>all</em> reasoning content is fully preserved throughout the entire conversation &mdash; <strong>including across user-message boundaries</strong> &mdash; maintaining "a coherent, cumulative chain of thought over long-horizon agent tasks."</li>
+<li><strong>General conversational scenarios:</strong> the V3.2 rule stands (reasoning from prior turns is dropped when a new user message arrives), "keeping the context concise for settings where persistent reasoning traces provide limited benefit."</li>
+</ul>
+
+<p>The caveat survives verbatim: frameworks that fake tool calls as user messages (Terminus is the named example again) do not trigger the tool-calling path and get the conversational semantics instead &mdash; and DeepSeek continues to recommend non-thinking models for those architectures. Read together, Chapters 11 and 12 give a lab-internal, two-step evolution of <em>the same policy</em>, each step justified by measured token waste in the previous one: R1's flush-everything &rarr; V3.2's flush-at-user-turns &rarr; V4's keep-everything-when-tools-are-real. No other frontier lab has published this reasoning trail.</p>
+
+<h3>12.3 The agent harness, stated in the report</h3>
+<p>DeepSeek's agent evaluations in the V4 report use an internally developed framework whose configuration is itself a reference design: a <strong>minimal tool set &mdash; a bash tool and a file-edit tool</strong>; a maximum of <strong>500 interaction steps</strong>; a maximum context of <strong>512K tokens</strong> (half the model's window). The reported results include <strong>Terminal-Bench 2.0 at 67.9</strong> for the V4-Pro-Max configuration (the report separately cites approximately <strong>72.0 on the Verified subset</strong> for V4-Pro) and <strong>SWE-Verified at 80.6</strong>, with search-agent tasks (BrowseComp, HLE with tools) run in a separate websearch-plus-Python harness &mdash; and, notably, BrowseComp evaluated with "the same discard-all context management strategy as DeepSeek-V3.2": the &sect;11.4 finding carried forward into the next generation. Behind the evaluations sits real infrastructure: the report describes <strong>DSec (DeepSeek Elastic Compute)</strong>, a production sandbox platform of three Rust services &mdash; API gateway, per-host agent, and cluster monitor &mdash; running agentic post-training and evaluation rollouts on the 3FS distributed filesystem. The training pipeline fed it a two-stage paradigm (domain specialist models trained with SFT+RL, then unified by on-policy distillation) with agent capability as an explicit domain, and the mid-training data mix gained agentic and long-document corpora. The pattern to notice: by 2026, DeepSeek treats <em>agent-loop context behavior</em> as a first-class training objective with its own data, infrastructure, and evaluation harness &mdash; not a post-deployment afterthought.</p>
+
+<h3>12.4 Quick Instruction: auxiliary tasks that reuse the cache</h3>
+<p>The V4 report's most quotable piece of systems craft targets a cost nobody benchmarks: the <em>small model</em> that production chat products run before the main model to classify the request (does this need a web search? what domain is it? should this URL be fetched?). That model cannot share the main model's KV cache, so the whole prefix is prefilled <strong>twice</strong>. Quick Instruction eliminates the second prefill by <em>appending dedicated special tokens directly to the input sequence</strong> &mdash; <code>&lt;|action|&gt;</code>, <code>&lt;|title|&gt;</code>, <code>&lt;|query|&gt;</code>, <code>&lt;|authority|&gt;</code>, <code>&lt;|domain|&gt;</code>, <code>&lt;|read_url|&gt;</code> &mdash; each bound to one auxiliary task. Because the tokens ride on the already-computed KV cache, the auxiliary outputs (search-trigger decisions, generated queries, authority and domain classifications, URL-read decisions) are produced <em>in the same forward pass, in parallel</em>, "completely avoiding redundant prefilling," cutting user-perceived time-to-first-token, and retiring the extra model from the stack. It is the same insight as Manus's stable-prefix rule, inverted: instead of protecting the cache from auxiliary work, move the work <em>into</em> the cache. The same release also moved tool-call serialization to an XML format that "mitigates escaping failures and reduces tool-call errors" &mdash; protocol-level context hygiene, the unglamorous kind that production uptime is made of.</p>
+
+<div class="src-block"><strong>DeepSeek-OCR, the detour worth one paragraph.</strong> October 2025's DeepSeek-OCR paper (arXiv 2510.18234) explored "Contexts Optical Compression" &mdash; feeding long text to the vision encoder as a 2D image so that a small number of visual tokens carry the document, an initial investigation into compressing context optically. A December 2025 follow-up from other authors ("Optical Context Compression Is Just (Bad) Autoencoding," arXiv 2512.03643) argued the reconstruction is shallow. We include it because it shows the lab treating <em>the input representation itself</em> as a context-management variable &mdash; the same research program that Engram later executed successfully at the weight level.</div>
+<h2 class="ch" id="ch13"><span class="chno">13</span> Engram &amp; V4.1-Flash</h2>
+<p class="ch-sub">January 2026's conditional-memory research, scaled to 196B parameters in the September 10, 2026 release &mdash; knowledge stored outside the attention stream, retrieved with O(1) lookups.</p>
+
+<h3>13.1 The research: a new axis of sparsity</h3>
+<p>The intellectual foundation of DeepSeek's late-2026 context story is <em>Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models</em> (Cheng et al., arXiv 2601.07372; submitted January 12, 2026, revised July 2026). The paper's starting observation is that transformers have <strong>no native knowledge-lookup primitive</strong> &mdash; to answer from memorized facts, they must "inefficiently simulate retrieval through computation," burning attention FLOPs to reconstruct what a database would fetch. The proposal: <strong>conditional memory</strong> as a sparsity axis complementary to MoE's conditional computation, instantiated as the <strong>Engram</strong> module &mdash; a modernized N-gram embedding table addressed by the input's local n-gram context with <strong>O(1) deterministic lookup</strong>. Formulating the "Sparsity Allocation" problem &mdash; how much capacity to spend on neural computation (MoE experts) versus static memory (Engram entries) &mdash; the authors uncovered a <strong>U-shaped scaling law</strong> governing that trade-off, and scaled the module to 27B parameters under its guidance, beating a strictly iso-parameter, iso-FLOPs MoE baseline.</p>
+
+<p>The results matrix is where context management re-enters. Knowledge benchmarks improve as expected (MMLU +3.4, CMMLU +4.0, HumanEval +3.0, MATH +2.4 over the MoE baseline) &mdash; but the larger gains are elsewhere: <strong>general reasoning</strong> (BBH +5.0, ARC-Challenge +3.7) and, most strikingly for this paper's subject, <strong>long-context retrieval: Multi-Query Needle-in-a-Haystack improves from 84.2 to 97.0</strong>. The mechanistic analysis explains the counter-intuitive part: by delegating local, static knowledge to lookups, Engram "relieves the backbone's early layers from static reconstruction, effectively deepening the network for complex reasoning," and "frees up attention capacity for global context" &mdash; the model attends <em>better</em> precisely because it no longer wastes attention on rote recall. Efficiency is infrastructure-aware by design: deterministic addressing enables runtime <strong>prefetching from host memory</strong> with negligible overhead, keeping the memory out of the GPU's HBM budget. The concluding vision &mdash; conditional memory as "an indispensable modeling primitive for next-generation" LLMs &mdash; is the thesis DeepSeek shipped seven months later.</p>
+
+<h3>13.2 V4.1-Flash: the release</h3>
+<p>DeepSeek-V4.1-Flash (September 10, 2026) is the smallest model of the new architecture family, and its release materials read as a context-management manifest. The headline configuration: a <strong>552B-parameter MoE backbone plus 196B of Engram memory</strong>, in a <strong>Causal Encoder&ndash;Decoder (CED)</strong> split &mdash; 20 encoder layers activating <strong>8B parameters per input token</strong>, 20 decoder layers activating <strong>16B per output token</strong> &mdash; with native multimodal understanding, trained on 45 trillion tokens with post-training deliberately weighted toward agentic and reasoning data. The attention stack is <strong>Compressed Sparse Attention 2 (CSA2)</strong>, which attacks the cache on three axes at once: <em>entry size</em> (projection shares information across heads), <em>sequence dimension</em> (multiple tokens compressed into single KV entries), and <em>layer dimension</em> (KV information reused across layers), operating in three modes &mdash; Full (compute and index), Reindex, and Reuse &mdash; under a hierarchical sparse-indexer design. The KV state is quantized to <strong>FP4 (MXFP4)</strong>.</p>
+
+<p>The context-economics bottom line, in the release's own figures: global KV footprint of <strong>890 bytes per token &mdash; roughly a quarter of V4-Flash's HBM requirement and an eighth of its SSD footprint</strong> &mdash; with the local sliding-window cache reconstructible via <strong>SWA Bounded Replay</strong> (rebuilding state from a bounded window rather than persisting it whole), shrinking the persistent cache to <strong>1/8 of the previous generation</strong>. Decode computation stays nearly flat as context scales toward one million tokens, courtesy of the hierarchical indexer and the encoder&ndash;decoder split. Benchmarks published with the release: <strong>Terminal-Bench 2.1 at 90.6</strong> (against V4-Pro's 82.7 in the same evaluation), <strong>DeepSWE at 74.2%</strong>, and a Codeforces rating of 3471 &mdash; agent-first numbers, led by the benchmark that Letta's own memory research treats as the holistic test of agent state management (&sect;8.3). The pricing page completes the picture: <strong>$0.006 per million cache-hit tokens, $0.30 misses, $1.20 output at peak</strong>, with off-peak at 50% &mdash; and the release note's one-line theory of agent cost: cache-hit charges are the large share; compress the cache, cut the bill.</p>
+
+<h3>13.3 What Engram changes about the taxonomy</h3>
+<p>Map the release against Part II's patterns and a new category appears. MemGPT pages memory via tool calls; Mem0 extracts facts into a vector store; Zep synthesizes them into a temporal graph; Anthropic's memory tool writes files. All of them keep the <em>model fixed</em> and manage context <em>around</em> it. Engram inverts the arrangement: the memory is <em>inside</em> the forward pass &mdash; addressed by the token stream itself, gated contextually (multi-head hashing with context-aware gating, in the V4.1-Flash paper's description), and invisible to the harness. Three consequences follow. <strong>Zero-latency memory:</strong> there is no retrieval round-trip to amortize; the lookup is part of the attention pass. <strong>Cache-native memory:</strong> Engram state is consistent for identical prefixes, so it composes with the context-caching discount rather than fighting it. <strong>Memory as capacity:</strong> knowledge migrates out of the attention stream, and &mdash; per the January paper's measurements &mdash; the freed attention capacity makes the <em>window</em> itself more reliable at range (the 84.2&rarr;97.0 NIAH jump). The name is the thesis: an engram is the physical trace a memory leaves in a brain, and this one leaves it in the weights.</p>
+
+<div class="callout info"><span class="lab">The honest caveats</span>
+<p>Engram does not solve cross-session user memory &mdash; per-user state still needs a harness-level store (Chapter 15's patterns remain necessary); it solves <em>knowledge</em> lookup for the model itself. The 196B module adds weight-storage cost that only pays off at serving scale, and the published comparisons are against DeepSeek's own iso-FLOPs baselines, not against an external frontier. And as of this writing, third-party evaluations of V4.1-Flash are just beginning to appear. The architecture direction is verifiable today; its external validation is still accumulating.</p></div>
+
+<h2 class="ch" id="ch14"><span class="chno">14</span> The DeepSeek Playbook</h2>
+<p class="ch-sub">Five layers, one cost model, and the compiled timeline: what a lab looks like when context management is the product plan.</p>
+
+<h3>14.1 The five layers</h3>
+<p>Assembled from Chapters 9&ndash;13, DeepSeek's 2024&ndash;2026 program attacks the agent-loop context problem at every layer of the stack simultaneously &mdash; which is the distinction this paper's title points at:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Layer</th><th>Mechanism</th><th>First shipped</th><th>Where it lives</th></tr></thead>
+<tbody>
+<tr><td><strong>Serving</strong></td><td>Disk context caching; MLA; DSA; CSA2; FP4 KV; SWA Bounded Replay</td><td>Aug 2024 / May 2024 / Sep 2025 / Sep 2026</td><td>API + inference stack</td></tr>
+<tr><td><strong>Protocol</strong></td><td>Reasoning-retention rules; <code>reasoning_content</code> contract; XML tool serialization</td><td>Dec 2025 / Apr 2026</td><td>Model behavior + API surface</td></tr>
+<tr><td><strong>Harness</strong></td><td>bash + file-edit minimal toolset; 500-step / 512K evaluation harness; DSec sandbox</td><td>Apr 2026</td><td>Training + evaluation infra</td></tr>
+<tr><td><strong>Training</strong></td><td>Thinking-in-tool-use trajectories; 1,800 environments / 85K instructions agentic RL; agent-domain distillation</td><td>Dec 2025 &rarr; 2026</td><td>Post-training data</td></tr>
+<tr><td><strong>Architecture</strong></td><td>Engram conditional memory (196B); CED asymmetry; hierarchical sparse indexer</td><td>Jan 2026 paper &rarr; Sep 2026 release</td><td>The weights</td></tr>
+</tbody><div class="tblfoot">Each row cites its chapter: serving &sect;9&ndash;10, &sect;13; protocol &sect;11&ndash;12; harness &sect;12.3; training &sect;11.2; architecture &sect;13.</div></table></div>
+
+<p>The strategic reading: harness-level context management (the Part II patterns) is table stakes that any lab's customers can implement; <em>weight-level</em> context management is a moat. DeepSeek's sequence &mdash; make context cheap, then make its retention policy explicit, then train the policy in, then move memory into the weights &mdash; is a coherent program of moving the discipline down the stack. The V4.1-Flash release note compresses the whole program into one sentence about one number: compress the cache, because cache hits are the agent bill.</p>
+
+<h3>14.2 The cost model, worked</h3>
+<p>Run the Chapter 3 economics on V4.1-Flash pricing and the loop's arithmetic becomes concrete. Take a 50-tool-call agent task (Manus's measured average) with a stable prefix that grows by ~2,000 tokens per turn, all calls at peak pricing:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Cost component</th><th class="num">Naive (no cache)</th><th class="num">Stable prefix (cache hits)</th></tr></thead>
+<tbody>
+<tr><td>Total prefill tokens (~50 turns, &Sigma; ~2.55M)</td><td class="num">2.55M &times; $0.30</td><td class="num">~100K new tokens (misses) + ~2.45M reused (hits)</td></tr>
+<tr><td>Prefill cost</td><td class="num">$765</td><td class="num">$30 + $15 = <strong>$45</strong></td></tr>
+<tr><td>Decode (50 &times; 300 output tokens &times; $1.20/M)</td><td class="num">$18</td><td class="num">$18</td></tr>
+<tr><td>Total, 50-call task</td><td class="num">~$783</td><td class="num">~$63</td></tr>
+</tbody><div class="tblfoot">Illustrative arithmetic from the published peak prices ($0.30/M miss, $0.006/M hit, $1.20/M output), assuming ideal incremental prefix caching: each turn's ~2,000 new tokens are prefilled once at the miss price and every prior turn's span is a hit. The ~12&times; swing comes entirely from prefix stability &mdash; before any architectural discount.</div></table></div>
+
+<p>Two conclusions fall out. First, <strong>the cache-hit rate is worth more than the model choice</strong>: a mid-loop tool-set change or a timestamped system prompt costs more than the difference between competing frontier models. Second, the reason DeepSeek keeps compressing the cache itself (93.3% &rarr; 656&ndash;132 bytes/token/layer &rarr; 890 bytes/token global) is that at agent-traffic volumes, the hit-rate line of the bill is the line that scales with the industry's agent adoption curve &mdash; 40% of enterprise applications integrating agents by end-2026 in Gartner's projection, from under 5% a year earlier.</p>
+
+<h3>14.3 The compiled timeline</h3>
+<div class="tline">
+  <div class="tl-item"><div class="tl-date">MAY 2024</div><div class="tl-head">MLA (DeepSeek-V2)</div><div class="tl-body">Latent-compressed KV cache: 93.3% smaller than the dense 67B baseline, 5.76&times; decode throughput, 42.5% training savings. Long context becomes affordable to serve.</div></div>
+  <div class="tl-item"><div class="tl-date">AUG 2024</div><div class="tl-head">Context Caching (API)</div><div class="tl-body">Automatic, disk-based prefix cache: hits at $0.014/M vs $0.14/M misses &mdash; the 90% agent-loop discount, two years before the industry's agent boom.</div></div>
+  <div class="tl-item"><div class="tl-date">DEC 2024&ndash;JAN 2025</div><div class="tl-head">V3 (MTP) &amp; R1</div><div class="tl-body">128K window carried over from the V2 line; MTP speculative decode at 1.8&times; TPS. R1's long CoT arrives with the flush-reasoning-at-user-turn contract &mdash; the policy V3.2 later rejects as token-inefficient.</div></div>
+  <div class="tl-item"><div class="tl-date">SEP 29, 2025</div><div class="tl-head">DeepSeek-V3.2-Exp: DSA</div><div class="tl-body">Lightning indexer + top-2048 selection: attention O(L&sup2;)&rarr;O(L&middot;k); ~132 B/token/layer indexer cache vs ~656 for MLA entries; ~5&times; decode-cache reduction at 131K; prices cut 50%+.</div></div>
+  <div class="tl-item"><div class="tl-date">OCT 2025</div><div class="tl-head">DeepSeek-OCR: Contexts Optical Compression</div><div class="tl-body">Research detour: compressing long contexts via optical 2D mapping of text through the vision encoder &mdash; input representation treated as a context variable.</div></div>
+  <div class="tl-item"><div class="tl-date">DEC 1, 2025</div><div class="tl-head">DeepSeek-V3.2: Thinking Context Management</div><div class="tl-body">Rule set: retain reasoning across tool outputs, discard at user turns, preserve tool history. First thinking-in-tool-use model; 1,800 environments / 85K prompts agentic RL; BrowseComp 51.4&rarr;67.6 with context management (&sect;4.4 study); <code>reasoning_content</code> contract with 400-error enforcement.</div></div>
+  <div class="tl-item"><div class="tl-date">JAN 12, 2026</div><div class="tl-head">Engram paper (arXiv 2601.07372)</div><div class="tl-body">Conditional memory via scalable lookup: O(1) n-gram-addressed memory as a second sparsity axis; U-shaped allocation law; Multi-Query NIAH 84.2&rarr;97.0; host-memory prefetch.</div></div>
+  <div class="tl-item"><div class="tl-date">APR 24, 2026</div><div class="tl-head">DeepSeek-V4 preview</div><div class="tl-body">1M-token context "agents can actually use": CSA+HCA at 27% FLOPs / 10% KV (Pro) vs V3.2 @1M; reasoning preserved across user turns in tool scenarios; Quick Instruction cache-native auxiliary tasks; 500-step/512K agent harness; DSec sandbox.</div></div>
+  <div class="tl-item"><div class="tl-date">AUG 2026</div><div class="tl-head">V4-Pro GA &amp; V4-Flash-Vision-Exp</div><div class="tl-body">General availability of the V4 line (Aug 13) and the vision experiment (Aug 21); Engram-equipped Flash lineage prepares for the September handoff.</div></div>
+  <div class="tl-item"><div class="tl-date">SEP 10, 2026</div><div class="tl-head">DeepSeek-V4.1-Flash</div><div class="tl-body">552B backbone + 196B Engram; CED 8B/16B asymmetric encoder&ndash;decoder; CSA2 with FP4 KV at 890 B/token global (438&times; below the V1-era baseline); SWA Bounded Replay at 1/8 persistent cache; Terminal-Bench 2.1 90.6; cache hits at $0.006/M. "Cache-hit charges often account for a large share of agent costs."</div></div>
+</div>
+<!-- ==================== PART IV ==================== -->
+<div class="part-divider" id="part4">
+  <div class="pd-part">Part IV &middot; Chapters 15&ndash;16</div>
+  <h2>Architectures &amp; the Playbook</h2>
+  <p>Nine context-management patterns with their trade-offs, a decision framework keyed to named constraints, working recipes &mdash; including the compliant DeepSeek reasoning loop &mdash; and the open problems the field has left on the table.</p>
+</div>
+
+<h2 class="ch" id="ch15"><span class="chno">15</span> The Pattern Catalog</h2>
+<p class="ch-sub">Nine architectures, organized by LangChain's four verbs, with the evidence for each and the failure mode that kills it.</p>
+
+<h3>15.1 The catalog</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>#</th><th>Pattern</th><th>Lever</th><th>Evidence anchor</th><th>Kills you when</th></tr></thead>
+<tbody>
+<tr><td>P1</td><td><strong>Sliding window / truncation</strong></td><td>Compress</td><td>Claude chat's rolling FIFO; every framework's max-history knob</td><td>Early facts (the failing test, the constraint) scroll out of view</td></tr>
+<tr><td>P2</td><td><strong>Compaction (summarize &amp; re-init)</strong></td><td>Compress</td><td>Anthropic's recipe (&sect;7.2); DeepSeek's Summary strategy (60.2, 364 steps)</td><td>Cache rewrite wipes the discount; recall drops below what you saved</td></tr>
+<tr><td>P3</td><td><strong>Tool-result clearing / output caps</strong></td><td>Compress</td><td>Claude context editing; Towards AI's 38% cost cut; V3.2's Discard-75%</td><td>Cleared payloads invalidate cached prefixes; future steps need the raw data</td></tr>
+<tr><td>P4</td><td><strong>Structured notes / scratchpad files</strong></td><td>Write</td><td>NOTES.md, todo.md recitation (Manus); Pok&eacute;mon memory; AGENTS.md conventions</td><td>Notes rot &mdash; stale state misleads more than no state</td></tr>
+<tr><td>P5</td><td><strong>Hierarchical memory store</strong></td><td>Write + Select</td><td>MemGPT blocks, Mem0, A-MEM, MemOS, Zep (&sect;5)</td><td>Retrieval quality caps at the driver model's tool competence</td></tr>
+<tr><td>P6</td><td><strong>Just-in-time retrieval / DCI</strong></td><td>Select</td><td>Anthropic JIT doctrine; DCI (arXiv 2605.05242); Claude Code's head/tail</td><td>Exploration loops burn tokens re-finding what a cache would have kept</td></tr>
+<tr><td>P7</td><td><strong>Sub-agent isolation</strong></td><td>Isolate</td><td>Anthropic orchestrator-worker (1&ndash;2K-token returns); V3.2's parallel-fewest-step</td><td>Shared context = KV penalty + pollution; handoff summaries lose the detail</td></tr>
+<tr><td>P8</td><td><strong>Cache-aware loop engineering</strong></td><td>(meta)</td><td>Manus's prefix rules; Bouchard's keep-everything result; Quick Instruction</td><td>Any prefix mutation &mdash; timestamps, tool churn, unstable serialization</td></tr>
+<tr><td>P9</td><td><strong>Model-native context features</strong></td><td>(meta)</td><td>DeepSeek <code>reasoning_content</code> contract; Claude memory tool / context editing; Engram</td><td>Provider lock-in; semantics differ per vendor (Terminus-style harnesses break rules)</td></tr>
+</tbody><div class="tblfoot">Lever vocabulary from LangChain's write/select/compress/isolate (&sect;6.4). Every pattern is documented in Part II or Part III with its primary source.</div></table></div>
+
+<h3>15.2 The decision framework: name the constraint first</h3>
+<p>The single most transferable lesson of 2025&ndash;2026 &mdash; common to the Anthropic essay, the Manus manual, the Towards AI measurements, and the DeepSeek &sect;4.4 study &mdash; is that pattern selection is <em>constraint-driven</em>, not fashion-driven. Bouchard's team reduced it to three named constraints; the DeepSeek study added the compute-budget axis. The framework below merges them:</p>
+
+<figure><div class="flow">
+  <div class="fdecision"><b>Name your constraint</b> &mdash; measured, not assumed</div>
+  <div class="fgrid3">
+    <div class="fnode"><strong>A. Window overflow</strong><br>The trajectory genuinely does not fit (500-step harness, 10M-token corpus). &rarr; P2 compaction, P3 clearing, P5 offload, P7 isolation. DeepSeek's evidence: even crude Discard-all beat an unmanaged overflow by +16.2 BrowseComp points.</div>
+    <div class="fnode"><strong>B. Cost</strong><br>Prefill dominates (100:1 skew); cached input price above your threshold (~$0.55/M in the Towards AI calculus). &rarr; P8 first (stabilize the prefix, cap outputs), then P9 native caching; only then P2. On DeepSeek pricing, keep-everything usually wins.</div>
+    <div class="fnode"><strong>C. Quality rot</strong><br>Blind-judged recall drops, NoLiMa-style associative failures, goal drift by turn 40. &rarr; P4 recitation (todo.md), P6 JIT loading, P7 clean sub-agent windows; P5 only with a strong driver model.</div>
+  </div>
+  <div class="farrow">&darr;</div>
+  <div class="fterminal"><b>Then measure on your own workload</b> &mdash; the Towards AI team's production defaults looked reasonable, scored 38% on memory probes, and cost twice the baseline. Every ordering in this catalog has task-dependence published against it.</div>
+</div><figcaption>Fig 15.1 &mdash; Constraint-first pattern selection. The three constraints fail together (&sect;2.4) but are fixed separately; fixing B with A's tools (summarizing for cost) is the documented 2026 mistake.</figcaption></figure>
+
+<h3>15.3 The hybrid that production converged on</h3>
+<p>No serious 2026 deployment runs one pattern; the convergent stack composes five, and it maps cleanly onto the four verbs. A <strong>stable, versioned system prompt</strong> and a <strong>frozen tool schema</strong> protect the cache (P8). A <strong>working set</strong> &mdash; current plan in a todo file, recent turns, uncleared critical outputs &mdash; rides in the window (P4 + light P3). Everything else lives in <strong>files or a store</strong> the agent queries on demand (P6), with <strong>sub-agents</strong> spawned for wide exploration and returning distilled findings (P7), and <strong>vendor-native features</strong> (DeepSeek's reasoning contract, Claude's editing) substituted for home-grown versions where the stack allows (P9). The V4 harness DeepSeek evaluates in its own report &mdash; two tools, 500 steps, 512K window &mdash; is this shape in miniature, which is the strongest available signal that the pattern generalizes across labs rather than being a house style.</p>
+
+<div class="callout ok"><span class="lab">The 2026 synthesis</span>
+<p>Three years of research resolved into one sentence: <strong>keep the working set small and cache-stable; write everything else down where the agent can find it; let sub-agents make the noise; and buy the model whose internals respect the budget</strong>. Parts I&ndash;III established why; this catalog is the how; the next chapter is the wiring.</p></div>
+<h2 class="ch" id="ch16"><span class="chno">16</span> Recipes, Checklists &amp; Outlook</h2>
+<p class="ch-sub">Working code for the compliant DeepSeek agent loop, the compaction harness, and the memory-block pattern &mdash; plus the open problems the field has left standing.</p>
+
+<h3>16.1 Recipe 1: the DeepSeek tool loop that respects the contract</h3>
+<p>Chapter 11.3 documented the rule: in tool-carrying requests, <code>reasoning_content</code> must round-trip for <em>every</em> prior assistant turn, or the API rejects the call. This is the compliant loop &mdash; and it is also the retention policy from &sect;11.1, expressed in harness code:</p>
+
+<div class="codetitle"><span>deepseek_agent_loop.py &mdash; compliant reasoning retention</span><span class="dots">&#9679;&#9679;&#9679;</span></div>
+<pre><code><span class="k">from</span> openai <span class="k">import</span> OpenAI
+
+client = OpenAI(api_key=<span class="s">"&lt;DeepSeek API Key&gt;"</span>,
+                base_url=<span class="s">"https://api.deepseek.com"</span>)
+
+messages = [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">"Find and fix the failing test."</span>}]
+
+<span class="k">while</span> <span class="k">True</span>:
+    resp = client.chat.completions.create(
+        model=<span class="s">"deepseek-flash"</span>,          <span class="c"># V4.1-Flash: $0.006/M cache hits (peak)</span>
+        messages=messages,
+        tools=TOOLS,                       <span class="c"># tools present => agent semantics</span>
+        reasoning_effort=<span class="s">"high"</span>,
+    )
+    msg = resp.choices[<span class="d">0</span>].message
+
+    <span class="c"># CRITICAL: keep reasoning_content in the history.</span>
+    <span class="c"># Dropping it => HTTP 400. Keeping it => reasoning persists</span>
+    <span class="c"># across tool outputs, per V3.2 Thinking Context Management.</span>
+    messages.append({
+        <span class="s">"role"</span>: <span class="s">"assistant"</span>,
+        <span class="s">"content"</span>: msg.content,
+        <span class="s">"reasoning_content"</span>: msg.reasoning_content,
+        <span class="s">"tool_calls"</span>: msg.tool_calls,
+    })
+
+    <span class="k">if not</span> msg.tool_calls:
+        <span class="k">break</span>                            <span class="c"># final answer; loop ends</span>
+
+    <span class="k">for</span> tc <span class="k">in</span> msg.tool_calls:        <span class="c"># execute each call, cap the output</span>
+        result = execute(tc.function.name, json.loads(tc.function.arguments))
+        messages.append({
+            <span class="s">"role"</span>: <span class="s">"tool"</span>,
+            <span class="s">"tool_call_id"</span>: tc.<span class="s">id</span>,
+            <span class="s">"content"</span>: cap(result, max_tokens=<span class="d">1500</span>),  <span class="c"># P3: stable caps, -38% cost</span>
+        })
+        <span class="c"># A new USER message here would trigger the discard rule;</span>
+        <span class="c"># tool outputs alone never do (&sect;11.1, Rule 1).</span>
+</code></pre>
+
+<p>Three details carry the whole Part III story. The <code>reasoning_content</code> append implements Rule 1 (tool outputs never wipe reasoning). The <code>cap()</code> on tool results implements the cheapest proven compaction tier from Chapter 3. And the loop's append-only shape &mdash; nothing above the current turn is ever rewritten &mdash; is what keeps every subsequent call inside the prefix cache, converting the 100:1 skew from a liability into the $0.006-per-million discount.</p>
+
+<h3>16.2 Recipe 2: compaction with the cache in mind</h3>
+<p>When the window genuinely overflows (constraint A), compact at the boundary &mdash; not mid-prefix &mdash; and keep a restorable residue, following the Anthropic recipe and the Manus restorability rule:</p>
+
+<div class="codetitle"><span>compact.py &mdash; recall-first, cache-aware</span><span class="dots">&#9679;&#9679;&#9679;</span></div>
+<pre><code><span class="k">def</span> <span class="h">maybe_compact</span>(messages, window, budget):
+    used = tokens(messages)
+    <span class="k">if</span> used &lt; <span class="d">0.80</span> * window:          <span class="c"># V3.2 &sect;4.4 trigger point</span>
+        <span class="k">return</span> messages
+
+    kept = [m <span class="k">for</span> m <span class="k">in</span> messages <span class="k">if</span> m[<span class="s">"role"</span>] <span class="k">in</span> (<span class="s">"system"</span>,)] \
+        + [m <span class="k">for</span> m <span class="k">in</span> messages[-<span class="d">5</span>:]]     <span class="c"># recent turns + system prompt</span>
+
+    summary = llm_summarize(
+        messages,
+        prompt=<span class="s">"""Preserve: architectural decisions, unresolved bugs,
+        implementation details, user constraints. Discard: raw tool outputs
+        whose facts you have restated, superseded search results.
+        For every dropped artifact, keep its reference (path/URL) so the
+        agent can re-fetch it."""</span>)                  <span class="c"># recall first, then precision</span>
+
+    <span class="k">return</span> kept[:<span class="d">1</span>] + [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: summary}] + kept[<span class="d">1</span>:]
+
+<span class="c"># Measured trade-offs before you ship this:</span>
+<span class="c">#  - DeepSeek BrowseComp study: Summary hit 60.2 at 364 avg steps;</span>
+<span class="c">#    Discard-all hit 67.6 with far fewer steps (&sect;11.4).</span>
+<span class="c">#  - Towards AI: with cheap cache hits, keep-everything beat every</span>
+<span class="c">#    summary on cost+latency+recall at once (&sect;3.2).</span>
+<span class="c">#  - Compaction rewrites the prefix: the next call re-prefills at full price.</span>
+</code></pre>
+
+<h3>16.3 Recipe 3: memory blocks, the Letta shape</h3>
+<p>For state that must outlive the window (constraint: long-horizon coherence), the self-editing block remains the pattern with the deepest evidence trail. A minimal JSON rendition of the Letta-style core memory, editable by the agent through tools:</p>
+
+<div class="codetitle"><span>core_memory.json &mdash; self-editing blocks (P4/P5)</span><span class="dots">&#9679;&#9679;&#9679;</span></div>
+<pre><code>{
+  <span class="s">"persona"</span>: {
+    <span class="s">"block"</span>: <span class="s">"You are the repo-maintenance agent for api-gateway."</span>,
+    <span class="s">"last_rewritten"</span>: <span class="s">"2026-09-13T10:22:31Z"</span>
+  },
+  <span class="s">"task_state"</span>: {
+    <span class="s">"block"</span>: <span class="s">"Goal: fix flaky auth e2e. Done: repro, log capture. Open: token-refresh race in middleware/auth.py:L214. Hypothesis 2 rejected (clock skew). Next: instrument refresh window."</span>,
+    <span class="s">"limit_tokens"</span>: <span class="d">2000</span>,              <span class="c"># bounded, in-window, always visible</span>
+    <span class="s">"rewrite_policy"</span>: <span class="s">"agent-tool: core_memory_replace"</span>
+  },
+  <span class="s">"project_facts"</span>: {
+    <span class="s">"block"</span>: <span class="s">"CI: GitHub Actions, runners have 7GB RAM. Test DB: ephemeral Postgres 16. Owner: @infra-oncall."</span>,
+    <span class="s">"limit_tokens"</span>: <span class="d">1000</span>
+  }
+}
+<span class="c"># The todo.md recitation rule (Manus) is this pattern's file-shaped twin:</span>
+<span class="c"># rewrite the block every few steps so the plan sits at the END of context,</span>
+<span class="c"># where attention is strongest (&sect;2.1) and drift dies.</span>
+</code></pre>
+
+<h3>16.4 The production checklist</h3>
+<ul>
+<li><strong>Stable prefix:</strong> no timestamps, no per-request IDs, no dynamic tool sets above the history. Version the system prompt; roll it deliberately (&sect;3.1).</li>
+<li><strong>Append-only history:</strong> deterministic serialization (stable JSON key order); tool outputs capped at a stable size; nothing rewritten mid-loop (&sect;3.2).</li>
+<li><strong>Reasoning contract honored:</strong> on DeepSeek, round-trip <code>reasoning_content</code> whenever <code>tools</code> is present; know your framework's user-message emulation (Terminus-style harnesses flip the semantics &mdash; &sect;11.1).</li>
+<li><strong>Working set defined:</strong> plan block + recent turns + uncleared critical outputs in the window; everything else addressable by reference (P4&ndash;P6).</li>
+<li><strong>Sub-agent seams sealed:</strong> fresh context per worker, 1&ndash;2K-token distilled returns; never share one growing window across workers (&sect;6.3).</li>
+<li><strong>Failures kept in context:</strong> no silent retries; the trace of what failed is the model's evidence (&sect;7.6).</li>
+<li><strong>Compaction is conditional:</strong> triggered at ~80% window use, recall-first prompt, restorable references for everything dropped (&sect;16.2).</li>
+<li><strong>Instrumented:</strong> cache-hit rate, tokens per query, and blind-graded memory probes on your own traffic &mdash; the three numbers every 2026 retrospective wished it had from day one (&sect;8.3).</li>
+</ul>
+
+<h3>16.5 The open problems, honestly stated</h3>
+<p>The field's own documents name what remains unsolved, and they agree more than their benchmark tables suggest. Mem0's 2026 report lists three: <strong>cross-session identity</strong> (whose memory is it, and how does it follow the user across agents and vendors?), <strong>temporal abstraction at scale</strong> (summarizing what changed <em>over time</em>, not just what is true now), and <strong>memory staleness</strong> (knowing when a stored fact has died). DeepSeek's V3.2 paper adds its own: the optimal <strong>combination of serial and parallel test-time scaling</strong> &mdash; when to keep one long managed trajectory versus sampling many short ones &mdash; and <strong>token efficiency</strong>: the model's own admission that its reasoning chains run longer than frontier quality justifies, with "intelligence density" of reasoning as the named target. The Anthropic essay closes on the same note from the opposite direction: smarter models need less prescriptive engineering, but "treating context as a precious, finite resource will remain central."</p>
+
+<h3>16.6 Outlook: what the next cycle looks like</h3>
+<p>Extrapolating only from shipped evidence, three trajectories are already visible. <strong>Memory continues migrating into the model:</strong> the harness patterns of Part II are being absorbed as trained behaviors and architectural primitives &mdash; retention rules at V3.2, cache-native auxiliary tasks and full reasoning persistence at V4, a 196B lookup memory at V4.1-Flash; the announced V4.1-Pro will show whether Engram scales with the flagship line. <strong>The economics compound:</strong> with cache hits at $0.006 per million and KV at 890 bytes per token, the marginal cost of a retained context is collapsing toward the cost of the <em>decision</em> to retain it &mdash; which is why DeepSeek's own release notes now discuss agent cost in cache terms. <strong>Context becomes observable operations:</strong> the ICML 2026 workshop program carried "agentic AI" in at least 60 of 247 accepted proposals, and monitoring products like Amazon CloudWatch's Coding Agent Insights (July 2026) exist because agent context behavior became a line item engineering leaders track. The three-year arc of this paper &mdash; from "fit the window" to "manage the artifact" to "engineer the economics" &mdash; has one more turn left, and it is the one DeepSeek has already bet on: context management as a property of the model itself, with everything else as scaffolding around it.</p>
+
+<div class="callout ok"><span class="lab">If you remember five numbers</span>
+<p><strong>100:1</strong> &mdash; the prefill:decode skew that makes caching the business model. <strong>50% at 32K</strong> &mdash; NoLiMa's cliff that bigger windows did not remove. <strong>74.0 vs 92.5</strong> &mdash; the benchmark spread that says "measure it yourself." <strong>51.4 &rarr; 67.6</strong> &mdash; what DeepSeek's own study says context management is worth on hard agentic search. <strong>84.2 &rarr; 97.0</strong> &mdash; what happens when memory moves into the weights. Everything else in this paper is derivation.</p></div>
+
+<!-- ==================== CLOSING ==================== -->
+<div class="footref" id="sources">
+<strong>Sources (all accessed and verified September 13, 2026).</strong>
+Primary papers: MemGPT (arXiv 2310.08560); Zep/Graphiti (arXiv 2501.13956); Mem0 (arXiv 2504.19413, ECAI 2025); Sleep-time Compute (arXiv 2504.13171); A-MEM (arXiv 2502.12110, NeurIPS 2025); MemOS (arXiv 2507.03724); NoLiMa (Modarressi et al., 2025); ACE (arXiv 2510.04618); DeepSeek-OCR (arXiv 2510.18234); optical-compression critique (arXiv 2512.03643); DeepSeek-V3.2 (arXiv 2512.02556); DeepSeek-V4 (arXiv 2606.19348); Engram (arXiv 2601.07372); DCI (arXiv 2605.05242); Lost in the Middle (Liu et al., 2023); Generative Agents, Reflexion, Voyager, LLMLingua, HippoRAG, LongMemEval (2023&ndash;2024 literature). Official engineering and product sources: Anthropic, "Effective Context Engineering for AI Agents" (Sep 29, 2025) and platform context docs; Manus, "Context Engineering for AI Agents" (Jul 18, 2025); Letta, "Benchmarking AI Agent Memory" (Aug 12, 2025) and memory-blocks/sleep-time posts; Zep blog (May 6, 2025); Mem0, "State of AI Agent Memory 2026" (Apr 1, 2026); LangChain context-engineering posts (Jul 2025; Jan 2026); philschmid (Dec 4, 2025); Crux Digits 2026 playbook (Jul 24, 2026); Louis-Fran&ccedil;ois Bouchard, "Context Engineering in 2026" (Aug 18, 2026); Chroma Research, "Context Rot" (Jul 2025); Karpathy, X post (Jun 25, 2025). DeepSeek primary releases: Context Caching (Aug 2, 2024); V3.2-Exp (Sep 29, 2025); V3.2 (Dec 1, 2025) + thinking-mode and tool-calls API guides; V4 preview (Apr 24, 2026) + Hugging Face announcement; V4-Pro GA (Aug 13, 2026); V4-Flash-Vision-Exp (Aug 21, 2026); V4.1-Flash (Sep 10, 2026) release notes, paper, and pricing page. Conflicting benchmark figures are presented with their publishers named; see &sect;8.3 for the reading protocol.
+</div>
+
+<p class="small" style="margin-top:28px">Compiled as a single self-contained HTML document. No external dependencies, no trackers, no build step &mdash; the way a research artifact should ship.</p>
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<!-- ==================== RELATED POSTS ==================== -->
+<section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
+  <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
+    <a href="how-to-build-an-ai-agent-step-by-step-guide.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">How to Build an AI Agent</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The build-alongside guide: thirteen cited steps from deciding whether you need an agent to the loop, guardrails and shipping.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="deepseek-kv-cache-optimization-research-paper.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">From 390 KB to 890 Bytes</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The companion paper on DeepSeek's KV-cache lineage — the prefix reuse that makes long agent contexts affordable.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="deepseek-ffn-moe-evolution-research-paper.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">From One Giant FFN to 384 Tiny Experts</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">DeepSeek's feed-forward and MoE history, including the Engram conditional-memory module in full.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+  </div>
+</section>
+
+
+<button class="btn-top" id="btnTop" aria-label="Back to top" title="Back to top">&#8593;</button>
+
+<script>
+(function(){
+  // ---- theme toggle ----
+  var btn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('ctx-paper-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+  } catch(e) {}
+  if (btn) btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.innerHTML = '&#9788;'; }
+    else { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+    try { localStorage.setItem('ctx-paper-theme', dark ? 'light' : 'dark'); } catch(e) {}
+  });
+
+  // ---- TOC active-section tracking ----
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var map = {};
+  links.forEach(function(l){ var h = l.getAttribute('href').slice(1); map[h] = l; });
+  var targets = Object.keys(map).map(function(id){ return document.getElementById(id); }).filter(Boolean);
+  function onScroll(){
+    var pos = window.scrollY + 140, current = null;
+    targets.forEach(function(t){ if (t.offsetTop <= pos) current = t.id; });
+    links.forEach(function(l){ l.classList.remove('active'); });
+    if (current && map[current]) map[current].classList.add('active');
+    var b = document.getElementById('btnTop');
+    if (b) b.classList.toggle('show', window.scrollY > 900);
+  }
+  var ticking = false;
+  window.addEventListener('scroll', function(){
+    if (!ticking){ requestAnimationFrame(function(){ onScroll(); ticking = false; }); ticking = true; }
+  }, {passive:true});
+  onScroll();
+
+  // ---- back to top ----
+  var topBtn = document.getElementById('btnTop');
+  if (topBtn) topBtn.addEventListener('click', function(){ window.scrollTo({top:0, behavior:'smooth'}); });
+})();
+</script>
+<script src="../js/theme-switcher.js"></script>
+</body>
+</html>

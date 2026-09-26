@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bonsai 2 27B: A 27B AI Model That Fits in 5.9 GB — Ternary Quantization Deep Dive</title>
+<meta name="description" content="Bonsai 2 27B is Prism ML's ternary-compressed 27-billion-parameter reasoning model that fits in 5.9 GB — about a ninth of the usual footprint — while keeping 98.2% of its full-precision benchmark intelligence. This deep dive covers the memory-wall problem, the ternary lineage from TTQ and BitNet to 2026 post-training ternarization, the Ternary g128 format and Hadamard rotated basis, hybrid-attention low-bit kernels, the full 20-benchmark evaluation, throughput and energy on twelve hardware platforms, the deployment field guide, and community reception. Every claim is traced to primary sources.">
+<meta name="keywords" content="Bonsai 2 27B, Ternary Bonsai, Prism ML, PrismML, ternary quantization, 1.58-bit, 1-bit LLM, BitNet, Qwen3.8-27B, hybrid attention, Gated DeltaNet, Hadamard rotation, SpinQuant, llama.cpp, MLX, intelligence density, on-device AI, PTQ1_0, PQ2_0, DSpark, speculative decoding, near-lossless compression">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Bonsai 2 27B: A 27B AI Model That Fits in 5.9 GB — Ternary Quantization Deep Dive",
+  "alternativeHeadline": "How Prism ML compressed a 27B reasoning model to 5.9 GB at 1.76 bits per weight",
+  "description": "A book-length deep dive on Bonsai 2 27B, Prism ML's ternary-compressed 27B reasoning model built on Qwen3.8-27B: the memory wall, the ternary lineage, the Ternary g128 format and rotated basis, hybrid-attention low-bit kernels, the full 20-benchmark evaluation, throughput and energy across twelve hardware platforms, and the deployment field guide.",
+  "author": {"@type": "Person", "name": "Hussain Nazary"},
+  "datePublished": "2026-09-21",
+  "dateModified": "2026-09-26",
+  "keywords": "Bonsai 2 27B, ternary quantization, Prism ML, 1.58-bit, BitNet, Qwen3.8-27B, GGUF, MLX, llama.cpp, edge AI, quantization, 2026",
+  "articleSection": "Research Paper",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 15000,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html",
+  "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
+  "about": [
+    {"@type": "Thing", "name": "Ternary quantization"},
+    {"@type": "Thing", "name": "Quantization"},
+    {"@type": "Thing", "name": "Prism ML"},
+    {"@type": "Thing", "name": "Qwen"},
+    {"@type": "Thing", "name": "LLM inference"},
+    {"@type": "Thing", "name": "Edge AI"}
+  ],
+  "isPartOf": {
+    "@type": "Blog",
+    "name": "Local AI Zone — Blog",
+    "url": "https://local-ai-zone.github.io/blog.html"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://local-ai-zone.github.io/og-image.png",
+    "width": 1200,
+    "height": 630
+  },
+  "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
+}
+</script>
+<!-- ==================== SEO ==================== -->
+<meta name="author" content="Local AI Zone">
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow">
+<meta name="bingbot" content="index, follow">
+<meta name="rating" content="general">
+<meta name="revisit-after" content="7 days">
+<meta name="theme-color" content="#4f46e5">
+<meta name="creator" content="Local AI Zone">
+<meta name="publisher" content="Local AI Zone">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:title" content="Bonsai 2 27B: A 27B AI Model That Fits in 5.9 GB — Ternary Quantization Deep Dive">
+<meta property="og:description" content="A citation-driven deep dive on Bonsai 2 27B, the ternary-compressed 27B reasoning model from Prism ML that keeps 98.2% of full-precision benchmark intelligence in a 5.9 GB footprint across GGUF and MLX runtimes.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bonsai 2 27B — A 27B AI Model That Fits in 5.9 GB">
+<meta property="article:author" content="Hussain Nazary">
+<meta property="article:published_time" content="2026-09-21T00:00:00Z">
+<meta property="article:modified_time" content="2026-09-26T00:00:00Z">
+<meta property="article:section" content="Research Paper">
+<meta property="article:tag" content="Bonsai 2 27B">
+<meta property="article:tag" content="Ternary Quantization">
+<meta property="article:tag" content="Prism ML">
+<meta property="article:tag" content="Quantization">
+<meta property="article:tag" content="Qwen">
+<meta property="article:tag" content="llama.cpp">
+<meta property="article:tag" content="Edge AI">
+<meta property="article:tag" content="LLM">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@localaizone">
+<meta name="twitter:creator" content="@hussainnazary">
+<meta name="twitter:title" content="Bonsai 2 27B: A 27B AI Model That Fits in 5.9 GB">
+<meta name="twitter:description" content="How Prism ML compressed a 27B reasoning model to ~1.76 bits per weight — the ternary lineage, rotated basis, low-bit kernels, all 20 benchmarks, and where to run it.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta name="twitter:image:alt" content="Bonsai 2 27B — A 27B AI Model That Fits in 5.9 GB">
+
+<!-- FAQ Schema (AEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Bonsai 2 27B?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Bonsai 2 27B is a ternary-compressed 27-billion-parameter reasoning model from Prism ML, released September 17, 2026, built on Qwen3.8-27B with the architecture unchanged. It retains 98.2% of its full-precision benchmark intelligence at roughly a ninth of the footprint."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much memory does Bonsai 2 27B need?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "About 5.9 GB for the language model at 1.76 bits per weight as shipped — roughly 9.1x smaller than the same model in FP16."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is ternary quantization (1.58-bit)?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ternary quantization stores each weight in three values — about 1.58 bits per weight — instead of 16 bits, using post-training ternarization together with a Hadamard-rotated basis and hybrid-attention low-bit kernels to preserve accuracy."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Bonsai 2 27B compare with a 4-bit quantization?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Against Unsloth's UD-Q4_K_XL at 5.2 bits per weight and 17.6 GB, which scores 85.18, Bonsai 2 27B scores 84.78 at 5.9 GB — within 0.4 points at roughly three times smaller."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where can I run Bonsai 2 27B?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "It ships as GGUF (llama.cpp) and MLX builds. Prism ML reports throughput and energy across twelve hardware platforms, with peak decode of about 143 tokens per second on an RTX 5090."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Breadcrumb Schema (GEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+    {"@type": "ListItem", "position": 3, "name": "Bonsai 2 27B Ternary Deep Dive", "item": "https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html"}
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<style>
+:root {
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#1a2233; --ink-soft:#46506a; --ink-faint:#7c86a0;
+  --line:#e3e7ee; --accent:#4f46e5; --accent-soft:#eef2ff; --accent-2:#0d9488;
+  --warn-bg:#fff7ed; --warn-line:#fdba74; --warn-ink:#9a3412;
+  --ok-bg:#f0fdf4; --ok-line:#86efac; --ok-ink:#166534;
+  --info-bg:#eff6ff; --info-line:#93c5fd; --info-ink:#1e3a8a;
+  --danger-bg:#fef2f2; --danger-line:#fca5a5; --danger-ink:#991b1b;
+  --code-bg:#0d1117; --code-ink:#d7dde7; --code-cmt:#7d8799; --code-head:#79c0ff; --code-key:#ff7b72; --code-str:#a5d6a7;
+  --side-bg:#0e1526; --side-ink:#aab6cf; --side-hover:#1b2540; --side-active:#4f46e5;
+  --mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,'Liberation Mono',monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif;
+}
+html[data-theme='dark'] {
+  --bg:#0b0f1a; --paper:#111827; --ink:#e5e9f2; --ink-soft:#b8c2d9; --ink-faint:#7c8aa5;
+  --line:#242f47; --accent:#818cf8; --accent-soft:#1e2440; --accent-2:#2dd4bf;
+  --warn-bg:#2a1c0e; --warn-line:#9a5b21; --warn-ink:#fdba74;
+  --ok-bg:#0d2418; --ok-line:#2f7a4f; --ok-ink:#86efac;
+  --info-bg:#101d33; --info-line:#2b4d8a; --info-ink:#93c5fd;
+  --danger-bg:#2a1214; --danger-line:#8a3a3f; --danger-ink:#fca5a5;
+  --side-bg:#0a0f1e; --side-ink:#aab6cf; --side-hover:#1b2540; --side-active:#6366f1;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+/* ============ LAYOUT ============ */
+.shell{display:flex;min-height:100vh}
+aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
+main{flex:1;min-width:0;display:flex;justify-content:center}
+.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
+/* ============ SIDEBAR TOC ============ */
+#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
+#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35;letter-spacing:.2px}
+#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
+#toc nav a{display:block;padding:5px 22px 5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
+#toc nav a:hover{background:var(--side-hover);color:#fff}
+#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
+#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
+#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
+#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
+/* ============ THEME TOGGLE ============ */
+.theme-btn{position:fixed;top:16px;right:20px;z-index:80;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:17px;line-height:1;box-shadow:0 2px 10px rgba(15,23,42,.12);transition:transform .15s}
+.theme-btn:hover{transform:scale(1.07)}
+/* ============ TYPOGRAPHY ============ */
+h1,h2,h3,h4{font-family:var(--sans);line-height:1.25;color:var(--ink)}
+.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
+.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
+.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px;letter-spacing:-.2px}
+.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
+.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--ink-soft)}
+p{margin:0 0 18px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid #c7d2fe}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:700;color:var(--ink)}
+em{font-style:italic}
+ul,ol{margin:0 0 18px;padding-left:26px}
+li{margin-bottom:7px}
+li::marker{color:var(--accent);font-weight:600}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+.small{font-size:13.5px;color:var(--ink-soft)}
+.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#3730a3;overflow-wrap:anywhere}
+html[data-theme='dark'] .mono, html[data-theme='dark'] code:not(pre code){background:#1c2438;border-color:#2c3752;color:#a5b4fc}
+/* ============ COVER ============ */
+.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
+.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
+.cover h1 .thin{color:var(--accent)}
+.cover .sub{font-size:19px;color:var(--ink-soft);max-width:640px;line-height:1.6;margin:0 0 30px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
+.cover .meta b{color:var(--ink-soft);font-weight:600}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:34px 0 8px}
+.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+html[data-theme='dark'] .statgrid .cell{background:linear-gradient(180deg,#141b2e,#10162a)}
+.statgrid .cell .v{font-size:24px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+/* ============ CALLOUTS ============ */
+.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
+.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
+.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
+.callout p:last-child{margin-bottom:0}
+.callout p{margin-bottom:8px}
+/* ============ TABLES ============ */
+.tblwrap{overflow-x:auto;margin:24px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;background:var(--paper)}
+thead th{background:#f1f3f8;text-align:left;font-weight:700;color:#2b3550;font-size:12.5px;letter-spacing:.4px;text-transform:uppercase;padding:10px 14px;border-bottom:2px solid var(--line);white-space:nowrap}
+html[data-theme='dark'] thead th{background:#1a2338;color:#c7d0e8}
+tbody td{padding:9px 14px;border-bottom:1px solid #edf0f5;vertical-align:top}
+html[data-theme='dark'] tbody td{border-bottom-color:#202a42}
+tbody tr:nth-child(even){background:#fafbfd}
+html[data-theme='dark'] tbody tr:nth-child(even){background:#131a2c}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .tag{display:inline-block;font-size:11px;font-weight:700;padding:1.5px 8px;border-radius:99px;letter-spacing:.3px}
+.tag.good{background:var(--ok-bg);color:var(--ok-ink);border:1px solid var(--ok-line)}
+.tag.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.tag.bad{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line)}
+.tag.neutral{background:#eef1f6;color:#3f4a63;border:1px solid #d8dee9}
+html[data-theme='dark'] .tag.neutral{background:#1c2438;color:#b8c2d9;border-color:#2c3752}
+.tblfoot{font-size:12.5px;color:var(--ink-faint);padding:8px 14px;background:#fafbfd;border-top:1px solid var(--line)}
+html[data-theme='dark'] .tblfoot{background:#131a2c}
+/* ============ CODE ============ */
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:22px 0;font-family:var(--mono);font-size:13.2px;line-height:1.62}
+pre code{font-family:inherit;background:none;border:none;padding:0;color:inherit;white-space:pre}
+pre .c, pre .cmt{color:var(--code-cmt);font-style:italic}
+pre .h, pre .head{color:var(--code-head)}
+pre .k, pre .key{color:var(--code-key)}
+pre .s, pre .str{color:var(--code-str)}
+pre .d{color:#e3b341}
+.codetitle{display:flex;justify-content:space-between;align-items:center;background:#161b22;border:1px solid #30363d;border-bottom:none;border-radius:12px 12px 0 0;padding:8px 16px;font-family:var(--mono);font-size:11.5px;color:#8b98ab;margin:22px 0 0}
+.codetitle .dots{color:#444d58;letter-spacing:2px}
+.codetitle + pre{margin-top:0;border-radius:0 0 12px 12px}
+/* ============ FIGURES ============ */
+figure{margin:28px 0}
+figcaption{font-size:13px;color:var(--ink-faint);margin-top:10px;text-align:center}
+.part-divider{page-break-inside:avoid}
+.chip{font-size:12px;font-weight:600;padding:5px 13px;border-radius:99px;border:1px solid var(--line);background:#fafbfd;color:var(--ink-soft)}
+html[data-theme='dark'] .chip{background:#131a2c}
+.kbd{font-family:var(--mono);font-size:.82em;border:1px solid #cbd3e1;border-bottom-width:2.5px;border-radius:6px;padding:1px 7px;background:#f8fafc;color:#3b475f}
+.footref{font-size:13px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:56px;padding-top:18px}
+.btn-top{position:fixed;right:26px;bottom:26px;width:44px;height:44px;border-radius:99px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 6px 20px rgba(79,70,229,.42);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;border:none;z-index:60}
+.btn-top.show{opacity:1;pointer-events:auto}
+.src-block{margin:18px 0;padding:14px 18px;border:1px dashed var(--line);border-radius:10px;font-size:14px;color:var(--ink-soft);background:#fbfcfe}
+html[data-theme='dark'] .src-block{background:#101728}
+/* ============ CODEBLOCK WRAP (used in ch13) ============ */
+.tblwrap pre{margin:0;border-radius:10px}
+.tblwrap table{border:none;background:transparent}
+@media (max-width:1100px){
+  .shell{display:block}
+  aside#toc{position:static;width:100%;height:auto;flex:none}
+  .page{padding:0 26px 90px}
+  .cover h1{font-size:36px}
+}
+@media print{
+  aside#toc,.btn-top,.theme-btn,#backTop{display:none}
+  body{background:#fff}
+  .page{box-shadow:none;max-width:100%;padding:0 6mm}
+  .part-divider{background:#1e293b !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  pre{white-space:pre-wrap}
+}
+/* ============ INTEGRATED SITE HEADER ============ */
+.premium-header{position:static !important}
+.theme-btn{display:none !important}
+</style>
+</head>
+<body>
+<!-- ==================== SITE HEADER ==================== -->
+<header class="premium-header blog-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-brand">
+                    <div class="header-logo-section">
+                        <div class="header-logo" onclick="window.location.href='../index.html'">
+                            <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="logo-fallback" style="display: none;">
+                                <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <div class="brand-title">GGUF Discovery</div>
+                            <p class="brand-subtitle">Blog &amp; Guides</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <nav class="blog-nav" aria-label="Main navigation">
+                    <a href="../index.html">Home</a>
+                    <a href="../about.html">About</a>
+                    <a href="../services.html">Need Help?</a>
+                    <a href="../blog.html" class="active">Blog</a>
+                </nav>
+                <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                    <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                    <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                    <span class="theme-label light-label">Light</span>
+                    <span class="theme-label dark-label">Dark</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<button class="theme-btn" id="themeBtn" aria-label="Toggle light/dark theme" title="Toggle theme">&#9788;</button>
+<div class="shell">
+<!-- ==================== SIDEBAR TOC ==================== -->
+<aside id="toc">
+  <div class="brand">
+    <div class="t">Bonsai 2 27B</div>
+    <div class="s">Ternary Quantization Deep Dive &middot; 2026</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Front Matter</div>
+    <a href="#abstract"><span class="num">&sect;</span>Abstract &amp; How to Read</a>
+    <div class="part">Part I &mdash; Problem &amp; Lineage</div>
+    <a href="#ch1"><span class="num">1</span>The Memory Wall</a>
+    <a href="#ch2"><span class="num">2</span>The Ternary Lineage</a>
+    <a href="#ch3"><span class="num">3</span>Prism ML, the Company</a>
+    <div class="part">Part II &mdash; The Bonsai Arc</div>
+    <a href="#ch4"><span class="num">4</span>1-bit Bonsai (March 2026)</a>
+    <a href="#ch5"><span class="num">5</span>Ternary Bonsai (April 2026)</a>
+    <a href="#ch6"><span class="num">6</span>Bonsai Image 4B (May 2026)</a>
+    <a href="#ch7"><span class="num">7</span>Bonsai 27B (July 2026)</a>
+    <div class="part">Part III &mdash; The Deep Dive</div>
+    <a href="#ch8"><span class="num">8</span>Anatomy of Bonsai 2 27B</a>
+    <a href="#ch9"><span class="num">9</span>The Rotated Basis</a>
+    <a href="#ch10"><span class="num">10</span>Low-Bit Kernels</a>
+    <a href="#ch11"><span class="num">11</span>The Benchmarks</a>
+    <a href="#ch12"><span class="num">12</span>Throughput &amp; Energy</a>
+    <a href="#ch13"><span class="num">13</span>Deployment Field Guide</a>
+    <div class="part">Part IV &mdash; Meaning</div>
+    <a href="#ch14"><span class="num">14</span>Reception &amp; Reception Risks</a>
+    <a href="#ch15"><span class="num">15</span>Intelligence Density</a>
+    <a href="#ch16"><span class="num">16</span>Limitations, Roadmap, Verdict</a>
+  </nav>
+  <div class="toc-foot">A fact-checked deep-dive research paper.<br>Every claim traced to primary sources.<br><span style="color:#7c86a0">Last updated: September 21, 2026</span></div>
+</aside>
+<!-- ==================== MAIN ==================== -->
+<main>
+<div class="page">
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <div class="kicker">Deep-Dive Research Paper &middot; Efficiency</div>
+  <h1>Bonsai 2 27B<br><span class="thin">A 27B AI Model That Fits in 5.9 GB</span></h1>
+  <p class="sub">How a Caltech-rooted startup compressed a 27-billion-parameter reasoning model into roughly 5.9&nbsp;GB &mdash; about a ninth of its full-precision size &mdash; while retaining 98.2% of its benchmark intelligence, and what six months of Bonsai releases say about where AI deployment is heading.</p>
+  <div class="statgrid">
+    <div class="cell"><div class="v">98.2%</div><div class="k">FP16 intelligence retained</div></div>
+    <div class="cell"><div class="v">1.76</div><div class="k">Bits per weight, as shipped</div></div>
+    <div class="cell"><div class="v">5.93 GB</div><div class="k">Language model footprint</div></div>
+    <div class="cell"><div class="v">~9.1&times;</div><div class="k">Smaller than FP16</div></div>
+    <div class="cell"><div class="v">143 tok/s</div><div class="k">Peak decode, RTX 5090</div></div>
+    <div class="cell"><div class="v">2.23M</div><div class="k">GGUF downloads in 4 days</div></div>
+  </div>
+  <div class="meta">
+    <span><b>Subject:</b> Ternary Bonsai 2 27B (Prism ML, September 17, 2026)</span>
+    <span><b>Base:</b> Qwen3.8-27B, architecture unchanged</span>
+    <span><b>License:</b> Apache 2.0</span>
+    <span><b>Scope:</b> format, math, kernels, two benchmark suites (20 + 14), 12 hardware platforms, ecosystem</span>
+  </div>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<h2 class="ch" id="abstract"><span class="chno">&sect;</span> Abstract &amp; How to Read</h2>
+<p class="ch-sub">What this paper claims, what it does not, and how the evidence is organized.</p>
+
+<p>On September 17, 2026, the Pasadena- and San Francisco-based company <strong>Prism ML</strong> released <strong>Ternary Bonsai 2 27B</strong>, a compressed build of the Qwen3.8-27B reasoning model in which essentially every language-model weight is stored as one of three values &mdash; <span class="mono">{&minus;1, 0, +1}</span> &mdash; with a single FP16 scale shared by each group of 128 weights. The result occupies <strong>5.93&nbsp;GB</strong> for the language model as shipped, against <strong>53.8&nbsp;GB</strong> for the FP16 baseline, and retains <strong>98.2%</strong> of the base model&rsquo;s average score across the company&rsquo;s 20-benchmark thinking-mode suite &mdash; 83.9 versus 85.4. That average also <em>slightly exceeds</em> the 83.6 posted by the previous-generation Qwen3.6-27B in full precision, at roughly a ninth of either model&rsquo;s size. The company&rsquo;s framing is direct: at this level of retention, compression becomes a deployment unlock rather than a quality compromise.</p>
+
+<p>This paper is a comprehensive technical deep dive on that release and the six-month arc that produced it &mdash; five public launches from March 31 to September 17, 2026, spanning 1-bit and ternary language models at 1.7B through 27B scale, an image-generation model, and the 27B flagship that first ran a model of its class on a phone. It reconstructs, from primary sources only, what the Bonsai representation actually is (Chapter&nbsp;8), how the rotated Hadamard basis works and why it is folded offline into the stored weights (Chapter&nbsp;9), what the custom hybrid-attention kernels do and why stock runtimes cannot execute these files (Chapter&nbsp;10), how the benchmarks were run and what the full per-benchmark tables say (Chapter&nbsp;11), and how the model performs across twelve hardware platforms from an L4 to an M5 Max laptop (Chapter&nbsp;12).</p>
+
+<p>It is equally a paper about evidence quality. Bonsai 2 27B arrives with an unusually detailed 14-page technical report, but also with two distinct benchmark suites (a 20-benchmark whitepaper suite and a 14-benchmark Hugging Face companion), two generations of throughput measurements as the stack matured, and several numbers that vary between documents by small, explainable amounts. Where sources disagree, this paper reports each figure with its attribution rather than silently picking one. The accompanying verification pass re-checked every quantitative claim in this document against the whitepaper, both model cards, the announcement posts, and third-party measurements; the fact-check results are summarized in Chapter&nbsp;16.</p>
+
+<div class="callout info"><span class="lab">How to read this paper</span>
+<p><strong>Part I</strong> (Chapters 1&ndash;3) builds the context: why 16-bit weights are the deployment bottleneck, where ternary quantization came from, and who Prism ML is. <strong>Part II</strong> (Chapters 4&ndash;7) walks the release chronology &mdash; each generation&rsquo;s claims, numbers, and reception. <strong>Part III</strong> (Chapters 8&ndash;13) is the technical core on Bonsai 2 27B itself: format, mathematics, kernels, benchmarks, performance, and deployment. <strong>Part IV</strong> (Chapters 14&ndash;16) covers community reception, the intelligence-density argument, limitations, and the verdict.</p>
+<p>Readers who want only the headline results can read the abstract, Chapter&nbsp;8&rsquo;s specification table, Chapter&nbsp;11&rsquo;s benchmark tables, and Chapter&nbsp;16. Readers evaluating whether to <em>deploy</em> the model should add Chapters 12 and 13 in full.</p></div>
+
+<div class="callout warn"><span class="lab">Scope and sourcing note</span>
+<p>Primary sources for this paper are: the Bonsai 2 27B technical report (PrismML, September 2026); the Hugging Face model cards for <span class="mono">Ternary-Bonsai-2-27B-gguf</span> and <span class="mono">Ternary-Bonsai-2-27B-mlx-2bit</span>; the five Prism ML announcement posts (March 31, April 16, May 26, July 14, September 17, 2026); the Qwen3.8-27B model card; the first-generation Bonsai 27B cards; Prism ML&rsquo;s documentation; OpenRouter and Ollama listings; Hacker News threads for both 27B launches; and third-party write-ups from regolo.ai, mindstudio.ai, and benchlm.ai. Where this paper quotes a number, the number comes from one of those sources; nothing is estimated or extrapolated by the author. Benchmark results are Prism ML&rsquo;s own unless explicitly attributed otherwise, and the caveats that apply to vendor-run evaluations are discussed in Chapters 11 and 14.</p></div>
+<!-- ==================== PART I DIVIDER ==================== -->
+<div class="part-divider" style="margin:64px 0 8px;padding:34px 30px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#eef2ff,#f8fafc 60%);">
+  <div style="font-size:12px;letter-spacing:2.4px;text-transform:uppercase;color:var(--accent);font-weight:800;">Part I</div>
+  <div style="font-size:32px;font-weight:850;letter-spacing:-.8px;margin:6px 0 8px;">The Problem and the Lineage</div>
+  <div style="font-size:16px;color:var(--ink-soft);max-width:600px;">Why extreme weight compression matters, where the ternary idea came from, and the company that bet on it.</div>
+</div>
+
+<!-- ==================== CHAPTER 1 ==================== -->
+<h2 class="ch" id="ch1"><span class="chno">1</span> The Memory Wall</h2>
+<p class="ch-sub">Why a 27B model needs 54 GB, why decode is bandwidth-bound, and why the conventional quantization ladder breaks below four bits.</p>
+
+<p>The defining constraint of local AI deployment is not compute &mdash; it is memory. A 27-billion-parameter model stored in the industry-standard 16-bit floating-point format occupies roughly <strong>54&nbsp;GB</strong> before a single token of context is loaded. That number alone disqualifies the model from every consumer device on the market: an everyday laptop ships with 16&ndash;32&nbsp;GB of unified memory, a phone offers far less usable headroom, and even a 24&nbsp;GB single-GPU workstation cannot hold the weights. The problem compounds at inference time, because generating text is dominated not by arithmetic but by <em>movement</em>: at batch size one, every decoding step streams the entire set of resident weights through the memory system. The arithmetic each weight performs is trivial; the cost of fetching it is everything.</p>
+
+<p>This is why Prism ML&rsquo;s whitepaper describes batch-1 decoding as &ldquo;memory-bandwidth-bound&rdquo; and why the entire Bonsai program is built around reducing bytes per weight rather than reducing the parameter count. The company&rsquo;s own measurement makes the point concretely: on an Apple M5 Pro laptop, Bonsai 2 27B sustains 27.7 tokens per second while streaming approximately <strong>201&nbsp;GB/s</strong> of weight traffic &mdash; the decode path is, to first order, a bandwidth benchmark. Cut the bits per weight by 9&times; and, on a bandwidth-limited device, tokens per second rise accordingly; the same 27B model that needed a datacenter-class memory system becomes interactive on hardware people already own.</p>
+
+<h3>The conventional ladder &mdash; and where it breaks</h3>
+
+<p>The industry&rsquo;s standard answer to the memory problem is post-training quantization (PTQ): take a trained FP16 model and round its weights to a coarser grid. The ladder is well understood. Eight-bit builds cost little quality. Four-bit builds &mdash; the current default for local deployment &mdash; lose roughly a point of aggregate benchmark score at a quarter of the footprint; Prism&rsquo;s own data shows Qwen3.8-27B&rsquo;s Unsloth <span class="mono">UD-Q4_K_XL</span> build scoring 85.18 against the FP16 baseline&rsquo;s 86.32 on their 14-benchmark suite, 98.7% retention at 17.6&nbsp;GB. Below four bits, the ladder historically collapses: the widely-used <span class="mono">IQ2_XXS</span> &ldquo;2-bit&rdquo; build of the same model scores 72.59 on that suite &mdash; 84.1% retention &mdash; and, more damaging, fails selectively, a pattern examined in detail in Chapter&nbsp;11.</p>
+
+<p>Two structural facts about conventional low-bit builds matter for everything that follows. First, <strong>their advertised labels understate their true bit-width</strong>. A GGUF &ldquo;2-bit&rdquo; build is a mixture: attention projections, embeddings, and sensitive tensors are quietly kept at higher precision, so the build Prism cites &mdash; at 9.4&nbsp;GB for a 27B model &mdash; is really <strong>2.8 bits per weight</strong> on average, not 2. Second, <strong>the mixture is where the quality hides</strong>: the high-precision escape hatches carry much of the reasoning load, so a &ldquo;2-bit&rdquo; label describes the cheapest tensors, not the model. Bonsai&rsquo;s central design commitment is the opposite: the low-bit representation runs <em>end to end</em> across the language model &mdash; embeddings, attention projections, MLP projections, and the LM head &mdash; with the advertised bit-width matching the shipped artifact, and only 26.2M parameters (0.0976% of the language model, the recurrent-state path and normalization weights that linear attention requires) held above it, explicitly counted into the 1.72-bits-per-weight figure.</p>
+
+<div class="callout info"><span class="lab">The phone gate</span>
+<p>Fitting a phone is a stricter test than storage numbers suggest. Prism&rsquo;s July 2026 announcement explains: &ldquo;a phone never exposes its full memory to an app &mdash; a 12&nbsp;GB iPhone offers about 6&nbsp;GB for the model to use on-device, and the model shares that budget with its KV cache and activations.&rdquo; At about 4&nbsp;GB, the first-generation 1-bit Bonsai 27B was, in the company&rsquo;s words, &ldquo;the first to pass through with room to work.&rdquo; No conventional build of a 27B model comes close: even a good 4-bit build sits near 18&nbsp;GB of weights.</p></div>
+
+<h3>Why 1.58 bits is the natural floor</h3>
+
+<p>Ternary storage &mdash; weights restricted to <span class="mono">{&minus;1, 0, +1}</span> &mdash; is not an arbitrary cruelty. A ternary value carries log<sub>2</sub>(3) &asymp; <strong>1.585 bits</strong> of information, and adding a single FP16 scale per 128-weight group costs 16/128 = 0.125 bits per weight, for an information-theoretic floor of about <strong>1.71 bits per weight</strong>. That is a 9.3&times; reduction against FP16 &mdash; large enough to move a 27B model across device-class boundaries, and small enough that the arithmetic (multiply-by-scale, accumulate, with zero contributions costing nothing) stays trivially cheap. Binary weights <span class="mono">{&minus;1, +1}</span> go further still &mdash; 1 bit plus scale overhead lands at <strong>1.125 bits per weight</strong>, a 14.2&times; reduction &mdash; which is exactly the operating point Prism used to put a 27B model on an iPhone. The question that defined the field for a decade was never whether ternary storage was compact; it was whether a network&rsquo;s <em>behavior</em> could survive it. Chapter&nbsp;2 traces how the answer evolved.</p>
+
+<!-- ==================== CHAPTER 2 ==================== -->
+<h2 class="ch" id="ch2"><span class="chno">2</span> The Ternary Lineage</h2>
+<p class="ch-sub">From Trained Ternary Quantization (2016) through BitNet and b1.58 to 2026&rsquo;s post-training ternarization &mdash; and the two schools that emerged.</p>
+
+<p>Ternary weights are older than the LLM era. <strong>Trained Ternary Quantization</strong> (Zhu et al., 2016) showed, in the pre-transformer world, that neural-network weights could be constrained to three values during training with tolerable accuracy loss &mdash; work that has since accumulated roughly 1,550 citations and established the basic recipe: pick per-layer scales, discretize, and retrain so the network adapts to its own coarseness. The idea then went quiet for half a decade, because dense FP16 training was cheap enough that nobody needed the savings.</p>
+
+<p>The LLM-scale revival came from Microsoft Research. <strong>BitNet</strong> (October 2023) proposed training transformers with binary weights from scratch; its follow-up, <strong>&ldquo;The Era of 1-bit LLMs: All Large Language Models are in 1.58 Bits&rdquo;</strong> (Ma et al., February 2024, arXiv 2402.17764), argued that ternary <span class="mono">{&minus;1, 0, +1}</span> weights, trained natively, match FP16 baselines at matched scale &mdash; Wikipedia&rsquo;s summary of the line of work puts it as &ldquo;comparable in performance to the 16-bit Llama 2&rdquo; &mdash; and defined a new scaling-law framing for what the paper&rsquo;s title called the 1-bit era. The proof that the recipe scaled to a genuinely useful model arrived in April 2025 with <strong>BitNet b1.58 2B4T</strong>, Microsoft&rsquo;s 2.4-billion-parameter model trained on 4 trillion tokens and released as &ldquo;the first open-source, native 1-bit LLM,&rdquo; with 1.58-bit weights and 8-bit activations, plus its own inference framework (<span class="mono">bitnet.cpp</span>).</p>
+
+<h3>Two schools: train ternary, or compress after</h3>
+
+<p>BitNet&rsquo;s school is <strong>quantization-aware training (QAT)</strong>: the model is born ternary, spending its full training budget inside the low-bit regime. Its strength is quality; its cost is that every ternary model must be trained from scratch, so the method only reaches the base models someone is willing to spend a pretraining run on. The whitepaper&rsquo;s reference table makes the contrast explicit in 2026 terms: among Prism&rsquo;s comparison points, the QAT entry is <strong>Gemma-4-31B QAT</strong> at 6.0 true bits per weight, 23.3&nbsp;GB, retaining 98.0% &mdash; excellent retention, at a footprint four times ternary&rsquo;s and a bit-width four times higher, because that QAT program chose 4-bit, not 1.58-bit, as its target.</p>
+
+<p>The second school is <strong>post-training ternarization</strong>: take an existing strong model &mdash; with its vision tower, its tool-calling tuning, its agentic post-training already paid for &mdash; and convert its weights to ternary without retraining. This is the harder scientific problem, and the one Prism ML chose: the company&rsquo;s first-generation 1-bit Bonsai 8B card states plainly that the methodology is applied to existing bases rather than baked into training, and third-party coverage from the launch window (regolo.ai among others) describes Bonsai explicitly as &ldquo;a compact representation of a much larger dense model,&rdquo; not a small model trained from scratch. The 2026 research literature crowded into exactly this gap &mdash; academic work on cost-efficient ternary quantization (CAT-Q, June 2026) and on training-free ternary optimization via asymmetric quantizers refined iteratively (ATQ) &mdash; which is the context in which Prism&rsquo;s claims of 90&ndash;98% retention from post-training conversion should be read: the company is claiming results at the aggressive end of what the field believed possible.</p>
+
+<div class="callout info"><span class="lab">The rotation connection</span>
+<p>Bonsai&rsquo;s secret weapon is not the ternary grid itself but the <em>basis</em> in which weights are ternarized. Rotation-based quantization &mdash; using orthogonal Hadamard transforms to spread weight outliers uniformly across dimensions before rounding &mdash; descends from the QuIP/QuIP# line of research and SpinQuant (Liu et al., 2024, arXiv 2405.16406), which is the exact reference the Bonsai 2 whitepaper cites for its blockwise Hadamard rotation with fixed &plusmn;1 signs. Chapter&nbsp;9 covers the mechanics; the historical point is that by 2024&ndash;2026, rotations had become the standard tool that made aggressive low-bit PTQ survivable, and Bonsai is the most complete industrial application of that idea to a frontier-class reasoning model.</p></div>
+
+<h3>Why a 2026 base model changes the calculus</h3>
+
+<p>One more piece of context is needed before the Bonsai story makes sense: the base model itself. Qwen3.8-27B is a <em>hybrid-attention</em> architecture &mdash; 75% of its layers use linear attention (Gated DeltaNet) rather than full attention &mdash; a design inherited from the Qwen3.5 generation that dramatically shrinks the KV cache and makes a 262K-token context practical on-device. Chapter&nbsp;8 details the layout. For compression, the hybrid backbone is a gift twice over: its recurrent-state path is small enough to keep in full precision at negligible cost (0.0976% of parameters), and its cache grows on only 16 of 64 layers, so long-context deployment is not memory-starved. The Bonsai program did not compress a 2023-style transformer; it compressed an architecture already engineered for efficiency, which is part of why the end-to-end numbers look the way they do.</p>
+
+<!-- ==================== CHAPTER 3 ==================== -->
+<h2 class="ch" id="ch3"><span class="chno">3</span> Prism ML, the Company</h2>
+<p class="ch-sub">A Caltech spinoff, an information-theory pedigree, and a thesis: intelligence per bit over parameter count.</p>
+
+<p>Prism ML incorporated as <strong>Prism ML, Inc.</strong> and, per its own July 2026 post, &ldquo;emerged from a team of Caltech researchers and was founded with support from Khosla Ventures, Cerberus, and Google, with continuing support from Samsung.&rdquo; The team page names <strong>Babak Hassibi</strong> &mdash; a Caltech computer scientist and mathematician, and the company&rsquo;s co-founder and CEO &mdash; alongside co-founders <strong>Sahin Lale</strong> and <strong>Omead Pooladzandi</strong> (co-heads of research) and <strong>Reza Sadri</strong> (VP Strategy), with Shayan Ilbagian as CFO, Karim Mattar as VP Engineering, and Tushar Bansal as Director of Product. The advisory board is short and heavyweight: <strong>Ion Stoica</strong> &mdash; the Berkeley professor behind much of modern serving infrastructure, from vLLM&rsquo;s PagedAttention lineage (which the Bonsai whitepaper itself cites as reference [5]) to Anyscale &mdash; plus Buno Pati and Julie Schoenfeld. Press coverage from the March 31, 2026 stealth emergence consistently framed the company as a Caltech research bet: &ldquo;founded by Caltech mathematicians including Babak Hassibi,&rdquo; in one April 2026 write-up&rsquo;s words.</p>
+
+<p>The company&rsquo;s framing of its own mission is unusually precise for an AI startup, and it matters for reading their engineering choices. The homepage is <em>&ldquo;Concentrating intelligence&rdquo;</em>, with the two-line problem statement: &ldquo;Large models can&rsquo;t fit on smartphones. Datacenters can&rsquo;t sustain them. Prism ML is building ultra dense intelligence to solve both.&rdquo; The About page casts the program as &ldquo;fundamental research problems around the decades-old quandary: can we massively multiply intelligence in models without increasing their size or complexity?&rdquo; And the CEO&rsquo;s launch-week quotation, given across the stealth-emergence press cycle, states the bet directly: &ldquo;We spent years developing the mathematical theory required to compress a neural network without losing its [reasoning ability].&rdquo;</p>
+
+<p>That orientation &mdash; compression as a mathematical problem in the information-theory tradition, rather than a systems-engineering problem &mdash; shows up in the artifacts. Prism publishes formal technical reports with reference lists that reach back to 1976 (the fast Walsh&ndash;Hadamard transform paper of Fino and Algazi is reference [29] of the Bonsai 2 whitepaper). It invented and repeatedly uses a quantitative framing device, <em>intelligence density</em> (Chapter&nbsp;15), defined with a logarithmic error term straight out of the channel-capacity playbook. And it ships its claims with more measurement disclosure than the local-model scene is used to: idle-power floors stated rather than silently subtracted, run-to-run variance quoted (up to ~11% on prefill), and cross-platform energy comparability explicitly <em>refused</em> where instrumentation encloses different components.</p>
+
+<div class="callout ok"><span class="lab">The release cadence</span>
+<p>Five public launches in under six months, every one on Hacker News&rsquo;s front page: <strong>1-bit Bonsai</strong> (March 31, 2026; 430 points), <strong>Ternary Bonsai</strong> (April 16; 225 points), <strong>Bonsai Image 4B</strong> (May 26; 464 points), <strong>Bonsai 27B</strong> (July 14; 706 points), and <strong>Bonsai 2 27B</strong> (September 17; 579 points). Each release compressed a newer and stronger base than the last &mdash; a cadence that treats base-model progress as a resource to be harvested by the compression pipeline rather than competed against.</p></div>
+
+<p>The business model around the open weights is still forming. The models are Apache 2.0; the company operates a free, limited-time developer-preview API announced with the July release; a consumer iOS app (<em>Bonsai Studio</em>) is on the App Store; and by September 18, 2026, an inference provider called <strong>Darkbloom</strong> was serving the model through OpenRouter at $0.075 per million input tokens. The careers page&rsquo;s open roles &mdash; kernel optimization, post-training platform, edge &amp; consumer AI, large-scale systems &mdash; read as a roadmap in themselves: the company is hiring for exactly the surfaces where ternary deployment is hardest.</p>
+<!-- ==================== PART II DIVIDER ==================== -->
+<div class="part-divider" style="margin:64px 0 8px;padding:34px 30px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#eef2ff,#f8fafc 60%);">
+  <div style="font-size:12px;letter-spacing:2.4px;text-transform:uppercase;color:var(--accent);font-weight:800;">Part II</div>
+  <div style="font-size:32px;font-weight:850;letter-spacing:-.8px;margin:6px 0 8px;">The Bonsai Arc: Five Releases in Six Months</div>
+  <div style="font-size:16px;color:var(--ink-soft);max-width:600px;">Every generation&rsquo;s claims, numbers, and reception &mdash; from a 1.15 GB 8B proof point to a 27B model that runs on a phone.</div>
+</div>
+
+<!-- ==================== CHAPTER 4 ==================== -->
+<h2 class="ch" id="ch4"><span class="chno">4</span> 1-bit Bonsai (March 2026)</h2>
+<p class="ch-sub">The stealth launch: binary 8B/4B/1.7B models, &ldquo;commercially viable 1-bit LLMs,&rdquo; and the first intelligence-density numbers.</p>
+
+<p>Prism ML emerged from stealth on <strong>March 31, 2026</strong> with <em>1-bit Bonsai</em>, a family of binary-weight language models the announcement called &ldquo;the first commercially viable 1-bit LLMs.&rdquo; The release comprised three sizes &mdash; 8B, 4B, and 1.7B parameters &mdash; each storing every language-model weight as a sign bit: <span class="mono">{&minus;1, +1}</span>, one FP16 scale per group of 128 weights, for an effective <strong>1.125 bits per weight</strong>. The 8B flagship&rsquo;s deployed footprint was <strong>1.15&nbsp;GB</strong> (1.16&nbsp;GB in the documentation&rsquo;s lineup table) against roughly 16&nbsp;GB for the same class in FP16 &mdash; the 14&times; reduction that let the model run on phones outright. The Hugging Face card for the 8B lists its architecture as <span class="mono">qwen3</span> with a packed <span class="mono">Bonsai-8B-unpacked</span> base &mdash; the family was built on the Qwen3 line of open models, a fact consistent with everything Prism later compressed.</p>
+
+<p>The proof point was a benchmark table that put 1-bit Bonsai 8B at a <strong>70.5 average</strong> across its reported suite &mdash; competitive with full-precision 8B-class instruct models at one-fourteenth the size. Among the peers listed in the Ternary Bonsai comparison a fortnight later, the 1-bit model&rsquo;s 70.5 sat above LFM2 8B (69.6), Llama 3.1 8B (67.1), GLM 4 9B (65.7), Hermes 3 8B (65.4), and a tail of smaller models, and behind only Qwen3 8B (79.3) among same-class full-precision peers. Per-benchmark, the card reports GSM8K at 88.0, HumanEval+ at 73.8, IFEval at 79.8, and BFCLv3 at 65.7 &mdash; numbers that made the &ldquo;commercially viable&rdquo; claim arguable rather than absurd for chat and summarization workloads, while leaving agentic tool use visibly weaker, a pattern that would define the family&rsquo;s reviews.</p>
+
+<p>The launch also introduced the metric that Prism has used to frame every release since: <strong>intelligence density</strong>, benchmark score per deployed gigabyte under a logarithmic error transform (formally, <span class="mono">D&nbsp;=&nbsp;&minus;log<sub>2</sub>(1&nbsp;&minus;&nbsp;score/100)&nbsp;/&nbsp;size<sub>GB</sub></span>). By that measure, 1-bit Bonsai 8B posted <strong>1.062 per GB</strong> against 0.098 for Qwen3 8B &mdash; &ldquo;10.8&times; higher intelligence density than full-precision Qwen&nbsp;3&nbsp;8B&rdquo; in the card&rsquo;s words. Whether one accepts the metric&rsquo;s framing or not (Chapter&nbsp;15 examines it), it supplied the company&rsquo;s public vocabulary: every release since is positioned as a leftward shift of the capability-per-gigabyte frontier.</p>
+
+<div class="callout info"><span class="lab">Reception</span>
+<p>The Show HN thread for the launch gathered <strong>430 points and 153 comments</strong> &mdash; strong for an unknown company&rsquo;s first release &mdash; and third-party coverage followed within days: NYU Shanghai&rsquo;s RITS service wrote the models up on April 1, latent.space&rsquo;s news digest covered the claim on April 2, and the Japanese tech site Gigazine published a hands-on with the 8B on April 7. The model cards&rsquo; own limitations section set honest expectations that would remain true of the whole program: &ldquo;No native 1-bit hardware exists yet &mdash; current gains are software-kernel optimizations on general-purpose hardware,&rdquo; and mobile power figures are estimates rather than metered measurements.</p></div>
+
+<!-- ==================== CHAPTER 5 ==================== -->
+<h2 class="ch" id="ch5"><span class="chno">5</span> Ternary Bonsai (April 2026)</h2>
+<p class="ch-sub">1.58 bits as the quality tier: the 8B model that trailed only Qwen3 8B, at 1.75 GB.</p>
+
+<p>Two weeks later, on <strong>April 16, 2026</strong>, Prism released <strong>Ternary Bonsai</strong> &mdash; the same three sizes in ternary <span class="mono">{&minus;1, 0, +1}</span> weights with group-128 FP16 scales, &ldquo;a modest increase in size for a meaningful gain in performance.&rdquo; The announcement positioned the two families as deliberate operating points rather than a replacement: 1-bit where footprint is everything, ternary where quality is. The trade was quantified cleanly: Ternary Bonsai 8B costs <strong>600&nbsp;MB more</strong> than its 1-bit sibling (1.75&nbsp;GB versus 1.15&nbsp;GB) and scores <strong>5 points higher</strong> (75.5 versus 70.5 average) &mdash; a exchange rate of roughly 0.12 GB per benchmark point that, at small scale, most observers found compelling.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Model (8B class)</th><th class="num">Size</th><th class="num">Avg</th><th class="num">MMLU Redux</th><th class="num">MuSR</th><th class="num">GSM8K</th><th class="num">HumanEval+</th><th class="num">IFEval</th><th class="num">BFCLv3</th></tr></thead>
+<tbody>
+<tr><td>Qwen 3 8B</td><td class="num">16.38 GB</td><td class="num"><strong>79.3</strong></td><td class="num">83.0</td><td class="num">55.0</td><td class="num">93.0</td><td class="num">82.3</td><td class="num">81.5</td><td class="num">81.0</td></tr>
+<tr><td><strong>Ternary Bonsai 8B</strong></td><td class="num">1.75 GB</td><td class="num"><strong>75.5</strong></td><td class="num">72.6</td><td class="num">56.2</td><td class="num">91.0</td><td class="num">77.4</td><td class="num">81.8</td><td class="num">73.9</td></tr>
+<tr><td>RNJ 8B</td><td class="num">16.63 GB</td><td class="num">73.1</td><td class="num">75.5</td><td class="num">50.4</td><td class="num">93.7</td><td class="num">84.2</td><td class="num">73.8</td><td class="num">61.1</td></tr>
+<tr><td>Ministral3 8B</td><td class="num">16.04 GB</td><td class="num">71.0</td><td class="num">68.9</td><td class="num">53.8</td><td class="num">87.9</td><td class="num">72.6</td><td class="num">67.4</td><td class="num">75.4</td></tr>
+<tr><td>Olmo 3 7B</td><td class="num">14.60 GB</td><td class="num">70.9</td><td class="num">72.0</td><td class="num">56.1</td><td class="num">92.5</td><td class="num">79.3</td><td class="num">87.1</td><td class="num">38.4</td></tr>
+<tr><td>1-bit Bonsai 8B</td><td class="num">1.15 GB</td><td class="num">70.5</td><td class="num">65.7</td><td class="num">50.0</td><td class="num">88.0</td><td class="num">73.8</td><td class="num">79.8</td><td class="num">65.7</td></tr>
+<tr><td>LFM2 8B</td><td class="num">16.68 GB</td><td class="num">69.6</td><td class="num">72.7</td><td class="num">49.5</td><td class="num">90.1</td><td class="num">61.0</td><td class="num">82.2</td><td class="num">62.0</td></tr>
+<tr><td>Llama 3.1 8B</td><td class="num">16.06 GB</td><td class="num">67.1</td><td class="num">72.9</td><td class="num">51.3</td><td class="num">87.0</td><td class="num">63.4</td><td class="num">76.4</td><td class="num">51.5</td></tr>
+<tr><td>GLM 4 9B</td><td class="num">18.80 GB</td><td class="num">65.7</td><td class="num">81.9</td><td class="num">53.2</td><td class="num">89.4</td><td class="num">78.7</td><td class="num">69.3</td><td class="num">21.9</td></tr>
+<tr><td>Hermes 3 8B</td><td class="num">16.06 GB</td><td class="num">65.4</td><td class="num">67.4</td><td class="num">52.2</td><td class="num">82.9</td><td class="num">51.2</td><td class="num">69.3</td><td class="num">69.6</td></tr>
+<tr><td>DeepSeek R1 Qwen 7B</td><td class="num">15.23 GB</td><td class="num">55.0</td><td class="num">62.5</td><td class="num">29.1</td><td class="num">92.7</td><td class="num">81.7</td><td class="num">48.8</td><td class="num">15.4</td></tr>
+</tbody></table></div>
+<p class="small">Ternary Bonsai 8B versus same-class peers, as published in Prism&rsquo;s April 16, 2026 announcement (thinking-mode evaluation). The ternary 8B trails only Qwen3 8B &mdash; at 1/9th of its footprint &mdash; and beats every other listed full-precision 8B-class model.</p>
+
+<p>The announcement&rsquo;s throughput claims established the mobile story early: <strong>82 tokens/second on an Apple M4 Pro</strong> for the ternary 8B (&ldquo;roughly 5&times; faster than a 16-bit 8B model&rdquo;) and <strong>27 tokens/second on an iPhone 17 Pro Max</strong>, with energy consumption of 0.105&nbsp;mWh/token on the M4 Pro and 0.132&nbsp;mWh/token on the phone &mdash; &ldquo;roughly 3&ndash;4&times; better energy efficiency&rdquo; than full-precision counterparts. Platform coverage at this stage was Apple-first: the models ran natively via MLX on Mac, iPhone, and iPad, with weights on Hugging Face under Apache 2.0. The Hacker News thread (April 18) drew a modest 225 points, but the more important audience was elsewhere: by June, the 1-bit 8B&rsquo;s GGUF pack was averaging <strong>123,876 downloads per month</strong> on Hugging Face, with 14 community Spaces built on top of it.</p>
+
+<!-- ==================== CHAPTER 6 ==================== -->
+<h2 class="ch" id="ch6"><span class="chno">6</span> Bonsai Image 4B (May 2026)</h2>
+<p class="ch-sub">The same recipe applied to diffusion: 1-bit and ternary image generation on FLUX.2 Klein 4B.</p>
+
+<p>The third release, on <strong>May 26, 2026</strong>, extended the compression thesis from language to <em>images</em>: <strong>Bonsai Image 4B</strong>, a pair of 1-bit and ternary <strong>diffusion</strong> models built on <strong>FLUX.2 Klein 4B</strong> that run image generation on laptops and phones. The numbers Prism published were, by the family&rsquo;s standards, conservative-sounding but striking in effect: packs up to <strong>8.3&times; smaller</strong> than the original, generating a 512&times;512 image on an iPhone in about <strong>9.4 seconds</strong>. The documentation&rsquo;s lineup table lists the binary variant at 0.93&nbsp;GB and the ternary at 1.21&nbsp;GB &mdash; image generation in a footprint comparable to the 8B language model&rsquo;s ternary pack.</p>
+
+<p>For the purposes of this paper, Bonsai Image 4B matters less for its own numbers than for what it demonstrated about the methodology&rsquo;s reach. The compression pipeline was claimed to be architecture-agnostic &mdash; a transformer language model, a hybrid-attention reasoning model, and a diffusion transformer all passed through it &mdash; which lent credibility to the central bet that the technique was a general property of neural-network weights rather than a trick specific to one model family. The release also drew the family&rsquo;s second-largest Hacker News audience (464 points, 201 comments, May 31), and the App Store presence that commenters noticed around Prism&rsquo;s demos dates from this era: an iOS image tool built on the model, followed by the <em>Bonsai Studio</em> app.</p>
+
+<div class="callout info"><span class="lab">The family portrait, mid-2026</span>
+<p>By June, the documentation described the complete lineup, all Apache 2.0: <strong>Ternary Bonsai 2 27B</strong> (not yet released &mdash; added later at 5.93&nbsp;GB), <strong>Bonsai 27B</strong> (3.9&nbsp;GB binary / 7.15&nbsp;GB ternary), <strong>Bonsai 8B</strong> (8.2B parameters; 1.16&nbsp;GB / 1.75&nbsp;GB), <strong>Bonsai 4B</strong> (0.57&nbsp;GB / 0.86&nbsp;GB), <strong>Bonsai 1.7B</strong> (0.25&nbsp;GB / 0.37&nbsp;GB), and <strong>Bonsai Image 4B</strong> (0.93&nbsp;GB / 1.21&nbsp;GB). The docs&rsquo; one-line summary of the energy story: &ldquo;roughly 4 to 5&times; better energy per token than 16-bit counterparts.&rdquo;</p></div>
+<!-- ==================== CHAPTER 7 ==================== -->
+<h2 class="ch" id="ch7"><span class="chno">7</span> Bonsai 27B (July 2026)</h2>
+<p class="ch-sub">The first 27B-class model on a phone: Qwen3.6-27B base, two operating points, DSpark speculative decoding, and the phone-gate arithmetic.</p>
+
+<p>On <strong>July 14, 2026</strong>, Prism announced <strong>Bonsai 27B</strong>, &ldquo;the new multimodal flagship of the Bonsai family and the first model of its capability class to run on a phone.&rdquo; The base was <strong>Qwen3.6-27B</strong> &mdash; the strongest 27B open-weight reasoning model of its generation, itself a hybrid-attention architecture &mdash; and the release shipped two deliberate operating points of the same compressed model:</p>
+
+<ul>
+<li><strong>Ternary Bonsai 27B</strong> &mdash; ternary <span class="mono">{&minus;1, 0, +1}</span> weights with FP16 group-wise scaling at a true <strong>1.71 bits per weight</strong>, occupying <strong>5.9&nbsp;GB</strong>. The quality-oriented variant: &ldquo;it runs on an everyday laptop with the full reasoning, tool-calling, and agentic capability.&rdquo;</li>
+<li><strong>1-bit Bonsai 27B</strong> &mdash; binary <span class="mono">{&minus;1, +1}</span> weights with the same scaling at <strong>1.125 bits per weight</strong>, occupying <strong>3.9&nbsp;GB</strong>. The footprint-oriented variant, sized to fit &ldquo;within the memory budget of an iPhone 17 Pro&rdquo; &mdash; the first 27B-class model to do so.</li>
+</ul>
+
+<p>Both variants kept the end-to-end discipline that defines the program &mdash; &ldquo;the low-bit representation runs end to end across the language network, embeddings, attention, MLPs, and the LM head, with no higher-precision escape hatches&rdquo; &mdash; and both shipped with the vision tower in a compact 4-bit form (HQQ inside a Q8_0 container, ~0.63&nbsp;GB, loaded only when an image arrives), a full <strong>262K-token context</strong>, and <strong>speculative decoding</strong> support. Everything was Apache 2.0, with a free limited-time developer-preview API alongside the weights.</p>
+
+<h3>The retention claim: 95% and 90%</h3>
+
+<p>Across a <strong>15-benchmark thinking-mode suite</strong>, the announcement reported that Ternary Bonsai 27B retained <strong>95%</strong> of the full-precision Qwen3.6-27B baseline, and 1-bit Bonsai 27B retained <strong>90%</strong>. The category-level table:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Category (benchmarks)</th><th class="num">Qwen 3.6 27B</th><th class="num">Ternary Bonsai 27B</th><th class="num">1-bit Bonsai 27B</th></tr></thead>
+<tbody>
+<tr><td>Math (GSM8K, MATH-500, AIME25, AIME26)</td><td class="num">95.3</td><td class="num">93.4</td><td class="num">91.7</td></tr>
+<tr><td>Coding (HumanEval+, MBPP+, LiveCodeBench)</td><td class="num">88.7</td><td class="num">86.0</td><td class="num">81.9</td></tr>
+<tr><td>Agentic &amp; Tool-calling (BFCL v3, TauBench)</td><td class="num">80.0</td><td class="num">74.0</td><td class="num">66.0</td></tr>
+<tr><td>Instruction following (IFEval, IFBench)</td><td class="num">78.4</td><td class="num">71.8</td><td class="num">65.8</td></tr>
+<tr><td>Knowledge / STEM (MMLU-Redux, MuSR)</td><td class="num">83.1</td><td class="num">77.0</td><td class="num">73.4</td></tr>
+<tr><td>Vision (MMMU Pro, OCRBench)</td><td class="num">72.6</td><td class="num">65.2</td><td class="num">59.6</td></tr>
+<tr><td><strong>Overall (15 benchmarks)</strong></td><td class="num"><strong>85.0</strong></td><td class="num"><strong>80.5</strong> <span class="tag good">95%</span></td><td class="num"><strong>76.1</strong> <span class="tag warn">90%</span></td></tr>
+</tbody></table></div>
+<p class="small">Bonsai 27B first-generation results as published July 14, 2026 (thinking mode). The model cards&rsquo; own tables give the precise averages: 85.07 FP16 baseline, 80.49 ternary (94.6%), 76.11 one-bit (89.5%).</p>
+
+<p>The model cards expanded this into a cross-family comparison that remains one of the most informative tables in the entire Bonsai corpus, because it includes a <em>second base model</em> &mdash; Gemma-4-31B &mdash; with both its QAT and conventional low-bit builds, demonstrating that the sub-4-bit collapse is a property of the methods, not of one base:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Variant</th><th class="num">True bpw</th><th class="num">Footprint</th><th class="num">Thinking avg</th><th class="num">vs FP16</th></tr></thead>
+<tbody>
+<tr><td>Qwen3.6-27B FP16</td><td class="num">16.0</td><td class="num">54 GB</td><td class="num">85.07</td><td class="num">100%</td></tr>
+<tr><td>Qwen3.6-27B Q4_K_XL (&ldquo;4-bit&rdquo;)</td><td class="num">5.2</td><td class="num">17.6 GB</td><td class="num">84.99</td><td class="num">99.9%</td></tr>
+<tr><td>Qwen3.6-27B IQ2_XXS (&ldquo;2-bit&rdquo;)</td><td class="num">2.8</td><td class="num">9.4 GB</td><td class="num">72.73</td><td class="num"><span class="tag bad">85.5%</span></td></tr>
+<tr><td>Gemma-4-31B FP16</td><td class="num">16.0</td><td class="num">61.5 GB</td><td class="num">84.58</td><td class="num">99.4%</td></tr>
+<tr><td>Gemma-4-31B QAT (&ldquo;4-bit&rdquo;)</td><td class="num">6.0</td><td class="num">23.3 GB</td><td class="num">83.41</td><td class="num">98.0%</td></tr>
+<tr><td>Gemma-4-31B Q2_K_XL (&ldquo;2-bit&rdquo;)</td><td class="num">3.0</td><td class="num">11.8 GB</td><td class="num">73.31</td><td class="num"><span class="tag bad">86.2%</span></td></tr>
+<tr><td><strong>Ternary Bonsai 27B</strong></td><td class="num"><strong>1.71</strong></td><td class="num"><strong>5.9 GB</strong></td><td class="num"><strong>80.49</strong></td><td class="num"><span class="tag good">94.6%</span></td></tr>
+<tr><td><strong>1-bit Bonsai 27B</strong></td><td class="num"><strong>1.125</strong></td><td class="num"><strong>3.9 GB</strong></td><td class="num"><strong>76.11</strong></td><td class="num"><span class="tag warn">89.5%</span></td></tr>
+</tbody></table></div>
+<p class="small">First-generation cross-family comparison (15-benchmark suite, thinking mode), from the Bonsai-27B-gguf model card. Both families&rsquo; conventional &ldquo;2-bit&rdquo; builds collapse into the low 70s while occupying 2.4&times; the ternary model&rsquo;s footprint; the Bonsai operating points sit well above them.</p>
+
+<h3>Throughput, memory, and the phone</h3>
+
+<p>The launch&rsquo;s throughput figures: <strong>163 tokens/second in 1-bit and 134 in ternary</strong> on an RTX 5090, and on an M5 Max laptop, <strong>87 in 1-bit and 58 in ternary</strong>. The 1-bit GGUF card&rsquo;s llama-bench table adds the mid-tier Apple hardware: 66.4&nbsp;tok/s on M5 Max, 44.2 on M5 Pro, 26.0 on M4 Pro for the binary pack &mdash; and a revealing datacenter row: on an H100 at batch&nbsp;1, binary and ternary converge (104.8 vs 98&nbsp;tok/s) &ldquo;despite their ~1.9&times; difference in bytes per step,&rdquo; because a datacenter GPU at batch one is limited by kernel-launch and synchronization latency rather than weight bandwidth. On the phone itself, the MLX Swift runtime for the 1-bit model reported about <strong>11 tokens/second on an iPhone 17 Pro Max</strong>.</p>
+
+<p>The card&rsquo;s most practically useful contribution may be its <strong>peak-memory table</strong> &mdash; what a device must actually accommodate is weights plus KV cache plus activations and runtime buffers (~1.3&nbsp;GB across backends), not the headline weight size:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Build</th><th class="num">Weights</th><th class="num">4K ctx</th><th class="num">10K ctx</th><th class="num">100K ctx</th></tr></thead>
+<tbody>
+<tr><td>1-bit Bonsai (Q1_0, no KV compression)</td><td class="num">3.79 GB</td><td class="num">5.2 GB</td><td class="num">5.6 GB</td><td class="num">11.6 GB</td></tr>
+<tr><td>Qwen3.6-27B &ldquo;4-bit&rdquo; (Q4_K_XL)</td><td class="num">17.6 GB</td><td class="num">19.2 GB</td><td class="num">19.6 GB</td><td class="num">25.6 GB</td></tr>
+<tr><td>27B 16-bit (GGUF bf16)</td><td class="num">51.25 GB</td><td class="num">52.6 GB</td><td class="num">53.3 GB</td><td class="num">59.3 GB</td></tr>
+</tbody></table></div>
+<p class="small">Peak memory in decimal GB, language model only, KV cache left at FP16. With the near-lossless 4-bit KV quantization enabled, the 1-bit build&rsquo;s 100K peak drops to ~6.8&nbsp;GB and the full 262K window fits in ~9.4&nbsp;GB peak. The hybrid backbone grows its full-attention cache on only 16 of 64 layers (~4.3&nbsp;GB at the full 262K window in FP16).</p>
+
+<h3>DSpark: speculative decoding for a ternary target</h3>
+
+<p>Both first-generation packs shipped with <strong>DSpark</strong>, a speculative-decoding drafter layer trained against the low-bit target &mdash; the detail that made a 3.9&nbsp;GB phone-class model feel fast on GPUs. The card&rsquo;s description is specific: a <em>semi-autoregressive</em> drafter with confidence-scheduled verification; a compact <strong>six-layer block-parallel transformer</strong> conditioned on hidden states tapped from <strong>five evenly spaced layers</strong> of the target model; drafter-unique weights of roughly <strong>0.5&nbsp;GB</strong> at serving precision (embeddings and output head shared with the resident target); a diffusion-flavored block-denoising objective with survival-probability-weighted distillation; and a draft block size chosen from a measured verify-cost model of the serving stack. The drafter ships 4-bit quantized as a 1.79&nbsp;GB Q4_1 pack by default (a 7.29&nbsp;GB bf16 reference also exists).</p>
+
+<p>Because verification preserves the target distribution exactly, the acceleration is lossless &mdash; drafter precision affects speed, never output. On the CUDA serving path, an accepted length of &tau;&nbsp;&asymp;&nbsp;3.6 at draft depth k&nbsp;=&nbsp;4 turned into a <strong>1.37&times;</strong> end-to-end decode speedup on H100 for the binary model (104.8&nbsp;&rarr;&nbsp;143.8&nbsp;tok/s) and <strong>1.34&times;</strong> for the ternary. On Apple Silicon, batch-1 verification does not yet amortize, so the drafter is not enabled by default on-device. The card also quotes decode energy on the M5 Pro of <strong>0.275&nbsp;mWh/token</strong> with the drafter enabled &mdash; against 0.63&ndash;1.32&nbsp;mWh/token across the datacenter GPU classes it measured.</p>
+
+<div class="callout info"><span class="lab">Reception &mdash; the 706-point thread</span>
+<p>The Hacker News thread for Bonsai 27B became the family&rsquo;s largest: <strong>706 points, 250 comments</strong>, submitted by Xenova (the transformers.js author). The discussion established the community&rsquo;s recurring positions in one place: enthusiasm for the phone-class footprint (&ldquo;TIL that 1-bit models are actually 1.58-bit with three values&rdquo;); the sharp-eyed counterpoint from MLC&rsquo;s Liu Xiaoyan that Unsloth&rsquo;s post-training UD_Q2 variant &ldquo;does only post-training&rdquo; and posts numbers &ldquo;pretty close to the 1-bit model here,&rdquo; with the tool-calling drop mattering more in real use than averages suggest; Simon Willison&rsquo;s early-hours finding that neither the GGUF nor the MLX pack ran in LM Studio yet (engines needed updating); and users reporting that the llama.cpp implementation of the day was slower than a 35B-A3B MoE at Q4_K_M with CPU offloading. All four positions &mdash; excitement, the PTQ-rivalry question, runtime friction, and speed skepticism &mdash; would recur in September.</p></div>
+<!-- ==================== PART III DIVIDER ==================== -->
+<div class="part-divider" style="margin:64px 0 8px;padding:34px 30px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#eef2ff,#f8fafc 60%);">
+  <div style="font-size:12px;letter-spacing:2.4px;text-transform:uppercase;color:var(--accent);font-weight:800;">Part III</div>
+  <div style="font-size:32px;font-weight:850;letter-spacing:-.8px;margin:6px 0 8px;">Bonsai 2 27B: The Deep Dive</div>
+  <div style="font-size:16px;color:var(--ink-soft);max-width:600px;">Format, mathematics, kernels, thirty-four benchmark results, twelve hardware platforms, and the deployment surface.</div>
+</div>
+
+<!-- ==================== CHAPTER 8 ==================== -->
+<h2 class="ch" id="ch8"><span class="chno">8</span> Anatomy of Bonsai 2 27B</h2>
+<p class="ch-sub">A Qwen3.8-27B backbone left architecturally untouched, a ternary grid applied end to end, and two new packing decisions that define the release.</p>
+
+<p>Bonsai 2 27B is, before everything else, a faithful copy of a specific strong model. The base is <strong>Qwen3.8-27B</strong>, the most capable generation of the Qwen open-model family at the 27B tier: a native vision-language model &ldquo;designed to carry complex, multi-step tasks through to completion with greater reliability,&rdquo; in its own card&rsquo;s words, with thinking mode on by default, tunable reasoning effort, and preserved reasoning context. The whitepaper is explicit that the Bonsai pipeline left the architecture unchanged &mdash; every structural number below is inherited, not designed, by Prism:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Item</th><th>Specification</th></tr></thead>
+<tbody>
+<tr><td><strong>Base model</strong></td><td>Qwen3.8-27B &mdash; 27B hybrid-attention causal language model (architecture unchanged)</td></tr>
+<tr><td><strong>Parameters</strong></td><td>27.36B total &mdash; 24.35B language backbone (64 blocks) + 2.54B embedding/LM head + 0.46B vision tower (27 blocks)</td></tr>
+<tr><td><strong>Architecture</strong></td><td>Hybrid attention (~75% linear / ~25% full attention), SwiGLU MLP, RoPE, RMSNorm</td></tr>
+<tr><td><strong>Base layout</strong></td><td>16 &times; (3 &times; (Gated DeltaNet &rarr; FFN) &rarr; 1 &times; (Gated Attention &rarr; FFN)) &mdash; hidden size 5120, token embedding 248,320 (padded), FFN intermediate 17,408</td></tr>
+<tr><td><strong>Context length</strong></td><td>262K tokens (inherited; native in the base, extensible to 1M there; kept practical on-device by the predominantly linear-attention backbone)</td></tr>
+<tr><td><strong>Weight format</strong></td><td>Ternary g128: {&minus;1, 0, +1} weights with FP16 group-wise scaling</td></tr>
+<tr><td><strong>Weight basis</strong></td><td>Blockwise Hadamard rotation (block 1024, fixed &plusmn;1 signs) folded into the stored weights</td></tr>
+<tr><td><strong>Low-bit coverage</strong></td><td>Embeddings, attention projections, MLP projections, LM head</td></tr>
+<tr><td><strong>Vision tower</strong></td><td>Packaged separately: GGUF release carries it as ~0.63&nbsp;GB mmproj (HQQ 4-bit in a Q8_0 container); the MLX pack keeps the official tower unquantized at 0.92&nbsp;GB FP16</td></tr>
+<tr><td><strong>Reasoning effort</strong></td><td>xhigh (default) or medium; low is not supported &mdash; selecting it behaves close to xhigh</td></tr>
+<tr><td><strong>Backends</strong></td><td>Apple MLX (Python, Swift) and CUDA (llama.cpp fork)</td></tr>
+<tr><td><strong>License</strong></td><td>Apache 2.0</td></tr>
+</tbody></table></div>
+<p class="small">System specification, consolidated from the Bonsai 2 27B whitepaper (Table 1) and both Hugging Face model cards. The Qwen3.8-27B card supplies the base-layout row: 48 linear-attention V heads / 16 QK heads at head dimension 128 for Gated DeltaNet; 24 Q / 4 KV heads at head dimension 256 with RoPE dimension 64 for the gated full-attention layers.</p>
+
+<p>The choice of base deserves a moment, because it is where the release&rsquo;s quality story starts. Qwen3.8-27B&rsquo;s own card reports results like 90.3 on LiveCodeBench v6, 89.2 on GPQA Diamond, 73.0 on Terminal-Bench 2.1 (Terminus), 84.3 on OSWorld-Verified, and 91.1 on OmniDocBench 1.5 &mdash; a compact, deployment-friendly <em>frontier-tier agentic</em> model, not merely a chat model. Compressing a model of that caliber to 98.2% retention is a categorically different claim than compressing a mid-tier one; and the choice of the 27B tier specifically &mdash; small enough for consumer hardware, large enough to carry real agentic capability &mdash; is the release&rsquo;s strategic center of gravity.</p>
+
+<h3>The ternary grid, precisely</h3>
+
+<p>The whitepaper&rsquo;s formal statement of the format is compact enough to quote almost in full. Each weight takes a value in <span class="mono">{&minus;1, 0, +1}</span> with one shared FP16 scale per group of 128 weights:</p>
+
+<div class="tblwrap" style="background:none;border:none;overflow:visible"><table style="background:none;border:none;font-size:15px"><tbody><tr><td style="border:none;padding:6px 0">
+<span class="mono" style="font-size:16px">w<sub>i</sub> = s<sub>g</sub> &middot; t<sub>i</sub>,&nbsp;&nbsp; t<sub>i</sub> &isin; {&minus;1, 0, +1}</span>
+</td></tr></tbody></table></div>
+
+<p>A ternary value carries log<sub>2</sub>(3) &asymp; 1.585 bits of information, so with one FP16 scale amortized over 128 weights the effective storage cost of the ternary tensors is <strong>b<sub>eff</sub> &asymp; 1.71 bits/weight</strong>. That covers the ternary tensors only; the release&rsquo;s second-generation refinement is a short, explicitly enumerated list of tensors held above the low-bit representation &mdash; the previous generation ternarized these alongside everything else, and Bonsai 2 does not. The list is the recurrent-state path of the linear-attention layers (the two <span class="mono">in_proj</span> matrices at 11.8M parameters each, the short <span class="mono">conv1d</span>, and the small <span class="mono">A_log</span>/<span class="mono">dt_bias</span>/state-norm tensors) plus ordinary normalization weights &mdash; <strong>26.2M parameters, 0.0976% of the language model, 52&nbsp;MB at bf16</strong>. Counting them in, the model as a whole is <strong>1.72 bits per weight</strong>, a ~9.3&times; reduction in principle against FP16. The practical figure, as shipped in the dense-trit GGUF packing with its container overhead, is <strong>1.76 bits per weight and 5.93&nbsp;GB</strong> against the FP16 baseline&rsquo;s 53.8&nbsp;GB &mdash; ~9.1&times;.</p>
+
+<h3>Two packings, one representation</h3>
+
+<p>Practical deployment needs formats that efficient kernels can consume, and Bonsai 2 ships two &mdash; a pairing introduced with this release, replacing the first generation&rsquo;s single <span class="mono">Q2_0_g128</span> layout:</p>
+
+<ul>
+<li><strong>PTQ1_0</strong> packs trits densely and &ldquo;lands essentially on the information-theoretic target&rdquo; &mdash; 1.75&ndash;1.76 bits per weight, 5.93&ndash;5.95&nbsp;GB, ~9.0&ndash;9.1&times; smaller than FP16. The catch: unpacking dense trits costs arithmetic, so it is <em>not</em> uniformly faster despite moving 17&ndash;18% less weight data per step.</li>
+<li><strong>PQ2_0</strong> stores each trit in a 2-bit slot &mdash; 2.13&ndash;2.16 bits per weight, 7.21&ndash;7.25&nbsp;GB, ~7.4&ndash;7.5&times; smaller &mdash; trading footprint for cheaper unpacking. It is the faster decode on Hopper- and Blackwell-class parts and the faster prompt-processing everywhere.</li>
+</ul>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Format (language model)</th><th class="num">True bits/weight</th><th class="num">Size</th><th class="num">Reduction</th></tr></thead>
+<tbody>
+<tr><td>FP16 (baseline)</td><td class="num">16.0</td><td class="num">53.80 GB</td><td class="num">1.0&times;</td></tr>
+<tr><td>Ternary g128 (ideal)</td><td class="num">1.72</td><td class="num">5.80 GB</td><td class="num">~9.3&times;</td></tr>
+<tr><td>GGUF PTQ1_0 (dense trits)</td><td class="num">1.76</td><td class="num">5.93 GB</td><td class="num">~9.1&times;</td></tr>
+<tr><td>GGUF PQ2_0 (2-bit slots)</td><td class="num">2.16</td><td class="num">7.25 GB</td><td class="num">~7.4&times;</td></tr>
+<tr><td>MLX 2-bit (this pack)</td><td class="num">2.25</td><td class="num">7.67 GB</td><td class="num">~7.0&times;</td></tr>
+</tbody></table></div>
+<p class="small">Storage footprint of the language model, whitepaper Table 3 (decimal GB). The model cards round the same rows to 5.95/7.21&nbsp;GB, and the Ollama mirror lists 5.53/6.70&nbsp;GiB &mdash; the same packs in binary units. The vision tower adds 0.63&nbsp;GB (GGUF, 4-bit) or 0.92&nbsp;GB (MLX, FP16) when image input is needed; the MLX pack on disk is 8.60&nbsp;GB including it.</p>
+
+<p>The MLX packaging deserves its own note because it is the release&rsquo;s most instructive example of container overhead. MLX&rsquo;s grouped low-bit format stores both a scale and a bias per group; Bonsai&rsquo;s ternary levels <span class="mono">{&minus;s, 0, +s}</span> need only the scale, so the bias is set to <span class="mono">&minus;s</span> and is formally redundant &mdash; the 2-bit codes <span class="mono">{0, 1, 2}</span> decode to <span class="mono">&minus;s, 0, +s</span> exactly. But the container stores two FP16 values per 128-weight group where the native format stores one, so the block costs 36 rather than 34 bytes and the packed rate rises from 2.125 to <strong>2.250 bits per weight</strong>. The whitepaper is careful to call this &ldquo;a container property, not a different representation&rdquo;: the packed weights decode to exactly the same ternary values as the GGUF bands, &ldquo;verified by comparing the group scales bit for bit.&rdquo;</p>
+
+<div class="callout ok"><span class="lab">The honesty dividend</span>
+<p>The end-to-end discipline buys the program something conventional builds cannot claim: bit-widths that match their names. The cards&rsquo; contrast is pointed &mdash; &ldquo;a widely-used &lsquo;2-bit&rsquo; build of Qwen3.8-27B is really 2.8 bits/weight at 9.4&nbsp;GB&rdquo; &mdash; and it is the kind of statement that survives third-party arithmetic precisely because the Bonsai figures count everything, including the 0.0976% high-precision tail, into the advertised number.</p></div>
+
+<h3>Serving parameters</h3>
+
+<p>The recommended sampling configuration is inherited verbatim from the base model&rsquo;s <span class="mono">generation_config.json</span> and carried in the GGUF metadata (<span class="mono">general.sampling.*</span>): thinking mode at temperature 1.0, top-p 0.95, top-k 20, min-p 0, no presence or repetition penalty; instruct mode at temperature 0.7, top-p 0.80, top-k 20, presence penalty 1.5. The model thinks by default at <strong>xhigh</strong> reasoning effort; <strong>medium</strong> trades some quality for shorter responses (both effort levels are fully reported in the whitepaper&rsquo;s appendix &mdash; 79.3 versus 83.9 average on the 20-suite); <strong>low</strong> is not supported. The system prompt can be as simple as &ldquo;You are a helpful assistant.&rdquo;</p>
+<!-- ==================== CHAPTER 9 ==================== -->
+<h2 class="ch" id="ch9"><span class="chno">9</span> The Rotated Basis</h2>
+<p class="ch-sub">Why ternarizing in a Hadamard-rotated coordinate system works, why the rotation costs nothing at inference, and the runtime contract that enforces it.</p>
+
+<p>The single most consequential idea in the Bonsai pipeline, after the ternary grid itself, is the <strong>basis in which the grid is applied</strong>. Ternarizing raw FP16 weights directly fails for a now well-understood reason: real weight matrices are badly conditioned for rounding &mdash; outlier dimensions concentrate variance in a few directions, and a uniform grid wastes most of its resolution on directions that barely matter while shredding the ones that do. The fix, descending from the QuIP/QuIP# line and from SpinQuant (Liu et al., 2024 &mdash; the whitepaper&rsquo;s reference [28]), is to <em>rotate</em> the weight matrix into a basis where no direction is special before the grid is applied.</p>
+
+<p>The whitepaper&rsquo;s formalization: ternary matrix weights <span class="mono">W</span> are stored transformed blockwise by</p>
+
+<div class="tblwrap" style="background:none;border:none;overflow:visible"><table style="background:none;border:none;font-size:15px"><tbody><tr><td style="border:none;padding:6px 0">
+<span class="mono" style="font-size:16px">R = (1/&radic;n) H<sub>n</sub> S,&nbsp;&nbsp; n = 1024</span>
+</td></tr></tbody></table></div>
+
+<p>where <span class="mono">H<sub>n</sub></span> is a Walsh&ndash;Hadamard matrix and <span class="mono">S</span> a fixed diagonal of &plusmn;1 signs. Inference at each layer then computes <span class="mono">f(x) = W(Rx)</span> &mdash; the activation is first transformed by the same rotation, then multiplied by the ternarized matrix. An orthogonal rotation preserves lengths and angles exactly, so the function computed is mathematically identical to the un-rotated one; what changes is only <em>which coordinate system the ternary rounding error lands in</em>. The Hadamard structure is what makes this practical: <span class="mono">H<sub>1024</sub></span> is a fixed matrix of &plusmn;1 entries, and multiplying by it costs <span class="mono">O(n log n)</span> via the fast Walsh&ndash;Hadamard transform (FWHT) &mdash; the 1976 Fino&ndash;Algazi result the whitepaper cites as reference [29] &mdash; which is negligible next to the matrix multiply it precedes.</p>
+
+<h3>The fold, and the zero-bit rotation</h3>
+
+<p>The release&rsquo;s cleverest engineering decision is that the rotation costs <strong>no extra bits and no extra weight traffic</strong>. Rather than storing <span class="mono">W</span> and <span class="mono">R</span> separately, the pipeline <em>folds</em> the rotation into the stored weights offline: what is ternarized and packed is the rotated matrix itself, so the packed file contains one ternary tensor per projection, exactly as an un-rotated build would. At runtime only the activation-side transform remains &mdash; a fixed sign flip followed by a blockwise FWHT before each folded matrix multiply. The card&rsquo;s phrasing: &ldquo;the rotation is folded into the stored weights offline, so it costs no extra bits and no extra weight traffic.&rdquo;</p>
+
+<p>That activation-side transform is not free, and the whitepaper is unusually candid about where it hurts. At batch size one it lies &ldquo;on the critical path of every projection&rdquo; &mdash; Appendix&nbsp;A names it &ldquo;one of the larger non-matrix-multiply costs of a decode step&rdquo; and lists it among the release&rsquo;s open engineering targets. The mitigation is per-backend: on Metal, the sign flip is fused into the transform&rsquo;s load path, &ldquo;eliminating a separate activation pass&rdquo; &mdash; a substantial saving when the transform accounts for a substantial fraction of the operations dispatched per generated token; on CUDA, the transform is parallelized across a full thread block rather than a single warp, &ldquo;reducing serialization across the Hadamard stages.&rdquo; Prompt processing is largely insensitive, since the transform amortizes across many tokens in the compute-bound regime.</p>
+
+<div class="callout warn"><span class="lab">The runtime contract &mdash; and why stock runtimes produce garbage</span>
+<p>A rotated model is only correct in a runtime that applies the matching transform. Bonsai&rsquo;s answer is metadata enforcement: &ldquo;the packed model declares its rotation as metadata, so a runtime either applies the matching transform or refuses to load the file.&rdquo; The failure modes differ by format, and the GGUF card describes both: stock llama.cpp <em>rejects</em> <span class="mono">PQ2_0</span> and <span class="mono">PTQ1_0</span> as unknown tensor types &mdash; a clean error &mdash; but it <em>loads</em> a first-generation <span class="mono">Q2_0</span> file without any warning and produces garbage, because it has no Hadamard activation runtime. This is the operational reason Chapter&nbsp;13 insists on Prism&rsquo;s fork: the representation is safe precisely because new type codes were introduced, but only for users who obtain a runtime that knows them.</p></div>
+
+<h3>Why the rotated grid holds reasoning together</h3>
+
+<p>It is tempting to treat the rotation as an implementation detail, but it is the most plausible mechanical explanation for the release&rsquo;s signature result &mdash; that <em>reasoning</em> survives ternarization while conventional sub-4-bit builds lose it first. The mechanism, in outline: an un-rotated grid&rsquo;s rounding error is concentrated in the directions of largest weight variance, which in transformer matrices correlate with the residual stream&rsquo;s functionally loaded directions; the compounding, multi-step character of reasoning benchmarks then amplifies small per-step corruption into task failure. The rotated grid&rsquo;s error, by contrast, is spread uniformly across directions &mdash; closer to isotropic noise, which deep networks tolerate far better and which does not systematically target the computations a chain of reasoning depends on. The whitepaper itself frames the observed pattern in exactly these terms: conventional low-bit failure &ldquo;is easy to miss in casual testing and expensive to discover in production&rdquo; because surface fluency survives while &ldquo;long context reasoning and coding deteriorate first.&rdquo;</p>
+
+<p>The independent evidence for this framing is the cross-family replication in Chapter&nbsp;7&rsquo;s table &mdash; the same selective collapse appears in IQ2_XXS builds of both Qwen3.6-27B and Gemma-4-31B, so the phenomenon is a property of the methods, not of one base model &mdash; and the per-benchmark pattern of Chapter&nbsp;11, where the conventional 2-bit build&rsquo;s worst losses land precisely on AIME and LiveCodeBench while its MMLU-Redux score barely moves. A skeptic should still note what this chapter has <em>not</em> established: no public ablation isolates the rotation&rsquo;s contribution from the rest of Prism&rsquo;s pipeline (the training-free conversion, the group scaling, the full-precision state path). The rotation is the best-supported explanation available, not a measured decomposition.</p>
+
+<!-- ==================== CHAPTER 10 ==================== -->
+<h2 class="ch" id="ch10"><span class="chno">10</span> Low-Bit Kernels</h2>
+<p class="ch-sub">Custom hybrid-attention kernels for MLX and CUDA, the bandwidth profile they exploit, and the PTQ1_0/PQ2_0 trade across GPU generations.</p>
+
+<p>A compact weight representation is useful only if the runtime can execute it directly, and here Bonsai 2 hit a genuine infrastructure gap: existing low-bit inference paths target standard full-attention transformers and simply do not cover Qwen3.8-27B&rsquo;s structure, which interleaves 48 Gated DeltaNet linear-attention layers with 16 full-attention layers in a repeating 3:1 pattern. The whitepaper&rsquo;s summary of the problem: &ldquo;Existing low-bit inference paths primarily target standard full-attention transformers and do not cover the hybrid-attention structure of Qwen3.8-27B.&rdquo; The release therefore ships <strong>custom kernels for the hybrid backbone on Apple Silicon and CUDA</strong>, operating directly on the packed ternary weights &mdash; &ldquo;avoiding materialization of dense FP16 weights,&rdquo; which the cards call essential to realizing the representation&rsquo;s bandwidth advantage.</p>
+
+<p>Three runtimes carry the kernels: the <strong>MLX fork</strong> (Python, Apple Silicon) and <strong>mlx-swift fork</strong> (iOS/macOS) for Apple platforms, and the <strong>llama.cpp fork</strong> (CUDA + Metal, with CPU paths) for everything else. The CUDA backend&rsquo;s description in the whitepaper&rsquo;s Appendix&nbsp;A is terse but complete: fused low-bit GEMM kernels that unpack ternary codes and apply group-wise scales <em>inside</em> the matrix multiply, with activations and numerically sensitive operations kept in higher precision. The Apple side adds the MLX-specific loading contract &mdash; the pack declares <span class="mono">model_type: prism_hadamard_qwen35</span> and requires the loader bundled in its <span class="mono">runtime/</span> directory, because &ldquo;ordinary MLX loaders skip the activation transform and the inverse embedding lookup, so they return wrong output rather than an error.&rdquo;</p>
+
+<h3>The bandwidth profile, measured</h3>
+
+<p>Chapter&nbsp;1 claimed decode is bandwidth-bound; the release&rsquo;s own measurements close the loop. On the M5 Pro laptop, the 27.7&nbsp;tok/s decode corresponds to &asymp;201&nbsp;GB/s of weight traffic &mdash; the model is, functionally, a bandwidth benchmark with an LLM attached. The whitepaper adds the operational details that make the number trustworthy: each configuration is measured three times after a warm-up pass, on the release artifact and backend build of September 16, 2026, with NVIDIA hosts first passing a memory-bandwidth health check (reaching 76&ndash;91% of rated bandwidth), and prefill acknowledged as the noisier measurement (run-to-run variation up to ~11% on the fastest devices).</p>
+
+<h3>The packing trade, across architectures</h3>
+
+<p>The two packings are &ldquo;a genuine trade rather than a strict ordering,&rdquo; and the whitepaper&rsquo;s architecture-specific analysis is the most instructive part of the throughput story. PTQ1_0 moves 17&ndash;18% less weight data per step than PQ2_0, but unpacking dense trits costs arithmetic. Which cost dominates depends on what limits the hardware:</p>
+
+<ul>
+<li><strong>Ada-generation cards and the L4</strong> &mdash; memory-constrained parts &mdash; favor PTQ1_0: RTX 6000 Ada (92.0 vs 84.8&nbsp;tok/s), RTX 4090 (96.7 vs 90.9), L4 (32.1 vs 29.7). Bytes saved translate directly into tokens.</li>
+<li><strong>Ampere, Hopper, and Blackwell</strong> &mdash; where batch-1 decode is limited by instruction throughput and launch overhead rather than bandwidth &mdash; favor PQ2_0: H100 SXM (103.2 vs 77.3), A100 (74.0 vs 54.6), RTX 5090 (142.5 vs 134.4), RTX PRO 6000 Blackwell (140.6 vs 136.8).</li>
+<li><strong>Prompt processing favors PQ2_0 everywhere</strong> &mdash; prefill is compute-bound and the cheaper unpacking matters more than the extra bytes: 4121 vs 1901&nbsp;tok/s on the RTX 5090.</li>
+</ul>
+
+<p>The GGUF card compresses the guidance into a rule of thumb: PQ2_0 is &ldquo;the faster decode on H100, A100, and the Blackwell cards, faster at prompt processing everywhere, and is the pack measured on Apple Silicon&rdquo;; PTQ1_0 is &ldquo;the faster decode on the Ada-generation cards and the L4, and the pick wherever memory is tightest.&rdquo; Making PTQ1_0 as fast as PQ2_0 everywhere &mdash; on top of its lower footprint &mdash; is named in the whitepaper&rsquo;s limitations section as an active engineering target.</p>
+
+<div class="callout info"><span class="lab">What the kernels do not do</span>
+<p>The first generation&rsquo;s card, describing the same kernel philosophy, includes a constraint worth carrying forward: &ldquo;No native 1-bit hardware exists yet &mdash; current gains are software-kernel optimizations on general-purpose hardware.&rdquo; The ternary advantage today is won by moving fewer bytes over existing memory systems and skipping zero-weight arithmetic in software, not by dedicated ternary ALUs. The moment dedicated low-bit silicon appears &mdash; the direction several accelerator roadmaps point &mdash; the balance of these engineering tradeoffs shifts again.</p></div>
+<!-- ==================== CHAPTER 11 ==================== -->
+<h2 class="ch" id="ch11"><span class="chno">11</span> The Benchmarks</h2>
+<p class="ch-sub">Two suites &mdash; twenty benchmarks plus a fourteen-benchmark companion &mdash; every per-benchmark table, the methodology behind them, where conventional 2-bit collapses, and how far the agentic claims reach.</p>
+
+<p>Bonsai 2 27B&rsquo;s evaluation is documented in more depth than any prior Bonsai release, and it comes in two parts that must be kept distinct: the <strong>20-benchmark suite</strong> of the technical report &mdash; the release&rsquo;s primary evidence, including the agentic long-horizon results &mdash; and a <strong>14-benchmark companion suite</strong> carried on the Hugging Face model cards, which adds the UD-Q4_K_XL four-bit comparison point and per-benchmark detail against it. Both are thinking-mode evaluations run through the same infrastructure: <strong>EvalScope with the vLLM backend on NVIDIA H100 GPUs</strong> (the whitepaper specifies tensor-parallel 2, data-parallel 4), reasoning effort <strong>xhigh</strong>, with a server-side reasoning parser so that &ldquo;extractors and judges score only the final answer.&rdquo;</p>
+
+<h3>The headline table</h3>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Variant</th><th class="num">True bpw</th><th class="num">Footprint</th><th class="num">Thinking avg</th><th class="num">vs Qwen3.8 FP16</th></tr></thead>
+<tbody>
+<tr><td>Qwen3.8-27B FP16</td><td class="num">16.0</td><td class="num">53.80 GB</td><td class="num">85.4</td><td class="num">100%</td></tr>
+<tr><td>Qwen3.6-27B FP16</td><td class="num">16.0</td><td class="num">53.80 GB</td><td class="num">83.6</td><td class="num">97.9%</td></tr>
+<tr><td>Qwen3.8-27B IQ2_XXS</td><td class="num">2.2</td><td class="num">7.3 GB</td><td class="num">75.2</td><td class="num"><span class="tag bad">88.4%</span></td></tr>
+<tr><td><strong>Ternary Bonsai 2 27B</strong></td><td class="num"><strong>1.76</strong></td><td class="num"><strong>5.93 GB</strong></td><td class="num"><strong>83.9</strong></td><td class="num"><span class="tag good">98.2%</span></td></tr>
+</tbody></table></div>
+<p class="small">Thinking-mode average across the 20-benchmark suite, whitepaper Table 7. Bits-per-weight are averages over all model weights for the packed checkpoint. The two sentences the table supports: Bonsai 2 retains 98.2% of the current-generation base at 1/9th its size, and its average slightly <em>exceeds</em> the previous generation&rsquo;s full-precision model &mdash; 83.9 versus 83.6 &mdash; while the conventional 2-bit build falls 8.7 points short of it despite being 1.23&times; larger than Bonsai&rsquo;s pack.</p>
+
+<h3>Category-level results</h3>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Category (benchmarks)</th><th class="num">Qwen3.8 27B</th><th class="num">Bonsai 2 27B</th><th class="num">Qwen3.6 27B</th></tr></thead>
+<tbody>
+<tr><td>Agentic / tool calling (τ²-Bench, BFCL v3)</td><td class="num">79.74</td><td class="num">77.57</td><td class="num">80.05</td></tr>
+<tr><td>Coding (HumanEval+, LiveCodeBench v6, MBPP+, BigCodeBench)</td><td class="num">82.17</td><td class="num">81.58</td><td class="num">82.57</td></tr>
+<tr><td>Math (AIME26, AIME25, GSM8K, MATH-500)</td><td class="num">97.06</td><td class="num">96.57</td><td class="num">94.64</td></tr>
+<tr><td>Knowledge &amp; reasoning (MMLU-Redux, GPQA Diamond, AA-LCR)</td><td class="num">86.66</td><td class="num">83.95</td><td class="num">84.71</td></tr>
+<tr><td>Instruction following (IFBench, IFEval)</td><td class="num">81.25</td><td class="num"><strong>82.66</strong></td><td class="num">74.53</td></tr>
+<tr><td>Vision (CharXiv, A-OKVQA, OmniDocBench v1.6, RealWorldQA, OCRBench v2)</td><td class="num">81.64</td><td class="num">78.59</td><td class="num">79.82</td></tr>
+<tr><td><strong>Overall (20)</strong></td><td class="num"><strong>85.4</strong></td><td class="num"><strong>83.9</strong></td><td class="num"><strong>83.6</strong></td></tr>
+</tbody></table></div>
+<p class="small">Whitepaper Table 8. Note the shape of the gap: the reasoning core holds &mdash; math within half a point of full precision (96.57 vs 97.06), coding within 0.6 (81.58 vs 82.17), instruction following <em>above</em> both baselines &mdash; while the remaining distance concentrates in knowledge &amp; reasoning (&minus;2.7) and vision (&minus;3.1), the two most demanding categories.</p>
+
+<h3>The full 20-benchmark table</h3>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.8-27B FP16</th><th class="num">Qwen3.6-27B FP16</th><th class="num">IQ2_XXS</th><th class="num">Bonsai 2 27B</th></tr></thead>
+<tbody>
+<tr><td colspan="5" style="font-weight:700;color:var(--accent)">Knowledge &amp; reasoning</td></tr>
+<tr><td>MMLU-Redux</td><td class="num">91.46</td><td class="num">93.26</td><td class="num">85.79</td><td class="num">89.09</td></tr>
+<tr><td>GPQA Diamond</td><td class="num">90.51</td><td class="num">86.87</td><td class="num">65.45</td><td class="num">85.76</td></tr>
+<tr><td>AA-LCR</td><td class="num">78.00</td><td class="num">74.00</td><td class="num">64.00</td><td class="num">77.00</td></tr>
+<tr><td colspan="5" style="font-weight:700;color:var(--accent)">Math</td></tr>
+<tr><td>GSM8K</td><td class="num">97.19</td><td class="num">95.60</td><td class="num">95.38</td><td class="num">96.66</td></tr>
+<tr><td>MATH-500</td><td class="num">99.80</td><td class="num">99.20</td><td class="num">94.8</td><td class="num">98.80</td></tr>
+<tr><td>AIME25</td><td class="num">96.67</td><td class="num">90.42</td><td class="num">82.5</td><td class="num">95.00</td></tr>
+<tr><td>AIME26</td><td class="num">94.58</td><td class="num">93.33</td><td class="num">78.6</td><td class="num">95.83</td></tr>
+<tr><td colspan="5" style="font-weight:700;color:var(--accent)">Coding</td></tr>
+<tr><td>HumanEval+</td><td class="num">93.29</td><td class="num">95.73</td><td class="num">87.95</td><td class="num">95.12</td></tr>
+<tr><td>MBPP+</td><td class="num">83.86</td><td class="num">83.07</td><td class="num">78.31</td><td class="num">83.07</td></tr>
+<tr><td>LiveCodeBench v6</td><td class="num">90.05</td><td class="num">89.10</td><td class="num">70.05</td><td class="num">90.07</td></tr>
+<tr><td>BigCodeBench</td><td class="num">61.49</td><td class="num">62.37</td><td class="num">49.81</td><td class="num">58.07</td></tr>
+<tr><td colspan="5" style="font-weight:700;color:var(--accent)">Instruction following</td></tr>
+<tr><td>IFEval</td><td class="num">91.50</td><td class="num">88.72</td><td class="num">81.52</td><td class="num">91.31</td></tr>
+<tr><td>IFBench</td><td class="num">71.00</td><td class="num">60.33</td><td class="num">52.33</td><td class="num"><strong>74.00</strong></td></tr>
+<tr><td colspan="5" style="font-weight:700;color:var(--accent)">Agentic / tool calling</td></tr>
+<tr><td>τ²-Bench</td><td class="num">82.73</td><td class="num">82.90</td><td class="num">69.43</td><td class="num">80.22</td></tr>
+<tr><td>BFCL v3</td><td class="num">76.74</td><td class="num">77.19</td><td class="num">66.1</td><td class="num">74.92</td></tr>
+<tr><td colspan="5" style="font-weight:700;color:var(--accent)">Vision</td></tr>
+<tr><td>CharXiv</td><td class="num">82.02</td><td class="num">81.60</td><td class="num">78.76</td><td class="num">80.00</td></tr>
+<tr><td>A-OKVQA</td><td class="num">89.34</td><td class="num">89.87</td><td class="num">86.2</td><td class="num">86.81</td></tr>
+<tr><td>OmniDocBench v1.6</td><td class="num">92.46</td><td class="num">84.17</td><td class="num">82.87</td><td class="num">89.13</td></tr>
+<tr><td>RealWorldQA</td><td class="num">83.40</td><td class="num">81.83</td><td class="num">78.56</td><td class="num">80.13</td></tr>
+<tr><td>OCR Bench v2</td><td class="num">60.99</td><td class="num">61.64</td><td class="num">55.37</td><td class="num">56.88</td></tr>
+<tr><td><strong>Average (20)</strong></td><td class="num"><strong>85.4</strong></td><td class="num"><strong>83.6</strong></td><td class="num"><strong>75.2</strong></td><td class="num"><strong>83.9</strong></td></tr>
+</tbody></table></div>
+<p class="small">Whitepaper Table 10, thinking mode with reasoning-effort xhigh. Sizes: 53.8 / 53.8 / 7.35 / 5.93 GB (language-model weights, decimal GB); bits/weight 16.0 / 16.0 / 2.2 / 1.76. On 9 of 20 benchmarks Bonsai 2 lands within a point of the current-generation FP16 baseline or ahead of it &mdash; including LiveCodeBench (90.07 vs 90.05) and IFBench (74.00 vs 71.00), where it is ahead; its largest deficits are GPQA Diamond (&minus;4.8), OCR Bench v2 (&minus;4.1), BigCodeBench (&minus;3.4), and the vision pair OmniDocBench/RealWorldQA (&minus;3.3 each).</p>
+
+<h3>The selective collapse of conventional 2-bit</h3>
+
+<p>The aggregate gap &ldquo;understates where quality is preserved,&rdquo; and the whitepaper&rsquo;s chosen example is the release&rsquo;s sharpest evidence. On the 20-suite, IQ2_XXS falls to <strong>78.6 on AIME26</strong> and <strong>70.05 on LiveCodeBench</strong> while still posting <strong>85.79 on MMLU-Redux</strong> &mdash; &ldquo;which is why casual testing misses the collapse.&rdquo; Bonsai 2 scores <strong>95.83</strong> and <strong>90.07</strong> on the same two benchmarks &mdash; the latter actually a hair <em>above</em> the FP16 baseline&rsquo;s 90.05 &mdash; and 89.09 on MMLU-Redux. The 14-benchmark companion suite sharpens the contrast further with a different IQ2_XXS build (2.8 true bpw at 9.4&nbsp;GB): there the conventional build&rsquo;s AIME26 falls to <strong>57.5</strong> and LiveCodeBench to <strong>56.4</strong>, versus Bonsai&rsquo;s 95.83 and 90.07. Either way, the pattern is the same: knowledge survives, sustained reasoning dies.</p>
+
+<div class="callout danger"><span class="lab">Why this table matters more than the average</span>
+<p>A deployment that only ever answers trivia can ship a conventional 2-bit build and lose little. A deployment that runs <em>chains</em> &mdash; coding agents, tool loops, multi-step mathematics &mdash; cannot: per-step corruption compounds across steps, which is exactly why the benchmarks demanding &ldquo;sustained chains of reasoning&rdquo; are where conventional sub-4-bit methods fail first, and why Prism&rsquo;s whole quality argument is built on holding precisely those benchmarks. The card&rsquo;s own sentence: &ldquo;coding agents, tool-use systems, multimodal workflows, and long-horizon tasks are particularly sensitive to model degradation because small errors can compound over many steps.&rdquo;</p></div>
+
+<h3>The agentic long-horizon results</h3>
+
+<p>For the first time, the evaluation extends to end-to-end software engineering, and here the retention story is more sober &mdash; honestly so. On <strong>Terminal-Bench 2.1</strong> (run with the Terminus-2 agent on all 89 tasks, single attempt, eight concurrent trials, 32 CPUs and 48&nbsp;GB of memory per task container, a 262,144-token context and an 80,000-token output budget per turn), Bonsai 2 reaches <strong>52.8</strong> against the FP16 baseline&rsquo;s <strong>69.7</strong>. On <strong>SWE-bench Verified</strong> (the mini-swe-agent scaffold on all 500 instances, resolved rate), it reaches <strong>60.8</strong> against <strong>80.6</strong>. That is roughly three-quarters retention on both &mdash; materially below the suite&rsquo;s 98.2%, and the whitepaper says so directly: &ldquo;long-horizon agentic evaluations are unforgiving under aggressive compression,&rdquo; while noting that &ldquo;models at this footprint often fail to make any meaningful progress&rdquo; where Bonsai 2 &ldquo;remains capable of sustained tool use and end-to-end software-engineering workflows.&rdquo; The shorter-horizon agentic results are stronger: τ²-Bench reaches 80.2 (up from 73.6 in the previous generation), BFCL v3 holds at 74.9, and AA-LCR lands within a point of full precision at 77.0.</p>
+
+<p>A methodological note for cross-source readers: Qwen&rsquo;s own card reports Terminal-Bench 2.1 at 73.0 for the FP16 model against Prism&rsquo;s 69.7 &mdash; the same model, different harness protocol. Prism&rsquo;s numbers are internally consistent (both models through the identical Terminus-2 configuration), which is what a compression comparison requires, but the absolute figure is protocol-dependent. The medium-effort appendix completes the picture: at reasoning effort <em>medium</em>, the FP16 baseline averages 82.6 and Bonsai 2 averages 79.3 &mdash; a slightly wider relative gap than at xhigh, with AIME25 the largest single drop (86.25 &rarr; 74.58).</p>
+
+<h3>Methodology, in enough detail to audit</h3>
+
+<p>The whitepaper&rsquo;s Appendix&nbsp;B is the most auditable evaluation description the local-model field has produced in some time, and its key commitments deserve listing, because they are what separates this release&rsquo;s benchmark claims from a marketing table:</p>
+
+<ul>
+<li><strong>One harness, all models.</strong> Every variant &mdash; FP16 baselines, conventional low-bit references, Bonsai &mdash; runs through the same EvalScope pipeline against the same vLLM serving path with identical dataset versions and scoring.</li>
+<li><strong>Single-sample discipline.</strong> Every item is answered once: pass@1 at temperature 1.0, not greedy decoding &mdash; except where a benchmark&rsquo;s convention demands sampling: GPQA Diamond five samples per question (990 completions, mean accuracy), AIME25/AIME26 eight samples per problem (240 completions each, avg@8).</li>
+<li><strong>Reasoning stripped before grading</strong>; generous output budgets (81,920 tokens for AIME/MATH-500/GPQA/LiveCodeBench/IFBench; 49,152 for HumanEval+/BigCodeBench/OmniDocBench/OCRBench/τ²-Bench; 32,768 for the rest).</li>
+<li><strong>Rule-based scoring wherever possible</strong> &mdash; sandboxed execution for code, programmatic verifiers for instruction following, parsing and state checks for tool calling, reference matching for OCR &mdash; with a rule-first extractor and a fixed LLM-judge fallback (Gemini 3 Flash, temperature 0, identical across models) for knowledge, reasoning, and math.</li>
+<li><strong>Explicit benchmark-version choices</strong>: MMLU-Redux 2.0 (57 subjects, 5,700 questions); LiveCodeBench release_v6 (1,055 problems); BigCodeBench complete split over all 1,140 problems (not the 148-problem Hard subset), v0.1.4 with calibrated pass@1 in a Docker sandbox; IFEval/IFBench reported at prompt-level strict accuracy; τ²-Bench&rsquo;s airline, retail, and telecom domains (278 tasks) scored as single-trial pass@1 with deepseek-v4-flash at temperature 0 as the user simulator; BFCL v3 in prompt-based function-calling mode over all 17 subsets including multi-turn (4,441 items, sample-weighted mean).</li>
+<li><strong>Agentic parity</strong>: all agentic benchmarks serve models identically and drive them through the Harbor framework.</li>
+</ul>
+
+<h3>The 14-benchmark companion, in one paragraph</h3>
+
+<p>The model cards&rsquo; companion suite (thinking mode, same infrastructure) replaces the suite&rsquo;s GPQA/AA-LCR/BigCodeBench/τ²-Bench/CharXiv/A-OKVQA/OmniDocBench/RealWorldQA entries with MuSR, MMMU-Pro, and a slightly different benchmark mix, and adds the four-bit comparison point that makes the deployment decision concrete: <strong>UD-Q4_K_XL at 5.2 true bpw and 17.6&nbsp;GB scores 85.18 (98.7%)</strong>, against Bonsai 2&rsquo;s <strong>84.78 (98.2%) at 5.9&nbsp;GB</strong> &mdash; &ldquo;within 0.4 points of UD-Q4_K_XL at three times the footprint.&rdquo; Per-benchmark on the overlapping entries the two suites agree on Bonsai&rsquo;s numbers exactly (AIME26 95.83, LiveCodeBench 90.07, IFEval 91.31, BFCL v3 74.92), which is itself a small integrity signal: the companion was clearly re-run, not copy-edited. The full 14-benchmark table, including the IQ2_XXS collapse figures cited above, appears in the cards; the whitepaper&rsquo;s 20-suite remains the release&rsquo;s canonical record.</p>
+<!-- ==================== CHAPTER 12 ==================== -->
+<h2 class="ch" id="ch12"><span class="chno">12</span> Throughput &amp; Energy</h2>
+<p class="ch-sub">Twelve platforms, two packings, and an energy-measurement discipline unusual enough to be its own finding.</p>
+
+<p>The whitepaper&rsquo;s throughput table is the release&rsquo;s most complete hardware survey &mdash; twelve platforms from a 72-watt L4 to an H200, plus three Apple laptops &mdash; measured on the current release stack (artifact and backend build of September 16, 2026) with the standardized <span class="mono">tg128</span>/<span class="mono">pp512</span> protocol: token-generation throughput over 128 generated tokens (the bandwidth-bound, interactive phase) and prompt-processing throughput over 512 input tokens (the compute-bound phase), each configuration run three times after warm-up, batch size one, depth zero, vision tower excluded.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Platform</th><th class="num">PQ2_0 TG128</th><th class="num">PQ2_0 PP512</th><th class="num">PQ2_0 mWh/tok</th><th class="num">PTQ1_0 TG128</th><th class="num">PTQ1_0 PP512</th><th class="num">PTQ1_0 mWh/tok</th></tr></thead>
+<tbody>
+<tr><td>RTX 5090 (32 GB)</td><td class="num"><strong>142.5</strong></td><td class="num"><strong>4121</strong></td><td class="num">0.582</td><td class="num">134.4</td><td class="num">1901</td><td class="num">0.609</td></tr>
+<tr><td>RTX PRO 6000 Blackwell</td><td class="num">140.6</td><td class="num">4520</td><td class="num">0.637</td><td class="num">136.8</td><td class="num">2290</td><td class="num">0.642</td></tr>
+<tr><td>H200 SXM (141 GB)</td><td class="num">118.0</td><td class="num">2818</td><td class="num">0.708</td><td class="num">89.5</td><td class="num">1216</td><td class="num">0.814</td></tr>
+<tr><td>B200 (180 GB)</td><td class="num">117.1</td><td class="num">3112</td><td class="num">0.830</td><td class="num">91.9</td><td class="num">1406</td><td class="num">1.019</td></tr>
+<tr><td>H100 NVL (94 GB)</td><td class="num">106.4</td><td class="num">2484</td><td class="num">0.541</td><td class="num">81.6</td><td class="num">1098</td><td class="num">0.647</td></tr>
+<tr><td>H100 SXM (80 GB)</td><td class="num">103.2</td><td class="num">2467</td><td class="num">0.584</td><td class="num">77.3</td><td class="num">1097</td><td class="num">0.706</td></tr>
+<tr><td>RTX 4090 (24 GB)</td><td class="num">90.9</td><td class="num">3134</td><td class="num">0.714</td><td class="num"><strong>96.7</strong></td><td class="num">1634</td><td class="num">0.682</td></tr>
+<tr><td>RTX 6000 Ada (48 GB)</td><td class="num">84.8</td><td class="num">2430</td><td class="num">0.731</td><td class="num"><strong>92.0</strong></td><td class="num">1627</td><td class="num">0.701</td></tr>
+<tr><td>L40S (48 GB)</td><td class="num">74.6</td><td class="num">2827</td><td class="num">0.812</td><td class="num"><strong>82.8</strong></td><td class="num">1601</td><td class="num">0.743</td></tr>
+<tr><td>A100 SXM (80 GB)</td><td class="num">74.0</td><td class="num">1328</td><td class="num">0.776</td><td class="num">54.6</td><td class="num">703</td><td class="num">0.932</td></tr>
+<tr><td>L4 (24 GB, 72 W)</td><td class="num">29.7</td><td class="num">778</td><td class="num">0.629</td><td class="num"><strong>32.1</strong></td><td class="num">468</td><td class="num">0.585</td></tr>
+<tr><td>Laptop (M5 Pro, Metal)</td><td class="num">27.7</td><td class="num">397</td><td class="num">&mdash;</td><td class="num">27.1</td><td class="num">369</td><td class="num">&mdash;</td></tr>
+</tbody></table></div>
+<p class="small">Whitepaper Table 5: cross-platform throughput and energy for the two packings, tokens/second and mWh/token (board power, no idle subtraction). Bold marks the faster decode per row &mdash; note the Ada/L4 rows flipping to PTQ1_0 exactly as Chapter&nbsp;10&rsquo;s analysis predicts. The announcement&rsquo;s &ldquo;up to 143 tokens/second on RTX 5090&rdquo; is this table&rsquo;s 142.5 rounded; its &ldquo;0.714 mWh/token on an RTX 4090&rdquo; is the PQ2_0 energy cell of the same row.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Apple Silicon laptop (Metal, PQ2_0)</th><th class="num">TG128 (tok/s)</th><th class="num">PP512 (tok/s)</th></tr></thead>
+<tbody>
+<tr><td>Apple M5 Max</td><td class="num">46.8</td><td class="num">765</td></tr>
+<tr><td>Apple M5 Pro</td><td class="num">27.7</td><td class="num">397</td></tr>
+<tr><td>Apple M4 Pro</td><td class="num">18.0</td><td class="num">125</td></tr>
+</tbody></table></div>
+<p class="small">Whitepaper Table 6. The M4 Pro row comes from the earlier pre-rotation build and should be read as a scaling indicator rather than a release-stack comparison; on M4 Pro, prefill (~125&nbsp;tok/s) rather than decode is the practical constraint for very long prompts. The announcement&rsquo;s &ldquo;46.8 tokens/second on M5 Max&rdquo; is this table&rsquo;s top row.</p>
+
+<h3>What the numbers mean in practice</h3>
+
+<p>Three practical readings of the tables are worth spelling out. <strong>First, the laptop row is qualitative, not a speedup.</strong> On a 16-class GB laptop, the FP16 baseline (54&nbsp;GB) and even the conventional 4-bit build (17.6&nbsp;GB) do not fit at all &mdash; &ldquo;the meaningful statement is not a speedup ratio but that a 27B model runs interactively on an everyday laptop,&rdquo; at 27.7&nbsp;tok/s on an M5 Pro and 46.8 on an M5 Max. <strong>Second, the consumer-GPU row is the value proposition.</strong> ~130&ndash;143&nbsp;tok/s of 27B-class decode from a single RTX 5090, ~91&ndash;97&nbsp;tok/s from a 24&nbsp;GB RTX 4090, and ~30&nbsp;tok/s from a 72-watt L4 &mdash; with the card&rsquo;s reminder that there is &ldquo;headroom for larger batches, longer contexts, or co-resident models&rdquo; since the weights leave most of a 24&ndash;32&nbsp;GB card free. <strong>Third, prefill is the constraint to watch on-device.</strong> Prompt processing runs far faster than decode on GPUs &mdash; 468&ndash;4,520&nbsp;tok/s of PP512 across the measured cards, against 30&ndash;143&nbsp;tok/s of decode &mdash; but on Apple laptops it sits at 125&ndash;765&nbsp;tok/s, which for very long prompts &mdash; the 262K-context workloads the model is otherwise built for &mdash; makes ingestion time, not generation, the binding limit.</p>
+
+<h3>The energy discipline</h3>
+
+<p>The most unusual feature of the throughput work is what the paper <em>refuses</em> to report. NVIDIA energy is board power via <span class="mono">nvidia-smi</span>, &ldquo;total, with no idle subtraction&rdquo;; Apple&rsquo;s <span class="mono">powermetrics</span> reports CPU, GPU, and ANE with <strong>no DRAM rail</strong>. Because excluding memory power would systematically flatter the Apple figures in a bandwidth-bound workload, the whitepaper declines to publish a cross-platform per-token energy number at all and instead reports absolute draw: the M5 Pro sustains plain autoregressive PQ2_0 decode at 27.0&nbsp;tok/s drawing <strong>27.0&nbsp;W on the GPU rail and 32.8&nbsp;W across CPU and GPU</strong>, with the idle floor stated separately (0.17&nbsp;W GPU, 1.47&nbsp;W CPU) rather than silently subtracted. Against that, the NVIDIA cards&rsquo; board power runs 300&ndash;455&nbsp;W under the same batch-1 decode.</p>
+
+<p>The announcement&rsquo;s headline energy claim &mdash; &ldquo;40% more energy-efficient than an 8B model running in full-precision&rdquo; on the RTX 4090, at 0.714&nbsp;mWh/token &mdash; is a comparison against a model class one-third its size, which is the right framing for the claim being made: per <em>unit of delivered capability</em>, the ternary 27B beats an FP16 8B on energy. And the whitepaper adds a detail deployers should internalize: prefill is far cheaper per token than decode everywhere measured (0.012&ndash;0.060&nbsp;mWh/token, e.g. 0.017 on the RTX PRO 6000), because prompt processing amortizes weight traffic across many tokens.</p>
+
+<div class="callout info"><span class="lab">Measurement provenance, three ways</span>
+<p>Three independent measurement rounds of essentially the same artifact exist, and they bracket each other usefully. The whitepaper&rsquo;s current-stack table reports <strong>142.5&nbsp;tok/s</strong> decode / 4121&nbsp;tok/s prefill on the RTX 5090 (measured 2026-09-16). The model cards&rsquo; earlier measurement round, in joules per token, reported <strong>129.9&nbsp;tok/s</strong> / 3893 on the same card. And the community Ollama mirror&rsquo;s own measurement reports <strong>135.41&nbsp;tok/s</strong> decode / 3802.74&nbsp;tok/s prefill. Nothing here is inconsistent &mdash; the kernels and measurement stacks moved between rounds, and prefill variance is quoted at up to ~11% &mdash; but it is a concrete reminder to check which stack a given number came from before comparing across sources.</p></div>
+<!-- ==================== CHAPTER 13 ==================== -->
+<h2 class="ch" id="ch13"><span class="chno">13</span> Deployment Field Guide</h2>
+<p class="ch-sub">What actually runs where: the fork, the MLX runtime, the Ollama situation, the browser demo, the API, and the integrations.</p>
+
+<p>Bonsai 2 27B&rsquo;s deployment surface is broader than any prior Bonsai release but comes with one non-negotiable requirement that shapes everything else: <strong>the packed formats need a runtime that knows them</strong>. The model cards designate the <span class="mono">PrismML-Eng/Bonsai-demo</span> repository (2,924 stars) as &ldquo;the source of truth for running these models &mdash; it carries the tested setup for every backend, pins a known-good binary release, and is kept current&rdquo;, with the rule stated without diplomacy: &ldquo;Where anything here disagrees with it, it is right.&rdquo; The repo ships run scripts that pick correct flags per hardware, plus serving, benchmarking, and integration examples for tool calling, reasoning budgets, image input with the mmproj file, and speculative decoding.</p>
+
+<h3>llama.cpp (CUDA, Metal, CPU)</h3>
+
+<p>The GGUF packs run through <strong>Prism&rsquo;s llama.cpp fork</strong>, which carries the ternary hybrid-attention kernels and the Hadamard activation runtime. Stock llama.cpp &ldquo;will not run these files. It rejects PQ2_0 and PTQ1_0 as unknown types, and it loads Q2_0 without any warning and produces garbage, because it has no Hadamard activation runtime&rdquo; &mdash; the first-generation format&rsquo;s name collision with llama.cpp&rsquo;s existing Q2_0 being the trap case. Prebuilt release archives exist (Simon Willison&rsquo;s thread-tested pick was the <span class="mono">prism-b10685-7dffb15</span> tag) alongside build-from-source instructions:</p>
+
+<div class="tblwrap" style="border:1px solid #0d1117;background:var(--code-bg);border-radius:10px;padding:0"><table style="background:none;border:none"><tbody><tr><td style="border:none;padding:0">
+<pre><code><span class="cmt"># Clone the PrismML fork of llama.cpp (ternary hybrid-attention kernels)</span>
+git clone https://github.com/PrismML-Eng/llama.cpp
+cd llama.cpp
+
+<span class="cmt"># Build with CUDA support (drop -DGGML_CUDA=ON on macOS; Metal is default)</span>
+cmake -B build -DGGML_CUDA=ON
+cmake --build build -j
+
+<span class="cmt"># Download the ternary GGUF weights (PQ2_0 packing shown)</span>
+hf download prism-ml/Ternary-Bonsai-2-27B-gguf Ternary-Bonsai-2-27B-PQ2_0.gguf --local-dir .
+
+<span class="cmt"># Run inference: this is a reasoning model &mdash; it thinks by default</span>
+./build/bin/llama-cli -m Ternary-Bonsai-2-27B-PQ2_0.gguf \
+  -ngl 99 -fa on -c 32768 \
+  --temp 1.0 --top-p 0.95 --top-k 20 \
+  -p <span class="str">"Explain quantum computing in simple terms."</span> -n 256
+<span class="cmt"># -ngl 99 offloads every layer (0 = CPU-only); -c sets context, up to 262144</span></code></pre>
+</td></tr></tbody></table></div>
+
+<h3>Apple MLX (Python and Swift)</h3>
+
+<p>The MLX pack runs on stock <span class="mono">mlx-lm</span>/<span class="mono">mlx-vlm</span> packages &mdash; &ldquo;no fork&rdquo; &mdash; but requires the custom loader bundled in the pack&rsquo;s <span class="mono">runtime/</span> directory, because the model declares <span class="mono">model_type: prism_hadamard_qwen35</span> and ordinary MLX loaders &ldquo;skip the activation transform and the inverse embedding lookup, so they return wrong output rather than an error.&rdquo; The vision flow:</p>
+
+<div class="tblwrap" style="border:1px solid #0d1117;background:var(--code-bg);border-radius:10px;padding:0"><table style="background:none;border:none"><tbody><tr><td style="border:none;padding:0">
+<pre><code><span class="cmt"># Get the pack (language model + vision tower, 8.60 GB on disk)</span>
+hf download prism-ml/Ternary-Bonsai-2-27B-mlx-2bit --local-dir bonsai2-27b-mlx
+
+pip install -r bonsai2-27b-mlx/runtime/requirements.txt
+
+<span class="cmt"># The pack's own loader applies the Hadamard transform + inverse embedding</span>
+<span class="key">import</span> sys; sys.path.insert(<span class="head">0</span>, <span class="str">"bonsai2-27b-mlx/runtime"</span>)
+<span class="key">from</span> vision_artifact <span class="key">import</span> load_vl_model, chat_config
+<span class="key">from</span> mlx_vlm <span class="key">import</span> generate
+<span class="key">from</span> mlx_vlm.prompt_utils <span class="key">import</span> apply_chat_template
+
+model, processor, config = load_vl_model(<span class="str">"bonsai2-27b-mlx"</span>)
+prompt = apply_chat_template(processor, chat_config(config),
+                             <span class="str">"What is in this image?"</span>, num_images=<span class="head">1</span>)
+<span class="head">print</span>(generate(model, processor, prompt, [<span class="str">"photo.jpg"</span>],
+                 max_tokens=<span class="head">256</span>, temperature=<span class="head">1.0</span>))
+<span class="cmt"># Pass no images for text-only use. PACK-RUNTIME.md documents the contract.</span></code></pre>
+</td></tr></tbody></table></div>
+
+<h3>Ollama, LM Studio, and the browser</h3>
+
+<p><strong>Ollama cannot run these packs today.</strong> A community mirror exists &mdash; <span class="mono">tobestyledintro/Ternary-Bonsai-2-27B</span>, republishing Prism&rsquo;s blobs with identical SHA-256 hashes, 7,961 downloads in its first days &mdash; but its own readme carries the warning in bold: &ldquo;These files do not run in Ollama.&rdquo; The mirror&rsquo;s verification against Ollama 0.34.2 is specific: the runner &ldquo;knows the architecture (<span class="mono">qwen35</span>) but has no <span class="mono">pq2_0</span> or <span class="mono">ptq1_0</span> anywhere in its library&rdquo; and fails with <span class="mono">unsupported tensor "output.weight" size overflows</span>. The mirror&rsquo;s model page nonetheless documents the application surface that wants this model &mdash; Claude Code, OpenCode, Hermes Agent, and OpenClaw can all be pointed at a compatible server via <span class="mono">ollama launch</span>-style flows once a runtime exists. <strong>LM Studio</strong> is listed among the pack&rsquo;s supported local apps (a faster turnaround than the first generation, whose GGUF and MLX packs initially failed there outright). And the most accessible entry point of all requires no install: the <strong>WebGPU Space</strong> (<span class="mono">webml-community/ternary-bonsai-2-webgpu-kernels</span>, 98 upvotes in its first days) runs the full ternary model in the browser &mdash; with the community&rsquo;s standing reminder to clear the downloaded weights afterward.</p>
+
+<h3>The API surface</h3>
+
+<p>For deployment without local hardware, OpenRouter listed <span class="mono">prism-ml/ternary-bonsai-2-27b</span> on September 18, 2026 at <strong>$0.075 per million input tokens and $0.50 per million output</strong>, served by a single provider (Darkbloom) with 99.99% uptime over the following three days, P50 latency of 0.66 seconds, and a tool-call error rate of 0.02% &mdash; alongside a structured-output error rate of 20.02% that early adopters should weigh before depending on strict JSON modes. Prism&rsquo;s own free, limited-time developer-preview API has run since the July launch. The pricing is the interesting signal: at roughly a tenth of typical frontier-model output pricing, the ternary model&rsquo;s serving economics &mdash; a 5.9&nbsp;GB resident footprint on commodity GPUs &mdash; are being passed through to the API customer.</p>
+
+<h3>Docs coverage and the integration map</h3>
+
+<p>Prism&rsquo;s documentation covers the fork&rsquo;s prebuilt binaries across macOS, Apple Silicon, Windows x64, CPU, CUDA 12.4, Vulkan, and HIP/ROCm &mdash; the broadest backend matrix any low-bit release has shipped &mdash; and the model cards enumerate first-party integration recipes for agent harnesses that were evidently treated as the primary users from day one: <strong>Pi</strong> (the coding agent, via a local OpenAI-compatible server), <strong>Hermes Agent</strong>, <strong>OpenClaw</strong>, plus <strong>Cline</strong> and a computer-use stack driving the announcement&rsquo;s two launch demos on an RTX 5090. The pattern across all of them is identical: run a local OpenAI-compatible endpoint (llama.cpp server or MLX server) and point the harness at it &mdash; the deployment model that made local models useful for agents in 2025&ndash;2026, now supplied with a 27B-class reasoning model at an 8B-class footprint.</p>
+
+<div class="callout warn"><span class="lab">Deployment checklist</span>
+<p>(1) Get the right runtime first &mdash; Prism&rsquo;s fork for GGUF, the pack&rsquo;s bundled MLX loader for Apple &mdash; before downloading weights. (2) Pick the packing per Chapter&nbsp;10&rsquo;s table: PQ2_0 on Hopper/Blackwell and Apple, PTQ1_0 on Ada-class and the L4, PTQ1_0 wherever memory is tightest. (3) Load the vision tower only if image input is needed &mdash; it is offloaded by default so text-only serving never pays for it. (4) Ship the base model&rsquo;s sampling defaults (thinking: temp 1.0 / top-p 0.95 / top-k 20; they ride in the GGUF metadata) and budget for xhigh reasoning by default. (5) On long-context Apple deployments, plan around prefill, not decode. (6) Treat the 262K window as real but watch KV growth &mdash; the first generation&rsquo;s peak-memory table is the template for the arithmetic.</p></div>
+<!-- ==================== PART IV DIVIDER ==================== -->
+<div class="part-divider" style="margin:64px 0 8px;padding:34px 30px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#eef2ff,#f8fafc 60%);">
+  <div style="font-size:12px;letter-spacing:2.4px;text-transform:uppercase;color:var(--accent);font-weight:800;">Part IV</div>
+  <div style="font-size:32px;font-weight:850;letter-spacing:-.8px;margin:6px 0 8px;">Meaning</div>
+  <div style="font-size:16px;color:var(--ink-soft);max-width:600px;">What the community made of it, what intelligence density actually measures, and where the program goes next.</div>
+</div>
+
+<!-- ==================== CHAPTER 14 ==================== -->
+<h2 class="ch" id="ch14"><span class="chno">14</span> Reception &amp; Reception Risks</h2>
+<p class="ch-sub">A 579-point launch thread, three independent write-ups, 2.23 million downloads in four days &mdash; and the criticisms that survived fact-checking.</p>
+
+<p>The Bonsai 2 launch reached Hacker News&rsquo;s front page within hours and finished its run at <strong>579 points and 199 comments</strong> &mdash; strong, though below the first-generation 27B&rsquo;s 706, a normal decay for a second act. The thread&rsquo;s most practical contribution came early from Simon Willison, who flagged the deployment trap this paper&rsquo;s Chapter&nbsp;13 exists because of &mdash; the GGUFs require Prism&rsquo;s llama.cpp fork, with a pinned release tag and a tested command sequence &mdash; and the thread&rsquo;s most upvoted practical observations traced the deployment envelope: excitement that a sub-6&nbsp;GB pack puts a 27B-class model on 16&nbsp;GB graphics cards that could never hold Qwen3.8-27B&rsquo;s FP16 (let alone its 4-bit), and confirmation that the full model runs <em>in the browser</em> via the WebGPU Space.</p>
+
+<h3>The criticisms, taken seriously</h3>
+
+<p>Four lines of criticism recur across both 27B launches, and they deserve precise statement because each one survived this paper&rsquo;s fact-checking pass in some form:</p>
+
+<ul>
+<li><strong>Long-horizon degradation.</strong> The most quoted community verdict, from the September thread: &ldquo;Like the last model, it&rsquo;s amazing they work as well as they do. Use it for any longer task and they fall apart spectacularly and in interesting ways.&rdquo; This is consistent with the whitepaper&rsquo;s own long-horizon numbers &mdash; 52.8 on Terminal-Bench 2.1 and 60.8 on SWE-bench Verified against 69.7/80.6 for FP16 &mdash; and with the first generation&rsquo;s τ²-Bench collapse in the binary build (82.9&nbsp;&rarr;&nbsp;61.3). The honest reading: the 98.2% headline describes the 20-suite average, not the hardest agentic tail.</li>
+<li><strong>The PTQ-rivalry question.</strong> From the July thread (the commenter <span class="mono">liuliu</span>): Unsloth&rsquo;s post-training UD_Q2 variant &ldquo;does only post-training&rdquo; and gets numbers &ldquo;pretty close to the 1-bit model here,&rdquo; while the 5% tool-calling drop matters more in real use than averages suggest. Prism&rsquo;s own 14-suite table partially answers this &mdash; Bonsai 2 at 84.78 beats the IQ2_XXS class at 72.59 on the same suite &mdash; but the criticism correctly notes that the right conventional comparison point is contested territory, and that the ternary model&rsquo;s advantage is narrower against modern <em>dynamic</em> 2-bit recipes than the headline suggests.</li>
+<li><strong>Knowledge, not reasoning, is the weak flank.</strong> The July thread&rsquo;s summary judgment &mdash; &ldquo;Where it falls apart is with knowledge. It has good prose/logic for a tiny model&rdquo; &mdash; matches the category table: knowledge &amp; reasoning is where Bonsai 2 gives up the most (86.66&nbsp;&rarr;&nbsp;83.95), with MuSR (79.63&nbsp;&rarr;&nbsp;70.63 on the 14-suite) and the OCR edge cases the visible symptoms. A model that reasons like a 27B but recalls like a compressed one is a specific product shape, not a universal substitute.</li>
+<li><strong>Runtime friction and speed skepticism.</strong> The first generation launched with LM Studio incompatibility and early llama.cpp builds that ran slower than competing MoE quants with CPU offloading; the second generation still requires a fork. Third-party write-ups from the September window state the constraint plainly: running it &ldquo;requires a custom llama.cpp fork from Prism ML&rsquo;s model card, since stock llama.cpp cannot decode the ternary kernels or apply the&rdquo; activation transform. Upstreaming is in active discussion &mdash; llama.cpp issues and PRs reference GGML types 142 (PQ2_0) and 143 (PTQ1_0), and a September 18 GitHub discussion on group-128 ternary support records the fork&rsquo;s constraint that upstream Q2_0 uses per-row scales &ldquo;so won&rsquo;t be native support&rdquo; &mdash; but at publication time, the ecosystem integration a casual user expects does not exist.</li>
+</ul>
+
+<h3>The independent record</h3>
+
+<p>Outside the aggregator threads, the third-party coverage converges on the same balanced picture. <strong>regolo.ai</strong>&rsquo;s Alex Genovese (July 17) ran the first generation&rsquo;s numbers and drew the line the community kept redrawing: tool calling and agentic capability &ldquo;drop significantly in the 1-bit variant (80.0&nbsp;&rarr;&nbsp;66.0), making it 4.6&times; more affected than mathematical reasoning tasks&rdquo; &mdash; so &ldquo;for AI agents, coding assistants, and tool-using workflows, the ternary Bonsai 27B is the recommended choice, while the 1-bit version is best suited for chatbots, text generation, summarization.&rdquo; <strong>mindstudio.ai</strong>&rsquo;s September write-up restated the headline correctly (&ldquo;Bonsai 2 27B shrinks a 27B model to 8.6GB using ternary quantization, keeping 98.2% of FP16 benchmark performance intact&rdquo; &mdash; the 8.6&nbsp;GB being the MLX pack with vision tower on disk). And <strong>benchlm.ai</strong>&rsquo;s independent tracker offers the most sobering external datapoint: on its own public-score estimate, Qwen3.8-Flash-Next outscores Ternary Bonsai 2 27B (57.11 vs 51.45) &mdash; with the caveat, in benchlm&rsquo;s own phrasing, that the 90% score intervals overlap, and that its estimate is a different instrument from Prism&rsquo;s suite. A frontier-class <em>smaller</em> model from the same family can still beat the compressed 27B on capability-per-token; Bonsai&rsquo;s claim is capability-per-<em>gigabyte</em>, not capability per parameter.</p>
+
+<h3>Adoption, measured</h3>
+
+<p>Whatever the caveats, the adoption signal is unambiguous and unusually fast. The <strong>GGUF pack crossed 2.23 million downloads within four days</strong> of release (against 36.7 thousand for the MLX pack and 4.5 thousand for the dev pack), the Hugging Face collection earned 135 upvotes, and the org passed 3.66k followers. The first generation&rsquo;s packs had been compounding for months &mdash; 442k downloads/month for the 1-bit 27B, 124k for the 1-bit 8B &mdash; and the ecosystem&rsquo;s build-out (23 community Spaces on the first-gen 1-bit model alone, WebGPU kernels, community mirrors, Docker serving recipes on ModelScope and beyond) shows a deployment community that treats the format as infrastructure, not a curiosity. A mid-August community thread on the first-gen ternary card asking for a &ldquo;Qwen3.8-27B version&rdquo; &mdash; answered with a discussion of the ternary container&rsquo;s properties under the name TAARDIS &mdash; foreshadowed exactly what shipped a month later: the base-model treadmill, and the community waiting on it, are both real.</p>
+
+<!-- ==================== CHAPTER 15 ==================== -->
+<h2 class="ch" id="ch15"><span class="chno">15</span> Intelligence Density</h2>
+<p class="ch-sub">The metric Prism invented to price capability per gigabyte &mdash; what it measures, what it hides, and what it predicts.</p>
+
+<p>Every Bonsai release has been framed through a single invented quantity. <strong>Intelligence density</strong>, introduced in the 1-bit Bonsai 8B report, is defined as benchmark performance per deployed gigabyte under a logarithmic error transform: with average score <span class="mono">avg</span> and error probability <span class="mono">P<sub>e</sub> = 1 &minus; avg/100</span>,</p>
+
+<div class="tblwrap" style="background:none;border:none;overflow:visible"><table style="background:none;border:none;font-size:15px"><tbody><tr><td style="border:none;padding:6px 0">
+<span class="mono" style="font-size:16px">ID = &minus;log<sub>2</sub>(P<sub>e</sub>) / N&nbsp;&nbsp;(per gigabyte, for a model occupying N GB)</span>
+</td></tr></tbody></table></div>
+
+<p>The logarithm is the load-bearing choice, and Prism is explicit about why: it &ldquo;places greater weight on preserving high accuracy,&rdquo; because &minus;log<sub>2</sub>(P<sub>e</sub>) grows without bound as the error probability approaches zero, while the naive score-per-GB metric would treat the difference between 95% and 99% accuracy as worth the same 4 points at any size. On the 20-benchmark suite, the release&rsquo;s densities:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Variant</th><th class="num">Size (GB)</th><th class="num">Avg</th><th class="num">Density (1/GB)</th></tr></thead>
+<tbody>
+<tr><td><strong>Ternary Bonsai 2 27B</strong></td><td class="num">5.93</td><td class="num">83.9</td><td class="num"><strong>0.444</strong></td></tr>
+<tr><td>Qwen3.8-27B IQ2_XXS</td><td class="num">7.3</td><td class="num">75.2</td><td class="num">0.276</td></tr>
+<tr><td>Qwen3.8-27B FP16</td><td class="num">53.80</td><td class="num">85.4</td><td class="num">0.051</td></tr>
+</tbody></table></div>
+<p class="small">Whitepaper Table 9, thinking mode, 20-benchmark suite. On the 14-benchmark companion suite the same framework yields 0.469 for Bonsai 2 against 0.416 for the previous-generation ternary (&ldquo;a 12.5% gain&rdquo;), 0.199 for the denser conventional build there, and 0.053 for FP16 &mdash; which is the source of the cards&rsquo; &ldquo;over 2.3&times; the density of the densest conventional build and nearly 9&times; FP16.&rdquo;</p>
+
+<p>What the metric genuinely captures is the deployment question this whole program is about: for a fixed memory budget &mdash; a phone&rsquo;s 6&nbsp;GB, a laptop&rsquo;s 16, a consumer card&rsquo;s 24 &mdash; <em>how much task capability fits?</em> By that measure the answer has moved by an order of magnitude in six months: 1-bit Bonsai 8B posted 1.062/GB in March (10.8&times; the FP16 Qwen3 8B&rsquo;s 0.098), the first-generation ternary 27B posted 0.416, and Bonsai 2 posts 0.444&ndash;0.469 &mdash; the small model&rsquo;s advantage shrinking as the flagship&rsquo;s quality rose, which is the density frontier&rsquo;s shape one should expect as compression moves up the capability scale.</p>
+
+<p>What the metric hides is equally worth stating, because no single number should steer a deployment. It is benchmark-indexed, so it inherits every limitation of Chapter&nbsp;11&rsquo;s suites &mdash; including the fact that the agentic long-horizon results sit well below the suite average that feeds the density numerator. It prices <em>storage</em>, not <em>operation</em>: KV cache, activations, and runtime overhead (the ~1.3&nbsp;GB of buffers from the first generation&rsquo;s peak-memory table) are outside N, and the vision tower&rsquo;s 0.63&ndash;0.92&nbsp;GB is optional and uncounted. And its logarithm rewards accuracy in a way that favors exactly the regime where Bonsai is strongest &mdash; high average scores &mdash; which is to say, it is a well-constructed metric for the company&rsquo;s thesis rather than a neutral one. Used as intended &mdash; as a placement on a capability-per-gigabyte frontier, alongside the category table and the long-horizon results &mdash; it is genuinely informative. Used as a single ranking number, it will mislead.</p>
+
+<div class="callout info"><span class="lab">The strategic reading</span>
+<p>The announcement frames what the density frontier buys in systems terms: local execution means &ldquo;the agent can live inside the product: the marginal cost of a hundred-step loop is zero, and the user&rsquo;s data never leaves the machine,&rdquo; and it &ldquo;unlocks a new system architecture: hybrid deployments that route non-frontier and privacy-sensitive tasks to a capable local model and reserve frontier cloud models for the hardest steps.&rdquo; Whether that architecture wins or not, its enabling constraint &mdash; a local model with enough retained capability to trust with sustained work &mdash; is precisely the one Bonsai 2 attacks: 98.2% suite retention at a phone-adjacent footprint, with the honest caveat that the hardest long-horizon workloads retain three-quarters, not ninety-eight percent.</p></div>
+<!-- ==================== CHAPTER 16 ==================== -->
+<h2 class="ch" id="ch16"><span class="chno">16</span> Limitations, Roadmap, Verdict</h2>
+<p class="ch-sub">What the release itself admits, what it leaves open, how this paper verified its claims, and what to conclude.</p>
+
+<h3>The stated limitations</h3>
+
+<p>The whitepaper&rsquo;s own limitations section is short, specific, and worth reproducing in substance, because each item is a real engineering constraint rather than a disclaimer. <strong>First, the quality&ndash;footprint trade remains a trade</strong>: 98.2% retention means the gap to FP16 is &ldquo;modest and predictable,&rdquo; concentrated in knowledge &amp; reasoning and vision, and &ldquo;deployments that need the last few points of accuracy can still reach for the full-precision model where its footprint is not a constraint.&rdquo; <strong>Second, the native kernels are unfinished</strong>: PTQ1_0&rsquo;s dense-trit unpacking wins on Ada-class and smaller accelerators but loses on Ampere, Hopper, and Blackwell, &ldquo;where batch-1 decode is not bandwidth-starved&rdquo; &mdash; returning the footprint advantage as latency on those targets is &ldquo;an active engineering target.&rdquo; <strong>Third, the roadmap names its next two moves</strong>: KV compression into the sub-4-bit regime (&ldquo;early results show that KV cache can be pushed toward the sub-4-bit regime while retaining benchmark performance&rdquo; &mdash; a path to still longer contexts in fixed memory), and the rotation overhead, &ldquo;a pure implementation cost with no bearing on output quality&rdquo; that is &ldquo;the most direct remaining lever on on-device decode latency.&rdquo;</p>
+
+<p>To the whitepaper&rsquo;s list this paper appends the constraints the community established in Chapter&nbsp;14: long-horizon agentic retention of roughly three-quarters rather than ninety-eight percent; the contested conventional-comparison question; the knowledge-flank weakness; and the runtime-friction problem &mdash; a fork requirement and no stock-Ollama path at publication time, with upstreaming (GGML types 142/143) under active but unresolved discussion.</p>
+
+<h3>Open questions</h3>
+
+<ul>
+<li><strong>Does the method scale past 27B?</strong> The community&rsquo;s most-requested next step &mdash; compress a 100B+-class model into a single-card footprint &mdash; is unanswered. Nothing in the public record tests the pipeline above 27B, and the whitepaper&rsquo;s roadmap does not promise it.</li>
+<li><strong>What exactly is the conversion pipeline?</strong> The rotated ternary grid, the group scales, the enumerated full-precision tail, and the results are all documented; the algorithm that <em>chooses</em> scales and signs for a given FP16 model is not. Post-training ternarization is a competitive research field (CAT-Q, ATQ, and peers in 2026), and Prism&rsquo;s exact recipe &mdash; training-free or lightly calibrated, iterative or closed-form &mdash; remains the program&rsquo;s least-disclosed component.</li>
+<li><strong>MoE bases?</strong> Thread commenters asked for a Qwen3.8-Next compression that would fit a single 5090; the hybrid-attention kernels cover a dense 27B, and nothing public covers sparse mixture-of-experts routing under ternary weights.</li>
+<li><strong>Hardware.</strong> The first generation&rsquo;s card said it outright: &ldquo;no native 1-bit hardware exists yet.&rdquo; Every number in this paper is a software-kernel result on general-purpose silicon.</li>
+<li><strong>Will the benchmarks survive contact with users?</strong> The suite is unusually auditable, but vendor-run; the community&rsquo;s long-task degradation reports and benchlm&rsquo;s overlapping-intervals estimate against Qwen3.8-Flash-Next are the current external checks, and both suggest the average overstates the hardest use cases.</li>
+</ul>
+
+<h3>The verification pass</h3>
+
+<p>Per this paper&rsquo;s remit, every quantitative claim above was re-checked after writing against the primary sources: the 14-page technical report (downloaded and fully extracted), both Hugging Face model cards, all five Prism ML announcement posts, the Qwen3.8-27B base-model card, the first-generation 27B cards, Prism&rsquo;s documentation and homepage, the OpenRouter and Ollama listings, both 27B Hacker News threads via their full comment records, and the third-party write-ups. Derived arithmetic was recomputed rather than trusted: the 1.71 bits/weight figure (log<sub>2</sub>3 + 16/128 = 1.585 + 0.125), the 98.2% retention (83.9/85.4 = 0.9824), the 14.2&times; binary reduction (16/1.125), the density ordering, and every average recomputed from the per-benchmark tables (the 20-suite averages check to 85.4/83.6/75.2/83.9 within rounding). Where documents disagree &mdash; 5.93 vs 5.95&nbsp;GB for PTQ1_0, 8.49 vs 8.60&nbsp;GB for the MLX package, a 0.46B vs 0.47B vision-tower parameter count between the cards and the whitepaper&rsquo;s Table 1, 142.5 vs 129.9&nbsp;tok/s on the RTX 5090 across measurement rounds, 2.2-bpw/7.3&nbsp;GB vs 2.8-bpw/9.4&nbsp;GB IQ2_XXS builds across suites &mdash; both figures are reported with attribution, and the discrepancies trace to decimal-rounding conventions, container accounting, kernel-build vintage, and genuinely different comparison builds respectively. No claim in this paper rests on an unattributed number.</p>
+
+<h3>Verdict</h3>
+
+<p>Bonsai 2 27B is the strongest evidence yet that extreme weight compression has crossed from research curiosity into deployment engineering. The specific achievement is narrow and real: a current-generation 27B reasoning model, compressed after training to 1.76 bits per weight with its architecture and 262K context intact, retaining 98.2% of a 20-benchmark thinking-mode average &mdash; and, more tellingly, holding the benchmarks that conventional sub-4-bit quantization provably destroys, at a footprint that fits phones-adjacent memory budgets, everyday laptops, and single consumer GPUs, with throughput and energy measured across twelve platforms and disclosed with unusual candor. The caveats are equally real: the hardest long-horizon agentic workloads retain three-quarters, not ninety-eight percent; knowledge and vision give up the most; the deployment story requires a fork; and every headline number is vendor-run, however auditable.</p>
+
+<p>The right conclusion is not that ternary models have replaced full-precision ones &mdash; it is that the deployment decision has become a genuine two-front choice for the first time. A 5.9&nbsp;GB pack that reasons like the 27B that generated it, at a tenth of the API price and zero network exposure, changes what a phone, a laptop, or a single GPU can be trusted to do alone; a frontier model kept in reserve for the hardest steps changes what the cloud is <em>for</em>. Prism&rsquo;s own closing frame is the one this paper&rsquo;s evidence supports: &ldquo;Raw capability determines what a model can do; density determines where it can do it.&rdquo; Six months and five releases in, the where has moved further than most observers expected &mdash; and the 2.23 million downloads in four days say the deployment world noticed.</p>
+
+<hr>
+
+<h3>Sources</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>#</th><th>Source</th><th>Role in this paper</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Prism ML, <em>Ternary Bonsai 2 27B: A 27B Ternary Reasoning Model</em>, technical report, September 2026 (via PrismML-Eng/Bonsai-demo)</td><td>Primary methodology, benchmarks, throughput/energy, limitations</td></tr>
+<tr><td>2</td><td>Hugging Face model card: <span class="mono">prism-ml/Ternary-Bonsai-2-27B-gguf</span></td><td>Format tables, 14-benchmark suite, throughput, deployment</td></tr>
+<tr><td>3</td><td>Hugging Face model card: <span class="mono">prism-ml/Ternary-Bonsai-2-27B-mlx-2bit</span></td><td>MLX packaging, 14-benchmark detail, quickstart, density</td></tr>
+<tr><td>4</td><td>Prism ML announcements: <em>Introducing Bonsai 2 27B</em> (Sep 17, 2026); <em>Announcing Bonsai 27B</em> (Jul 14, 2026); <em>Introducing Ternary Bonsai</em> (Apr 16, 2026); Bonsai Image 4B (May 26, 2026); 1-bit Bonsai (Mar 31, 2026)</td><td>Release claims, first-generation tables, company and funding facts</td></tr>
+<tr><td>5</td><td>Hugging Face model cards: <span class="mono">prism-ml/Bonsai-27B-gguf</span>, <span class="mono">prism-ml/Ternary-Bonsai-27B-gguf</span>, <span class="mono">prism-ml/Bonsai-8B-gguf</span></td><td>First-generation specifications, DSpark, peak memory, cross-family table</td></tr>
+<tr><td>6</td><td>Hugging Face model card: <span class="mono">Qwen/Qwen3.8-27B</span></td><td>Base-model architecture, base benchmark context, sampling defaults</td></tr>
+<tr><td>7</td><td>Prism ML documentation (docs.prismml.com) and homepage/about</td><td>Family lineup, runtime coverage, team, quickstart surface</td></tr>
+<tr><td>8</td><td>OpenRouter model page: <span class="mono">prism-ml/ternary-bonsai-2-27b</span>; Ollama community mirror <span class="mono">tobestyledintro/Ternary-Bonsai-2-27B</span>; Hugging Face collection <span class="mono">prism-ml/bonsai-2</span></td><td>API pricing and telemetry; Ollama compatibility; adoption counts</td></tr>
+<tr><td>9</td><td>Hacker News threads 49746618 (Sep 17, 2026) and 48910545 (Jul 14, 2026), plus 47593422, 47812749, 48346257 (via Algolia API)</td><td>Reception, community criticism, practical deployment reports</td></tr>
+<tr><td>10</td><td>regolo.ai (A. Genovese, Jul 17, 2026); mindstudio.ai (Sep 17 and Jul 20, 2026); benchlm.ai tracker; NVIDIA developer-forum thread; ggml-org/llama.cpp issues, PRs, and discussions; Hugging Face community discussion on Ternary-Bonsai-27B-gguf; stealth-launch press (Mar 31&ndash;Apr 3, 2026)</td><td>Third-party analyses, independent measurements, upstreaming status</td></tr>
+<tr><td>11</td><td>Historical: Zhu et al., <em>Trained Ternary Quantization</em> (2016); Ma et al., <em>The Era of 1-bit LLMs</em> (arXiv 2402.17764, 2024); <span class="mono">microsoft/bitnet-b1.58-2B-4T</span> (Apr 2025); SpinQuant (arXiv 2405.16406); 2026 ternary-quantization literature (CAT-Q, ATQ)</td><td>Lineage and research context</td></tr>
+</tbody></table></div>
+
+<p class="small">Document-dates note: this paper was assembled September 21, 2026, four days after the Bonsai 2 27B release; adoption figures, OpenRouter telemetry, HN scores, and upstreaming status are current to that date and will age. Citation of Prism ML&rsquo;s own materials follows the company&rsquo;s requested format: <span class="mono">@techreport{bonsai2_27b, title={Bonsai 2 27B: A 27B Ternary Reasoning Model}, author={Prism ML}, year={2026}, month={September}}</span>.</p>
+
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<!-- ==================== RELATED POSTS ==================== -->
+<section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
+  <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
+    <a href="quantization-formats-guide.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">GGUF vs EXL2 vs AWQ vs GPTQ</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The broader quantization landscape this paper sits inside: formats, bit-widths and the accuracy/size trade-offs.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="deepseek-kv-cache-optimization-research-paper.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">From 390 KB to 890 Bytes</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The other half of the efficiency story — DeepSeek's three-year compression of the KV cache.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="gpu-cpu-inference-troubleshooting.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">GPU & CPU Inference Troubleshooting</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">Practical fixes for the OOMs, speed walls and offload issues that low-bit models still run into.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+  </div>
+</section>
+
+
+<button id="backTop" title="Back to top" aria-label="Back to top" style="position:fixed;bottom:26px;right:22px;z-index:70;width:44px;height:44px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:19px;box-shadow:0 4px 16px rgba(15,23,42,.16);display:none;">&#8593;</button>
+
+<script>
+(function(){
+  // ---- theme toggle ----
+  var btn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('bonsai-paper-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+  } catch(e) {}
+  if (btn) btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.innerHTML = '&#9788;'; }
+    else { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+    try { localStorage.setItem('bonsai-paper-theme', dark ? 'light' : 'dark'); } catch(e) {}
+  });
+
+  // ---- scroll-spy TOC ----
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function onScroll(){
+    var y = window.scrollY + 120, best = 0;
+    for (var i = 0; i < targets.length; i++) {
+      if (targets[i] && targets[i].offsetTop <= y) best = i;
+    }
+    links.forEach(function(a, i){ a.classList.toggle('active', i === best); });
+    var bt = document.getElementById('backTop');
+    if (bt) bt.style.display = (window.scrollY > 900) ? 'block' : 'none';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ---- back to top ----
+  var backTop = document.getElementById('backTop');
+  if (backTop) backTop.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+<script src="../js/theme-switcher.js"></script>
+</body>
+</html>

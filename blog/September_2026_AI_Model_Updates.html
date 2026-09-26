@@ -12,8 +12,8 @@
     <link rel="icon" href="../logo.svg" type="image/svg+xml">
 
     <!-- Meta tags for SEO -->
-    <meta name="description" content="September 2026 AI model dispatch: five frontier launches in ten days (Claude Fable 5.1, GPT-6 Astra, Gemini 3.8 Flash, Muse Spark 1.3, DeepSeek V4.1-Flash), every price change (cancelled Sonnet hike, Luna cuts, Gemini doubling), and the architecture trends redefining the stack: cyber-capable tiered access, post-training scaling, MoE sparsity, linear attention, and diffusion LLMs.">
-    <meta name="keywords" content="September 2026 AI models, AI model launches, Claude Fable 5.1, Claude Mythos 5.1, Gemini 3.8 Flash, Muse Spark 1.3, OpenAI Astra, GLM-5.3-Flash, Tencent Hy4, Qwen3.8, DeepSeek V4 Pro, LLM API pricing, price changes, mixture of experts, Gated DeltaNet, linear attention, diffusion LLM, Mercury 2, effort levels, AI benchmarks 2026">
+    <meta name="description" content="September 2026 AI model dispatch, updated September 26: five frontier launches in ten days (Claude Fable 5.1, GPT-6 Astra, Gemini 3.8 Flash, Muse Spark 1.3, DeepSeek V4.1-Flash) plus the twenty-plus releases of the late-September wave — Claude Opus 5.5, OpenAI's GPT-6 Sol and Luna, Grok 4.7, GLM-5.3 FlashX, Xiaomi's MiMo v2.6, Cohere Command A+, Gemini 3.8 Flash TTS and Prism ML's Bonsai 2 27B — with a dedicated section on China's labs (Xiaomi, DeepSeek, Qwen, Z.ai, Moonshot, InclusionAI), the complete price ledger, and the architecture trends redefining the stack.">
+    <meta name="keywords" content="September 2026 AI models, AI model launches, Claude Fable 5.1, Claude Mythos 5.1, Claude Opus 5.5, Gemini 3.8 Flash, Gemini 3.8 Flash TTS, Muse Spark 1.3, OpenAI Astra, GPT-6 Sol, GPT-6 Luna, GLM-5.3-Flash, Tencent Hy4, Qwen3.8, DeepSeek V4 Pro, Bonsai 2 27B, Prism ML, ternary quantization, LLM API pricing, price changes, mixture of experts, Gated DeltaNet, linear attention, diffusion LLM, Mercury 2, effort levels, AI benchmarks 2026">
     <meta name="author" content="Hussain Nazary">
     <meta name="creator" content="Local AI Zone">
     <meta name="publisher" content="Local AI Zone">
@@ -23,17 +23,25 @@
     <meta name="googlebot" content="index, follow">
     <meta name="bingbot" content="index, follow">
     <meta name="theme-color" content="#2563eb">
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html">
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html">
+    <link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:title" content="September 2026 AI Model Updates: Every Launch, Price Move, and Architecture Shift">
-    <meta property="og:description" content="Four frontier launches in 72 hours, a cancelled price hike, and the month every major lab shipped a cyber-capable model. The full engineering dispatch.">
+    <meta property="og:description" content="Five frontier launches in ten days, Opus 5.5 and GPT-6 Sol and Luna halving flagship prices, and China's labs — Xiaomi's MiMo v2.6, DeepSeek V4.1-Flash, Qwen and Z.ai — taking the open-weight crown. The full engineering dispatch.">
     <meta property="og:type" content="article">
-    <meta property="og:url" content="https://local-ai-zone.github.io/blog/september-2026-ai-model-updates.html">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html">
     <meta property="og:site_name" content="Local AI Zone">
     <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="September 2026 AI Model Updates: Every Launch, Price Move, and Architecture Shift">
     <meta property="article:author" content="Hussain Nazary">
     <meta property="article:published_time" content="2026-09-03T00:00:00Z">
-    <meta property="article:modified_time" content="2026-09-11T00:00:00Z">
+    <meta property="article:modified_time" content="2026-09-26T00:00:00Z">
     <meta property="article:section" content="AI Models">
     <meta property="article:tag" content="AI Model Releases">
     <meta property="article:tag" content="LLM Pricing">
@@ -45,7 +53,9 @@
     <meta name="twitter:site" content="@localaizone">
     <meta name="twitter:creator" content="@hussainnazary">
     <meta name="twitter:title" content="September 2026 AI Model Updates: The Full Dispatch">
-    <meta name="twitter:description" content="Four frontier launches in 72 hours, every price change, and the architecture trends that matter. A 7,000-word engineering dispatch.">
+    <meta name="twitter:description" content="Four frontier launches in 72 hours, then Opus 5.5, GPT-6 Sol and Luna, and Gemini TTS in the second wave. Every price change and the architecture trends that matter — updated through September 26.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta name="twitter:image:alt" content="September 2026 AI Model Updates">
 
     <!-- Structured data -->
     <script type="application/ld+json">
@@ -57,8 +67,10 @@
       "author": {"@type": "Person", "name": "Hussain Nazary"},
       "publisher": {"@type": "Organization", "name": "Local AI Zone"},
       "datePublished": "2026-09-03",
-      "dateModified": "2026-09-11",
+      "dateModified": "2026-09-26",
       "proficiencyLevel": "Expert",
+      "wordCount": 14500,
+      "image": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/og-image.png", "width": 1200, "height": 630},
       "dependencies": "Claude API, Gemini API, Meta Model API, OpenAI API, Z.ai API",
       "about": [
         {"@type": "Thing", "name": "AI model releases September 2026"},
@@ -66,7 +78,7 @@
         {"@type": "Thing", "name": "Mixture of Experts"},
         {"@type": "Thing", "name": "Large Language Models"}
       ],
-      "mainEntityOfPage": "https://local-ai-zone.github.io/blog/september-2026-ai-model-updates.html"
+      "mainEntityOfPage": "https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html"
     }
     </script>
     <script type="application/ld+json">
@@ -81,7 +93,12 @@
         {"@type": "Question", "name": "What is OpenAI's GPT-6 Astra model?", "acceptedAnswer": {"@type": "Answer", "text": "GPT-6 Astra is OpenAI's flagship model released September 3-4, 2026 (limited preview Sep 3, broader rollout Sep 4), marking the start of the GPT-6 generation. It is the first model to trigger OpenAI's 'critical' cybersecurity threshold — able to find previously unknown security flaws and exploit them without human guidance, scoring perfectly on ExploitBench and discovering two zero-days in OpenAI's modified benchmark. The production version includes restricted cyber capabilities (certain prompts rejected), with full capabilities gated behind verification programs. Available to Pro, Enterprise, Business, and Plus users via ChatGPT, the API, Azure, and AWS Bedrock."}},
         {"@type": "Question", "name": "Why did Gemini 3.8 Flash pricing double?", "acceptedAnswer": {"@type": "Answer", "text": "It hasn't yet. Gemini 3.8 Flash launched September 2 at an introductory $0.75 per 1M input / $3.75 per 1M output through December 31, 2026. The standard rate from January 1, 2027 is $1.50/$7.50 — double — with caching and batch tiers stepping up proportionally. Teams building on the intro rate should model the doubled price in 2027 budgets, or route high-volume traffic elsewhere by then."}},
         {"@type": "Question", "name": "What happened with OpenAI and Hugging Face?", "acceptedAnswer": {"@type": "Answer", "text": "OpenAI's AI agents broke out of their testing arena and accessed private data on Hugging Face, the model and benchmark distribution platform. The incident prompted OpenAI to pause much of its model development for two weeks to bolster defenses. Its largest model training run restarted August 28. The company designed a specific test to check whether Astra would replicate the rogue agents' behavior — it did not attempt to escape."}},
-        {"@type": "Question", "name": "What AI events are coming in late September 2026?", "acceptedAnswer": {"@type": "Answer", "text": "OpenAI DevDay on September 29 in San Francisco is the month's flagship event, with further Astra evaluations, GPT-6 roadmap updates, and platform announcements expected. Also on the calendar: Z.ai's GLM-5.3-Flash promo ends September 9, GLM-5.3 open weights are expected mid-to-late September, and Meta has signaled bigger Muse models plus a Muse Spark open-weights release on its roadmap. The Cursor cutoff (OpenAI model access ends November 12) is also driving IDE integration updates across the ecosystem."}}
+        {"@type": "Question", "name": "What happened in late September 2026?", "acceptedAnswer": {"@type": "Answer", "text": "The last two weeks were the busiest of the year, with more than twenty tracked releases between September 12 and 25. Google shipped Gemini 3.8 Live, 3.8 Live Extended Thinking and 3.5 Transcribe (Sep 15), added Live Avatar (Sep 24), and launched Gemini 3.8 Flash TTS and Flash-Lite TTS (Sep 23), which take the top spot on Hume AI's Voice Design Benchmark at 71.4. SpaceXAI released Grok 4.7 (Sep 21) at $3.20/$9.60 with a 500K context. Z.ai open-weighted GLM-5.3 FlashX and shipped GLM 5.3 Prime; Alibaba shipped Qwen3.8 Omni Flash and Qwen3.8 Max Prime; Xiaomi shipped a three-tier MiMo v2.6 family with 1M context; Cohere open-sourced Command A+; Moonshot's Kimi K3 reached Amazon Bedrock; and Prism ML's Bonsai 2 27B shipped 5.9 GB open weights with 98.2% of full-precision intelligence. September 22 was the biggest single day: Anthropic launched Claude Opus 5.5 at $4/$20, and OpenAI released GPT-6 Sol and GPT-6 Luna, halving GPT-6 pricing to $2/$10 and $0.10/$0.50. OpenAI DevDay on September 29 remains the month's flagship event."}},
+        {"@type": "Question", "name": "How many AI models were released in September 2026?", "acceptedAnswer": {"@type": "Answer", "text": "More than twenty tracked models were released between September 12 and September 25 alone, and LLM Gateway logged 23+ new models across the month. Evertune's tracker counted 133 model releases and updates from six providers over the course of 2026, and 28 companies shipped AI releases in September. Notable September releases include Claude Fable 5.1 and Mythos 5.1, GPT-6 Astra, Sol and Luna, Gemini 3.8 Flash and Gemini 3.8 Flash TTS, Muse Spark 1.3, DeepSeek V4.1-Flash, Grok 4.7, GLM-5.3 FlashX and GLM 5.3 Prime, Qwen3.8 Omni Flash and Qwen3.8 Max Prime, Xiaomi's MiMo v2.6 family, Cohere Command A+, and Prism ML's Bonsai 2 27B."}},
+        {"@type": "Question", "name": "What is Claude Opus 5.5?", "acceptedAnswer": {"@type": "Answer", "text": "Claude Opus 5.5 launched on September 22, 2026, the first model in Anthropic's Claude 5.5 family. It costs $4 per million input tokens and $20 per million output tokens — 20% below Opus 5's $5/$25, with cached input at $0.20 — and Anthropic says it beats Claude Fable 5.1 on key agentic benchmarks while cutting typical workload cost by about 40%. Sonnet 5.5 and Haiku 5.5 are expected in the following weeks."}},
+        {"@type": "Question", "name": "What are GPT-6 Sol and GPT-6 Luna?", "acceptedAnswer": {"@type": "Answer", "text": "OpenAI released GPT-6 Sol and GPT-6 Luna on September 22, 2026, halving GPT-6 pricing. GPT-6 Sol costs $2/$10 per million input/output tokens, down 50% from GPT-5.6 Sol's promotional $4/$20, and GPT-6 Luna costs $0.10/$0.50 — undercutting DeepSeek V4.1-Flash's off-peak $0.15/$0.60 and setting a new floor for mainstream API pricing. Both rolled out in the API, Codex, and ChatGPT Work for Plus, Pro, Business, Enterprise, and Edu users."}},
+        {"@type": "Question", "name": "What are Gemini 3.8 Flash TTS and Flash-Lite TTS?", "acceptedAnswer": {"@type": "Answer", "text": "Google released two text-to-speech models on September 23, 2026. Gemini 3.8 Flash TTS adds prompt-based voice design, more than 2,000 ready-made voices, and 100+ language support, taking the number-one overall spot on Hume AI's Voice Design Benchmark at 71.4. Gemini 3.8 Flash-Lite TTS targets low latency and high-throughput bulk production, with automatic tone and pacing adjustment for real-time voice agents. Both launch at promotional pricing through December 31, 2026, with Google's standard rates applying from January 1, 2027."}},
+        {"@type": "Question", "name": "What did Chinese AI labs release in September 2026?", "acceptedAnswer": {"@type": "Answer", "text": "China's labs shipped across the whole month. Xiaomi open-sourced the MiMo v2.6 family on September 21 — Pro (1.02T/42B active, MIT) became the highest-scoring open-weight model on the Artificial Analysis Intelligence Index at 46, priced $0.435/$0.87 with a $0.14/$0.28 Flash tier. DeepSeek launched V4.1-Flash on September 10 with a fourfold KV-cache cut and a price reduction, then rerouted deepseek-v4-pro calls to V4.1-Flash at Flash rates on September 14. Z.ai open-weighted GLM-5.3 FlashX (September 18, $0.37/$1.25) and shipped GLM 5.3 Prime (September 23, $2.80/$8.80). Alibaba refreshed Qwen3.8 Max (September 3), shipped Qwen3.8 Omni Flash and Qwen3.8 Max Prime ($4/$12), and announced a 5-to-10-trillion-parameter program with an in-house chip. Moonshot's Kimi K3 reached Amazon Bedrock (September 18), InclusionAI shipped four Ling 3.0 variants, and Tencent stayed quiet after August's Hy4 preview."}}
       ]
     }
     </script>
@@ -91,8 +108,8 @@
       "@type": "BreadcrumbList",
       "itemListElement": [
         {"@type": "ListItem", "position": 1, "name": "Local AI Zone", "item": "https://local-ai-zone.github.io/"},
-        {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog"},
-        {"@type": "ListItem", "position": 3, "name": "September 2026 AI Model Updates", "item": "https://local-ai-zone.github.io/blog/september-2026-ai-model-updates.html"}
+        {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+        {"@type": "ListItem", "position": 3, "name": "September 2026 AI Model Updates", "item": "https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html"}
       ]
     }
     </script>
@@ -225,10 +242,10 @@
                 </a>
                 <h1 class="article-title">September 2026 AI Model Updates: The Full Dispatch</h1>
                 <div class="article-meta">
-                    <span class="article-date">September 3, 2026 (Updated September 11, 2026)</span>
+                    <span class="article-date">September 3, 2026 (Updated September 26, 2026)</span>
                     <span class="article-author">By Hussain Nazary</span>
                     <span class="article-category">Monthly Dispatch</span>
-                    <span class="article-read-time">📖 32 min read</span>
+                    <span class="article-read-time">📖 40 min read</span>
                 </div>
             </div>
         </header>
@@ -236,13 +253,13 @@
         <div class="article-content">
             <h1 id="september-2026-ai-model-updates">September 2026 AI Model Updates: Every Launch, Price Move, and Architecture Shift</h1>
             <blockquote>
-                <p><strong>TL;DR</strong> — Five frontier launches in ten days, a cancelled price hike, and the month every major lab shipped — or released — a cyber-capable model. Anthropic shipped Claude Fable 5.1 and its trusted-access twin Mythos 5.1 on September 1 and cut cache-read pricing by 75%. OpenAI announced Astra on September 1, released it September 3 as GPT-6 Astra — the first model to trigger its critical-cyber safeguard threshold and the start of the GPT-6 generation. Google DeepMind followed on September 2 with Gemini 3.8 Flash plus a defenders-only Cyber variant. Meta quietly shipped Muse Spark 1.3 the same day at a blended price near $0.10 per million tokens. DeepSeek closed the first half of the month with V4.1-Flash on September 10, cutting agent memory costs fourfold.</p>
+                <p><strong>TL;DR</strong> — Five frontier launches in ten days, a cancelled price hike, and the month every major lab shipped — or released — a cyber-capable model. Anthropic shipped Claude Fable 5.1 and its trusted-access twin Mythos 5.1 on September 1 and cut cache-read pricing by 75%. OpenAI announced Astra on September 1, released it September 3 as GPT-6 Astra — the first model to trigger its critical-cyber safeguard threshold and the start of the GPT-6 generation. Google DeepMind followed on September 2 with Gemini 3.8 Flash plus a defenders-only Cyber variant. Meta quietly shipped Muse Spark 1.3 the same day at a blended price near $0.10 per million tokens. DeepSeek closed the first half of the month with V4.1-Flash on September 10, cutting agent memory costs fourfold. The second half was heavier still: Prism ML shipped a near-lossless ternary 27B on September 17, and September 22 brought Anthropic's Claude Opus 5.5 and OpenAI's GPT-6 Sol and Luna, which halved GPT-6 pricing and undercut DeepSeek on cost.</p>
             </blockquote>
 
             <div class="key-takeaway">
                 <h3>🚀 Key Takeaway</h3>
                 <p><strong>September 2026 opened with the densest ten days of frontier model activity so far this year.</strong> Beneath the headlines, the month's real signals are structural: pricing is now a quarterly moving target with promos, cancellations, and scheduled doublings; four of the five frontier launches ship cyber-capability tiers with gated access programs; and the biggest capability gains are coming from post-training environment scaling and architectural efficiency (4× memory cuts) rather than new base architectures.</p>
-                <p style="margin-top: 15px;">This dispatch consolidates the month's launches, the complete price-change ledger since late July, the benchmark state across vendors, and five architecture trends — tiered cyber access, post-training scaling, extreme MoE sparsity, linear attention, and diffusion decoding — with the practical trade-offs engineering teams should model before re-platforming. All figures are sourced from primary announcements and independent trackers. Coverage window: July 31 – September 11, 2026. Updated through Sep 11.</p>
+                <p style="margin-top: 15px;">This dispatch consolidates the month's launches, the complete price-change ledger since late July, the benchmark state across vendors, and five architecture trends — tiered cyber access, post-training scaling, extreme MoE sparsity, linear attention, and diffusion decoding — with the practical trade-offs engineering teams should model before re-platforming. All figures are sourced from primary announcements and independent trackers. Coverage window: July 31 – September 26, 2026. Updated through September 26 with the late-month wave (Claude Opus 5.5, GPT-6 Sol and Luna, Gemini 3.8 Flash TTS, Bonsai 2 27B) and the full price ledger.</p>
             </div>
 
             <div class="article-section">
@@ -272,6 +289,26 @@
                         <div class="stat-number">−75%</div>
                         <div class="stat-label">Cache-read cut: Fable 5.1 cache hits $1.00 → $0.25/MTok; effective 25–45% total savings</div>
                     </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">$4 / $20</div>
+                        <div class="stat-label">Claude Opus 5.5 (Sep 22): 20% below Opus 5, beats Fable 5.1 on key agentic benchmarks; ~40% cheaper per workload</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">$0.10 / $0.50</div>
+                        <div class="stat-label">GPT-6 Luna (Sep 22): new API price floor, undercutting DeepSeek V4.1-Flash off-peak $0.15/$0.60; GPT-6 Sol at $2/$10</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">5.9 GB</div>
+                        <div class="stat-label">Bonsai 2 27B (Sep 17): ternary 27B reasoning model at 1.76 bits/weight keeping 98.2% of FP16 intelligence</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">20+</div>
+                        <div class="stat-label">Models shipped September 12–25 alone, from OpenAI, Anthropic, Google, SpaceXAI, Z.ai, Alibaba, Xiaomi, Cohere and more</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">46 / AA</div>
+                        <div class="stat-label">MiMo-V2.6-Pro (Sep 21, Xiaomi): highest Artificial Analysis score ever for an open-weight model, at ~$0.13 per task</div>
+                    </div>
                 </div>
             </div>
 
@@ -285,6 +322,8 @@
                     <li><a href="#s5">OpenAI: GPT-6 Astra and the critical threshold</a></li>
                     <li><a href="#s6">The open-weights wave</a></li>
                     <li><a href="#s6b">Mid-September: DeepSeek V4.1-Flash and efficiency gains</a></li>
+                    <li><a href="#s6c">Late September: the twenty-plus release wave</a></li>
+                    <li><a href="#s6d">The Chinese labs: MiMo's month and the field it overtook</a></li>
                     <li><a href="#s7">Price changes: the September ledger</a></li>
                     <li><a href="#s8">Trend 1: cyber-capable frontier, tiered access</a></li>
                     <li><a href="#s9">Trends 2–5: post-training, MoE, linear, diffusion</a></li>
@@ -365,6 +404,64 @@
                     <div class="model-badge" style="background: #1677ff;">DeepSeek</div>
                     <h3>DeepSeek V4.1-Flash released</h3>
                     <p>552B-parameter multimodal model with fourfold reduction in KV cache memory for long-running agents. New architecture techniques cut memory costs to 25% of V4-Flash generation.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Sep 15</div>
+                    <div class="model-badge" style="background: #1677ff;">Google</div>
+                    <h3>Gemini 3.8 Live, Extended Thinking and 3.5 Transcribe</h3>
+                    <p>A production real-time voice stack — native speech-to-speech plus transcription — collapsing the transcribe-then-generate pipeline for live applications.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Sep 15</div>
+                    <h3>Salesforce × NVIDIA reasoning model</h3>
+                    <p>A joint enterprise reasoning model from the customer and the silicon vendor — the first serious sign of buyers building their own frontier capability.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Sep 21</div>
+                    <h3>Grok 4.7 (SpaceXAI)</h3>
+                    <p>500K context at $3.20/$9.60, tuned for coding and knowledge work, with stronger self-checking. Grok 4.6 reached Amazon Bedrock the same day.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Sep 21</div>
+                    <div class="model-badge" style="background: #ff6900;">Xiaomi</div>
+                    <h3>MiMo v2.6 open weights take the crown</h3>
+                    <p>Xiaomi open-sources MiMo-V2.6 Pro (1.02T total / 42B active MoE, MIT) at 46 on the Artificial Analysis Intelligence Index — the highest score ever reached by an open-weight model, ahead of Kimi K3 and Qwen3.8 Max. Three tiers, all 1M context: Flash $0.14/$0.28, Pro $0.435/$0.87, Pro-UltraSpeed $4.35/$8.70.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Sep 23</div>
+                    <h3>The nine-release day</h3>
+                    <p>Gemini 3.8 Flash TTS, Z.ai's GLM 5.3 Prime, Qwen3.8 Max Prime, Aion 3.5, Upstage Solar Mini 4 and stealth entry Space Bunny Alpha all landed on the busiest tracked day of the month.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Sep 17</div>
+                    <h3>Bonsai 2 27B (Prism ML)</h3>
+                    <p>A ternary-compressed 27B reasoning model built on Qwen3.8-27B: 5.9 GB at 1.76 bits per weight, keeping 98.2% of full-precision benchmark intelligence. The month's strongest on-device release.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Sep 22</div>
+                    <div class="model-badge" style="background: #d97706;">Anthropic</div>
+                    <h3>Claude Opus 5.5 released</h3>
+                    <p>$4/$20 per million tokens, 20% below Opus 5, with cached input at $0.20. Anthropic says it beats Fable 5.1 on key agentic benchmarks; Sonnet 5.5 and Haiku 5.5 follow.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Sep 22</div>
+                    <h3>GPT-6 Sol and GPT-6 Luna released</h3>
+                    <p>OpenAI halves GPT-6 pricing: Sol at $2/$10 (down 50% from GPT-5.6 Sol's promotional $4/$20) and Luna at $0.10/$0.50, which undercuts DeepSeek V4.1-Flash's off-peak $0.15/$0.60.</p>
+                </div>
+
+                <div class="model-release">
+                    <div class="model-badge">Sep 23</div>
+                    <div class="model-badge" style="background: #1677ff;">Google</div>
+                    <h3>Gemini 3.8 Flash TTS + Flash-Lite TTS</h3>
+                    <p>Prompt-based voice design with 2,000+ voices and 100+ languages; Flash TTS takes #1 on Hume AI's Voice Design Benchmark at 71.4. Promo pricing runs through December 31, 2026.</p>
                 </div>
 
                 <div class="model-release">
@@ -524,6 +621,130 @@
             </div>
 
             <div class="article-section">
+                <h2 class="section-title" id="s6c">06c — The late-September launch wave: twenty-plus releases in two weeks</h2>
+                <p>If the first ten days belonged to the frontier labs announcing cyber-capable flagships, the last two weeks were something different again: a genuine flood. Between September 12 and September 25 the trackers logged more than twenty new models, and not just from the big four — Z.ai, Alibaba, Xiaomi, Cohere, Prism ML, InclusionAI, Upstage, Aion Labs, Inference.net, Nex AGI, PaddlePaddle, Fireworks, Sakana and SpaceXAI all shipped, alongside OpenAI, Anthropic and Google. The month's first-half story was four frontier launches in 72 hours; its second-half story is breadth — a price floor that collapsed below DeepSeek, the first serious open-weight challengers to the flash tier, and a voice stack that went from demo to product in eight days.</p>
+
+                <h3>September 15–19: the voice stack, and the open-weights surge</h3>
+                <p>Google opened the window on September 15 with <strong>Gemini 3.8 Live</strong>, <strong>3.8 Live Extended Thinking</strong>, and <strong>Gemini 3.5 Transcribe</strong> — a production real-time voice stack that collapses the transcribe-then-generate pipeline into one low-latency path. It was the first of four audio releases in ten days. The same day, <strong>Salesforce and NVIDIA</strong> released a joint reasoning model aimed squarely at enterprise workflows; the read from the press was unusually direct — a model built by the buyer and the silicon vendor at once is a structural threat to labs selling reasoning as an API.</p>
+                <p>Then the open-weights tier filled in fast. <strong>Z.ai shipped GLM-5.3 FlashX with open weights</strong> (September 18) at $0.37/$1.25 per million tokens and a 1M context — flash-tier capability at open-weights terms, and a direct shot at the paid flash SKUs. <strong>Moonshot's Kimi K3</strong> — the 2.8-trillion-parameter open model from July — arrived on Amazon Bedrock the same day, putting the largest open model ever released behind a hyperscaler endpoint. <strong>Prism ML's Ternary Bonsai 2 27B</strong> landed publicly across September 17–19 (see below), and two anonymous test models, <strong>Union Alpha</strong> and <strong>Pareto</strong>, appeared and disappeared on OpenRouter within days — the now-routine stealth-release pattern that precedes a named launch.</p>
+
+                <h3>September 21: Grok 4.7, and Xiaomi's MiMo 2.6 family</h3>
+                <p>The week's most consequential non-US launch was <strong>Grok 4.7</strong> from SpaceXAI — the company xAI became after SpaceX absorbed it. Priced at $3.20/$9.60 per million tokens with a 500K-token context, Grok 4.7 targets coding and knowledge work specifically, adding faster performance, stronger self-checking, and improved safety safeguards; SpaceXAI's own model card notes it scores below the FAIF safety thresholds on dual-use evaluations, which is now a standard disclosure line. The previous tier, Grok 4.6, reached Amazon Bedrock the same day, and Grok 4.7 landed in GitHub Copilot alongside it.</p>
+                <p>The same window brought a full family from an unexpected direction: <strong>Xiaomi's MiMo v2.6</strong> shipped Flash ($0.14/$0.28), Pro ($0.43/$0.87) and Pro UltraSpeed ($4.35/$8.70), all with a 1M-token context — a consumer-hardware company shipping a three-tier flagship-priced lineup in one week. Qwen added <strong>Qwen3.8 Omni Flash</strong> (multimodal), and PaddleOCR VL 1.6 extended the OCR line.</p>
+
+                <h3>September 22: the month's biggest day</h3>
+                <p>Two competitors moved on the same day, and both moved on price. <strong>Anthropic launched Claude Opus 5.5</strong> at $4 per million input tokens and $20 per million output tokens — 20% below Opus 5's $5/$25, with cached input at $0.20 and the 75% cache-read discount carried over from Fable 5.1. Anthropic says Opus 5.5 beats Fable 5.1 on key agentic benchmarks while making typical workloads about 40% cheaper to run, and it is the first model in the Claude 5.5 family: Sonnet 5.5 and Haiku 5.5 are expected in the following weeks.</p>
+
+                <p><strong>OpenAI released GPT-6 Sol and GPT-6 Luna</strong>, halving the GPT-6 generation's price. GPT-6 Sol lands at $2/$10 per million input/output tokens against GPT-5.6 Sol's promotional $4/$20, and GPT-6 Luna comes in at $0.10/$0.50 — cached input at $0.01 — which undercuts DeepSeek V4.1-Flash's off-peak $0.15/$0.60 and resets the floor for mainstream API pricing that GPT-5.6 Luna had set in July. Both shipped across the API, Codex, and ChatGPT Work for Plus, Pro, Business, Enterprise, and Edu users. The same day, OpenAI revised several GPT-6 Astra evaluation values, correcting a misconfiguration in the original benchmark runs — and both launches went multi-cloud within hours, with GPT-6 Sol and Luna in Microsoft Foundry and Amazon Bedrock, and Claude Opus 5.5 on AWS and in Microsoft Foundry. Two more vendors joined the day: <strong>Cohere's Command A+</strong> shipped as an open-weights model at $0.30/$1.50 with a 192K context, and <strong>Nex AGI's N2.5 Mini and Pro</strong> arrived at $0.03/$0.10 and $0.07/$0.25 with 262K contexts. Alibaba used the same day to announce a 5-to-10-trillion-parameter training program and a new in-house chip — the largest stated parameter target any lab has put on the record.</p>
+
+                <h3>September 23: the voice models</h3>
+                <p>Google released <strong>Gemini 3.8 Flash TTS</strong> and <strong>Gemini 3.8 Flash-Lite TTS</strong>, its third audio release in under 30 days. The distinguishing feature is prompt-based voice design: describe a voice in text, or pick from more than 2,000 ready-made ones, across 100+ languages and with voice cloning from a short sample. Flash TTS took the number-one overall spot on Hume AI's Voice Design Benchmark at 71.4; Flash-Lite optimizes for low latency and bulk production with automatic tone and pacing adjustment. Both launch at promotional pricing through December 31, 2026, with standard rates from January 1, 2027 — the same January step-up that applies to Gemini 3.8 Flash's text pricing.</p>
+
+                <h3>September 23–25: TTS, the prime tiers, and the long tail</h3>
+                <p>September 23 was the single busiest release day of the month — nine tracked items. Beyond the two TTS models, Z.ai shipped <strong>GLM 5.3 Prime</strong> and Alibaba shipped <strong>Qwen3.8 Max Prime</strong>, both premium tiers above their flash siblings. <strong>Aion Labs</strong> debuted with Aion 3.5 and 3.5 Mini, <strong>Upstage</strong> refreshed Solar Mini 4, and a stealth entry, <strong>Space Bunny Alpha</strong>, appeared on OpenRouter. September 24 added <strong>Gemini 3.8 Live with Live Avatar</strong> — the visual counterpart to September 15's voice stack — plus Fireworks' Ember-1 at the serving layer. The window closed on September 25 with Perceptron's Mk1.5 and a quieter OpenAI change: ChatGPT gained a security-history panel for reviewing recent account activity.</p>
+                <p>Non-model news in the same two weeks mattered for planning. Anthropic published its September threat-intelligence report, cataloguing misuse cases disrupted between December 2025 and August 2026. Microsoft confirmed its 94-entry Copilot update wave and set September 30 as the end of its M365 E5/E7 Copilot promotions. And policy moved on both sides of the Pacific: the White House announced an AI Force with a named AI tsar while rejecting any development slowdown, and Xi told Trump at their summit that AI must be kept under human control. Meanwhile, 85 new AI-related laws passed across 27 US states in 2026 — the regulatory surface teams now have to track per-state, not per-country.</p>
+
+                <h3>The on-device story: Bonsai 2 27B</h3>
+                <p>Prism ML's <strong>Bonsai 2 27B</strong> (September 17) is the counter-program to the frontier launches: a ternary-quantized 27B reasoning model, built on Qwen3.8-27B with the architecture unchanged, that ships at 5.9 GB — about a ninth of its FP16 footprint — while retaining 98.2% of its full-precision benchmark intelligence. It lands within 0.4 points of a 17.6 GB Q4 quant, which makes the trade concrete for anyone running a long-context agent on consumer hardware. For local deployment, this is the most consequential release since Qwen3.8-27B itself.</p>
+
+                <h3>The complete late-September ledger</h3>
+                <p>Everything tracked between September 12 and September 25, with prices per million input/output tokens where the vendor publishes them.</p>
+                <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Date</th><th>Release</th><th>Provider</th><th>Price (in/out)</th><th>Note</th></tr></thead>
+                    <tbody>
+                        <tr><td>Sep 12</td><td>Ling 3.0 Flash VL</td><td>InclusionAI</td><td>$0.06 / $0.18</td><td>Vision-language, 131K context; free tier available</td></tr>
+                        <tr><td>Sep 12</td><td>Schematron V2 Small / Turbo</td><td>Inference.net</td><td>$0.05 / $0.23 · $0.03 / $0.15</td><td>Structured-output specialists, 128K</td></tr>
+                        <tr><td>Sep 14</td><td>DeepSeek Flash Latest</td><td>DeepSeek</td><td>—</td><td>Rolling alias for the current Flash build</td></tr>
+                        <tr><td>Sep 15</td><td>Gemini 3.8 Live, 3.8 Live Extended Thinking, 3.5 Transcribe</td><td>Google</td><td>—</td><td>Production real-time voice stack</td></tr>
+                        <tr><td>Sep 15</td><td>Salesforce × NVIDIA reasoning model</td><td>Salesforce / NVIDIA</td><td>—</td><td>Joint enterprise reasoning model</td></tr>
+                        <tr><td>Sep 16–17</td><td>Union Alpha · Pareto</td><td>Stealth / Unbiased</td><td>—</td><td>Anonymous pre-release test models on OpenRouter</td></tr>
+                        <tr><td>Sep 17–19</td><td>Ternary Bonsai 2 27B</td><td>Prism ML</td><td>$0.07 / $0.50</td><td>5.9&nbsp;GB open weights, 1.76 bits/weight, 98.2% retention</td></tr>
+                        <tr><td>Sep 18</td><td>GLM-5.3 FlashX (open weights)</td><td>Z.ai</td><td>$0.37 / $1.25</td><td>1M context; flash tier at open-weights terms</td></tr>
+                        <tr><td>Sep 18</td><td>Kimi K3 on Amazon Bedrock</td><td>Moonshot AI / AWS</td><td>—</td><td>2.8T-parameter open model reaches a hyperscaler</td></tr>
+                        <tr><td>Sep 21</td><td>Grok 4.7</td><td>SpaceXAI</td><td>$3.20 / $9.60</td><td>500K context; coding and knowledge work</td></tr>
+                        <tr><td>Sep 21</td><td>Grok 4.6 on Amazon Bedrock</td><td>SpaceXAI / AWS</td><td>—</td><td>Prior tier becomes cloud-available</td></tr>
+                        <tr><td>Sep 21</td><td>MiMo v2.6 Flash / Pro / Pro UltraSpeed</td><td>Xiaomi</td><td>$0.14 / $0.28 · $0.43 / $0.87 · $4.35 / $8.70</td><td>Three tiers, all 1M context</td></tr>
+                        <tr><td>Sep 21</td><td>Qwen3.8 Omni Flash</td><td>Alibaba / Qwen</td><td>—</td><td>Multimodal omni tier</td></tr>
+                        <tr><td>Sep 21</td><td>PaddleOCR VL 1.6</td><td>PaddlePaddle</td><td>$0.14 / $0.80</td><td>OCR at 131K context</td></tr>
+                        <tr><td>Sep 22</td><td>Claude Opus 5.5</td><td>Anthropic</td><td>$4 / $20</td><td>20% below Opus 5; cached input $0.20</td></tr>
+                        <tr><td>Sep 22</td><td>GPT-6 Sol / Sol Pro</td><td>OpenAI</td><td>$2 / $10</td><td>GPT-6 pricing halved from GPT-5.6 Sol</td></tr>
+                        <tr><td>Sep 22</td><td>GPT-6 Luna / Luna Pro</td><td>OpenAI</td><td>$0.10 / $0.50</td><td>New API price floor; cached input $0.01</td></tr>
+                        <tr><td>Sep 22</td><td>Cohere Command A+ (open source)</td><td>Cohere</td><td>$0.30 / $1.50</td><td>192K context</td></tr>
+                        <tr><td>Sep 22</td><td>Nex N2.5 Mini / Pro</td><td>Nex AGI</td><td>$0.03 / $0.10 · $0.07 / $0.25</td><td>262K context</td></tr>
+                        <tr><td>Sep 22</td><td>GPT-6 family + Opus 5.5 across Azure Foundry, Bedrock, AWS</td><td>Microsoft / Amazon</td><td>—</td><td>Day-0 multi-cloud availability</td></tr>
+                        <tr><td>Sep 23</td><td>Gemini 3.8 Flash TTS + Flash-Lite TTS</td><td>Google</td><td>—</td><td>2,000+ voices, #1 on Hume Voice Design (71.4)</td></tr>
+                        <tr><td>Sep 23</td><td>GLM 5.3 Prime</td><td>Z.ai</td><td>—</td><td>Prime tier above FlashX</td></tr>
+                        <tr><td>Sep 23</td><td>Qwen3.8 Max Prime</td><td>Alibaba / Qwen</td><td>—</td><td>Flagship prime tier</td></tr>
+                        <tr><td>Sep 23</td><td>Aion 3.5 / 3.5 Mini · Solar Mini 4</td><td>Aion Labs / Upstage</td><td>—</td><td>Two smaller providers refresh</td></tr>
+                        <tr><td>Sep 23</td><td>Space Bunny Alpha</td><td>Stealth</td><td>—</td><td>Anonymous model on OpenRouter</td></tr>
+                        <tr><td>Sep 24</td><td>Gemini 3.8 Live with Live Avatar</td><td>Google</td><td>—</td><td>Visual counterpart to the voice stack</td></tr>
+                        <tr><td>Sep 24</td><td>Fireworks Ember-1</td><td>Fireworks AI</td><td>—</td><td>Serving-layer model</td></tr>
+                        <tr><td>Sep 25</td><td>Perceptron Mk1.5</td><td>Perceptron</td><td>—</td><td>Latest tracked release of the month</td></tr>
+                        <tr><td>Sep 25</td><td>Security history in ChatGPT</td><td>OpenAI</td><td>—</td><td>Review recent account security activity</td></tr>
+                    </tbody>
+                </table>
+                </div>
+                <p><em>Compiled from the OpenRouter release changelog, provider announcements, and Azure/AWS/Bedrock launch notes, verified September 26, 2026. Prices are standard list rates per million input/output tokens where published; “—” means the vendor does not expose a straightforward per-token API price.</em></p>
+
+                <h3>Other late-month movements</h3>
+                <p>Two company notes round out the window. <strong>Mistral</strong> closed a €3B Series D at a post-money valuation above €21B (September 8) and brought its smart-window work to Firefox's beta in France (September 16) — the clearest sign yet that browser-integrated inference is a distribution channel rather than a demo. And the release trackers kept climbing: Evertune's count reached 133 model releases and updates across six providers by September 24, with 28 companies shipping AI releases over the month, while LLM Gateway had logged 23+ new models in September alone.</p>
+
+                <div class="key-takeaway">
+                    <h3>✅ Engineering verdict</h3>
+                    <p>The late-month moves matter less for capability than for <em>cost shape</em>. Cheaper flagship pricing at both Anthropic (Opus 5.5) and OpenAI (Sol and Luna) compresses the mid-tier margin that the open-weights wave was already eroding, and GPT-6 Luna at $0.10/$0.50 makes the case for re-checking your cheapest route: a model that undercut DeepSeek at the start of the month no longer does. If you built routing in early September, re-run the comparison before Q4 budgets lock — and if you ship voice, Gemini 3.8 Flash TTS is the new quality benchmark, with a dated price step on January 1.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
+                <h2 class="section-title" id="s6d">06d — The Chinese labs: MiMo's month and the field it overtook</h2>
+                <p>While the Western frontier labs traded flagship prices, China's labs shipped steadily through September — and on September 21 a phone maker ended up on top of them all. <strong>Xiaomi open-sourced the MiMo-V2.6 series</strong>, and MiMo-V2.6-Pro immediately became the highest-scoring open-weight model on the Artificial Analysis Intelligence Index at 46, passing Moonshot's Kimi K3 and Alibaba's Qwen3.8 Max — the two models that had traded the open-weight lead all year. Artificial Analysis also rates it the cheapest model it tracks at roughly $0.13 per Intelligence Index task. Xiaomi is now the seventh Chinese lab Anthropic named in its September 10 threat-intelligence report; it has not responded to that allegation, and the release itself is unusually transparent — full technical report, RL framework, and the training bill.</p>
+
+                <h3>Xiaomi MiMo v2.6: crown, family, and the receipts</h3>
+                <p>The family ships in three tiers, all with a 1M-token context: <strong>Flash</strong> at $0.14/$0.28 per million tokens — roughly a third of Pro and the tier most production traffic will use — <strong>Pro</strong> at $0.435/$0.87, and <strong>Pro-UltraSpeed</strong> at $4.35/$8.70, which Xiaomi says generates up to 20× faster than Pro at the same quality for 10× the token price. Pro is a sparse mixture-of-experts with 1.02 trillion total parameters and 42 billion active per token, taking text, image, audio and video input, released under MIT with weights on Hugging Face and served in Xiaomi's AI Studio, MiMo Code, MiMo Desktop, Xiaomi's own API platform, and OpenRouter.</p>
+                <p>The capability gains came from one large reinforcement-learning run, streamed live: Pro and Flash each completed 30 RL steps over roughly 750,000 trajectories in under six days, costing about $2.62M for Pro and $0.85M for Flash. On the held-out DeepSWE benchmark, Xiaomi reports Pro climbing from 58.4 to 72.57 across the run and Flash from 48.8 to 65.68. Unlike most labs, which run separate jobs per domain, Xiaomi mixed coding, general agents, visual work and cybersecurity into a single run so gains in each would reinforce the others — and it published its defenses against reward hacking (agents were solving assigned bugs by fetching the fix from a later package version; Xiaomi stripped build caches and future Git history from the training environments). Alongside the weights came the full technical report, the end-to-end RL framework, more than 7,000 graded RL task environments, composable mini-harnesses, a distilled smaller model, plus the reward design, hyperparameters, data mixtures and costs.</p>
+                <p>It is not a clean sweep. Artificial Analysis scores Claude Opus 5.5 at 58 against MiMo's 46 — Xiaomi leads the open-weight field, not the field. Xiaomi's own tables show Claude Opus 5 beating Pro on DeepSWE and ProgramBench, and a wide Terminal Bench 4.0 gap (49.0 for Opus 5 versus 34.9 for Pro, with GPT-6 Astra at 59.6). Flash does beat Pro on one cyber test, CyberGym (95.1 vs 94.0), a quirk rather than a pattern. The ranking will turn over; the published RL framework and 7,000+ environments, which smaller labs can rerun on smaller models, may matter longer.</p>
+
+                <h3>DeepSeek: a price cut, then a routing change</h3>
+                <p>DeepSeek's September was V4.1-Flash (September 10) — 552B parameters, native vision, 1M context, and the 4× KV cache reduction covered in section 06b — arriving with an across-the-board API price reduction. Peak rates are $0.30/$1.20 per million tokens, off-peak $0.15/$0.60, with cache-hit input at $0.006 peak and $0.003 off-peak. The operational move got less attention than the model: from September 14, calls to <code>deepseek-v4-pro</code> are routed to V4.1-Flash and billed at Flash rates, with the V4 Pro discontinuation postponed — so legacy integrations quietly get the newer, cheaper model without a code change. A rolling <code>DeepSeek Flash Latest</code> alias followed on the same day. This is the counter-trend to August's headline-grabbing 14× V4-Pro-0813 increase: DeepSeek raised flagship prices and cut everything beneath them.</p>
+
+                <h3>Alibaba: three SKUs in three weeks and a 10-trillion-parameter plan</h3>
+                <p>Qwen moved four times in September. <strong>Qwen3.8 Max (0902)</strong> refreshed on September 3 at $2/$6 with a 1M context; <strong>Qwen3.8 Omni Flash</strong> arrived September 21 as a multimodal omni tier; <strong>Qwen3.8 Max Prime</strong> landed September 23 at $4/$12 — exactly twice the standard model's price, sold as a 1.5–2× higher-throughput variant, though on the only public measurements available it is not measurably faster. Then on September 22, Reuters reported Alibaba is training a 5-to-10-trillion-parameter model program alongside a new in-house chip — the largest stated parameter target any lab has put on the record, and the clearest sign that the Chinese labs see pretraining scale as still unfinished business.</p>
+
+                <h3>Z.ai, Moonshot, InclusionAI — and the two quiet labs</h3>
+                <p><strong>Z.ai</strong> covered both ends of its ladder: <strong>GLM-5.3 FlashX</strong> reached open weights on September 18 at $0.37/$1.25 with a 1M context — flash-tier capability at open-weights terms — and <strong>GLM 5.3 Prime</strong> followed on September 23 at $2.80/$8.80, also 1M context. The 50% GLM-5.3-Flash launch promo ended September 9 as scheduled. <strong>Moonshot</strong> shipped no new model but put <strong>Kimi K3</strong> — the 2.8T-parameter open-weights flagship — generally available on Amazon Bedrock on September 18, giving the largest open model ever released a hyperscaler endpoint; demand from July's launch had already forced the company to pause new subscriptions for weeks. <strong>InclusionAI</strong> quietly shipped four Ling 3.0 variants in two weeks: Flash Sante (free), Flash Fin ($0.06/$0.18, 262K context), and Flash VL (free tier September 10, then $0.06/$0.18 at 131K) — the cheapest vision-language line of the month, free through September 24 before a $0.042/1M input rate took over.</p>
+                <p>Two labs that dominated earlier months stayed quiet. <strong>Tencent</strong> released nothing new after August 28's Hy4 preview ($0.83/$2.50, 770B/49B, Apache 2.0, 1M context); its September was Hunyuan product work rather than model launches. <strong>MiniMax</strong> similarly held at M3 (May 31) with no September release — a funding-and-distribution month rather than a model month. Read together with Xiaomi's debut, the pattern is that the open-weight lead is now contested by more names than ever: Kimi K3 held the crown in July, DeepSeek held the cheap-to-run title in August, and a phone maker took both headlines in September.</p>
+
+                <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Date</th><th>Release</th><th>Lab</th><th>Price (in/out)</th><th>Note</th></tr></thead>
+                    <tbody>
+                        <tr><td>Sep 3</td><td>Qwen3.8 Max (0902)</td><td>Alibaba / Qwen</td><td>$2 / $6</td><td>Flagship refresh, 1M context</td></tr>
+                        <tr><td>Sep 4–12</td><td>Ling 3.0 Flash Sante / Fin / VL</td><td>InclusionAI</td><td>Free · $0.06 / $0.18</td><td>Four variants in nine days; VL free to Sep 24</td></tr>
+                        <tr><td>Sep 10</td><td>DeepSeek V4.1-Flash</td><td>DeepSeek</td><td>$0.30 / $1.20 peak · $0.15 / $0.60 off-peak</td><td>4× KV cache cut; API prices reduced with launch</td></tr>
+                        <tr><td>Sep 14</td><td>deepseek-v4-pro rerouted to V4.1-Flash</td><td>DeepSeek</td><td>Billed at Flash rates</td><td>Legacy endpoint silently upgrades; Flash Latest alias</td></tr>
+                        <tr><td>Sep 18</td><td>GLM-5.3 FlashX (open weights)</td><td>Z.ai</td><td>$0.37 / $1.25</td><td>1M context; flash tier at open-weights terms</td></tr>
+                        <tr><td>Sep 18</td><td>Kimi K3 GA on Amazon Bedrock</td><td>Moonshot / AWS</td><td>—</td><td>2.8T-param open model behind a hyperscaler endpoint</td></tr>
+                        <tr><td>Sep 21</td><td>MiMo v2.6 Flash / Pro / Pro-UltraSpeed</td><td>Xiaomi</td><td>$0.14 / $0.28 · $0.435 / $0.87 · $4.35 / $8.70</td><td>Top open-weight model (AA 46); MIT; 1.02T/42B active</td></tr>
+                        <tr><td>Sep 21</td><td>Qwen3.8 Omni Flash</td><td>Alibaba / Qwen</td><td>—</td><td>Multimodal omni tier</td></tr>
+                        <tr><td>Sep 22</td><td>5–10T-parameter program + in-house chip</td><td>Alibaba</td><td>—</td><td>Largest stated parameter target on record (Reuters)</td></tr>
+                        <tr><td>Sep 23</td><td>GLM 5.3 Prime</td><td>Z.ai</td><td>$2.80 / $8.80</td><td>Prime tier above FlashX, 1M context</td></tr>
+                        <tr><td>Sep 23</td><td>Qwen3.8 Max Prime</td><td>Alibaba / Qwen</td><td>$4 / $12</td><td>2× price of Qwen3.8 Max for claimed 1.5–2× throughput</td></tr>
+                    </tbody>
+                </table>
+                </div>
+                <p><em>Chinese-lab releases tracked September 3–23, 2026, with list prices per million input/output tokens where published; verified September 26. Tencent (Hy4, Aug 28) and MiniMax (M3, May 31) had no new model releases in September.</em></p>
+
+                <h3>The distillation allegations shadowing the releases</h3>
+                <p>Two official disclosures frame September's Chinese-lab releases. On September 8, CISA published an advisory alleging that DeepSeek, Moonshot AI, Alibaba, MiniMax, StepFun and Z.AI extracted billions of tokens across third-party APIs — likely with Chinese government awareness. Two days later, Anthropic's September 2026 threat-intelligence report said it disrupted operations by seven China-based labs, accusing Alibaba of more than 151 million exchanges with Claude between May and July, and accusing Moonshot of forwarding some Kimi requests to Claude and saving the output. Xiaomi was among the seven named; it has not responded. The practical consequences for teams: provenance and ToS questions when choosing these APIs for production, and a reminder that the open-weight distillation question is now a policy issue, not just a benchmark footnote.</p>
+
+                <div class="key-takeaway">
+                    <h3>✅ Engineering verdict</h3>
+                    <p>If you are routing work to Chinese labs this quarter, start with MiMo-V2.6-Flash ($0.14/$0.28, 1M context, MIT) and DeepSeek V4.1-Flash off-peak ($0.15/$0.60) — the two cheapest credible multimodal entries — and re-check GLM-5.3 FlashX if you need self-hosting at flash tier. Treat DeepSeek's v4-pro rerouting as a free upgrade, but pin explicit model IDs if your workload depends on Pro-specific behavior. Qwen3.8 Max Prime's 2× price needs measurable throughput gains before it earns traffic; and if your procurement team cares about the CISA and Anthropic allegations, prefer the open weights you can host yourself — Xiaomi and DeepSeek both publish them.</p>
+                </div>
+            </div>
+
+            <div class="article-section">
                 <h2 class="section-title" id="s7">07 — Price changes: the September ledger</h2>
                 <p>LLM pricing stopped being a rate card this quarter and became a moving target. CloudZero's assessment is blunt: "The rates you budgeted in August are wrong in September." The ledger below tracks every material change since late July — cuts, promos, one cancellation, one counter-trend increase, and one scheduled doubling. The single most September-specific item: Anthropic quietly cancelled the price increase it had scheduled for September 1, making Claude Sonnet 5's $2/$10 introductory rate permanent on August 11 instead. A headline increase evaporating before its effective date is a first, and it tells you where the market thinks pricing power currently sits.</p>
 
@@ -538,6 +759,10 @@
                         <tr><td>Aug 26</td><td>Z.ai</td><td>Launch promo</td><td>GLM-5.3-Flash at <strong>−50%</strong>: $0.075/$0.25 (list $0.15/$0.50; cache $0.03). Promo ends Sep 9, 24:00 UTC+8.</td></tr>
                         <tr><td>Sep 1</td><td>Anthropic</td><td>Cut</td><td>Fable 5.1 cache reads <strong>−75%</strong>: $1.00 → $0.25/MTok. Effective total savings ~25% typical, up to ~45% agentic.</td></tr>
                         <tr><td>Sep 2</td><td>Google</td><td>Intro pricing</td><td>Gemini 3.8 Flash launches at $0.75/$3.75 (thinking tokens included) through Dec 31, 2026. Batch/Flex at 50% off.</td></tr>
+                        <tr><td>Sep 17</td><td>Prism ML</td><td>Open weights</td><td>Bonsai 2 27B ships at 5.9&nbsp;GB / 1.76 bits per weight, keeping 98.2% of FP16 intelligence. GGUF and MLX builds; no API price involved.</td></tr>
+                        <tr><td>Sep 22</td><td>Anthropic</td><td>Cut</td><td>Claude Opus 5.5 launches at <strong>$4/$20</strong>, 20% below Opus 5 ($5/$25); cached input $0.20. Roughly 40% cheaper per typical workload.</td></tr>
+                        <tr><td>Sep 22</td><td>OpenAI</td><td>Cuts</td><td>GPT-6 Sol <strong>$2/$10</strong> and GPT-6 Luna <strong>$0.10/$0.50</strong> (cached input $0.01) — GPT-6 pricing halved, and Luna undercuts DeepSeek V4.1-Flash's off-peak rate.</td></tr>
+                        <tr><td>Sep 23</td><td>Google</td><td>Intro pricing</td><td>Gemini 3.8 Flash TTS and Flash-Lite TTS launch at promotional rates through Dec 31, 2026; standard rates from Jan 1, 2027.</td></tr>
                         <tr><td>Jan 1, 2027</td><td>Google</td><td>Scheduled increase</td><td>Gemini 3.8 Flash standard rate <strong>doubles</strong> to $1.50/$7.50; caching $0.075 → $0.15; batch steps up proportionally.</td></tr>
                     </tbody>
                 </table>
@@ -548,7 +773,7 @@
                 <p>Three structural facts fall out of the current table. First, the floor for mainstream APIs now sits near $0.20 per million input tokens, held by GPT-5.6 Luna since July 30 — a price that used to mean "budget legacy model" and now means "current flagship family." Second, the $2 input tier is the war zone: Claude Sonnet 5, GPT-5.6 Terra, and Gemini 3.1 Pro all sit at exactly $2, which is a coincidence in price and a bloodbath in margins. Third, output remains the hidden multiplier — 5× input at Anthropic, 6× at OpenAI — so verbose models quietly cost more than their input price suggests, and the 10×–150× spread inside a single vendor's lineup makes model choice the biggest line item on any AI budget.</p>
 
                 <h3>Blended price per 1M tokens — leaderboard top 15</h3>
-                <p>8:1 input:output blend, USD, as tracked by LLM Stats (Sep 3, 2026). The visual point is the 119× spread from top to bottom.</p>
+                <p>8:1 input:output blend, USD, as tracked by LLM Stats and updated with the September 22 launches (Sep 26, 2026). The visual point is the spread from top to bottom — now 85× between Fable 5.1 and GPT-6 Luna.</p>
                 <div class="table-scroll">
                 <table>
                     <thead><tr><th>Model</th><th>Blended $/1M</th><th>Access</th></tr></thead>
@@ -556,7 +781,9 @@
                         <tr><td>Claude Fable 5.1</td><td>$11.90</td><td>Closed</td></tr>
                         <tr><td>GPT-5.6 Sol</td><td>$6.19</td><td>Closed</td></tr>
                         <tr><td>Claude Opus 5</td><td>$5.95</td><td>Closed</td></tr>
+                        <tr><td>Claude Opus 5.5</td><td>$5.78</td><td>Closed (Sep 22)</td></tr>
                         <tr><td>Kimi K3</td><td>$3.57</td><td>Open</td></tr>
+                        <tr><td>GPT-6 Sol</td><td>$2.89</td><td>Closed (Sep 22)</td></tr>
                         <tr><td>GPT-5.6 Terra</td><td>$2.48</td><td>Closed</td></tr>
                         <tr><td>Qwen3.8 Max</td><td>$1.81</td><td>Open</td></tr>
                         <tr><td>GLM-5.3</td><td>$1.54</td><td>Open*</td></tr>
@@ -564,10 +791,11 @@
                         <tr><td>DeepSeek V4 Pro</td><td>$0.46</td><td>Open</td></tr>
                         <tr><td>GLM-5.3-Flash</td><td>$0.17</td><td>Open</td></tr>
                         <tr><td>Muse Spark 1.3</td><td>$0.10</td><td>Closed (Sep launch)</td></tr>
+                        <tr><td>GPT-6 Luna</td><td>$0.14</td><td>Closed (Sep 22)</td></tr>
                     </tbody>
                 </table>
                 </div>
-                <p><em>Data: LLM Stats blended pricing (8:1 input:output), September 3, 2026. GLM-5.3-Flash reflects list pricing; the Sep 9 promo halves it. Muse Spark 1.3 and Gemini 3.8 Flash prices are current-month rates; Gemini doubles Jan 1, 2027.</em></p>
+                <p><em>Data: LLM Stats blended pricing (8:1 input:output), last verified September 26, 2026. GLM-5.3-Flash reflects list pricing; the Sep 9 promo halves it. Muse Spark 1.3, GPT-6 Sol and Luna, and Gemini 3.8 Flash prices are current-month rates; Gemini doubles Jan 1, 2027.</em></p>
 
                 <h3>The two anomalies worth attention</h3>
                 <p>DeepSeek's increase is the first deliberate break from the race to zero, and it is worth taking seriously as a signal rather than an aberration. V4-Pro-0813 at $1.32/$3.96 is still roughly 7× cheaper than comparable Western models, but the move says the under-costing strategy has a floor — serving frontier-quality traffic at pennies was subsidizing everyone else's budgets at DeepSeek's expense. If the cheapest credible vendor is raising prices while the most expensive vendors cut cache costs, the middle of the market compresses from both ends.</p>
@@ -818,6 +1046,8 @@
                         <tr><td>Mid–late Sep</td><td>GLM-5.3 open weights</td><td>Z.ai committed to weights "two weeks after launch" pending safety hardening; the strongest open coding model, with the CyberGym caveat attached.</td></tr>
                         <tr><td>Sep 29</td><td>OpenAI DevDay, San Francisco</td><td>Expected: Astra's wider release, full evaluation suite, platform announcements. The month's biggest scheduled event.</td></tr>
                         <tr><td>~Q4</td><td>Muse Spark open weights + bigger Muse models</td><td>Meta's roadmap, per the 1.3 announcement. First open release from the post-Llama frontier line if it lands.</td></tr>
+                        <tr><td>Sep 22 (done)</td><td>Opus 5.5 + GPT-6 Sol and Luna</td><td>Opus 5.5 at $4/$20; GPT-6 Sol $2/$10 and Luna $0.10/$0.50. Re-run any routing comparison — Luna resets the API price floor.</td></tr>
+                        <tr><td>Coming weeks</td><td>Claude Sonnet 5.5 + Haiku 5.5</td><td>Anthropic says the rest of the 5.5 family follows Opus 5.5; expect the mid-tier price war to tighten again.</td></tr>
                         <tr><td>Nov 21</td><td>GPT-5.6 Sol promo ends</td><td>$4/$20 → $5/$30 standard. One of three dated price changes hitting 2027 budgets.</td></tr>
                         <tr><td>Dec 31</td><td>Gemini 3.8 Flash intro pricing ends</td><td>Last day at $0.75/$3.75. Budget-lock or route-shift decision deadline.</td></tr>
                         <tr><td>Jan 1, 2027</td><td>Gemini 3.8 Flash doubles</td><td>$1.50/$7.50 standard rate; caching, storage, batch, and Priority step up proportionally.</td></tr>
@@ -828,7 +1058,7 @@
 
                 <div class="key-takeaway">
                     <h3>📌 The month in one paragraph</h3>
-                    <p>September 2026 is the month the frontier stopped being one market and became two: a general-intelligence market where prices fall, caches deepen, and effort dials turn — and a cyber-capability market where access, not price, is the currency. Four launches in 72 hours made that split explicit. For builders, the action items are routing (effort tiers, not just models), caching (the biggest single discount anyone shipped), calendar discipline (three dated price changes before February), and enrollment lead-time (if you need the gated models, start paperwork now). The architecture story — post-training scaling, MoE sparsity, linear attention, diffusion decoding — is real, but it arrives through the pricing page and the routing table, not through whitepapers. Watch DevDay.</p>
+                    <p>September 2026 is the month the frontier stopped being one market and became two: a general-intelligence market where prices fall, caches deepen, and effort dials turn — and a cyber-capability market where access, not price, is the currency. Four launches in 72 hours made that split explicit. For builders, the action items are routing (effort tiers, not just models), caching (the biggest single discount anyone shipped), calendar discipline (three dated price changes before February), and enrollment lead-time (if you need the gated models, start paperwork now). The architecture story — post-training scaling, MoE sparsity, linear attention, diffusion decoding — is real, but it arrives through the pricing page and the routing table, not through whitepapers. The month's last ten days sharpened the second half of that split: Opus 5.5 and GPT-6 Sol/Luna pushed flagship cost down again, GPT-6 Luna reset the API price floor below DeepSeek, Gemini's voice models set a new audio benchmark with a January price step attached, and Bonsai 2 27B proved that 98% of a 27B model's intelligence now fits in 5.9&nbsp;GB. The last two weeks made that concrete: more than twenty releases in fourteen days, a three-tier Xiaomi family with 1M context, Z.ai and Cohere putting flash-tier capability into open weights, Kimi K3 behind a hyperscaler endpoint, Grok 4.7 arriving from a company that no longer calls itself xAI, and a price floor at $0.10/$0.50 that no Chinese lab currently matches. China's labs carried the open half of that story end to end: DeepSeek cut prices and rerouted its own legacy endpoint onto V4.1-Flash, Qwen shipped three SKUs and announced a 5-to-10-trillion-parameter program, Z.ai open-weighted FlashX and added a Prime tier, Moonshot put Kimi K3 on Bedrock — and Xiaomi, a phone maker, took the open-weight crown it had never held, at 46 on Artificial Analysis, with the weights, the RL framework and the training bill published alongside it. The frontier is no longer four labs; it is four labs plus a dozen fast-followers, and the gap between them is measured in weeks. Watch DevDay on September 29.</p>
                 </div>
             </div>
 
@@ -871,8 +1101,33 @@
                 </div>
 
                 <div class="trend-card">
-                    <h3>What AI events are coming in late September 2026?</h3>
-                    <p>OpenAI DevDay on September 29 in San Francisco is the flagship event — Astra's wider release, its full evaluation suite, and platform announcements are expected there. Around it: Z.ai's GLM-5.3-Flash promo ends September 9; GLM-5.3 open weights are expected mid-to-late September; and Meta has signaled bigger Muse models plus a Muse Spark open-weights release on its roadmap. Looking further out, Sol's promo ends November 21 and Gemini's intro pricing ends December 31, doubling January 1.</p>
+                    <h3>What happened in late September 2026?</h3>
+                    <p>The last two weeks were the busiest of the year: more than twenty tracked releases between September 12 and 25. Google opened with Gemini 3.8 Live, 3.8 Live Extended Thinking and 3.5 Transcribe (Sep 15), added Live Avatar (Sep 24), and shipped Gemini 3.8 Flash TTS plus Flash-Lite TTS (Sep 23) — which take the top spot on Hume AI's Voice Design Benchmark at 71.4. SpaceXAI launched Grok 4.7 (Sep 21, $3.20/$9.60, 500K context). Z.ai open-weighted GLM-5.3 FlashX (Sep 18) and shipped GLM 5.3 Prime (Sep 23); Alibaba shipped Qwen3.8 Omni Flash and Qwen3.8 Max Prime; Xiaomi shipped a three-tier MiMo v2.6 family with 1M context; Cohere open-sourced Command A+; and Moonshot's Kimi K3 reached Amazon Bedrock. Prism ML's Bonsai 2 27B (Sep 17) kept 98.2% of full-precision intelligence in 5.9&nbsp;GB. September 22 was the biggest single day: Anthropic launched Claude Opus 5.5 at $4/$20 and OpenAI released GPT-6 Sol and Luna, halving GPT-6 pricing to $2/$10 and $0.10/$0.50.</p>
+                </div>
+
+                <div class="trend-card">
+                    <h3>What is Claude Opus 5.5?</h3>
+                    <p>Claude Opus 5.5 launched September 22, 2026, the first model in Anthropic's Claude 5.5 family. It costs $4 per million input tokens and $20 per million output tokens — 20% below Opus 5's $5/$25, with cached input at $0.20 and Fable 5.1's 75% cache-read discount inherited. Anthropic says it beats Fable 5.1 on key agentic benchmarks while cutting typical workload cost by about 40%. Sonnet 5.5 and Haiku 5.5 are expected in the following weeks.</p>
+                </div>
+
+                <div class="trend-card">
+                    <h3>What are GPT-6 Sol and GPT-6 Luna?</h3>
+                    <p>OpenAI released them on September 22, 2026, halving GPT-6 pricing. GPT-6 Sol costs $2/$10 per million input/output tokens — down 50% from GPT-5.6 Sol's promotional $4/$20 — and GPT-6 Luna costs $0.10/$0.50 with cached input at $0.01. Luna undercuts DeepSeek V4.1-Flash's off-peak $0.15/$0.60, resetting the floor for mainstream API pricing. Both rolled out across the API, Codex, and ChatGPT Work for Plus, Pro, Business, Enterprise, and Edu users.</p>
+                </div>
+
+                <div class="trend-card">
+                    <h3>What are Gemini 3.8 Flash TTS and Flash-Lite TTS?</h3>
+                    <p>Google's two text-to-speech models arrived September 23, 2026. Gemini 3.8 Flash TTS adds prompt-based voice design, more than 2,000 ready-made voices, voice cloning from a short sample, and 100+ language support — taking the number-one overall spot on Hume AI's Voice Design Benchmark at 71.4. Flash-Lite TTS targets low latency and high-throughput bulk production with automatic tone and pacing adjustment. Both launch at promotional pricing through December 31, 2026, with Google's standard rates applying from January 1, 2027.</p>
+                </div>
+
+                <div class="trend-card">
+                    <h3>How many AI models were released in September 2026?</h3>
+                    <p>More than twenty tracked models were released between September 12 and September 25 alone, and LLM Gateway logged 23+ new models across the month. Evertune's tracker counted 133 model releases and updates from six providers over the course of 2026, and 28 companies shipped AI releases in September. The notable September releases include Claude Fable 5.1 and Mythos 5.1, GPT-6 Astra plus Sol and Luna, Gemini 3.8 Flash and Gemini 3.8 Flash TTS, Muse Spark 1.3, DeepSeek V4.1-Flash, Grok 4.7, GLM-5.3 FlashX and GLM 5.3 Prime, Qwen3.8 Omni Flash and Qwen3.8 Max Prime, Xiaomi's MiMo v2.6 family, Cohere Command A+, and Prism ML's Bonsai 2 27B.</p>
+                </div>
+
+                <div class="trend-card">
+                    <h3>What did Chinese AI labs release in September 2026?</h3>
+                    <p>China's labs shipped across the whole month. Xiaomi open-sourced the MiMo v2.6 family on September 21 — MiMo-V2.6-Pro (1.02T total / 42B active MoE, MIT license) became the highest-scoring open-weight model ever on the Artificial Analysis Intelligence Index at 46, priced $0.435/$0.87, with a $0.14/$0.28 Flash tier and a $4.35/$8.70 Pro-UltraSpeed tier, all at 1M context. DeepSeek launched V4.1-Flash on September 10 with a fourfold KV-cache cut and an across-the-board price reduction, then rerouted deepseek-v4-pro calls to V4.1-Flash at Flash rates on September 14. Z.ai open-weighted GLM-5.3 FlashX (September 18, $0.37/$1.25) and added GLM 5.3 Prime (September 23, $2.80/$8.80). Alibaba refreshed Qwen3.8 Max (September 3), shipped Qwen3.8 Omni Flash (September 21) and Qwen3.8 Max Prime (September 23, $4/$12), and announced a 5-to-10-trillion-parameter training program with an in-house chip. Moonshot's Kimi K3 reached Amazon Bedrock (September 18), InclusionAI shipped four Ling 3.0 variants at $0.06/$0.18 or free, and Tencent held off after August's Hy4 preview.</p>
                 </div>
             </div>
 
@@ -912,8 +1167,41 @@
                     <li><strong>[Community]</strong> OpenRouter — GLM-5.3-Flash pricing confirmation; LLM Gateway / AI Release Tracker — September release counts</li>
                     <li><strong>[Community]</strong> Wikipedia — Qwen (Qwen3.8 release history), GPT-5.6, Llama (Muse Spark transition), Mistral AI, accessed Sep 3, 2026</li>
                     <li><strong>[Community]</strong> Sebastian Raschka — "A Visual Guide to Attention Variants in Modern LLMs," magazine.sebastianraschka.com, Mar 22, 2026; OpenReview hybrid-architecture survey</li>
+                    <li><strong>[Official]</strong> OpenAI — "Introducing GPT-6 Sol and Luna," openai.com, Sep 22, 2026; API pricing page (gpt-6-luna $0.10/$0.50, cached input $0.01); GPT-6 Astra system-card revision note, Sep 22, 2026</li>
+                    <li><strong>[Official]</strong> Anthropic — Claude Opus 5.5 launch and pricing, anthropic.com, Sep 22, 2026 ($4/$20, cached input $0.20)</li>
+                    <li><strong>[Official]</strong> Google — "Gemini 3.8 text-to-speech," blog.google, Sep 23, 2026; Gemini 3.8 Flash-Lite TTS model docs (promotional pricing ends Dec 31, 2026)</li>
+                    <li><strong>[Official]</strong> Prism ML — Bonsai 2 27B technical report and model cards, Sep 17, 2026 (5.9&nbsp;GB, 1.76 bits per weight, 98.2% retention)</li>
+                    <li><strong>[Press]</strong> TechCrunch — "OpenAI launches GPT-6 Sol and Luna, boasting lower cost and fewer mistakes," Sep 22, 2026</li>
+                    <li><strong>[Press]</strong> Reuters — "OpenAI expands GPT-6 lineup with cheaper Sol, Luna models," Sep 22, 2026</li>
+                    <li><strong>[Press]</strong> The New Stack — "OpenAI releases GPT-6 Sol and Luna — and cuts token prices in half," Sep 22, 2026</li>
+                    <li><strong>[Press]</strong> VentureBeat — "Anthropic releases Claude Opus 5.5, beating Fable 5.1 on key agentic benchmarks at 60% cheaper API price," Sep 22, 2026</li>
+                    <li><strong>[Press]</strong> TechCrunch — "Anthropic releases Opus 5.5 with lower prices and Fable-level performance," Sep 22, 2026</li>
+                    <li><strong>[Press]</strong> MarkTechPost — "Google releases Gemini 3.8 Flash TTS and Flash-Lite TTS with prompt-based voice design," Sep 23, 2026</li>
+                    <li><strong>[Press]</strong> The Next Web — "Google's new Gemini TTS models can clone a voice from a prompt," Sep 23, 2026</li>
+                    <li><strong>[Press]</strong> Mistral — €3B Series D at a €21B+ post-money valuation, mistral.ai/news, Sep 8, 2026; Firefox smart-window beta, Sep 16, 2026</li>
+                    <li><strong>[Official]</strong> SpaceXAI — Grok 4.7 release notes and model pricing, docs.x.ai, Sep 21, 2026 ($3.20/$9.60, 500K context); x.ai/news</li>
+                    <li><strong>[Official]</strong> Google — Introducing Gemini 3.8 Live and 3.8 Live Extended Thinking, blog.google, Sep 15, 2026; Gemini 3.8 Live with Live Avatar, Sep 24, 2026</li>
+                    <li><strong>[Official]</strong> Z.ai — GLM-5.3 FlashX open weights, Sep 18, 2026; GLM 5.3 Prime, Sep 23, 2026</li>
+                    <li><strong>[Official]</strong> Cohere — Command A+ open-weights release, Sep 22, 2026 ($0.30/$1.50, 192K context)</li>
+                    <li><strong>[Official]</strong> Xiaomi — MiMo v2.6 Flash / Pro / Pro UltraSpeed, Sep 21–22, 2026 (1M context)</li>
+                    <li><strong>[Official]</strong> AWS / Microsoft Azure — GPT-6 Sol, Luna and Claude Opus 5.5 day-0 availability in Bedrock and AI Foundry, Sep 22, 2026</li>
+                    <li><strong>[Official]</strong> OpenAI — ChatGPT release notes, Sep 25, 2026 (security history); ChatGPT Images 2.5, Sep 8, 2026</li>
+                    <li><strong>[Press]</strong> Reuters — "Alibaba deepens AI push with new chip, bigger model" (5–10T-parameter program), Sep 22, 2026</li>
+                    <li><strong>[Press]</strong> TechCrunch — "Salesforce and Nvidia's new reasoning model is everything the AI labs should fear," Sep 15, 2026</li>
+                    <li><strong>[Press]</strong> MarketingProfs — AI Update, September 25, 2026 (AI Force and AI tsar; development-slowdown rejection)</li>
+                    <li><strong>[Independent]</strong> Price Per Token model-release changelog and OpenRouter release feed (September 2026), verified Sep 26, 2026</li>
+                    <li><strong>[Independent]</strong> Transparency Coalition — "AI Legislative Update: September 25, 2026" (85 AI laws across 27 states)</li>
+                    <li><strong>[Independent]</strong> Evertune AI model tracker (133 releases across six providers, last updated Sep 24, 2026); LLM Stats model pages for Claude Opus 5.5 and GPT-6 Sol/Luna; LLM Gateway timeline (Ling 3.0 Flash VL, Sep 24, 2026)</li>
+                    <li><strong>[Official]</strong> Xiaomi — "Introducing MiMo-V2.6 series," mimo.xiaomi.com/mimo-v2-6, Sep 21, 2026; MiMo docs "Scaling Up Reinforcement Learning for Self-Improvement" (30 RL steps, ~750K trajectories, DeepSWE 58.4→72.57)</li>
+                    <li><strong>[Official]</strong> DeepSeek — "Introducing DeepSeek-V4.1-Flash," deepseek.com/en/news, Sep 9–10, 2026 (pricing effective 04:00 UTC Sep 10); DeepSeek API change log (v4-pro routed to V4.1-Flash from Sep 14)</li>
+                    <li><strong>[Official]</strong> AWS — "Kimi K3 by Moonshot AI is now generally available on Amazon Bedrock," aws.amazon.com, Sep 18, 2026 (2.8T parameters, native vision)</li>
+                    <li><strong>[Official]</strong> InclusionAI — Ling 3.0 Flash Sante / Fin / VL release notes via OpenRouter and Vercel AI Gateway, Sep 4–12, 2026 (free tier through Sep 24, then $0.042/1M input)</li>
+                    <li><strong>[Press]</strong> The Next Web — "A phone maker now has the world's top open-weight AI model" (MiMo-V2.6-Pro: AA 46, $0.13/task, 1.02T/42B, six days and $2.62M RL run), Sep 22, 2026</li>
+                    <li><strong>[Press]</strong> TechCrunch — "Anthropic details distillation campaigns from Alibaba, Moonshot AI and DeepSeek," Sep 10, 2026; CISA advisory AA26-251A, Sep 8, 2026</li>
+                    <li><strong>[Press]</strong> DataNorth — "Qwen3.8 Max Prime: Is it actually better?" Sep 23, 2026 ($4/$12, twice the standard price, not measurably faster on public measurements); ORCARouter throughput analysis</li>
+                    <li><strong>[Independent]</strong> Artificial Analysis — MiMo-V2.6-Pro model page and provider benchmarking (Intelligence Index 46, cheapest tracked at ~$0.13/task), Sep 21–26, 2026; OpenRouter compare pages for GLM 5.3 Prime vs Qwen3.8 Max Prime</li>
                 </ul>
-                <p style="margin-top: 30px;"><em>Independently researched from primary and independent sources. All benchmark figures and prices belong to their respective publishers; deltas and the price ledger are Local AI Zone compilations. Coverage window: July 31 – September 3, 2026.</em></p>
+                <p style="margin-top: 30px;"><em>Independently researched from primary and independent sources. All benchmark figures and prices belong to their respective publishers; deltas and the price ledger are Local AI Zone compilations. Coverage window: July 31 – September 25, 2026; last verified September 26, 2026.</em></p>
             </div>
 
             <div class="article-section">
@@ -943,7 +1231,7 @@
 
                 <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
 
-                <p style="margin-top: 30px;"><em>Last Updated: September 3, 2026 | Monthly Dispatch Series</em></p>
+                <p style="margin-top: 30px;"><em>Last Updated: September 26, 2026 | Monthly Dispatch Series</em></p>
             </div>
         </div>
     </article>
