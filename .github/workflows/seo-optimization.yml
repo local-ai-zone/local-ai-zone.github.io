@@ -47,6 +47,50 @@ jobs:
         node scripts/generate-seo.js
         echo "SEO generation completed"
         
+    # Image-search regression guard. The sitemap carries one <image:image>
+    # entry per post image, and this workflow regenerates it nightly. If a
+    # stale generator or a bad merge drops those entries, the whole site
+    # silently disappears from Google/Bing image search, so fail here --
+    # before the commit step -- rather than publish a regressed sitemap.
+    - name: Verify image sitemap coverage
+      run: |
+        SUMMARY="${GITHUB_STEP_SUMMARY:-/dev/null}"
+
+        NOW=$(grep -c "<image:loc>" sitemap.xml 2>/dev/null || true)
+        PREV=$(git show HEAD:sitemap.xml 2>/dev/null | grep -c "<image:loc>" || true)
+        NOW=${NOW:-0}
+        PREV=${PREV:-0}
+
+        echo "Image sitemap entries: ${NOW} this run, ${PREV} in the previous commit"
+
+        if [ "${NOW}" -eq 0 ] && [ "${PREV}" -gt 0 ]; then
+          echo "IMAGE GUARD: sitemap.xml has no <image:loc> entries, but the previous commit had ${PREV}."
+          exit 1
+        fi
+
+        if [ "${PREV}" -gt 0 ] && [ "${NOW}" -lt $((PREV / 2)) ]; then
+          echo "IMAGE GUARD: image entries dropped from ${PREV} to ${NOW} (more than 50% loss vs HEAD)."
+          exit 1
+        fi
+
+        if ! grep -q "xmlns:image" sitemap.xml; then
+          echo "IMAGE GUARD: sitemap.xml lost the image namespace."
+          exit 1
+        fi
+
+        for agent in Googlebot-Image Bingbot; do
+          if ! grep -q "User-agent: ${agent}" robots.txt; then
+            echo "IMAGE GUARD: robots.txt no longer allows ${agent}."
+            exit 1
+          fi
+        done
+
+        echo "Image sitemap guard passed: ${NOW} image entries, image crawlers still allowed"
+        {
+          echo ""
+          echo "- Image sitemap entries: ${NOW} (previous commit: ${PREV})"
+        } >> "${SUMMARY}"
+
     - name: Check for SEO changes
       id: check_seo_changes
       run: |
