@@ -740,11 +740,11 @@ class SitemapGenerator {
 
         for (const url of sortedUrls) {
             lines.push('  <url>');
-            lines.push(`    <loc>${this.escapeXML(url.loc)}</loc>`);
+            lines.push(`    <loc>${this.escapeXML(this.encodeURL(url.loc))}</loc>`);
             if (Array.isArray(url.images)) {
                 for (const image of url.images) {
                     lines.push('    <image:image>');
-                    lines.push(`      <image:loc>${this.escapeXML(image.loc)}</image:loc>`);
+                    lines.push(`      <image:loc>${this.escapeXML(this.encodeURL(image.loc))}</image:loc>`);
                     if (image.title) lines.push(`      <image:title>${this.escapeXML(image.title)}</image:title>`);
                     if (image.caption) lines.push(`      <image:caption>${this.escapeXML(image.caption)}</image:caption>`);
                     lines.push('    </image:image>');
@@ -792,7 +792,7 @@ class SitemapGenerator {
         
         for (const sitemap of sitemaps) {
             lines.push('  <sitemap>');
-            lines.push(`    <loc>${baseURL}/${sitemap.filename}</loc>`);
+            lines.push(`    <loc>${this.escapeXML(this.encodeURL(`${baseURL}/${sitemap.filename}`))}</loc>`);
             lines.push(`    <lastmod>${now}</lastmod>`);
             lines.push('  </sitemap>');
         }
@@ -856,6 +856,21 @@ class SitemapGenerator {
         } catch (error) {
             return { valid: false, error: error.message };
         }
+    }
+
+    /**
+     * Sitemap <loc> values must be URL-escaped. Paths here come from disk walks and
+     * from raw HTML src attributes, so they routinely carry characters a URL cannot
+     * hold literally — "chart (1).png" was emitted with a raw space, which Google
+     * discards. Existing escapes are isolated before encoding so that a nightly re-run
+     * cannot double-encode them (encodeURI would turn %20 into %2520); everything else
+     * is escaped, including a lone "%".
+     */
+    encodeURL(url) {
+        return url
+            .split(/(%[0-9A-Fa-f]{2})/)
+            .map((part) => (/^%[0-9A-Fa-f]{2}$/.test(part) ? part : encodeURI(part)))
+            .join('');
     }
 
     escapeXML(text) {
