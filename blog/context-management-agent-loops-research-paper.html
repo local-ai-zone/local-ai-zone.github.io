@@ -50,9 +50,10 @@
   },
   "image": {
     "@type": "ImageObject",
-    "url": "https://local-ai-zone.github.io/og-image.png",
+    "url": "https://local-ai-zone.github.io/blog/ai-agent-context-management-hero.png",
     "width": 1200,
-    "height": 630
+    "height": 630,
+    "caption": "Agent-loop context economics: a 100:1 input-to-output token ratio, BrowseComp rising from 51.4 to 67.6 with context management, and an 890-byte per token KV cache"
   },
   "speakable": {
     "@type": "SpeakableSpecification",
@@ -81,10 +82,10 @@
 <meta property="og:url" content="https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html">
 <meta property="og:site_name" content="Local AI Zone">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/ai-agent-context-management-hero.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Context Management in Agent Loops — DeepSeek Late-2026 Research Paper">
+<meta property="og:image:alt" content="Context management for agent loops illustrated: a 100:1 input-to-output token ratio, context rot measured at 32K, and the patterns that fix it">
 <meta property="article:author" content="Hussain Nazary">
 <meta property="article:published_time" content="2026-09-13T00:00:00Z">
 <meta property="article:modified_time" content="2026-09-26T00:00:00Z">
@@ -104,8 +105,8 @@
 <meta name="twitter:creator" content="@hussainnazary">
 <meta name="twitter:title" content="Context Management in Agent Loops — The Full Research">
 <meta name="twitter:description" content="16 chapters on agent context: context rot, MemGPT to MemOS, the Manus KV-cache lessons, and DeepSeek's stack from MLA and context caching to V4's 1M tokens and Engram.">
-<meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
-<meta name="twitter:image:alt" content="Context Management in Agent Loops — DeepSeek Late-2026 Research Paper">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/ai-agent-context-management-hero.png">
+<meta name="twitter:image:alt" content="Context management for agent loops illustrated: a 100:1 input-to-output token ratio, context rot measured at 32K, and the patterns that fix it">
 
 <!-- FAQ Schema (AEO) -->
 <script type="application/ld+json">
@@ -294,6 +295,8 @@ pre .d{color:#e3b341}
 /* ============ FIGURES / DIAGRAMS ============ */
 figure{margin:28px 0}
 figcaption{font-size:13px;color:var(--ink-faint);margin-top:10px;text-align:center}
+figure img{display:block;width:100%;height:auto;margin:0;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+html[data-theme='dark'] figure img{filter:brightness(.94)}
 .flow{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:22px;font-size:14px}
 html[data-theme='dark'] .flow{background:#101728}
 .flow .fnode{background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;line-height:1.5;box-shadow:0 1px 2px rgba(16,24,40,.05)}
@@ -541,6 +544,11 @@ html[data-theme='dark'] .src-block{background:#101728}
 <h3>2.4 The compounding loop failure</h3>
 <p>Put the three findings together and the agent-loop failure mode emerges with uncomfortable clarity. An agent accumulates search results, tool outputs, and abandoned reasoning paths as it works. That accumulated noise degrades every <em>subsequent</em> step, not just the final answer &mdash; each new decision is made inside a context that is longer, more middle-heavy, and more associatively demanding than the last. The 2026 retrospectives converge on the same production observation: a ticket that reaches turn ten with an untrimmed transcript is simultaneously the most likely to hallucinate and the most expensive call of the conversation to run. Quality and cost fail together, on the same curve, because they share a cause. This is why the field stopped treating "context window size" as the headline specification and started treating context <em>management</em> as the discipline &mdash; and it is why every pattern in Part IV exists.</p>
 
+<figure>
+  <img src="context-rot-measured.png" alt="Chart: context rot measured &mdash; 99.3% recall at short range, 69.7% on the same associative recall task at 32K tokens, and a 50% cliff on NoLiMa at 32K" width="2160" height="1380" loading="lazy" decoding="async">
+  <figcaption>Context rot, measured: the same models, the same task, different distances. Failures arrive exactly where agent loops do their work.</figcaption>
+</figure>
+
 <h2 class="ch" id="ch3"><span class="chno">3</span> The Economics of the Loop</h2>
 <p class="ch-sub">Prefix caching, the 10&times; cached-input discount, and why 2026's compaction debate is decided by cache arithmetic, not sentiment.</p>
 
@@ -668,6 +676,13 @@ html[data-theme='dark'] .src-block{background:#101728}
 
 <div class="callout warn"><span class="lab">One caution inside the manual</span>
 <p>Manus's logit-masking recipe assumes control of the decoding loop (self-hosted or prefill-friendly providers) and their file-system doctrine assumes a sandbox with real storage. Both hold for their product. In a managed-API setting, the equivalents are weaker: tool-set stability plus provider-native clearing features, and object-store references instead of a live filesystem. The rules survive the translation; the mechanisms do not.</p></div>
+
+<!-- PHOTO SLOT (context): save a real screenshot to blog/agent-context-compaction-notes.png (landscape, 1600x900 or larger, under 400 KB), then run python scripts/install-post-photo.py --slot=context --file=PATH (see scripts/PHOTO_SLOTS.md). Suggested subject: a screenshot of a real agent session's working notes file, shown beside the session's token counter or context usage meter.
+<figure>
+  <img src="agent-context-compaction-notes.png" alt="Screenshot of an agent session working notes file beside a context usage meter, showing the note taking pattern in a real tool loop" width="1600" height="900" loading="lazy" decoding="async">
+  <figcaption>Structured note taking in a real session: the file that survives compaction, and the counter that made it necessary.</figcaption>
+</figure>
+-->
 
 <h2 class="ch" id="ch8"><span class="chno">8</span> The Benchmark Wars</h2>
 <p class="ch-sub">LoCoMo, LongMemEval, BEAM, DMR: what each benchmark actually measures, and how to read vendor tables whose publishers are also contestants.</p>
@@ -814,6 +829,11 @@ html[data-theme='dark'] .src-block{background:#101728}
 
 <div class="callout info"><span class="lab">The honest caveats</span>
 <p>Engram does not solve cross-session user memory &mdash; per-user state still needs a harness-level store (Chapter 15's patterns remain necessary); it solves <em>knowledge</em> lookup for the model itself. The 196B module adds weight-storage cost that only pays off at serving scale, and the published comparisons are against DeepSeek's own iso-FLOPs baselines, not against an external frontier. And as of this writing, third-party evaluations of V4.1-Flash are just beginning to appear. The architecture direction is verifiable today; its external validation is still accumulating.</p></div>
+
+<figure>
+  <img src="context-management-payoff.png" alt="Chart: what context management buys on DeepSeek models &mdash; BrowseComp rising from 51.4 to 67.6, Multi-Query needle in a haystack rising from 84.2 to 97.0 with Engram memory, and a production counter-example scoring 38% on memory probes" width="2160" height="1479" loading="lazy" decoding="async">
+  <figcaption>The measured payoff, and the honest counterweight: DeepSeek's own studies on the left, a production team's tested defaults on the right.</figcaption>
+</figure>
 
 <h2 class="ch" id="ch14"><span class="chno">14</span> The DeepSeek Playbook</h2>
 <p class="ch-sub">Five layers, one cost model, and the compiled timeline: what a lab looks like when context management is the product plan.</p>
@@ -1006,6 +1026,11 @@ messages = [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span
 <span class="c"># rewrite the block every few steps so the plan sits at the END of context,</span>
 <span class="c"># where attention is strongest (&sect;2.1) and drift dies.</span>
 </code></pre>
+
+<figure>
+  <img src="context-constraint-decision-map.png" alt="Decision map: which context management pattern to reach for &mdash; window overflow points to P2 compaction, P3 clearing, P5 offload and P7 isolation; cost points to P8 prefix stabilisation then P9 native caching; quality rot points to P4 recitation, P6 just-in-time loading and P7 isolation" width="2160" height="1668" loading="lazy" decoding="async">
+  <figcaption>Name the constraint first: the three failure modes show up together and are fixed separately, which is the documented 2026 mistake.</figcaption>
+</figure>
 
 <h3>16.4 The production checklist</h3>
 <ul>

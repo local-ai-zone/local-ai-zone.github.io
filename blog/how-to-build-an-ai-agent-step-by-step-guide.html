@@ -50,9 +50,10 @@
   },
   "image": {
     "@type": "ImageObject",
-    "url": "https://local-ai-zone.github.io/og-image.png",
+    "url": "https://local-ai-zone.github.io/blog/how-to-build-ai-agent-hero.png",
     "width": 1200,
-    "height": 630
+    "height": 630,
+    "caption": "How to build an AI agent: the five-component anatomy, the four-line loop and Anthropic's five composable workflow patterns"
   },
   "speakable": {
     "@type": "SpeakableSpecification",
@@ -81,10 +82,10 @@
 <meta property="og:url" content="https://local-ai-zone.github.io/blog/how-to-build-an-ai-agent-step-by-step-guide.html">
 <meta property="og:site_name" content="Local AI Zone">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/how-to-build-ai-agent-hero.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="How to Build an AI Agent — Step-by-Step Guide">
+<meta property="og:image:alt" content="How to build an AI agent: the canonical anatomy, the four-line agent loop and five composable workflow patterns">
 <meta property="article:author" content="Hussain Nazary">
 <meta property="article:published_time" content="2026-09-13T00:00:00Z">
 <meta property="article:modified_time" content="2026-09-26T00:00:00Z">
@@ -104,8 +105,8 @@
 <meta name="twitter:creator" content="@hussainnazary">
 <meta name="twitter:title" content="How to Build an AI Agent — 13 Cited Steps">
 <meta name="twitter:description" content="The canonical agent-building method in one guide: the loop, tools, instructions, context engineering, guardrails, human oversight, evals, and framework choice for 2026.">
-<meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
-<meta name="twitter:image:alt" content="How to Build an AI Agent — Step-by-Step Guide">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/how-to-build-ai-agent-hero.png">
+<meta name="twitter:image:alt" content="How to build an AI agent: the canonical anatomy, the four-line agent loop and five composable workflow patterns">
 
 <!-- FAQ Schema (AEO) -->
 <script type="application/ld+json">
@@ -294,6 +295,8 @@ pre .d{color:#e3b341}
 /* ============ FIGURES / DIAGRAMS ============ */
 figure{margin:28px 0}
 figcaption{font-size:13px;color:var(--ink-faint);margin-top:10px;text-align:center}
+figure img{display:block;width:100%;height:auto;margin:0;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+html[data-theme='dark'] figure img{filter:brightness(.94)}
 .flow{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:22px;font-size:14px}
 html[data-theme='dark'] .flow{background:#101728}
 .flow .fnode{background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;line-height:1.5;box-shadow:0 1px 2px rgba(16,24,40,.05)}
@@ -480,6 +483,11 @@ html[data-theme='dark'] .src-block{background:#101728}
   <h2>Foundations, Definitions, and the Hardest Step</h2>
   <p>Four chapters on what you are about to build, where the canonical method comes from, whether your use case actually needs it, and the architecture every production agent shares &mdash; settled before a single line of code is written.</p>
 </div>
+
+<figure>
+  <img src="ai-agent-canonical-anatomy.png" alt="Diagram: the canonical AI agent anatomy &mdash; model, tools, instructions, memory and context, the loop that executes tool calls and appends observations, and the boundary of guardrails, human escalation and evaluation" width="2160" height="2124" loading="lazy" decoding="async">
+  <figcaption>The canonical agent, in the order its parts tend to fail: the model at the top, the boundary that keeps it safe at the bottom.</figcaption>
+</figure>
 
 <h2 class="ch" id="ch1"><span class="chno">1</span> The Method Everyone References</h2>
 <p class="ch-sub">Why the industry converged on a handful of documents, and what this guide takes from each.</p>
@@ -870,6 +878,11 @@ TOOL_IMPLS = {<span class="s">"search_orders"</span>: search_orders, <span class
 
 <p>Trace the loop once against the pseudocode from Chapter 4 and the canonical definitions line up exactly. <code class="mono">llm_get_next_action</code> is the API call; <code class="mono">execute_action</code> is <code class="mono">execute_tool</code>; <code class="mono">memory += [action, observations]</code> is the two <code class="mono">append</code> calls; <code class="mono">llm_should_continue</code> is <code class="mono">stop_reason != "tool_use"</code>. The exit conditions are the two OpenAI enumerates for <code class="mono">Runner.run()</code> &mdash; "a final-output tool is invoked" or "the model returns a response without any tool calls" &mdash; plus the one Anthropic insists on: "stopping conditions (such as a maximum number of iterations) to maintain control." A production loop adds a third exit, error-abort, when a failure repeats beyond a retry budget &mdash; which is also the signal to hand off to a human (Ch. 12).</p>
 
+<figure>
+  <img src="ai-agent-loop-code.png" alt="Code card: the four line smolagents agent loop &mdash; a memory list, a while loop that asks the model for the next action, executes it and appends the observation" width="2160" height="1380" loading="lazy" decoding="async">
+  <figcaption>The loop, precisely: four lines of pseudocode, and the reason a run spends about 100 input tokens for every token it produces.</figcaption>
+</figure>
+
 <h3>Three details that separate this from a toy</h3>
 <p><strong>Assistant turns are appended before results.</strong> The full <code class="mono">response.content</code> &mdash; including any text the model wrote alongside its tool calls &mdash; goes into the message array first, then the tool results follow as the next user message. Dropping the assistant turn is the single most common hand-rolled bug: the model loses its own reasoning and repeats itself.<br>
 <strong>Errors are content, not exceptions.</strong> <code class="mono">execute_tool</code> converts failures into <code class="mono">tool_result</code> blocks with actionable text. The next inference sees the failure, reads the steering, and can change strategy &mdash; this is Anthropic's "recovering from errors" agent capability, implemented in one branch.<br>
@@ -894,6 +907,13 @@ TOOL_IMPLS = {<span class="s">"search_orders"</span>: search_orders, <span class
   <div class="cell"><div class="v">1&ndash;2K</div><div class="k">Tokens a sub-agent returns, after exploring tens of thousands</div></div>
   <div class="cell"><div class="v">25K</div><div class="k">Default cap on a single tool response, Claude Code</div></div>
 </div>
+
+<!-- PHOTO SLOT (agent): save a real screenshot to blog/ai-agent-run-terminal.png (landscape, 1600x900 or larger, under 400 KB), then run python scripts/install-post-photo.py --slot=agent --file=PATH. Capture it with python scripts/minimal-agent-loop.py (see scripts/PHOTO_SLOTS.md). Suggested subject: a terminal capture of a working agent run showing the tool calls, the observations and the final answer, ideally with the iteration count visible.
+<figure>
+  <img src="ai-agent-run-terminal.png" alt="Terminal screenshot of a working AI agent run showing each tool call, its observation and the final answer" width="1600" height="900" loading="lazy" decoding="async">
+  <figcaption>What this guide produces: a run you can watch, with every tool call and observation on screen.</figcaption>
+</figure>
+-->
 
 <h3>Technique one: compaction</h3>
 <p>For tasks that outrun the window, Anthropic's first lever: <em>"Compaction is the practice of taking a conversation nearing the context window limit, summarizing its contents, and reinitiating a new context window with the summary. Compaction typically serves as the first lever in context engineering to drive better long-term coherence."</em> The mechanics are simple &mdash; detect a threshold (say, 70% of the window), run a summarization call over the transcript that preserves goal state, decisions made, and open threads, then swap the transcript for the summary and continue. The design work is in <em>what the summary must retain</em>: task objective, verified facts from tool results, constraints discovered, and the current plan. Compaction loses detail by design; what you keep defines the agent's long-term coherence.</p>
@@ -950,6 +970,11 @@ document = call_llm(<span class="s">"Write the document from this outline: "</sp
 </tbody>
 </table>
 <div class="tblfoot">The five workflow patterns from "Building effective agents" plus the agent itself, as the sixth row the patterns graduate into. Cost profiles are this guide's annotation.</div></div>
+
+<figure>
+  <img src="ai-agent-five-workflow-patterns.png" alt="Grid: Anthropic's five composable workflow patterns &mdash; prompt chaining, routing, parallelization, orchestrator-workers and evaluator-optimizer &mdash; with who decides the path in each, when to use it and its cost profile" width="2160" height="2016" loading="lazy" decoding="async">
+  <figcaption>The palette, not a complexity ladder: five workflow patterns, who decides the path in each, and what each one costs &mdash; plus the sixth row they graduate into.</figcaption>
+</figure>
 
 <h3>The graduation rule</h3>
 <p>When does a workflow stop being enough? The essay's boundary: agents "can be used for open-ended problems where it's difficult or impossible to predict the required number of steps, and where you can't hardcode a fixed path," with the essential precondition that "you must have some level of trust in its decision-making." In practice you graduate when the branches multiply faster than you can maintain them &mdash; OpenAI's guide gives the two measurable triggers in its multi-agent chapter, and they apply a fortiori to the agent decision: prompts "contain many conditional statements (multiple if-then-else branches)" and tools have grown past what better naming cannot fix. Between workflow and agent sits the economics of error: a workflow fails locally (one step reruns); an agent compounds ("higher costs, and the potential for compounding errors" &mdash; hence "extensive testing in sandboxed environments"). The closing rule of the essay's pattern section is the one to obey: <em>"you should consider adding complexity only when it demonstrably improves outcomes."</em> If your eval cannot demonstrate it, the workflow stays.</p>

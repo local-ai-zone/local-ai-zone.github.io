@@ -585,6 +585,32 @@ select:focus,
     margin: var(--space-6) 0;
 }
 
+/* Figures: captioned data charts and diagrams */
+.article-content figure {
+    margin: var(--space-8, 2.5rem) 0;
+}
+
+.article-content figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0;
+    border: 1px solid var(--neutral-200);
+    background: var(--neutral-50);
+}
+
+.article-content figcaption {
+    margin-top: var(--space-3, 0.75rem);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: var(--neutral-500);
+    text-align: center;
+}
+
+html[data-theme='dark'] .blog-article-page .article-content figure img {
+    filter: brightness(0.94);
+}
+
 .article-content hr {
     margin: var(--space-12) 0;
     border: none;

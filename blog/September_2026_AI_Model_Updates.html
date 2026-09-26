@@ -29,16 +29,16 @@
     <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html">
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:title" content="September 2026 AI Model Updates: Every Launch, Price Move, and Architecture Shift">
+    <meta property="og:title" content="September 2026 AI Model Updates: 20+ releases in two weeks, a 119x price spread and a new $0.10 per million token price floor">
     <meta property="og:description" content="Five frontier launches in ten days, Opus 5.5 and GPT-6 Sol and Luna halving flagship prices, and China's labs — Xiaomi's MiMo v2.6, DeepSeek V4.1-Flash, Qwen and Z.ai — taking the open-weight crown. The full engineering dispatch.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html">
     <meta property="og:site_name" content="Local AI Zone">
     <meta property="og:locale" content="en_US">
-    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/september-2026-ai-model-updates-hero.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="September 2026 AI Model Updates: Every Launch, Price Move, and Architecture Shift">
+    <meta property="og:image:alt" content="September 2026 AI Model Updates: 20+ releases in two weeks, a 119x price spread and a new $0.10 per million token price floor">
     <meta property="article:author" content="Hussain Nazary">
     <meta property="article:published_time" content="2026-09-03T00:00:00Z">
     <meta property="article:modified_time" content="2026-09-26T00:00:00Z">
@@ -54,8 +54,8 @@
     <meta name="twitter:creator" content="@hussainnazary">
     <meta name="twitter:title" content="September 2026 AI Model Updates: The Full Dispatch">
     <meta name="twitter:description" content="Four frontier launches in 72 hours, then Opus 5.5, GPT-6 Sol and Luna, and Gemini TTS in the second wave. Every price change and the architecture trends that matter — updated through September 26.">
-    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
-    <meta name="twitter:image:alt" content="September 2026 AI Model Updates">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/september-2026-ai-model-updates-hero.png">
+    <meta name="twitter:image:alt" content="September 2026 AI Model Updates: every launch and price move, July 31 to September 25, 2026">
 
     <!-- Structured data -->
     <script type="application/ld+json">
@@ -70,7 +70,7 @@
       "dateModified": "2026-09-26",
       "proficiencyLevel": "Expert",
       "wordCount": 14500,
-      "image": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/og-image.png", "width": 1200, "height": 630},
+      "image": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/blog/september-2026-ai-model-updates-hero.png", "width": 1200, "height": 630},
       "dependencies": "Claude API, Gemini API, Meta Model API, OpenAI API, Z.ai API",
       "about": [
         {"@type": "Thing", "name": "AI model releases September 2026"},
@@ -333,6 +333,14 @@
                     <li><a href="#faq">FAQ</a></li>
                     <li><a href="#sources">Sources</a></li>
                 </ol>
+                <!-- PHOTO SLOT (dispatch): save a real screenshot to blog/september-2026-local-models-dashboard.png (landscape, 1600x900 or larger, under 400 KB), then run python scripts/install-post-photo.py --slot=dispatch --file=PATH. Suggested subject: your own GGUF model browser, or a desk shot of the rig running several of the month's open-weight releases.
+                <figure>
+                    <img src="september-2026-local-models-dashboard.png" alt="GGUF model browser with cards for Qwen3.8 27b, Gemma 7b and Qwythos 9b, each listing quantizations, file size and downloads" width="1600" height="900" loading="lazy" decoding="async">
+                    <figcaption>The browser this site is built around: the GGUF builds behind the month&rsquo;s open-weight releases, with quantization counts, file sizes and download counts.</figcaption>
+                </figure>
+                -->
+
+
             </div>
 
             <div class="article-section">
@@ -694,6 +702,10 @@
                     <h3>✅ Engineering verdict</h3>
                     <p>The late-month moves matter less for capability than for <em>cost shape</em>. Cheaper flagship pricing at both Anthropic (Opus 5.5) and OpenAI (Sol and Luna) compresses the mid-tier margin that the open-weights wave was already eroding, and GPT-6 Luna at $0.10/$0.50 makes the case for re-checking your cheapest route: a model that undercut DeepSeek at the start of the month no longer does. If you built routing in early September, re-run the comparison before Q4 budgets lock — and if you ship voice, Gemini 3.8 Flash TTS is the new quality benchmark, with a dated price step on January 1.</p>
                 </div>
+                <figure>
+                    <img src="september-2026-release-density.png" alt="September 2026 AI model release density chart: two launches on September 12, one on September 14, two on September 15, two on September 18, five on September 21, six on September 22, five on September 23, two on September 24 and two on September 25" width="2160" height="1440" loading="lazy" decoding="async">
+                    <figcaption>Release density for September 12&ndash;25, 2026 &mdash; the late-September wave in one chart. Three days carry 16 of the 29 logged launches.</figcaption>
+                </figure>
             </div>
 
             <div class="article-section">
@@ -742,6 +754,10 @@
                     <h3>✅ Engineering verdict</h3>
                     <p>If you are routing work to Chinese labs this quarter, start with MiMo-V2.6-Flash ($0.14/$0.28, 1M context, MIT) and DeepSeek V4.1-Flash off-peak ($0.15/$0.60) — the two cheapest credible multimodal entries — and re-check GLM-5.3 FlashX if you need self-hosting at flash tier. Treat DeepSeek's v4-pro rerouting as a free upgrade, but pin explicit model IDs if your workload depends on Pro-specific behavior. Qwen3.8 Max Prime's 2× price needs measurable throughput gains before it earns traffic; and if your procurement team cares about the CISA and Anthropic allegations, prefer the open weights you can host yourself — Xiaomi and DeepSeek both publish them.</p>
                 </div>
+                <figure>
+                    <img src="september-2026-chinese-labs.png" alt="September 2026 Chinese AI lab releases and prices: Qwen3.8 Max, the Ling 3.0 Flash variants, DeepSeek V4.1-Flash, GLM-5.3 FlashX, Kimi K3 on Bedrock, Xiaomi's MiMo v2.6 Flash, Pro and Pro-UltraSpeed, GLM 5.3 Prime and Qwen3.8 Max Prime" width="2160" height="2184" loading="lazy" decoding="async">
+                    <figcaption>China's September, lab by lab &mdash; thirteen releases and the price each one shipped at, with MiMo-V2.6-Pro's Artificial Analysis score of 46 the highest any open-weight model has reached.</figcaption>
+                </figure>
             </div>
 
             <div class="article-section">
@@ -768,6 +784,11 @@
                 </table>
                 </div>
                 <p><em>Compiled from provider pricing pages and CloudZero's verified ledger (updated Sep 2, 2026). Anthropic's cancellation was reported by CloudZero; the Gemini schedule is from Google's pricing documentation.</em></p>
+
+                <figure>
+                    <img src="september-2026-price-moves.png" alt="September 2026 AI price moves: Claude Fable 5.1 cache reads cut 75%, Opus 5.5 down 20%, GPT-6 Sol down 50%, GPT-6 Luna at a new $0.10/$0.50 floor, GLM-5.3-Flash promo halved, and Gemini 3.8 Flash doubling on January 1, 2027" width="2160" height="1905" loading="lazy" decoding="async">
+                    <figcaption>The September price ledger's headline moves, in and out, per million tokens &mdash; cuts, one promo, one scheduled doubling and the counter-trend increase.</figcaption>
+                </figure>
 
                 <h3>The shape of the market</h3>
                 <p>Three structural facts fall out of the current table. First, the floor for mainstream APIs now sits near $0.20 per million input tokens, held by GPT-5.6 Luna since July 30 — a price that used to mean "budget legacy model" and now means "current flagship family." Second, the $2 input tier is the war zone: Claude Sonnet 5, GPT-5.6 Terra, and Gemini 3.1 Pro all sit at exactly $2, which is a coincidence in price and a bloodbath in margins. Third, output remains the hidden multiplier — 5× input at Anthropic, 6× at OpenAI — so verbose models quietly cost more than their input price suggests, and the 10×–150× spread inside a single vendor's lineup makes model choice the biggest line item on any AI budget.</p>
@@ -796,6 +817,11 @@
                 </table>
                 </div>
                 <p><em>Data: LLM Stats blended pricing (8:1 input:output), last verified September 26, 2026. GLM-5.3-Flash reflects list pricing; the Sep 9 promo halves it. Muse Spark 1.3, GPT-6 Sol and Luna, and Gemini 3.8 Flash prices are current-month rates; Gemini doubles Jan 1, 2027.</em></p>
+
+                <figure>
+                    <img src="september-2026-blended-price-frontier.png" alt="Blended price per million tokens for the leaderboard top 15 in September 2026, from Claude Fable 5.1 at $11.90 down to Muse Spark 1.3 at $0.10, with the open-weight models highlighted" width="2160" height="2337" loading="lazy" decoding="async">
+                    <figcaption>Blended price per million tokens at an 8:1 input-to-output blend, leaderboard top 15 &mdash; an 85&times; spread from Fable 5.1 to GPT-6 Luna, and 119&times; down to the cheapest top-5 model.</figcaption>
+                </figure>
 
                 <h3>The two anomalies worth attention</h3>
                 <p>DeepSeek's increase is the first deliberate break from the race to zero, and it is worth taking seriously as a signal rather than an aberration. V4-Pro-0813 at $1.32/$3.96 is still roughly 7× cheaper than comparable Western models, but the move says the under-costing strategy has a floor — serving frontier-quality traffic at pennies was subsidizing everyone else's budgets at DeepSeek's expense. If the cheapest credible vendor is raising prices while the most expensive vendors cut cache costs, the middle of the market compresses from both ends.</p>

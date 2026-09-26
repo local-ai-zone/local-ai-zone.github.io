@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
   <url>
     <loc>https://local-ai-zone.github.io</loc>
     <lastmod>2026-09-26</lastmod>
@@ -30482,6 +30482,20 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/ai-inference-hardware-2026.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/inference-hw-tflops-chart (1).png</image:loc>
+      <image:title>AI inference hardware TFLOPS comparison across GPU, NPU, and TPU options in 2026</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/inference-hw-memory-chart.png</image:loc>
+      <image:title>Log-log scatter plot showing memory capacity (GB) vs memory bandwidth (TB/s) for 23 AI inference hardware products. Products color-coded by vendor, marker shape indicates consumer/workstation/data-cen</image:title>
+      <image:caption>Figure 1. Memory capacity vs bandwidth for 23 AI inference hardware products. NVIDIA Blackwell (B300, 288GB/8 TB/s) and Google TPU v7 Ironwood (192GB/7.37 TB/s) lead the data-center tier. Apple Mac Studio M5 Ultra (512GB/1.2 TB/s) offers the most memory but at lower bandwidth. Consumer GPUs cluster in the 16–32GB / 0.5–1.8 TB/s range.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/inference-hw-tflops-chart.png</image:loc>
+      <image:title>Horizontal bar chart ranking 15 data-center AI accelerators by FP8 peak TFLOPS. NVIDIA B300 leads at 7,200 TFLOPS, followed by B200 at 4,500, H100/H200 at 3,958. AMD MI355X at 2,880 is the strongest n</image:title>
+      <image:caption>Figure 2. Data-center AI accelerators ranked by FP8 peak TFLOPS. NVIDIA Blackwell (B300: 7,200; B200: 4,500) leads decisively. AMD MI355X (2,880) is the strongest non-NVIDIA option. Huawei Ascend 910C (~800) trails significantly but is China&apos;s best domestic option. FP8 is peak theoretical; sustained performance is typically 40–60% of peak.</image:caption>
+    </image:image>
     <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -30494,6 +30508,20 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/bonsai-2-27b-5-9gb-hero.png</image:loc>
+      <image:title>Bonsai 2 27B illustrated: a 27B reasoning model in 5.93 GB at 1.76 bits per weight, keeping 98.2% of FP16 intelligence</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/bonsai-ternary-quantization-explained.png</image:loc>
+      <image:title>Diagram: what ternary quantisation changes in Bonsai 2 27B full precision weights, a Hadamard rotated basis, the Ternary g128 format with three weight levels, 1.76 bits per weight against a 1.75 to 1.</image:title>
+      <image:caption>From 53.8 GB of full precision weights to roughly 143 tokens per second on a single RTX 5090, step by step.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/bonsai-2-27b-footprint-vs-4bit.png</image:loc>
+      <image:title>Chart: Bonsai 2 27B footprint versus conventional quantisation 53.8 GB at FP16, 17.6 GB for a four bit UD-Q4_K_XL build at 5.2 bits per weight, and 5.93 GB for Bonsai 2 27B at 1.76 bits per weight</image:title>
+      <image:caption>The footprint ladder: three times smaller than a conventional four bit build, within 0.4 benchmark points of it, and 98.2% of the FP16 baseline.</image:caption>
+    </image:image>
     <lastmod>2026-09-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -30506,24 +30534,114 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/claude-fable-5-1-technical-breakdown.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/chart1_benchmarks.png</image:loc>
+      <image:title>Claude Fable 5.1 official benchmark results vs. predecessor and rivals - Terminal-Bench Science, Terminal-Bench 4.0, AutomationBench, CursorBench</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/chart3_aa.png</image:loc>
+      <image:title>Artificial Analysis Intelligence Index v4.1.1 ranking and cost per task - Fable 5.1 scores 66, highest intelligence but highest per-task cost at $3.69</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/coding-benchmark-matrix.png</image:loc>
+      <image:title>Coding benchmark matrix comparing Claude Fable 5.1 across multiple coding evaluation suites</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/chart4_coderabbit.png</image:loc>
+      <image:title>CodeRabbit code-review evaluation - 34% fewer comments, 70% fewer nitpicks, precision up 4.5 points, recall held at 61%</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/chart2_pricing.png</image:loc>
+      <image:title>Fable 5.1 pricing economics - cache-read price cut 75% vs Fable 5, effective cost 25-45% lower on agentic workloads</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/intelligence-per-dollar.png</image:loc>
+      <image:title>Intelligence per dollar analysis showing Fable 5.1 cost-effectiveness across workload types</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/developer-sentiment-chart.png</image:loc>
+      <image:title>Developer sentiment and adoption patterns for Claude Fable 5.1</image:title>
+    </image:image>
     <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/ai-agent-context-management-hero.png</image:loc>
+      <image:title>Context management for agent loops illustrated: a 100:1 input-to-output token ratio, context rot measured at 32K, and the patterns that fix it</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/context-rot-measured.png</image:loc>
+      <image:title>Chart: context rot measured 99.3% recall at short range, 69.7% on the same associative recall task at 32K tokens, and a 50% cliff on NoLiMa at 32K</image:title>
+      <image:caption>Context rot, measured: the same models, the same task, different distances. Failures arrive exactly where agent loops do their work.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/context-management-payoff.png</image:loc>
+      <image:title>Chart: what context management buys on DeepSeek models BrowseComp rising from 51.4 to 67.6, Multi-Query needle in a haystack rising from 84.2 to 97.0 with Engram memory, and a production counter-examp</image:title>
+      <image:caption>The measured payoff, and the honest counterweight: DeepSeek&apos;s own studies on the left, a production team&apos;s tested defaults on the right.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/context-constraint-decision-map.png</image:loc>
+      <image:title>Decision map: which context management pattern to reach for window overflow points to P2 compaction, P3 clearing, P5 offload and P7 isolation; cost points to P8 prefix stabilisation then P9 native cac</image:title>
+      <image:caption>Name the constraint first: the three failure modes show up together and are fixed separately, which is the documented 2026 mistake.</image:caption>
+    </image:image>
     <lastmod>2026-09-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-moe-384-experts-hero.png</image:loc>
+      <image:title>DeepSeek MoE evolution illustrated: from a dense 67B baseline to 384 routed experts activating 1.4% of a 552B backbone</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-moe-sparsity-ladder.png</image:loc>
+      <image:title>Chart: the DeepSeek MoE sparsity ladder activated parameters as a share of total, from 100% for the dense V1 67B baseline to 1.4% for V4.1-Flash activating 8B of 552B during prefill</image:title>
+      <image:caption>The sparsity ladder in one chart: activated parameters as a share of total, release by release, measured against the dense 67B baseline DeepSeek started from.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-moe-training-economics.png</image:loc>
+      <image:title>Chart: what DeepSeek</image:title>
+      <image:caption>What sparsity bought, in the paper&apos;s own units: training cost, generation throughput, speculative decode and the widest backbone-to-active ratio in the line.</image:caption>
+    </image:image>
     <lastmod>2026-09-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/deepseek-kv-cache-optimization-research-paper.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-kv-cache-890-bytes-hero.png</image:loc>
+      <image:title>DeepSeek KV cache optimization illustrated: 890 bytes per cached token at V4.1-Flash, a 438x reduction from the 2023 baseline</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-kv-cache-four-discontinuities.png</image:loc>
+      <image:title>Chart: four DeepSeek KV cache generations GQA-8 at 389,120 bytes per cached token in 2023, MLA at 69,120, MLA plus DSA at 48,068, and CSA2 at 890 bytes per token at V4.1-Flash</image:title>
+      <image:caption>Fig. 1 The four architectural discontinuities in DeepSeek&apos;s KV cache history. Each attacks a different axis of the same equation.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-kv-mla-vs-mha-bytes.png</image:loc>
+      <image:title>Chart: per-layer KV cache bytes at DeepSeek-V2</image:title>
+      <image:caption>Fig. 2 Per-layer cache entries at DeepSeek-V2&apos;s geometry. MLA stores 1.76% of MHA&apos;s bytes and 28% of GQA-8&apos;s.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-kv-dsa-decode-path.png</image:loc>
+      <image:title>Diagram: the DSA decode path a cheap lightning indexer scores every past token, a top-k selection is chosen, and full attention reads only the selection</image:title>
+      <image:caption>Fig. 3 The DSA decode path. The indexer reads everything cheaply; attention reads the selection expensively. Storage grows with context; read time barely does.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-kv-v41-cache-pipeline.png</image:loc>
+      <image:title>Diagram: the DeepSeek-V4.1-Flash cache pipeline one global KV projection at 890 bytes per token, shared across decoder layers, stored at four bits and pooled, with a replayable local window</image:title>
+      <image:caption>Fig. 4 The V4.1-Flash cache pipeline: one global KV projection, shared across decoder layers, 4-bit and pooled, with a replayable local window.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-kv-bytes-per-token-lineage.png</image:loc>
+      <image:title>Chart: stored KV bytes per token across the DeepSeek lineage, from 491,520 bytes at the 2023 7B model to 890 bytes at V4.1-Flash, a 438x reduction on a linear scale</image:title>
+      <image:caption>Fig. 5 Stored KV bytes per token across the lineage (log-free linear scale, which is the honest way to feel a 438 gap: the last two bars are nearly invisible). V4 bars are implied from DeepSeek&apos;s @1M percentages.</image:caption>
+    </image:image>
     <lastmod>2026-09-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -30542,12 +30660,47 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/deepseek-v4-flash-deep-dive.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-v4-flash-architecture.png</image:loc>
+      <image:title>DeepSeek V4 Flash architecture</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-v4-flash-benchmarks.png</image:loc>
+      <image:title>Benchmark comparison</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-v4-flash-reasoning-modes.png</image:loc>
+      <image:title>Reasoning mode scaling</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/deepseek-v4-flash-training-pipeline.png</image:loc>
+      <image:title>Training pipeline</image:title>
+    </image:image>
     <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/flash-tier-ai-models-comparative-analysis.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/major-ai-models-comparison.png</image:loc>
+      <image:title>Major AI models comparison chart showing architecture, parameters, and capabilities across DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/flash-tier-architecture-comparison.png</image:loc>
+      <image:title>Three-column architecture comparison infographic showing DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next layer-by-layer stack diagrams with a 24-dimension comparison matrix below.</image:title>
+      <image:caption>Figure 1. Three-column architecture comparison. Each column shows the layer-by-layer stack for one model (left: DeepSeek V4 Flash with CSA+HCA blocks; center: GLM-5.3 Flash with KDA+Sparse MLA blocks and ViT vision encoder; right: Qwen3.8 Flash-Next with GDN+QSA blocks and 51B N-gram engram). The bottom matrix table compares all three across 24 dimensions including parameters, layers, attention design, MoE config, context length, weight precision, optimizer, and unique differentiator. Color codi</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/major-models-benchmarks.png</image:loc>
+      <image:title>Major AI models benchmark comparison across MMLU, HumanEval, MATH, and domain-specific evaluations for DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next</image:title>
+      <image:caption>Figure 2. Flash-tier benchmark comparison. DeepSeek V4 Flash (cyan) leads on MMLU-Pro (86.2), LiveCodeBench (91.6), and SWE-bench Verified (79.0). GLM-5.3 Flash (blue) leads on HLE without tools (50.2), DeepSWE v1.1 (63.4), and GDPval-AA v2 Elo (1773 — the sole independently-evaluated number). Qwen3.8 Flash-Next (green) leads narrowly on GPQA Diamond (91.7). NaN cells indicate benchmarks where the model has not been evaluated in a comparable setup.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/flash-tier-benchmark-comparison.png</image:loc>
+      <image:title>Grouped bar chart comparing DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next across nine benchmarks including MMLU-Pro, GPQA Diamond, HLE, LiveCodeBench, SWE-bench Verified, DeepSWE, Terminal </image:title>
+      <image:caption>Figure 2. Flash-tier benchmark comparison. DeepSeek V4 Flash (cyan) leads on MMLU-Pro (86.2), LiveCodeBench (91.6), and SWE-bench Verified (79.0). GLM-5.3 Flash (blue) leads on HLE without tools (50.2), DeepSWE v1.1 (63.4), and GDPval-AA v2 Elo (1773 — the sole independently-evaluated number). Qwen3.8 Flash-Next (green) leads narrowly on GPQA Diamond (91.7). NaN cells indicate benchmarks where the model has not been evaluated in a comparable setup.</image:caption>
+    </image:image>
     <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -30560,30 +30713,98 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/glm-5-3-flash-deep-dive.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/glm-5.3-flash-architecture.png</image:loc>
+      <image:title>GLM-5.3-Flash architecture</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/glm-5.3-flash-intra-family.png</image:loc>
+      <image:title>Intra-family evolution GLM-4.5 → GLM-5.3-Flash</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/glm-5.3-flash-benchmarks.png</image:loc>
+      <image:title>Benchmark comparison</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/glm-5.3-flash-training-pipeline.png</image:loc>
+      <image:title>Training pipeline</image:title>
+    </image:image>
     <lastmod>2026-08-27</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/gpt-6-astra-deep-dive.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/gpt6-astra-benchmark-comparison.png</image:loc>
+      <image:title>GPT-6 Astra benchmark comparison</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/gpt6-astra-cost-vs-quality.png</image:loc>
+      <image:title>GPT-6 Astra cost vs quality comparison</image:title>
+    </image:image>
     <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/gpu-cpu-inference-troubleshooting.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/inference-bottleneck-flowchart.png</image:loc>
+      <image:title>6-step diagnostic flowchart showing how to identify inference bottlenecks: model loading, GPU utilization, token speed, CPU offload, KV cache, and format/runtime mismatch.</image:title>
+      <image:caption>Figure 1. Inference bottleneck diagnosis flowchart. Start at Step 1 (does the model load?) and follow through GPU utilization, token speed, and the three most common bottleneck types: CPU offload, KV cache, and format/runtime mismatch.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/inference-optimization-waterfall.png</image:loc>
+      <image:title>Waterfall chart showing cumulative token speed improvement from 7 optimizations: Flash Attention, thread tuning, quantization, KV cache FP8, MTP, context reduction, and EXL2 switch.</image:title>
+      <image:caption>Figure 2. Cumulative optimization impact for a 70B model on RTX 5090 (32GB). Starting at 12 tok/s (baseline, no optimization), each fix adds speed. The biggest wins: quantization (Q8→Q4, +56%), MTP speculative decoding (+31%), and switching from GGUF to EXL2 (+35%). Total improvement: 12 → 65 tok/s (442%).</image:caption>
+    </image:image>
     <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/how-much-local-ai-costs-2026.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/local-ai-tier-cost-chart.png</image:loc>
+      <image:title>Two-panel chart: left shows cost range by tier (log scale), right shows max model size and concurrent users per tier.</image:title>
+      <image:caption>Figure 1. Local AI system tiers — cost vs capability. Left: cost ranges (log scale) from Tier 1 ($1.2K) to Tier 5 ($400K). Right: max model size (in B parameters at Q4 quantization) and concurrent users each tier can serve. Tier 3 ($5K–$9.5K) is the sweet spot — runs 70B models, serves 3 concurrent users.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/local-vs-cloud-breakeven.png</image:loc>
+      <image:title>Line chart showing cumulative cost over 12 months for three local AI tiers (dashed lines) vs three cloud API usage levels (solid lines). Break-even intersections marked.</image:title>
+      <image:caption>Figure 2. Local AI vs cloud API — 12-month break-even analysis. Cloud API = Claude Opus 4.8 at $5/$25 per million tokens. Heavy use = 50M output tokens/month ($1,250/mo cloud). Medium = 20M tokens ($500/mo). Light = 5M tokens ($125/mo). Tier 2 ($3,500 system) breaks even with heavy cloud use at 2.8 months; Tier 3 ($7,000) at 5.7 months; Tier 4 ($15,000) at 12.8 months.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/local-ai-cost-breakdown.png</image:loc>
+      <image:title>Horizontal bar chart showing 9 cost components for a Tier 3 build + 3-year TCO: GPU, CPU/motherboard, RAM, storage, PSU/case/cooling, electricity, software, maintenance, your time.</image:title>
+      <image:caption>Figure 3. Where the money goes — Tier 3 build ($7K) + 3-year TCO breakdown. The GPU is the largest single cost ($2,400), but electricity ($1,080 over 3 years) and your time ($2,000 at 40 hours setup) are substantial hidden costs. Software is $0 — the entire local AI software stack is free and open source.</image:caption>
+    </image:image>
     <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/how-to-build-an-ai-agent-step-by-step-guide.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/how-to-build-ai-agent-hero.png</image:loc>
+      <image:title>How to build an AI agent: the canonical anatomy, the four-line agent loop and five composable workflow patterns</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/ai-agent-canonical-anatomy.png</image:loc>
+      <image:title>Diagram: the canonical AI agent anatomy model, tools, instructions, memory and context, the loop that executes tool calls and appends observations, and the boundary of guardrails, human escalation and</image:title>
+      <image:caption>The canonical agent, in the order its parts tend to fail: the model at the top, the boundary that keeps it safe at the bottom.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/ai-agent-loop-code.png</image:loc>
+      <image:title>Code card: the four line smolagents agent loop a memory list, a while loop that asks the model for the next action, executes it and appends the observation</image:title>
+      <image:caption>The loop, precisely: four lines of pseudocode, and the reason a run spends about 100 input tokens for every token it produces.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/ai-agent-five-workflow-patterns.png</image:loc>
+      <image:title>Grid: Anthropic</image:title>
+      <image:caption>The palette, not a complexity ladder: five workflow patterns, who decides the path in each, and what each one costs plus the sixth row they graduate into.</image:caption>
+    </image:image>
     <lastmod>2026-09-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -30620,12 +30841,32 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/migrate-claude-to-local-ai (1).html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/claude-to-local-migration-flowchart.png</image:loc>
+      <image:title>6-step migration flowchart showing the pipeline from assessing Claude usage through hardware selection, model choice, inference server setup, prompt migration, and testing/deployment.</image:title>
+      <image:caption>Figure 1. The 6-step migration pipeline. The bottom panels show what you&apos;ll lose (and how to compensate) vs what you&apos;ll gain. The most common paths (September 2026): Claude Opus 4.8 → Kimi K3 via Together AI API ($3/$15/M, AA Idx 74.76 Opus 72.17) for true Opus-tier open-weights quality; → DeepSeek V4.1 Flash on Mac Studio M5 Ultra ($5.5K+) for local self-host; → Qwen3.8 27B on RTX 5080 ($1.2K) for budget Sonnet-tier replacement.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/claude-vs-local-equivalents.png</image:loc>
+      <image:title>Grouped bar chart comparing Claude Opus 4.8 vs Kimi K3, DeepSeek V4.1 Flash, GLM-5.3 Flash, and Qwen3.8 27B across 6 dimensions: chat, coding, reasoning, long-context, tool use, and cost. Kimi K3 (pur</image:title>
+      <image:caption>Figure 2. Claude Opus 4.8 vs September 2026 open-weights equivalents. Claude (orange) leads on tool use (95) and chat quality (95). Kimi K3 (purple, AA Idx 74.76 Opus 72.17) is the only open-weights model to exceed Opus 4.8 on the Artificial Analysis Intelligence Index. DeepSeek V4.1 Flash (blue, NEW Sept 10) leads on coding (94). GLM-5.3 Flash (green) and Qwen3.8 27B (mint) are mid-tier-optimised but still strong. The gap has narrowed substantially — Kimi K3 actually beats Opus on the AA Index.</image:caption>
+    </image:image>
     <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/migrate-claude-to-local-ai.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/claude-to-local-migration-flowchart.png</image:loc>
+      <image:title>6-step migration flowchart showing the pipeline from assessing Claude usage through hardware selection, model choice, inference server setup, prompt migration, and testing/deployment.</image:title>
+      <image:caption>Figure 1. The 6-step migration pipeline. The bottom panels show what you&apos;ll lose (and how to compensate) vs what you&apos;ll gain. The most common paths (September 2026): Claude Opus 4.8 → Kimi K3 via Together AI API ($3/$15/M, AA Idx 74.76 Opus 72.17) for true Opus-tier open-weights quality; → DeepSeek V4.1 Flash on Mac Studio M5 Ultra ($5.5K+) for local self-host; → Qwen3.8 27B on RTX 5080 ($1.2K) for budget Sonnet-tier replacement.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/claude-vs-local-equivalents.png</image:loc>
+      <image:title>Grouped bar chart comparing Claude Opus 4.8 vs Kimi K3, DeepSeek V4.1 Flash, GLM-5.3 Flash, and Qwen3.8 27B across 6 dimensions: chat, coding, reasoning, long-context, tool use, and cost. Kimi K3 (pur</image:title>
+      <image:caption>Figure 2. Claude Opus 4.8 vs September 2026 open-weights equivalents. Claude (orange) leads on tool use (95) and chat quality (95). Kimi K3 (purple, AA Idx 74.76 Opus 72.17) is the only open-weights model to exceed Opus 4.8 on the Artificial Analysis Intelligence Index. DeepSeek V4.1 Flash (blue, NEW Sept 10) leads on coding (94). GLM-5.3 Flash (green) and Qwen3.8 27B (mint) are mid-tier-optimised but still strong. The gap has narrowed substantially — Kimi K3 actually beats Opus on the AA Index.</image:caption>
+    </image:image>
     <lastmod>2026-09-11</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -30644,6 +30885,22 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/quantization-formats-guide.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/quant-vram-comparison.png</image:loc>
+      <image:title>VRAM requirements comparison across quantization levels showing memory savings at each bit width</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/quant-format-comparison.png</image:loc>
+      <image:title>Quantization format comparison chart showing GGUF, GPTQ, AWQ, and EXL2 formats side by side</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/benchmark-prompt-to-score.png</image:loc>
+      <image:title>Benchmark prompt-to-score pipeline showing how model inputs are transformed into evaluation metrics</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/benchmark-anatomy.png</image:loc>
+      <image:title>Anatomy of an AI benchmark showing how evaluation scores are computed and what they measure</image:title>
+    </image:image>
     <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -30662,6 +30919,30 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/september-2026-ai-model-updates-hero.png</image:loc>
+      <image:title>September 2026 AI Model Updates: 20+ releases in two weeks, a 119x price spread and a new $0.10 per million token price floor</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/september-2026-release-density.png</image:loc>
+      <image:title>September 2026 AI model release density chart: two launches on September 12, one on September 14, two on September 15, two on September 18, five on September 21, six on September 22, five on September</image:title>
+      <image:caption>Release density for September 12 25, 2026 the late-September wave in one chart. Three days carry 16 of the 29 logged launches.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/september-2026-chinese-labs.png</image:loc>
+      <image:title>September 2026 Chinese AI lab releases and prices: Qwen3.8 Max, the Ling 3.0 Flash variants, DeepSeek V4.1-Flash, GLM-5.3 FlashX, Kimi K3 on Bedrock, Xiaomi</image:title>
+      <image:caption>China&apos;s September, lab by lab thirteen releases and the price each one shipped at, with MiMo-V2.6-Pro&apos;s Artificial Analysis score of 46 the highest any open-weight model has reached.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/september-2026-price-moves.png</image:loc>
+      <image:title>September 2026 AI price moves: Claude Fable 5.1 cache reads cut 75%, Opus 5.5 down 20%, GPT-6 Sol down 50%, GPT-6 Luna at a new $0.10/$0.50 floor, GLM-5.3-Flash promo halved, and Gemini 3.8 Flash doub</image:title>
+      <image:caption>The September price ledger&apos;s headline moves, in and out, per million tokens cuts, one promo, one scheduled doubling and the counter-trend increase.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/september-2026-blended-price-frontier.png</image:loc>
+      <image:title>Blended price per million tokens for the leaderboard top 15 in September 2026, from Claude Fable 5.1 at $11.90 down to Muse Spark 1.3 at $0.10, with the open-weight models highlighted</image:title>
+      <image:caption>Blended price per million tokens at an 8:1 input-to-output blend, leaderboard top 15 an 85 spread from Fable 5.1 to GPT-6 Luna, and 119 down to the cheapest top-5 model.</image:caption>
+    </image:image>
     <lastmod>2026-09-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -30674,12 +30955,38 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/top-20-inference-providers-2026.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/inference-providers-cost-vs-quality.png</image:loc>
+      <image:title>Inference providers cost versus quality analysis showing price-performance tradeoffs</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/inference-providers-cost-chart.png</image:loc>
+      <image:title>GPU inference provider cost comparison chart showing pricing across top 20 providers in 2026</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/gpu-rental-cost-chart.png</image:loc>
+      <image:title>Horizontal bar chart ranking 20 GPU rental providers by H100 80GB per-hour cost. Vast.ai spot at $1.33, GCP at $8.00.</image:title>
+      <image:caption>Figure 1. H100 80GB GPU rental cost per hour across 20 providers (August 2026). Budget zone (under $2/hr): Vast.ai spot, JarvisLabs, Voltage Park, RunPod community, GMI Cloud. Premium zone (over $5/hr): Nebius, Together dedicated, Azure, GCP. Local AI at $0.50/hr (amortized RTX 5090) is cheapest overall.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/gpu-rental-vram-vs-cost.png</image:loc>
+      <image:title>Scatter plot showing GPU rental cost per hour (log scale, x-axis) vs VRAM GB (y-axis). Point size proportional to VRAM-per-dollar value metric. DeepInfra B300 at $4.89/hr with 288GB is high value; Vas</image:title>
+      <image:caption>Figure 2. VRAM capacity vs cost per hour across GPU rental options. Point size = VRAM-per-dollar value metric. DeepInfra B300 ($4.89/hr, 288GB) is the best value for large models. Vast.ai A100 spot ($0.68/hr, 80GB) is cheapest per-GB. Local Mac Studio M5 Ultra ($1.50/hr amortized, 512GB) offers the most VRAM at lowest effective cost. RTX 5090 spot ($0.29/hr, 32GB) is cheapest absolute.</image:caption>
+    </image:image>
     <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/top-embedding-reranker-ocr-models-2026.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/rag-tools-usecase-matrix.png</image:loc>
+      <image:title>RAG tools use-case matrix matching embedding, reranker, and OCR models to specific pipeline requirements</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/rag-tools-capability-chart.png</image:loc>
+      <image:title>RAG tools capability comparison chart showing embedding, reranker, and OCR model performance across key dimensions</image:title>
+    </image:image>
     <lastmod>2026-09-02</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>

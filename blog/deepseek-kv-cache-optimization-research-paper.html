@@ -50,9 +50,10 @@
   },
   "image": {
     "@type": "ImageObject",
-    "url": "https://local-ai-zone.github.io/og-image.png",
+    "url": "https://local-ai-zone.github.io/blog/deepseek-kv-cache-890-bytes-hero.png",
     "width": 1200,
-    "height": 630
+    "height": 630,
+    "caption": "DeepSeek's KV cache across four architectural generations: from 389,120 bytes per cached token in 2023 to 890 bytes at V4.1-Flash, a 438x reduction"
   },
   "speakable": {
     "@type": "SpeakableSpecification",
@@ -82,10 +83,10 @@
 <meta property="og:url" content="https://local-ai-zone.github.io/blog/deepseek-kv-cache-optimization-research-paper.html">
 <meta property="og:site_name" content="Local AI Zone">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/deepseek-kv-cache-890-bytes-hero.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="From 390 KB to 890 Bytes — DeepSeek's KV Cache Optimization">
+<meta property="og:image:alt" content="DeepSeek KV cache optimization illustrated: 890 bytes per cached token at V4.1-Flash, a 438x reduction from the 2023 baseline">
 <meta property="article:author" content="Hussain Nazary">
 <meta property="article:published_time" content="2026-09-13T00:00:00Z">
 <meta property="article:modified_time" content="2026-09-26T00:00:00Z">
@@ -105,8 +106,8 @@
 <meta name="twitter:creator" content="@hussainnazary">
 <meta name="twitter:title" content="DeepSeek KV Cache: From 390 KB to 890 Bytes">
 <meta name="twitter:description" content="16 chapters tracing every DeepSeek KV-cache optimization — MLA, the lightning indexer, CSA/HCA pooling, CSA2 cross-layer reuse and FP4 caching. Every number cited.">
-<meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
-<meta name="twitter:image:alt" content="From 390 KB to 890 Bytes — DeepSeek's KV Cache Optimization">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/deepseek-kv-cache-890-bytes-hero.png">
+<meta name="twitter:image:alt" content="DeepSeek KV cache optimization illustrated: 890 bytes per cached token at V4.1-Flash, a 438x reduction from the 2023 baseline">
 
 <!-- FAQ Schema (AEO) -->
 <script type="application/ld+json">
@@ -310,6 +311,8 @@ pre .d{color:#e3b341}
 /* ============ FIGURES / DIAGRAMS ============ */
 figure{margin:28px 0}
 figcaption{font-size:13px;color:var(--ink-faint);margin-top:10px;text-align:center}
+figure img{display:block;width:100%;height:auto;margin:0;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+html[data-theme='dark'] figure img{filter:brightness(.94)}
 .flow{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:22px;font-size:14px}
 html[data-theme='dark'] .flow{background:#101728}
 .flow .fnode{background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;line-height:1.5;box-shadow:0 1px 2px rgba(16,24,40,.05)}
@@ -521,7 +524,7 @@ html[data-theme='dark'] .src-block{background:#101728}
   <div class="fnode"><b>2026 (September) &mdash; CSA2 + FP4 + CED (DeepSeek-V4.1-Flash).</b> Share the cache <em>across layers</em>, quantize it to 4-bit MXFP4, and recompute local state instead of persisting it: 890 bytes per token in HBM &mdash; 1/4 of V4-Flash's footprint, with 1/8 the persistent storage.</div>
 </div>
 
-<figure><figcaption>Fig. 1 &mdash; The four architectural discontinuities in DeepSeek's KV cache history. Each attacks a different axis of the same equation.</figcaption></figure>
+<figure><img src="deepseek-kv-cache-four-discontinuities.png" alt="Chart: four DeepSeek KV cache generations &mdash; GQA-8 at 389,120 bytes per cached token in 2023, MLA at 69,120, MLA plus DSA at 48,068, and CSA2 at 890 bytes per token at V4.1-Flash" width="2160" height="1380" loading="lazy" decoding="async"><figcaption>Fig. 1 &mdash; The four architectural discontinuities in DeepSeek's KV cache history. Each attacks a different axis of the same equation.</figcaption></figure>
 
 <p>Why should you care, if you are not DeepSeek? Because the economics propagate. When the cache shrinks, a fixed fleet of GPUs serves more concurrent users at longer contexts, and the price floor drops with it. DeepSeek's API cache-hit price fell from $0.014 per million tokens in 2024 to $0.006 per million at V4.1-Flash's launch &mdash; while the cache-hit <em>discount</em> versus a cache miss deepened from 10&times; to 50&times;, a direct consequence of cheaper persistent caches. The Tensor Economics analysis made the strategic case explicit: sparse attention is what makes "Claude Code-like" long-context coding products viable with positive gross margins, and DeepSeek's own V4.1 announcement states it in one line &mdash; cache-hit charges often account for a large share of agent costs, and compressing the cache cuts those costs significantly. The cache is not an implementation detail. It is the unit of account for the entire agentic era.</p>
 
@@ -642,7 +645,7 @@ html[data-theme='dark'] .src-block{background:#101728}
   </div>
 </div>
 
-<figure><figcaption>Fig. 2 &mdash; Per-layer cache entries at DeepSeek-V2's geometry. MLA stores 1.76% of MHA's bytes and 28% of GQA-8's.</figcaption></figure>
+<figure><img src="deepseek-kv-mla-vs-mha-bytes.png" alt="Chart: per-layer KV cache bytes at DeepSeek-V2's geometry &mdash; MLA stores 1.76% of multi-head attention's bytes and 28% of GQA-8's" width="2160" height="1380" loading="lazy" decoding="async"><figcaption>Fig. 2 &mdash; Per-layer cache entries at DeepSeek-V2's geometry. MLA stores 1.76% of MHA's bytes and 28% of GQA-8's.</figcaption></figure>
 
 <h3>The arithmetic, honestly done</h3>
 <p>Run the Chapter 2 formula across the full 60-layer stack and the totals fall out cleanly: MHA 3.84 MB/token, GQA-8 240 KB, MLA 67.5 KB (the paper rounds to 70 KB). MLA's per-token footprint is thus <strong>56.9&times; smaller than MHA</strong> at identical geometry &mdash; which matches the ~57&times; theoretical HBM-traffic reduction the paper derives for decoding &mdash; and <strong>5.6&times; smaller than the 67B's GQA-8 across its 95 layers</strong> (389 KB &rarr; 67.5 KB, an 82.2% reduction). The abstract's headline 93.3%, meanwhile, is DeepSeek's own accounting against the 67B under its stated comparison conditions; independent arithmetic at face-value configs lands between 82% and 98% depending on the baseline chosen (the V2 report's MHA-vs-MLA framing implies the upper end, the GQA framing the lower).</p>
@@ -785,6 +788,13 @@ V_C = W_UV @ c_KV         # 512 -&gt; 128 heads x 128 dims</code></pre>
 <p>The model lineage around this systems work kept improving while the attention stayed frozen: <strong>DeepSeek-V2.5</strong> (September 5, 2024) merged the V2 chat and DeepSeek-Coder lines into one model with the same MLA cache and 128K context, and the <strong>V2.5-1210</strong> point release (December 10, 2024) tuned alignment and function-calling &mdash; the property agents actually felt. Through all of it, the per-token cache never changed: 576 elements, ~70 KB. The compression and the reuse were now both in place. What remained was scale &mdash; and the 671B model that would make MLA carry more parameters than any open model in history.</p>
 
 <!-- ==================== CHAPTER 7 ==================== -->
+<!-- PHOTO SLOT (kv): save a real screenshot to blog/deepseek-kv-cache-disk-hit.png (landscape, 1600x900 or larger, under 400 KB), then run python scripts/install-post-photo.py --slot=kv --file=PATH (see scripts/PHOTO_SLOTS.md). Suggested subject: a terminal capture of a serving log showing KV cache reuse across conversation turns, with cache hit bytes visible in the per request metrics.
+<figure>
+  <img src="deepseek-kv-cache-disk-hit.png" alt="Terminal screenshot of a DeepSeek serving log showing KV cache reuse across conversation turns and the bytes served from cache" width="1600" height="900" loading="lazy" decoding="async">
+  <figcaption>A real cache hit, on real hardware: the serving log that turns this paper's byte arithmetic into a warm cache and a cheaper turn.</figcaption>
+</figure>
+-->
+
 <h2 class="ch" id="ch7"><span class="chno">7.</span> V2.5 to V3: Scaling the Latent</h2>
 <p class="ch-sub">December 26, 2024: 671B parameters, 37B active &mdash; and the exact same 576-element cache, now carrying the biggest open model on Earth.</p>
 
@@ -928,7 +938,7 @@ dsa(N)      = 132 B * N      * 61          # indexer sees all, cheap
   <div class="fterminal"><b>Sparse MLA attention</b><br>full 656-byte latents for exactly k = 2,048 tokens<br>fixed cost &middot; identical to dense MLA, minus 99% of the tokens</div>
 </div>
 
-<figure><figcaption>Fig. 3 &mdash; The DSA decode path. The indexer reads everything cheaply; attention reads the selection expensively. Storage grows with context; read time barely does.</figcaption></figure>
+<figure><img src="deepseek-kv-dsa-decode-path.png" alt="Diagram: the DSA decode path &mdash; a cheap lightning indexer scores every past token, a top-k selection is chosen, and full attention reads only the selection" width="2160" height="1836" loading="lazy" decoding="async"><figcaption>Fig. 3 &mdash; The DSA decode path. The indexer reads everything cheaply; attention reads the selection expensively. Storage grows with context; read time barely does.</figcaption></figure>
 
 <h3>10.4 &mdash; Day-0 kernels and what the support post reveals</h3>
 <p>The engineering lift to serve DSA was nontrivial, and the vLLM team's Day-0 post is the best public record of why. Three cache layouts now coexist (latent, indexer keys at per-block granularity, page table mappings between them); continuous batching must track separate prefill/decode paths for the indexer; and the top-k over a materialized (q, n, h) logits tensor wants fusion at scale &mdash; vLLM shipped a fused kernel taking design cues from DeepSeek's own TileLang reference. The compute path uses new DeepGEMM routines (<span class="mono">fp8_mqa_logits</span> for indexer scoring, causality bounded by per-query start/end context markers) and a new sparse attention kernel in FlashMLA, with out-of-the-box Blackwell support landed in collaboration with NVIDIA (B200 and GB200 from day zero). SGLang's simultaneous Day-0 post told the same story from its side. The message to the industry was unmistakable: when DeepSeek ships an attention mechanism, it ships the kernels too, and the engines follow within hours.</p>
@@ -1102,7 +1112,7 @@ vllm serve deepseek-ai/DeepSeek-V4-Flash \
   </div>
 </div>
 
-<figure><figcaption>Fig. 4 &mdash; The V4.1-Flash cache pipeline: one global KV projection, shared across decoder layers, 4-bit and pooled, with a replayable local window.</figcaption></figure>
+<figure><img src="deepseek-kv-v41-cache-pipeline.png" alt="Diagram: the DeepSeek-V4.1-Flash cache pipeline &mdash; one global KV projection at 890 bytes per token, shared across decoder layers, stored at four bits and pooled, with a replayable local window" width="2160" height="1638" loading="lazy" decoding="async"><figcaption>Fig. 4 &mdash; The V4.1-Flash cache pipeline: one global KV projection, shared across decoder layers, 4-bit and pooled, with a replayable local window.</figcaption></figure>
 
 <h3>14.5 &mdash; Engram and the rest of the machine</h3>
 <p>Two further mechanisms round out the architecture. <strong>Engram</strong> is a conditional memory module of 196B parameters using multi-head hashing and context-aware gating to store and retrieve knowledge without materially raising the activated parameter count &mdash; capacity that lives in weights rather than cache, the mirror image of every previous chapter's move. <strong>Single-Pass mHC</strong> revises the V4 residual-mixing design into a kernel-fusable "Mega-mHC" pass that cuts activation memory traffic to (2n+2)d reads and writes &mdash; roughly half. Training infrastructure earned its own section: Attention Sharing Training manages "shadow indexers" (lightweight replicas of indexer state) to overlap communication and computation under pipeline parallelism; the Muon optimizer became head-wise (separate preconditioners per attention head); and the huge embedding tables train with Sinkhorn-Balanced Updates, a momentum-plus-balance scheme that shrank optimizer state while stabilizing the big tables. Post-training pushed further into agentic and multimodal data, and introduced <strong>Controllable Reasoning Effort</strong>: a scalar effort level (1&ndash;100) in the system prompt, trained with an exponential token-penalty reward, that lets one checkpoint behave as a quick assistant or a deep reasoner &mdash; up to 2.5&times; more output tokens at maximum effort.</p>
@@ -1149,7 +1159,7 @@ vllm serve deepseek-ai/DeepSeek-V4-Flash \
   <div class="bar-row"><div class="lbl">V4-Pro &middot; CSA+HCA @1M</div><div class="track"><div class="fill" style="width:1.24%"></div></div><div class="val">~4.8 KB</div></div>
   <div class="bar-row"><div class="lbl">V4.1-Flash &middot; CSA2, MXFP4</div><div class="track"><div class="fill ok" style="width:0.24%"></div></div><div class="val">890 B</div></div>
 </div>
-<figure><figcaption>Fig. 5 &mdash; Stored KV bytes per token across the lineage (log-free linear scale, which is the honest way to feel a 438&times; gap: the last two bars are nearly invisible). V4 bars are implied from DeepSeek's @1M percentages.</figcaption></figure>
+<figure><img src="deepseek-kv-bytes-per-token-lineage.png" alt="Chart: stored KV bytes per token across the DeepSeek lineage, from 491,520 bytes at the 2023 7B model to 890 bytes at V4.1-Flash, a 438x reduction on a linear scale" width="2160" height="1599" loading="lazy" decoding="async"><figcaption>Fig. 5 &mdash; Stored KV bytes per token across the lineage (log-free linear scale, which is the honest way to feel a 438&times; gap: the last two bars are nearly invisible). V4 bars are implied from DeepSeek's @1M percentages.</figcaption></figure>
 
 <h3>15.2 &mdash; Read traffic per decode step</h3>
 <div class="tblwrap">

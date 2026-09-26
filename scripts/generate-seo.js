@@ -253,6 +253,91 @@ class URLProcessor {
     constructor(logger, baseURL = 'https://local-ai-zone.github.io') {
         this.logger = logger;
         this.baseURL = baseURL;
+        this.rootDir = path.join(__dirname, '..');
+    }
+
+    /**
+     * Harvest in-page content images so the sitemap can advertise them to image search.
+     * Only relative, on-disk raster images are included: logos, SVGs, remote assets and
+     * root-relative paths are skipped.
+     */
+    extractPageImages(relativePath) {
+        try {
+            const filePath = path.join(this.rootDir, relativePath);
+            if (!fs.existsSync(filePath)) return [];
+
+            const html = fs.readFileSync(filePath, 'utf8');
+            const dir = path.dirname(filePath);
+            const pageDir = path.posix.dirname(relativePath.replace(/\\/g, '/'));
+            const images = [];
+            const seen = new Set();
+            const imgRe = /<img\b[^>]*>/gi;
+            let match;
+
+            while ((match = imgRe.exec(html)) !== null) {
+                const tag = match[0];
+                const srcMatch = tag.match(/\bsrc\s*=\s*["']([^"']+)["']/i);
+                if (!srcMatch) continue;
+
+                const src = srcMatch[1].trim();
+                if (!src || /^(https?:)?\/\//i.test(src) || /^data:/i.test(src)) continue;
+                if (src.startsWith('/') || src.startsWith('..')) continue;
+                if (/logo/i.test(src) || /\.svg($|\?)/i.test(src)) continue;
+                if (!/\.(png|jpe?g|webp|gif|avif)$/i.test(src)) continue;
+                if (!fs.existsSync(path.join(dir, src))) continue;
+
+                const loc = `${this.baseURL}/${path.posix.join(pageDir === '.' ? '' : pageDir, src.replace(/\\/g, '/'))}`;
+                if (seen.has(loc)) continue;
+                seen.add(loc);
+
+                const altMatch = tag.match(/\balt\s*=\s*["']([^"']*)["']/i);
+                const clean = (text) => text
+                    .replace(/<[^>]+>/g, ' ')
+                    .replace(/&(\w+|#\d+);/g, ' ')
+                    .replace(/[#]/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+                const alt = altMatch ? clean(altMatch[1]) : '';
+
+                const after = html.slice(match.index, match.index + 5000);
+                const capMatch = after.match(/<figcaption[^>]*>([\s\S]*?)<\/figcaption>/i);
+                const caption = capMatch ? clean(capMatch[1]) : '';
+
+                images.push({
+                    loc,
+                    title: (alt || caption || path.basename(src)).slice(0, 200),
+                    caption: caption.slice(0, 500)
+                });
+            }
+
+            // Social/OG hero cards are not in the page body. Register them too, as long as
+            // they are bespoke (not the site-wide default) and resolvable on disk.
+            const ogTag = html.match(/<meta[^>]*og:image[^>]*>/i);
+            if (ogTag) {
+                const ogUrl = (ogTag[0].match(/content\s*=\s*["']([^"']+)["']/i) || [])[1];
+                if (ogUrl && ogUrl.startsWith(`${this.baseURL}/`) && !/\/og-image\.png$/i.test(ogUrl)) {
+                    const ogRel = ogUrl.slice(this.baseURL.length + 1);
+                    if (/\.(png|jpe?g|webp|avif)$/i.test(ogRel) && fs.existsSync(path.join(this.rootDir, ogRel)) && !seen.has(ogUrl)) {
+                        seen.add(ogUrl);
+                        images.unshift({
+                            loc: ogUrl,
+                            title: (html.match(/<meta[^>]*og:image:alt[^>]*>/i) || [''])[0]
+                                .replace(/.*content\s*=\s*["']([^"']*)["'].*/i, '$1')
+                                .replace(/[#]/g, '')
+                                .replace(/\s+/g, ' ')
+                                .trim()
+                                .slice(0, 200),
+                            caption: ''
+                        });
+                    }
+                }
+            }
+
+            return images;
+        } catch (error) {
+            this.logger.warn(`Image harvest skipped for ${relativePath}: ${error.message}`);
+            return [];
+        }
     }
 
     generateModelURLs(models) {
@@ -333,7 +418,8 @@ class URLProcessor {
                         metadata: {
                             fileName: file.name,
                             fileSize: file.size
-                        }
+                        },
+                        images: this.extractPageImages(file.relativePath)
                     };
 
                     if (this.validateURL(url.loc)) {
@@ -639,8 +725,11 @@ class SitemapGenerator {
 
     generateSingleSitemap(urls) {
         const lines = [];
+        const hasImages = urls.some(url => Array.isArray(url.images) && url.images.length > 0);
         lines.push('<?xml version="1.0" encoding="UTF-8"?>');
-        lines.push('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
+        lines.push(hasImages
+            ? '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">'
+            : '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">');
 
         // Sort URLs by priority (highest first) and then alphabetically for consistency
         const sortedUrls = urls.sort((a, b) => {
@@ -652,6 +741,15 @@ class SitemapGenerator {
         for (const url of sortedUrls) {
             lines.push('  <url>');
             lines.push(`    <loc>${this.escapeXML(url.loc)}</loc>`);
+            if (Array.isArray(url.images)) {
+                for (const image of url.images) {
+                    lines.push('    <image:image>');
+                    lines.push(`      <image:loc>${this.escapeXML(image.loc)}</image:loc>`);
+                    if (image.title) lines.push(`      <image:title>${this.escapeXML(image.title)}</image:title>`);
+                    if (image.caption) lines.push(`      <image:caption>${this.escapeXML(image.caption)}</image:caption>`);
+                    lines.push('    </image:image>');
+                }
+            }
             lines.push(`    <lastmod>${url.lastmod}</lastmod>`);
             lines.push(`    <changefreq>${url.changefreq}</changefreq>`);
             lines.push(`    <priority>${url.priority}</priority>`);

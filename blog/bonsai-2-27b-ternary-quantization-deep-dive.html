@@ -39,9 +39,10 @@
   },
   "image": {
     "@type": "ImageObject",
-    "url": "https://local-ai-zone.github.io/og-image.png",
+    "url": "https://local-ai-zone.github.io/blog/bonsai-2-27b-5-9gb-hero.png",
     "width": 1200,
-    "height": 630
+    "height": 630,
+    "caption": "Bonsai 2 27B ternary quantization: a 27-billion-parameter reasoning model in 5.93 GB at 1.76 bits per weight, keeping 98.2% of FP16 intelligence"
   },
   "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
 }
@@ -68,10 +69,10 @@
 <meta property="og:url" content="https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html">
 <meta property="og:site_name" content="Local AI Zone">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/bonsai-2-27b-5-9gb-hero.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Bonsai 2 27B — A 27B AI Model That Fits in 5.9 GB">
+<meta property="og:image:alt" content="Bonsai 2 27B illustrated: a 27B reasoning model in 5.93 GB at 1.76 bits per weight, keeping 98.2% of FP16 intelligence">
 <meta property="article:author" content="Hussain Nazary">
 <meta property="article:published_time" content="2026-09-21T00:00:00Z">
 <meta property="article:modified_time" content="2026-09-26T00:00:00Z">
@@ -91,8 +92,8 @@
 <meta name="twitter:creator" content="@hussainnazary">
 <meta name="twitter:title" content="Bonsai 2 27B: A 27B AI Model That Fits in 5.9 GB">
 <meta name="twitter:description" content="How Prism ML compressed a 27B reasoning model to ~1.76 bits per weight — the ternary lineage, rotated basis, low-bit kernels, all 20 benchmarks, and where to run it.">
-<meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
-<meta name="twitter:image:alt" content="Bonsai 2 27B — A 27B AI Model That Fits in 5.9 GB">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/bonsai-2-27b-5-9gb-hero.png">
+<meta name="twitter:image:alt" content="Bonsai 2 27B illustrated: a 27B reasoning model in 5.93 GB at 1.76 bits per weight, keeping 98.2% of FP16 intelligence">
 
 <!-- FAQ Schema (AEO) -->
 <script type="application/ld+json">
@@ -281,6 +282,8 @@ pre .d{color:#e3b341}
 /* ============ FIGURES ============ */
 figure{margin:28px 0}
 figcaption{font-size:13px;color:var(--ink-faint);margin-top:10px;text-align:center}
+figure img{display:block;width:100%;height:auto;margin:0;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+html[data-theme='dark'] figure img{filter:brightness(.94)}
 .part-divider{page-break-inside:avoid}
 .chip{font-size:12px;font-weight:600;padding:5px 13px;border-radius:99px;border:1px solid var(--line);background:#fafbfd;color:var(--ink-soft)}
 html[data-theme='dark'] .chip{background:#131a2c}
@@ -686,6 +689,11 @@ html[data-theme='dark'] .src-block{background:#101728}
 
 <p>The recommended sampling configuration is inherited verbatim from the base model&rsquo;s <span class="mono">generation_config.json</span> and carried in the GGUF metadata (<span class="mono">general.sampling.*</span>): thinking mode at temperature 1.0, top-p 0.95, top-k 20, min-p 0, no presence or repetition penalty; instruct mode at temperature 0.7, top-p 0.80, top-k 20, presence penalty 1.5. The model thinks by default at <strong>xhigh</strong> reasoning effort; <strong>medium</strong> trades some quality for shorter responses (both effort levels are fully reported in the whitepaper&rsquo;s appendix &mdash; 79.3 versus 83.9 average on the 20-suite); <strong>low</strong> is not supported. The system prompt can be as simple as &ldquo;You are a helpful assistant.&rdquo;</p>
 <!-- ==================== CHAPTER 9 ==================== -->
+<figure>
+  <img src="bonsai-ternary-quantization-explained.png" alt="Diagram: what ternary quantisation changes in Bonsai 2 27B &mdash; full precision weights, a Hadamard rotated basis, the Ternary g128 format with three weight levels, 1.76 bits per weight against a 1.75 to 1.76 target, and hybrid attention low bit kernels" width="2160" height="2043" loading="lazy" decoding="async">
+  <figcaption>From 53.8 GB of full precision weights to roughly 143 tokens per second on a single RTX 5090, step by step.</figcaption>
+</figure>
+
 <h2 class="ch" id="ch9"><span class="chno">9</span> The Rotated Basis</h2>
 <p class="ch-sub">Why ternarizing in a Hadamard-rotated coordinate system works, why the rotation costs nothing at inference, and the runtime contract that enforces it.</p>
 
@@ -757,6 +765,11 @@ html[data-theme='dark'] .src-block{background:#101728}
 <tr><td><strong>Ternary Bonsai 2 27B</strong></td><td class="num"><strong>1.76</strong></td><td class="num"><strong>5.93 GB</strong></td><td class="num"><strong>83.9</strong></td><td class="num"><span class="tag good">98.2%</span></td></tr>
 </tbody></table></div>
 <p class="small">Thinking-mode average across the 20-benchmark suite, whitepaper Table 7. Bits-per-weight are averages over all model weights for the packed checkpoint. The two sentences the table supports: Bonsai 2 retains 98.2% of the current-generation base at 1/9th its size, and its average slightly <em>exceeds</em> the previous generation&rsquo;s full-precision model &mdash; 83.9 versus 83.6 &mdash; while the conventional 2-bit build falls 8.7 points short of it despite being 1.23&times; larger than Bonsai&rsquo;s pack.</p>
+
+<figure>
+  <img src="bonsai-2-27b-footprint-vs-4bit.png" alt="Chart: Bonsai 2 27B footprint versus conventional quantisation &mdash; 53.8 GB at FP16, 17.6 GB for a four bit UD-Q4_K_XL build at 5.2 bits per weight, and 5.93 GB for Bonsai 2 27B at 1.76 bits per weight" width="2160" height="1380" loading="lazy" decoding="async">
+  <figcaption>The footprint ladder: three times smaller than a conventional four bit build, within 0.4 benchmark points of it, and 98.2% of the FP16 baseline.</figcaption>
+</figure>
 
 <h3>Category-level results</h3>
 
@@ -887,6 +900,13 @@ html[data-theme='dark'] .src-block{background:#101728}
 <p class="ch-sub">What actually runs where: the fork, the MLX runtime, the Ollama situation, the browser demo, the API, and the integrations.</p>
 
 <p>Bonsai 2 27B&rsquo;s deployment surface is broader than any prior Bonsai release but comes with one non-negotiable requirement that shapes everything else: <strong>the packed formats need a runtime that knows them</strong>. The model cards designate the <span class="mono">PrismML-Eng/Bonsai-demo</span> repository (2,924 stars) as &ldquo;the source of truth for running these models &mdash; it carries the tested setup for every backend, pins a known-good binary release, and is kept current&rdquo;, with the rule stated without diplomacy: &ldquo;Where anything here disagrees with it, it is right.&rdquo; The repo ships run scripts that pick correct flags per hardware, plus serving, benchmarking, and integration examples for tool calling, reasoning budgets, image input with the mmproj file, and speculative decoding.</p>
+
+<!-- PHOTO SLOT (bonsai): save a real screenshot to blog/bonsai-2-27b-rtx-5090.png (landscape, 1600x900 or larger, under 400 KB), then run python scripts/install-post-photo.py --slot=bonsai --file=PATH (see scripts/PHOTO_SLOTS.md). Suggested subject: a photo of the card running the model, or a llama.cpp capture printing the ternary Bonsai at roughly 143 tokens per second with the 5.93 GB model size on screen.
+<figure>
+  <img src="bonsai-2-27b-rtx-5090.png" alt="A 27 billion parameter ternary model running locally on an RTX 5090, with llama.cpp reporting roughly 143 tokens per second" width="1600" height="900" loading="lazy" decoding="async">
+  <figcaption>5.93 GB of weights on one consumer card: the footprint claim, on screen.</figcaption>
+</figure>
+-->
 
 <h3>llama.cpp (CUDA, Metal, CPU)</h3>
 

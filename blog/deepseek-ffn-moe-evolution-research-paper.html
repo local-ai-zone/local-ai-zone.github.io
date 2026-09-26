@@ -50,9 +50,10 @@
   },
   "image": {
     "@type": "ImageObject",
-    "url": "https://local-ai-zone.github.io/og-image.png",
+    "url": "https://local-ai-zone.github.io/blog/deepseek-moe-384-experts-hero.png",
     "width": 1200,
-    "height": 630
+    "height": 630,
+    "caption": "From one giant FFN to 384 tiny experts: DeepSeek's sparse MoE evolution, with 42.5% lower training cost and 1.8x decode from Multi-Token Prediction"
   },
   "speakable": {
     "@type": "SpeakableSpecification",
@@ -82,10 +83,10 @@
 <meta property="og:url" content="https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html">
 <meta property="og:site_name" content="Local AI Zone">
 <meta property="og:locale" content="en_US">
-<meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/deepseek-moe-384-experts-hero.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="From One Giant FFN to 384 Tiny Experts — DeepSeek's Feed-Forward Evolution">
+<meta property="og:image:alt" content="DeepSeek MoE evolution illustrated: from a dense 67B baseline to 384 routed experts activating 1.4% of a 552B backbone">
 <meta property="article:author" content="Hussain Nazary">
 <meta property="article:published_time" content="2026-09-13T00:00:00Z">
 <meta property="article:modified_time" content="2026-09-26T00:00:00Z">
@@ -105,8 +106,8 @@
 <meta name="twitter:creator" content="@hussainnazary">
 <meta name="twitter:title" content="DeepSeek FFN &amp; MoE Evolution: Dense SwiGLU to 384 Experts">
 <meta name="twitter:description" content="16 chapters tracing every DeepSeek feed-forward and MoE design — DeepSeekMoE fine-grained experts, aux-loss-free balancing, Multi-Token Prediction, FP4 expert weights, and V4.1-Flash's 196B Engram memory.">
-<meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
-<meta name="twitter:image:alt" content="From One Giant FFN to 384 Tiny Experts — DeepSeek's Feed-Forward Evolution">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/deepseek-moe-384-experts-hero.png">
+<meta name="twitter:image:alt" content="DeepSeek MoE evolution illustrated: from a dense 67B baseline to 384 routed experts activating 1.4% of a 552B backbone">
 
 <!-- FAQ Schema (AEO) -->
 <script type="application/ld+json">
@@ -310,6 +311,8 @@ pre .d{color:#e3b341}
 /* ============ FIGURES / DIAGRAMS ============ */
 figure{margin:28px 0}
 figcaption{font-size:13px;color:var(--ink-faint);margin-top:10px;text-align:center}
+figure img{display:block;width:100%;height:auto;margin:0;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+html[data-theme='dark'] figure img{filter:brightness(.94)}
 .flow{background:#fbfcfe;border:1px solid var(--line);border-radius:12px;padding:22px;font-size:14px}
 html[data-theme='dark'] .flow{background:#101728}
 .flow .fnode{background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:10px 14px;line-height:1.5;box-shadow:0 1px 2px rgba(16,24,40,.05)}
@@ -554,6 +557,11 @@ y      = W_down(h)        : [d]        # down projection: W_down in R^{d x d_ff}
 <p>DeepSeek&rsquo;s engineers did not invent the idea of curing these diseases; they invented the specific cures that survived contact with frontier scale. Fine-grained segmentation attacks disease one. Shared experts attack disease one from the other side. The auxiliary-loss-free bias attacks disease two. Node-limited routing and redundant expert placement attack disease three. The next three chapters take those cures in the order DeepSeek shipped them.</p>
 
 <!-- ==================== CHAPTER 2 ==================== -->
+<figure>
+  <img src="deepseek-moe-sparsity-ladder.png" alt="Chart: the DeepSeek MoE sparsity ladder &mdash; activated parameters as a share of total, from 100% for the dense V1 67B baseline to 1.4% for V4.1-Flash activating 8B of 552B during prefill" width="2160" height="1407" loading="lazy" decoding="async">
+  <figcaption>The sparsity ladder in one chart: activated parameters as a share of total, release by release, measured against the dense 67B baseline DeepSeek started from.</figcaption>
+</figure>
+
 <h2 class="ch" id="ch2"><span class="chno">02</span>The 2023 Baseline: Dense SwiGLU</h2>
 <p class="ch-sub">DeepSeek LLM 7B/67B and DeepSeek Coder: LLaMA&rsquo;s feed-forward block, adopted wholesale, then deepened instead of widened.</p>
 
@@ -890,6 +898,13 @@ L_MTP = (lambda / D) * sum_k CrossEntropy( P^k, t_{i+k+1} )   # averaged, weight
 
 <p>There is also a quieter reason MTP belongs in an FFN history. The projection <em>M<sub>k</sub></em> and the per-depth Transformer block are feed-forward machinery in the strict sense &mdash; position-wise transformation of concatenated representations &mdash; and the module&rsquo;s design shows the DeepSeek house style applying to a new problem: share the expensive parts (embedding, head), minimize the new parameters, keep the causal chain complete, and make the whole thing optional at deployment. It is the same design grammar as one-shared-expert-plus-256-narrow-ones, transposed from &ldquo;which FFNs run&rdquo; to &ldquo;which tokens get predicted.&rdquo;</p>
 <!-- ==================== CHAPTER 9 ==================== -->
+<!-- PHOTO SLOT (ffn): save a real screenshot to blog/deepseek-moe-expert-parallel-gpus.png (landscape, 1600x900 or larger, under 400 KB), then run python scripts/install-post-photo.py --slot=ffn --file=PATH (see scripts/PHOTO_SLOTS.md). Suggested subject: a GPU utilisation dashboard or nvidia-smi capture during a MoE forward pass, showing expert parallelism across devices.
+<figure>
+  <img src="deepseek-moe-expert-parallel-gpus.png" alt="GPU utilisation dashboard during a DeepSeek MoE forward pass, showing expert parallelism spread across devices" width="1600" height="900" loading="lazy" decoding="async">
+  <figcaption>Where the arithmetic meets silicon: expert parallelism in flight across a multi-GPU node.</figcaption>
+</figure>
+-->
+
 <h2 class="ch" id="ch9"><span class="chno">09</span>The Expert-Parallel Machine</h2>
 <p class="ch-sub">R1 freezes the weights while RL runs; DeepSeek open-sources the FFN&rsquo;s circulatory system &mdash; DeepEP, EPLB, DualPipe &mdash; in a single February week.</p>
 
@@ -1083,6 +1098,11 @@ L_MTP = (lambda / D) * sum_k CrossEntropy( P^k, t_{i+k+1} )   # averaged, weight
 <p>The reported results close the loop on the economics that opened this paper: benchmark performance ahead of V4-Pro (the launch cites independent tests placing it ahead on performance, cost, speed and total runtime), agentic coding results including DeepSWE 74.2% and Terminal-Bench 2.1 at 90.6 (V4-Pro: 82.7), and a Codeforces rating of 3471 &mdash; from a model whose <em>prefill</em> compute matches the 2023 dense 7B baseline this history started with. The two-thirds problem of Chapter 1, measured against that baseline, is now a <em>69&times;-capacity-per-prefill-FLOP</em> separation: 552B of knowledge consulted at 8B of activation, gated by hashes, biases, and gates.</p>
 
 <!-- ==================== CHAPTER 14 ==================== -->
+<figure>
+  <img src="deepseek-moe-training-economics.png" alt="Chart: what DeepSeek's MoE conversion bought &mdash; 42.5% lower training cost, 5.76x maximum generation throughput, 1.8x tokens per second with Multi-Token Prediction, and a 69:1 backbone-to-active ratio at V4.1-Flash" width="2160" height="1458" loading="lazy" decoding="async">
+  <figcaption>What sparsity bought, in the paper's own units: training cost, generation throughput, speculative decode and the widest backbone-to-active ratio in the line.</figcaption>
+</figure>
+
 <h2 class="ch" id="ch14"><span class="chno">14</span>Compiled Evidence &amp; Timeline</h2>
 <p class="ch-sub">Every feed-forward configuration in the DeepSeek line, one table at a time &mdash; then the complete release timeline, and the five generational moves in summary form.</p>
 
