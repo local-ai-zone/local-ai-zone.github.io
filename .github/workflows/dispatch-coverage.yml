@@ -1,0 +1,40 @@
+name: Dispatch coverage check
+
+# Catches dateline gaps in the monthly dispatches: every stated coverage window is
+# compared against the newest dated row in that post's own tables and timeline cards,
+# so a post that gains content without its dateline moving (September 2026 shipped a
+# "September 26" dateline over a month that ran to the 30th) fails the build.
+
+on:
+  push:
+    paths:
+      - 'blog/**'
+      - 'scripts/check-dispatch-coverage.py'
+      - '.github/workflows/dispatch-coverage.yml'
+  pull_request:
+    paths:
+      - 'blog/**'
+      - 'scripts/check-dispatch-coverage.py'
+      - '.github/workflows/dispatch-coverage.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  coverage-window:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # The check is stdlib-only, so no npm ci is needed.
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      # Failures stop the build; warnings (a dispatch with no stated window) are
+      # printed in the log. Use --strict locally to make those fatal too.
+      - name: Compare coverage windows with the newest dated rows
+        run: python scripts/check-dispatch-coverage.py
