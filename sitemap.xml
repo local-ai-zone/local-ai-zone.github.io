@@ -30544,6 +30544,26 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://local-ai-zone.github.io/blog/decision-models-vs-rerankers.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/decision-vs-reranker-hero.png</image:loc>
+      <image:title>Decision models vs rerankers: two kinds of model that score an input and generate no output tokens, one returning a raw logit and the other a calibrated probability</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/decision-vs-reranker-context.png</image:loc>
+      <image:title>Bar chart of published context limits comparing rerankers per query-document pair against decision models for the whole state: Qwen3-Reranker 4B and 8B and Jev at 32,768 tokens, Nimble 9B and Rizzo Fl</image:title>
+      <image:caption>The budgets are not measured the same way, and that is the point: a reranker gets its window per pair , re-reading each document from scratch, while a decision model spends one window across a shared state plus every question asked against it. Ten passages do not fit a 192-token option budget, and one long document costs a decision model most of its window which is where the substitution test stops.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/decision-vs-reranker-pipeline.png</image:loc>
+      <image:title>Four-stage pipeline showing where each model sits: recall by an embedding model producing 50 to 100 candidates, precision by the reranker keeping the top 5 to 10, generation by a frontier model that w</image:title>
+      <image:caption>The two families never meet, because they face opposite directions. A reranker looks outward at candidates the world supplied and asks which of those matters; a decision model looks at a state you assembled and answers a question you formulated. Same mechanism, opposite direction of travel.</image:caption>
+    </image:image>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html</loc>
     <image:image>
       <image:loc>https://local-ai-zone.github.io/blog/deepseek-moe-384-experts-hero.png</image:loc>
@@ -30774,6 +30794,46 @@
     <priority>0.5</priority>
   </url>
   <url>
+    <loc>https://local-ai-zone.github.io/blog/local-image-generation-2026.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/local-image-hero.png</image:loc>
+      <image:title>Image generation run locally: the eight open-weight models of 2026 compared on licence, VRAM and what each is for</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/image-models-field.png</image:loc>
+      <image:title>Grid of eight local image generation models for 2026 with their parameter counts, licences and roles: FLUX.1 dev 12B non-commercial, FLUX.1 schnell 12B Apache, FLUX.2 dev 32B non-commercial, FLUX.2 kl</image:title>
+      <image:caption>The licence column decides before quality does. Both FLUX [dev] models are the models you prototype on, not the ones you ship — while their distilled siblings carry the same lineage under Apache 2.0.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/image-models-vram.png</image:loc>
+      <image:title>Bar chart of minimum VRAM for each local image generation model: SDXL 1.0 at 6 to 8 GB, FLUX.1 dev and schnell at about 12 GB, SD 3.5 Large about 12 GB, Qwen-Image 12 to 13 GB, FLUX.2 klein about 13 G</image:title>
+      <image:caption>Practical floors for quantised builds, not fp16 theory. A 12 GB card — the last-generation mid-range — covers five of these seven rows; the 32B ceiling needs the 24 GB class.</image:caption>
+    </image:image>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://local-ai-zone.github.io/blog/local-voice-models-2026.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/local-voice-hero.png</image:loc>
+      <image:title>Voice, run locally: the open-weight text-to-speech and speech-to-text models of 2026, ranked on blind listening tests and word error rate</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/voice-tts-arena.png</image:loc>
+      <image:title>Bar chart of Artificial Analysis Speech Arena Elo for open-weight text-to-speech models in August 2026: Cartesia Sonic 3.6 at 1283 as a closed reference, Breeze TTS 2 at 1215 ahead of ElevenLabs Eleve</image:title>
+      <image:caption>Blind pairwise votes, no vendor present. Breeze TTS 2 sits 90 Elo clear of the pack and is the first open-weight model ever to outrank ElevenLabs flagship — but three of the seven open models in this chart cannot be used commercially, which is chapter 4 s problem.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/voice-stt-wer.png</image:loc>
+      <image:title>Bar chart of average word error rate on eight English test sets: Parakeet TDT 0.6B v3 at 6.32 percent from 0.6 billion parameters, Voxtral Small 24B at 6.62, Moonshine streaming-medium 245M at 6.66, W</image:title>
+      <image:caption>Shorter is better. The argument of this chart is not the ranking but the labels: a 600M model leads, a 245M model beats the 1.55B default, and a 24B model lands second. If you have been sizing your transcription model the way you size a language model, stop.</image:caption>
+    </image:image>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
     <loc>https://local-ai-zone.github.io/blog/low-resource-ai-agents-experiment-archive.html</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
@@ -30803,6 +30863,46 @@
   </url>
   <url>
     <loc>https://local-ai-zone.github.io/blog/muse-glimmer-30b-comprehensive-analysis.html</loc>
+    <lastmod>2026-10-06</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+  <url>
+    <loc>https://local-ai-zone.github.io/blog/October_2026_AI_Model_Updates.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/october-2026-ai-model-updates-hero.png</image:loc>
+      <image:title>October 2026 AI Model Updates: eight specialist releases in three days, no frontier launch, and the cost-per-task ledger</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/october-2026-specialist-wave.png</image:loc>
+      <image:title>October 2026 opening model ledger: Cloudflare Clef and Clef-flash on October 1, Amazon Strands Decider 2B on October 1, Microsoft MAI-Voice-2.1 and MAI-Voice-2.1-Flash and MAI-Transcribe-2-Streaming o</image:title>
+      <image:caption>The October 1–3 ledger: eight models, five vendors, no frontier LLM. Clef and Clef-flash are counted as two models; Microsoft&apos;s three and Tavus&apos;s one are API-only, and the other four ship Apache 2.0 weights.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/october-2026-laptop-180b.png</image:loc>
+      <image:title>Five-step explanation of how POCKET-Darwin-180B runs on a 32 GB laptop: a datacentre mixture of experts that tops seven Hugging Face leaderboards, a four-bit GGUF at roughly 111 GB, SSD streaming with</image:title>
+      <image:caption>POCKET-Darwin-180B compresses the weights and moves the bottleneck to the disk. Our own index lists the repository at 425 GB across all of its files, so the 111 GB figure applies to the four-bit build specifically.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/october-2026-local-downloads.png</image:loc>
+      <image:title>Bar chart of Hugging Face download counts for GGUF repositories uploaded in early October 2026: Qwen3.8 Flash Next IQ quants from SC117, the newest Qwen with downloadable weights, at 291,404 downloads</image:title>
+      <image:caption>Repository-level download counts read from this site&apos;s model index on October 6, 2026. Qwen3.8-Flash-Next is still the newest Qwen with downloadable weights — Qwen 4 was announced on September 22 and remains in training with no date or weights. Counts accumulate across all files in a repository, so the comparison is directional rather than like-for-like.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/october-2026-cost-per-task.png</image:loc>
+      <image:title>Bar chart of Artificial Analysis cost per Intelligence Index run as of October 6, 2026, each row dated: GPT-6 Luna at 0.07 dollars (September 22), MiMo-V2.6-Pro at 0.13 dollars (September 21), GPT-6.1</image:title>
+      <image:caption>Cost to complete one Artificial Analysis Intelligence Index run, each row dated to a current released version — the whole chart spans September 21 to September 30, 2026. The same model appears three times: Sonnet 5.5 runs $1.08 to $7.60 depending on effort level, a 7× spread inside one model.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/october-2026-openai-price-tiers.png</image:loc>
+      <image:title>Bar chart of OpenAI gpt-6-astra output pricing per million tokens across its five October 2026 service tiers, short context: Ultrafast at 300 dollars, Fast at 100 dollars, Standard at 50 dollars, and </image:title>
+      <image:caption>gpt-6-astra output pricing per 1M tokens, short context, from OpenAI&apos;s published October 2026 pricing page. The cheapest and dearest routes to the same weights differ by 12×; long-context pricing doubles every tier on top of that.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/october-2026-intelligence-index.png</image:loc>
+      <image:title>Bar chart of Artificial Analysis Intelligence Index version 4.3.2 scores as of October 6, 2026, each row dated to its release: Claude Opus 5.5 at 57.6 (September 22), Claude Sonnet 5.5 at 56.0 (Septem</image:title>
+      <image:caption>Every row is the current released version of its family, dated on the chart: the oldest is September 1 and the newest September 30, 2026, and no successor has shipped for any of them through October 6. Effort level matters as much as model choice — Sonnet 5.5 reads 56.0 at max, 51.9 at xhigh and 46.7 at high, and Argon&apos;s 52.6 is a high-effort reading with no published max row.</image:caption>
+    </image:image>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
@@ -30878,47 +30978,32 @@
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://local-ai-zone.github.io/blog/October_2026_AI_Model_Updates.html</loc>
-    <image:image>
-      <image:loc>https://local-ai-zone.github.io/blog/october-2026-ai-model-updates-hero.png</image:loc>
-      <image:title>October 2026 AI Model Updates: eight specialist releases in three days, no frontier launch, and the cost-per-task ledger</image:title>
-    </image:image>
-    <image:image>
-      <image:loc>https://local-ai-zone.github.io/blog/october-2026-specialist-wave.png</image:loc>
-      <image:title>October 2026 opening model ledger: Cloudflare Clef and Clef-flash on October 1, Amazon Strands Decider 2B on October 1, Microsoft MAI-Voice-2.1 and MAI-Voice-2.1-Flash and MAI-Transcribe-2-Streaming o</image:title>
-      <image:caption>The October 1–3 ledger: eight models, five vendors, no frontier LLM. Clef and Clef-flash are counted as two models; Microsoft&apos;s three and Tavus&apos;s one are API-only, and the other four ship Apache 2.0 weights.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://local-ai-zone.github.io/blog/october-2026-laptop-180b.png</image:loc>
-      <image:title>Five-step explanation of how POCKET-Darwin-180B runs on a 32 GB laptop: a datacentre mixture of experts that tops seven Hugging Face leaderboards, a four-bit GGUF at roughly 111 GB, SSD streaming with</image:title>
-      <image:caption>POCKET-Darwin-180B compresses the weights and moves the bottleneck to the disk. Our own index lists the repository at 425 GB across all of its files, so the 111 GB figure applies to the four-bit build specifically.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://local-ai-zone.github.io/blog/october-2026-local-downloads.png</image:loc>
-      <image:title>Bar chart of Hugging Face download counts for GGUF repositories uploaded in early October 2026: Qwen3.8 Flash Next IQ quants from SC117, the newest Qwen with downloadable weights, at 291,404 downloads</image:title>
-      <image:caption>Repository-level download counts read from this site&apos;s model index on October 6, 2026. Qwen3.8-Flash-Next is still the newest Qwen with downloadable weights — Qwen 4 was announced on September 22 and remains in training with no date or weights. Counts accumulate across all files in a repository, so the comparison is directional rather than like-for-like.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://local-ai-zone.github.io/blog/october-2026-cost-per-task.png</image:loc>
-      <image:title>Bar chart of Artificial Analysis cost per Intelligence Index run as of October 6, 2026, each row dated: GPT-6 Luna at 0.07 dollars (September 22), MiMo-V2.6-Pro at 0.13 dollars (September 21), GPT-6.1</image:title>
-      <image:caption>Cost to complete one Artificial Analysis Intelligence Index run, each row dated to a current released version — the whole chart spans September 21 to September 30, 2026. The same model appears three times: Sonnet 5.5 runs $1.08 to $7.60 depending on effort level, a 7× spread inside one model.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://local-ai-zone.github.io/blog/october-2026-openai-price-tiers.png</image:loc>
-      <image:title>Bar chart of OpenAI gpt-6-astra output pricing per million tokens across its five October 2026 service tiers, short context: Ultrafast at 300 dollars, Fast at 100 dollars, Standard at 50 dollars, and </image:title>
-      <image:caption>gpt-6-astra output pricing per 1M tokens, short context, from OpenAI&apos;s published October 2026 pricing page. The cheapest and dearest routes to the same weights differ by 12×; long-context pricing doubles every tier on top of that.</image:caption>
-    </image:image>
-    <image:image>
-      <image:loc>https://local-ai-zone.github.io/blog/october-2026-intelligence-index.png</image:loc>
-      <image:title>Bar chart of Artificial Analysis Intelligence Index version 4.3.2 scores as of October 6, 2026, each row dated to its release: Claude Opus 5.5 at 57.6 (September 22), Claude Sonnet 5.5 at 56.0 (Septem</image:title>
-      <image:caption>Every row is the current released version of its family, dated on the chart: the oldest is September 1 and the newest September 30, 2026, and no successor has shipped for any of them through October 6. Effort level matters as much as model choice — Sonnet 5.5 reads 56.0 at max, 51.9 at xhigh and 46.7 at high, and Argon&apos;s 52.6 is a high-effort reading with no published max row.</image:caption>
-    </image:image>
+    <loc>https://local-ai-zone.github.io/blog/system-architect-without-coding.html</loc>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://local-ai-zone.github.io/blog/system-architect-without-coding.html</loc>
+    <loc>https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html</loc>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/system-one-decision-models-hero.png</image:loc>
+      <image:title>Jev and the seven open clones: a decision model that returns calibrated probabilities instead of text, with the independent 0.966 versus 0.720 accuracy gap</image:title>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/system-one-kv-cache-flow.png</image:loc>
+      <image:title>Diagram of the shared KV cache: the state is prefilled once into the cache, every question branches off those same cells in one unpadded micro-batch, and the answer is read from the logits of the allo</image:title>
+      <image:caption>The whole mechanism in one picture. The state is charged once, the questions share its cells rather than copying them, and nothing is generated — so the cache never grows while the model answers. That is why latency is flat in the number of questions and options, and linear only in the length of the state.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/system-one-eight-models.png</image:loc>
+      <image:title>Grid of the eight System One decision models: Jev hosted and closed, Von and Laya on ModernBERT encoders, Kev and SemIf on Qwen bases, Nimble as a published data recipe, Rizzo Flow on llama.cpp, and N</image:title>
+      <image:caption>The cast, before the per-model chapters. The interface is the same everywhere; the bets underneath are not — hosted and closed, an encoder with no cache at all, LoRA on a causal trunk, or no training at all. Star counts and repository figures were read on 6 October 2026.</image:caption>
+    </image:image>
+    <image:image>
+      <image:loc>https://local-ai-zone.github.io/blog/system-one-accuracy-latency-trade.png</image:loc>
+      <image:title>Horizontal bar chart of mean latency per task on the jabr v2 suite: TypeSafe Jev at 330 milliseconds and 0.966 macro accuracy, GLiNER2 at 73 milliseconds and 0.684, Von 1.1 at 53 milliseconds and 0.72</image:title>
+      <image:caption>The same benchmark read the other way round: what the accuracy costs you in time. Von is roughly six times faster than Jev and about 25 accuracy points behind it — and it beats GLiNER2 on both axes, which is why the recommendation in this article is Von rather than one of the other encoders. Jev costs about $0.000014 per call on this suite; the local models cost nothing but your own hardware.</image:caption>
+    </image:image>
     <lastmod>2026-10-06</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
