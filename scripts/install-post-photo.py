@@ -48,6 +48,12 @@ SLOTS = {
         "subject": "your own GGUF model browser, or a desk shot of the rig running several of the month's open-weight releases",
         "capture": "node scripts/capture-post-screenshots.js --slot=dispatch",
     },
+    "october": {
+        "post": "blog/October_2026_AI_Model_Updates.html",
+        "file": "october-2026-local-models-dashboard.png",
+        "subject": "your own GGUF model browser filtered to the October uploads, or a desk shot of the rig running one of the month's open-weight releases",
+        "capture": "node scripts/capture-post-screenshots.js --slot=october",
+    },
     "kv": {
         "post": "blog/deepseek-kv-cache-optimization-research-paper.html",
         "file": "deepseek-kv-cache-disk-hit.png",

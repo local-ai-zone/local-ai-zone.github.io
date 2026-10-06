@@ -176,6 +176,7 @@
 <link rel="stylesheet" href="../css/blog-article.css">
 <link rel="stylesheet" href="../css/theme.css">
 <link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
 <link rel="icon" href="../logo.svg" type="image/svg+xml">
 <style>
 :root {
@@ -454,6 +455,7 @@ html[data-theme='dark'] .src-block{background:#101728}
     <div class="cell"><div class="v">890 B</div><div class="k">Global KV bytes per token, V4.1-Flash (438&times; below V1)</div></div>
   </div>
   <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
     <span><b>Scope:</b> Research landscape 2023&ndash;2026 &middot; DeepSeek stack 2024&ndash;2026 &middot; Architecture patterns</span>
     <span><b>Method:</b> every number traced to a paper, official blog, or API document</span>
     <span><b>Read time:</b> ~65 minutes</span>
@@ -808,7 +810,7 @@ html[data-theme='dark'] .src-block{background:#101728}
 <p>DeepSeek's agent evaluations in the V4 report use an internally developed framework whose configuration is itself a reference design: a <strong>minimal tool set &mdash; a bash tool and a file-edit tool</strong>; a maximum of <strong>500 interaction steps</strong>; a maximum context of <strong>512K tokens</strong> (half the model's window). The reported results include <strong>Terminal-Bench 2.0 at 67.9</strong> for the V4-Pro-Max configuration (the report separately cites approximately <strong>72.0 on the Verified subset</strong> for V4-Pro) and <strong>SWE-Verified at 80.6</strong>, with search-agent tasks (BrowseComp, HLE with tools) run in a separate websearch-plus-Python harness &mdash; and, notably, BrowseComp evaluated with "the same discard-all context management strategy as DeepSeek-V3.2": the &sect;11.4 finding carried forward into the next generation. Behind the evaluations sits real infrastructure: the report describes <strong>DSec (DeepSeek Elastic Compute)</strong>, a production sandbox platform of three Rust services &mdash; API gateway, per-host agent, and cluster monitor &mdash; running agentic post-training and evaluation rollouts on the 3FS distributed filesystem. The training pipeline fed it a two-stage paradigm (domain specialist models trained with SFT+RL, then unified by on-policy distillation) with agent capability as an explicit domain, and the mid-training data mix gained agentic and long-document corpora. The pattern to notice: by 2026, DeepSeek treats <em>agent-loop context behavior</em> as a first-class training objective with its own data, infrastructure, and evaluation harness &mdash; not a post-deployment afterthought.</p>
 
 <h3>12.4 Quick Instruction: auxiliary tasks that reuse the cache</h3>
-<p>The V4 report's most quotable piece of systems craft targets a cost nobody benchmarks: the <em>small model</em> that production chat products run before the main model to classify the request (does this need a web search? what domain is it? should this URL be fetched?). That model cannot share the main model's KV cache, so the whole prefix is prefilled <strong>twice</strong>. Quick Instruction eliminates the second prefill by <em>appending dedicated special tokens directly to the input sequence</strong> &mdash; <code>&lt;|action|&gt;</code>, <code>&lt;|title|&gt;</code>, <code>&lt;|query|&gt;</code>, <code>&lt;|authority|&gt;</code>, <code>&lt;|domain|&gt;</code>, <code>&lt;|read_url|&gt;</code> &mdash; each bound to one auxiliary task. Because the tokens ride on the already-computed KV cache, the auxiliary outputs (search-trigger decisions, generated queries, authority and domain classifications, URL-read decisions) are produced <em>in the same forward pass, in parallel</em>, "completely avoiding redundant prefilling," cutting user-perceived time-to-first-token, and retiring the extra model from the stack. It is the same insight as Manus's stable-prefix rule, inverted: instead of protecting the cache from auxiliary work, move the work <em>into</em> the cache. The same release also moved tool-call serialization to an XML format that "mitigates escaping failures and reduces tool-call errors" &mdash; protocol-level context hygiene, the unglamorous kind that production uptime is made of.</p>
+<p>The V4 report's most quotable piece of systems craft targets a cost nobody benchmarks: the <em>small model</em> that production chat products run before the main model to classify the request (does this need a web search? what domain is it? should this URL be fetched?). That model cannot share the main model's KV cache, so the whole prefix is prefilled <strong>twice</strong>. Quick Instruction eliminates the second prefill by <em>appending dedicated special tokens directly to the input sequence</em> &mdash; <code>&lt;|action|&gt;</code>, <code>&lt;|title|&gt;</code>, <code>&lt;|query|&gt;</code>, <code>&lt;|authority|&gt;</code>, <code>&lt;|domain|&gt;</code>, <code>&lt;|read_url|&gt;</code> &mdash; each bound to one auxiliary task. Because the tokens ride on the already-computed KV cache, the auxiliary outputs (search-trigger decisions, generated queries, authority and domain classifications, URL-read decisions) are produced <em>in the same forward pass, in parallel</em>, "completely avoiding redundant prefilling," cutting user-perceived time-to-first-token, and retiring the extra model from the stack. It is the same insight as Manus's stable-prefix rule, inverted: instead of protecting the cache from auxiliary work, move the work <em>into</em> the cache. The same release also moved tool-call serialization to an XML format that "mitigates escaping failures and reduces tool-call errors" &mdash; protocol-level context hygiene, the unglamorous kind that production uptime is made of.</p>
 
 <div class="src-block"><strong>DeepSeek-OCR, the detour worth one paragraph.</strong> October 2025's DeepSeek-OCR paper (arXiv 2510.18234) explored "Contexts Optical Compression" &mdash; feeding long text to the vision encoder as a 2D image so that a small number of visual tokens carry the document, an initial investigation into compressing context optically. A December 2025 follow-up from other authors ("Optical Context Compression Is Just (Bad) Autoencoding," arXiv 2512.03643) argued the reconstruction is shallow. We include it because it shows the lab treating <em>the input representation itself</em> as a context-management variable &mdash; the same research program that Engram later executed successfully at the weight level.</div>
 <h2 class="ch" id="ch13"><span class="chno">13</span> Engram &amp; V4.1-Flash</h2>
@@ -1054,7 +1056,22 @@ messages = [{<span class="s">"role"</span>: <span class="s">"user"</span>, <span
 <p><strong>100:1</strong> &mdash; the prefill:decode skew that makes caching the business model. <strong>50% at 32K</strong> &mdash; NoLiMa's cliff that bigger windows did not remove. <strong>74.0 vs 92.5</strong> &mdash; the benchmark spread that says "measure it yourself." <strong>51.4 &rarr; 67.6</strong> &mdash; what DeepSeek's own study says context management is worth on hard agentic search. <strong>84.2 &rarr; 97.0</strong> &mdash; what happens when memory moves into the weights. Everything else in this paper is derivation.</p></div>
 
 <!-- ==================== CLOSING ==================== -->
-<div class="footref" id="sources">
+<div class="footref" 
+<section id="faq" class="article-section faq">
+<h2>Frequently asked questions</h2>
+<h3>What is context rot in AI agents?</h3>
+<p>Context rot is the degradation in model quality as a context window fills. Agent loops hit it harder than chat because every tool call appends results, so a run can accumulate tens of thousands of tokens of low-signal text that dilutes the instructions the model is trying to follow.</p>
+<h3>What is the difference between context management, memory and context engineering?</h3>
+<p>Context management covers decisions about what occupies the live window within a single session. Memory is what persists across sessions or beyond the window. Context engineering is the umbrella discipline covering both, plus system prompts, tool schemas and retrieval policy.</p>
+<h3>What did MemGPT introduce?</h3>
+<p>MemGPT (2023) introduced the operating-system metaphor for context: treat the context window as fast main memory and page information in and out of an external store, so the model manages its own context the way an OS manages virtual memory.</p>
+<h3>How does DeepSeek manage context for agents?</h3>
+<p>DeepSeek engineered context management at every layer: MLA and disk-based context caching (2024), DeepSeek Sparse Attention for cheap long context (2025), the thinking-context-management rules of V3.2, the million-token agent context of V4, and the 196B-parameter Engram conditional-memory module of V4.1-Flash (September 2026).</p>
+<h3>What is Engram conditional memory?</h3>
+<p>Engram is DeepSeek's conditional-memory module, described in 'Conditional Memory via Scalable Lookup: A New Axis of Sparsity for Large Language Models' (January 2026). It is addressed by the input's local n-gram context with O(1) deterministic lookup, adding a knowledge-lookup primitive alongside MoE's conditional computation.</p>
+</section>
+
+id="sources">
 <strong>Sources (all accessed and verified September 13, 2026).</strong>
 Primary papers: MemGPT (arXiv 2310.08560); Zep/Graphiti (arXiv 2501.13956); Mem0 (arXiv 2504.19413, ECAI 2025); Sleep-time Compute (arXiv 2504.13171); A-MEM (arXiv 2502.12110, NeurIPS 2025); MemOS (arXiv 2507.03724); NoLiMa (Modarressi et al., 2025); ACE (arXiv 2510.04618); DeepSeek-OCR (arXiv 2510.18234); optical-compression critique (arXiv 2512.03643); DeepSeek-V3.2 (arXiv 2512.02556); DeepSeek-V4 (arXiv 2606.19348); Engram (arXiv 2601.07372); DCI (arXiv 2605.05242); Lost in the Middle (Liu et al., 2023); Generative Agents, Reflexion, Voyager, LLMLingua, HippoRAG, LongMemEval (2023&ndash;2024 literature). Official engineering and product sources: Anthropic, "Effective Context Engineering for AI Agents" (Sep 29, 2025) and platform context docs; Manus, "Context Engineering for AI Agents" (Jul 18, 2025); Letta, "Benchmarking AI Agent Memory" (Aug 12, 2025) and memory-blocks/sleep-time posts; Zep blog (May 6, 2025); Mem0, "State of AI Agent Memory 2026" (Apr 1, 2026); LangChain context-engineering posts (Jul 2025; Jan 2026); philschmid (Dec 4, 2025); Crux Digits 2026 playbook (Jul 24, 2026); Louis-Fran&ccedil;ois Bouchard, "Context Engineering in 2026" (Aug 18, 2026); Chroma Research, "Context Rot" (Jul 2025); Karpathy, X post (Jun 25, 2025). DeepSeek primary releases: Context Caching (Aug 2, 2024); V3.2-Exp (Sep 29, 2025); V3.2 (Dec 1, 2025) + thinking-mode and tool-calls API guides; V4 preview (Apr 24, 2026) + Hugging Face announcement; V4-Pro GA (Aug 13, 2026); V4-Flash-Vision-Exp (Aug 21, 2026); V4.1-Flash (Sep 10, 2026) release notes, paper, and pricing page. Conflicting benchmark figures are presented with their publishers named; see &sect;8.3 for the reading protocol.
 </div>
@@ -1065,6 +1082,23 @@ Primary papers: MemGPT (arXiv 2310.08560); Zep/Graphiti (arXiv 2501.13956); Mem0
 </div><!-- /shell -->
 
 <!-- ==================== RELATED POSTS ==================== -->
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Context Management in Agent Loops">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
 <section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
   <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
@@ -1130,5 +1164,132 @@ Primary papers: MemGPT (arXiv 2310.08560); Zep/Graphiti (arXiv 2501.13956); Mem0
 })();
 </script>
 <script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
 </body>
 </html>

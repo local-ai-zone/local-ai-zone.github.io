@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="../css/blog-article.css">
     <link rel="stylesheet" href="../css/theme.css">
     <link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
     <link rel="icon" href="../logo.svg" type="image/svg+xml">
     
     <!-- Meta tags for SEO -->
@@ -347,7 +348,7 @@
                     <span class="article-date">Updated August 21, 2026</span>
                     <span class="article-author">By Hussain Nazary</span>
                     <span class="article-category">AI News & Updates</span>
-                    <span class="article-read-time">📖 10 min read</span>
+                    <span class="article-read-time">📖 16 min read</span>
                 </div>
             </div>
         </header>
@@ -659,7 +660,7 @@
                             <td class="local-no">No (Gated)</td>
                         </tr>
                         <tr>
-                            <td><a href="../models/qwen3-8-max.html" class="model-link">Qwen3.8-Max</a></td>
+                            <td>Qwen3.8-Max</td>
                             <td>Aug 3</td>
                             <td>2.4T / 95B (MoE)</td>
                             <td>1M tokens</td>
@@ -729,7 +730,7 @@
                     <ul>
                         <li><strong>Best all-rounder on big iron (128GB+)</strong>: <a href="../models/kimi-k3.html" class="model-link">Kimi K3</a> — still the most capable open model globally at 2.8T parameters</li>
                         <li><strong>Best for coding & cybersecurity (128GB+)</strong>: <a href="../models/glm-5-3.html" class="model-link">GLM-5.3</a> — #1 on CyberGym (84.5%), 6× coding improvement via post-training</li>
-                        <li><strong>Best value flagship (128GB+)</strong>: <a href="../models/qwen3-8-max.html" class="model-link">Qwen3.8-Max</a> — 2.4T parameters with aggressive pricing, once weights publish</li>
+                        <li><strong>Best value flagship (128GB+)</strong>: Qwen3.8-Max — 2.4T parameters with aggressive pricing, once weights publish</li>
                         <li><strong>Best for agentic work (64GB+)</strong>: <a href="../models/deepseek-v4-pro.html" class="model-link">DeepSeek V4 Pro</a> — Enhanced long-horizon reasoning, MIT license</li>
                         <li><strong>Best speed-to-quality ratio (128GB+)</strong>: <a href="../models/glm-5-2.html" class="model-link">GLM-5.2</a> — ~168 tok/s changes how interactive local use feels</li>
                         <li><strong>Best coding agent on modest hardware (32GB+)</strong>: <a href="../models/deepseek-v4-flash-0731.html" class="model-link">DeepSeek V4-Flash-0731</a> — 13B active with #1 LiveCodeBench</li>
@@ -804,7 +805,24 @@
                 Back to All Articles
             </a>
         </div>
-    </article>
+        <!-- Need help with this post? -->
+    <section class="post-help" aria-labelledby="post-help-title">
+        <div class="post-help-inner">
+            <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+            <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+            through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+            pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+            you&rsquo;re reading.</p>
+            <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: July 2026 AI Model Roundup">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>Ask me about this post</span>
+            </button>
+        </div>
+    </section>
+
+</article>
 
     <footer class="premium-footer">
         <div class="container">
@@ -835,10 +853,105 @@
          aria-labelledby="contact-form-title"
          aria-modal="true"
          aria-hidden="true">
-        <!-- Contact form content -->
+                <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
     </div>
 
-    <script src="../js/components/contact-form.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
     <script src="../js/theme-switcher.js"></script>
     <script>
         // Initialize contact form
@@ -859,5 +972,6 @@
         });
     </script>
 
+<script src="/js/goatcounter.js" defer></script>
 </body>
 </html>

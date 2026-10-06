@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decision Models vs Rerankers: What Actually Separates Them, and Can You Swap Them</title>
+<meta name="description" content="Both a decision model and a reranker score an input and generate nothing. One returns a calibrated distribution over options you defined, the other a raw logit you may only sort by. The six differences that matter, the compute shape of each, and an honest verdict on whether either can stand in for the other.">
+<meta name="keywords" content="decision model vs reranker, reranker score calibration, cross-encoder, Qwen3-Reranker, Jina Reranker, BGE-Reranker, Jev, Von, Laya, Kev, SemIf, Rizzo Flow, does a reranker output a probability, reranker threshold, RAG reranking, typed decisions, logits, RLCD">
+<meta name="author" content="Local AI Zone">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Decision Models vs Rerankers: What Actually Separates Them, and Can You Swap Them",
+  "alternativeHeadline": "Two scoring engines that never generate a token — and why only one of them gives you a probability",
+  "description": "A side-by-side comparison of decision models (Jev, Von, Laya, Kev, SemIf, Nimble, Rizzo Flow) and reranker models (cross-encoders such as Jina Reranker v3.5, Qwen3-Reranker and BGE-Reranker-v2-M3): their output types, training targets, compute shape and calibration, plus a substitution test in both directions.",
+  "author": {"@type": "Person", "name": "Hussain Nazary"},
+  "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
+  "datePublished": "2026-10-06",
+  "dateModified": "2026-10-06",
+  "keywords": "decision model, reranker, cross-encoder, calibration, logits, Jev, Jina Reranker, Qwen3-Reranker, BGE-Reranker, RAG, 2026",
+  "articleSection": "Deep Dive",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 5928,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/decision-models-vs-rerankers.html",
+  "about": [
+    {"@type": "Thing", "name": "Reranker models"},
+    {"@type": "Thing", "name": "Decision models"},
+    {"@type": "Thing", "name": "Calibration"},
+    {"@type": "Thing", "name": "Retrieval-augmented generation"},
+    {"@type": "Thing", "name": "Cross-encoders"}
+  ],
+  "isPartOf": {
+    "@type": "Blog",
+    "name": "Local AI Zone — Blog",
+    "url": "https://local-ai-zone.github.io/blog.html"
+  },
+  "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "What is the difference between a decision model and a reranker?", "acceptedAnswer": {"@type": "Answer", "text": "A reranker scores one query-document pair at a time and returns a single relevance score, which is normally a raw logit difference that means nothing outside the sort it feeds. A decision model reads one block of state, answers typed questions you define at request time, and returns a probability distribution over exactly those options — trained so that the numbers are calibrated. Both generate zero tokens."}},
+    {"@type": "Question", "name": "Can a decision model replace a reranker?", "acceptedAnswer": {"@type": "Answer",      "text": "Only up to a point, and the point has been measured. For a top-10 list of short passages it works, and it buys you a threshold and an abstention option that a reranker cannot give; at 60 to 200 candidates a third-party 64-query test found it beat every dedicated cross-encoder on Recall@20, +12 points against +7, at comparable latency. For the retrieval job it fails: candidate counts run into the hundreds, option budgets are capped at a few hundred tokens, context limits are 8k to 32k against a reranker's 32k per pair, and the softmax over mutually exclusive options cannot express that several documents are all relevant."}},
+    {"@type": "Question", "name": "Can a reranker replace a decision model?", "acceptedAnswer": {"@type": "Answer", "text": "No. A reranker can be pointed at a single binary question through its instruction field, which fakes one yes/no decision, but it cannot return typed values, an ordinal score, an abstention, or a probability you can threshold. It is a ranking instrument: one scalar per pair, valid only for ordering candidates within a single query."}},
+    {"@type": "Question", "name": "Can you put a threshold on a reranker score?", "acceptedAnswer": {"@type": "Answer", "text": "Not without fitting a mapping first. Reranker outputs are raw logits that are not comparable across models or across queries, and a sigmoid puts them in 0-1 without making them probabilities. If you need a threshold, fit a calibrator on your own labelled data or use a model trained on a proper scoring rule."}},
+    {"@type": "Question", "name": "Do rerankers and decision models both skip text generation?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. That is the reason they are related at all: both read logits at a single prompt position instead of decoding tokens, so neither pays the sequential cost of a generation loop and neither produces output you have to parse."}}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+    {"@type": "ListItem", "position": 3, "name": "Decision Models vs Rerankers", "item": "https://local-ai-zone.github.io/blog/decision-models-vs-rerankers.html"}
+  ]
+}
+</script>
+
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/decision-models-vs-rerankers.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/decision-models-vs-rerankers.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/decision-models-vs-rerankers.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/decision-models-vs-rerankers.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="theme-color" content="#4f46e5">
+<meta property="og:title" content="Decision Models vs Rerankers: What Actually Separates Them">
+<meta property="og:description" content="Both score an input and neither writes a token. One returns a calibrated distribution over your options; the other returns a raw logit you may only sort by — and only one of those can be thresholded.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/decision-models-vs-rerankers.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/decision-vs-reranker-hero.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Decision models vs rerankers: two kinds of model that score an input and generate no output tokens, one returning a raw logit and the other a calibrated probability">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Decision Models vs Rerankers">
+<meta name="twitter:description" content="Two kinds of model that never generate a token. What separates a reranker's logit from a decision model's probability, and whether either can stand in for the other.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/decision-vs-reranker-hero.png">
+<meta name="twitter:image:alt" content="Decision models vs rerankers: why only one of them gives you a probability you can threshold">
+
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<style>
+:root{--bg:#f6f7f9;--paper:#ffffff;--ink:#1a2233;--ink-soft:#46506a;--ink-faint:#7c86a0;--line:#e3e7ee;--accent:#4f46e5;--accent-soft:#eef2ff;--accent-2:#0d9488;--warn-bg:#fff7ed;--warn-line:#fdba74;--warn-ink:#9a3412;--ok-bg:#f0fdf4;--ok-line:#86efac;--ok-ink:#166534;--info-bg:#eff6ff;--info-line:#93c5fd;--info-ink:#1e3a8a;--danger-bg:#fef2f2;--danger-line:#fca5a5;--danger-ink:#991b1b;--code-bg:#0d1117;--code-ink:#d7dde7;--side-bg:#0e1526;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#4f46e5;--mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,monospace;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif}
+html[data-theme='dark']{--bg:#0b0f1a;--paper:#111827;--ink:#e5e9f2;--ink-soft:#b8c2d9;--ink-faint:#7c8aa5;--line:#242f47;--accent:#818cf8;--accent-soft:#1e2440;--accent-2:#2dd4bf;--warn-bg:#2a1c0e;--warn-line:#9a5b21;--warn-ink:#fdba74;--ok-bg:#0d2418;--ok-line:#2f7a4f;--ok-ink:#86efac;--info-bg:#101d33;--info-line:#2b4d8a;--info-ink:#93c5fd;--danger-bg:#2a1214;--danger-line:#8a3a3f;--danger-ink:#fca5a5;--side-bg:#0a0f1e;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#6366f1}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.shell{display:flex;min-height:100vh}
+aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
+main{flex:1;min-width:0;display:flex;justify-content:center}
+.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
+#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
+#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35}
+#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
+#toc nav a{display:block;padding:5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
+#toc nav a:hover{background:var(--side-hover);color:#fff}
+#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
+#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
+#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
+#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
+.theme-btn{position:fixed;top:16px;right:20px;z-index:80;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:17px;line-height:1;box-shadow:0 2px 10px rgba(15,23,42,.12)}
+h1,h2,h3,h4{line-height:1.25;color:var(--ink)}
+.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
+.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
+.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px}
+.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
+.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--ink-soft)}
+p{margin:0 0 18px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid #c7d2fe}
+a:hover{border-bottom-color:var(--accent)}
+ul,ol{margin:0 0 18px;padding-left:26px}
+li{margin-bottom:7px}
+li::marker{color:var(--accent);font-weight:600}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+.small{font-size:13.5px;color:var(--ink-soft)}
+.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#3730a3;overflow-wrap:anywhere}
+html[data-theme='dark'] .mono,html[data-theme='dark'] code:not(pre code){background:#1c2438;border-color:#2c3752;color:#a5b4fc}
+.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
+.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
+.cover h1 .thin{color:var(--accent)}
+.cover .sub{font-size:19px;color:var(--ink-soft);max-width:660px;line-height:1.6;margin:0 0 30px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
+.cover .meta b{color:var(--ink-soft);font-weight:600}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:34px 0 8px}
+.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+html[data-theme='dark'] .statgrid .cell{background:linear-gradient(180deg,#141b2e,#10162a)}
+.statgrid .cell .v{font-size:23px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
+.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
+.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;margin:0 0 20px}
+pre code{background:none;border:none;padding:0;color:inherit;font-size:inherit}
+.tblwrap{overflow-x:auto;margin:0 0 22px}
+figure{margin:30px 0 34px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+figure figcaption{font-size:13.5px;color:var(--ink-faint);line-height:1.6;margin-top:13px;padding-left:14px;border-left:3px solid #c7d2fe}
+html[data-theme='dark'] figure figcaption{border-left-color:#312e81}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);font-weight:700}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+h2.ch{scroll-margin-top:20px}
+h3,h4{scroll-margin-top:70px}
+@media(max-width:1000px){aside#toc{display:none}.page{padding:0 22px 90px}.cover h1{font-size:34px}}
+</style>
+</head>
+<body>
+<button id="themeBtn" class="theme-btn" title="Toggle theme" aria-label="Toggle dark mode">&#9788;</button>
+
+<div class="shell">
+<aside id="toc">
+  <div class="brand">
+    <div class="t">Decision Models vs Rerankers</div>
+    <div class="s">Two models that never generate</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Foundations</div>
+    <a href="#s1"><span class="num">01</span>Two models that refuse to write</a>
+    <a href="#s2"><span class="num">02</span>What a reranker actually does</a>
+    <a href="#s3"><span class="num">03</span>What a decision model does</a>
+    <a href="#s4"><span class="num">04</span>The differences that matter</a>
+    <div class="part">Where they split</div>
+    <a href="#s5"><span class="num">05</span>Calibration, the real divide</a>
+    <a href="#s6"><span class="num">06</span>Compute shape</a>
+    <div class="part">The substitution tests</div>
+    <a href="#s7"><span class="num">07</span>Test A: reranker &rarr; decision</a>
+    <a href="#s8"><span class="num">08</span>Test B: decision &rarr; reranker</a>
+    <div class="part">Operating them</div>
+    <a href="#s9"><span class="num">09</span>Where each one belongs</a>
+    <a href="#s10"><span class="num">10</span>Pick by job</a>
+    <a href="#s11"><span class="num">11</span>FAQ</a>
+    <a href="#sources"><span class="num">12</span>Sources</a>
+    <div class="toc-foot">Every claim attributed. Numbers dated 6 October 2026.</div>
+  </nav>
+</aside>
+
+<main>
+<div class="page">
+
+<div class="cover">
+  <span class="kicker">Deep Dive &middot; Architecture</span>
+  <h1>Decision models <span class="thin">vs</span> rerankers</h1>
+  <p class="sub">They look like different categories — one is a retrieval component, the other is the model that decides things for your agent. They are not. Both read an input, score it, and write nothing. The gap between them is narrower than the labels suggest, and the one place they genuinely diverge is a number that most pipelines throw away.</p>
+  <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
+    <span><b>Published</b> 6 October 2026</span>
+    <span><b>Models named</b> 23</span>
+    <span><b>Reading time</b> ~30 min</span>
+    <span><b>Level</b> Expert</span>
+  </div>
+  <div class="statgrid">
+    <div class="cell"><div class="v">0</div><div class="k">output tokens, either model</div></div>
+    <div class="cell"><div class="v">+12 vs +7</div><div class="k">Recall@20 pts: decision model vs best cross-encoder, measured</div></div>
+    <div class="cell"><div class="v">logit diff</div><div class="k">what a reranker returns</div></div>
+    <div class="cell"><div class="v">Calibrated</div><div class="k">what a decision model returns</div></div>
+    <div class="cell"><div class="v">50 &rarr; 10</div><div class="k">the reranker&rsquo;s standard job</div></div>
+    <div class="cell"><div class="v">255</div><div class="k">max options in one decision</div></div>
+    <div class="cell"><div class="v">32K</div><div class="k">per pair on a modern reranker</div></div>
+  </div>
+</div>
+
+<h2 class="ch" id="s1"><span class="chno">01</span> — Two models that refuse to write</h2>
+<p class="ch-sub">The similarity is not superficial, and neither is the divergence.</p>
+
+<p>Ask a general-purpose model a question and it writes you a paragraph. Ask a reranker how relevant a passage is and it returns a number. Ask a decision model whether a customer is likely to cancel and it returns a probability. Three behaviours, two of them apparently boring &mdash; and it is the two boring ones that turn out to be siblings.</p>
+
+<p>The shared trait is structural, not cosmetic. <strong>Neither a reranker nor a decision model ever generates a token.</strong> Both run a forward pass, read the logits sitting at one position of the prompt, and hand them back. There is no decode loop, no sampling, no output string to parse, and no cost that grows with how long the answer would have been. That is a real architectural property, and it is why the two families feel interchangeable the moment you first look at them.</p>
+
+<div class="callout info"><span class="lab">The one-sentence version</span>A reranker answers <em>&ldquo;how relevant is this document to my query?&rdquo;</em> once per document, and the number it gives you is a <strong>logit you may only sort by</strong>. A decision model answers <em>&ldquo;which of these options is it, and how sure are you?&rdquo;</em> for many questions at once, and the number it gives you is a <strong>probability you can threshold</strong>. Same mechanism, different contract.</div>
+
+<p>That contract is what the rest of this article is about. Chapters 2 and 3 put each model under the microscope, chapter 4 lines them up on six axes, chapters 5 and 6 take the two that actually decide the answer &mdash; calibration and compute shape &mdash; and chapters 7 and 8 run the substitution test in both directions, because the honest answer is not symmetric: <strong>one direction works with conditions attached, and the other does not work at all.</strong></p>
+
+<p>One note before starting: both families have been moving fast. The reranker figures here come from our own <a href="../guides/best-ai-reranker-models-ultimate-ranking-2026.html">top-20 reranker ranking</a> and from the model cards themselves; the decision-model figures come from our <a href="system-one-decision-models-deep-dive.html">System One deep dive</a> and the independent benchmark behind it. Every number is dated so you can re-check the ones that will have aged. One thing has changed since the substitution tests were first written: third parties have now ranked both families over the same candidate window and published the numbers, so chapters 7 and 8 quote those measurements directly, name who ran them, and say what they do not cover.</p>
+
+<h2 class="ch" id="s2"><span class="chno">02</span> — What a reranker actually does</h2>
+<p class="ch-sub">A cross-encoder, one forward pass per pair, and a number that is not a probability.</p>
+
+<p>A reranker &mdash; more precisely a cross-encoder &mdash; takes your query and one candidate document, concatenates them into a single input, and runs them through a transformer where every token can attend to every other token. It then reads a score from that pass. Because the query and the document see each other from the first layer, this is strictly more expressive than the alternative, where each is embedded separately and compared afterwards.</p>
+
+<p>Two things follow from that design. First, <strong>the cost is per pair</strong>: to score <em>k</em> candidates you run <em>k</em> forward passes (batched together, but still <em>k</em> inputs). This is why the accepted practice is to embed your way to 50&ndash;100 candidates and rerank only those down to the top 5&ndash;10 &mdash; never to rerank a corpus. Second, <strong>pair order matters</strong>: most cross-encoders are asymmetric, so the query goes first.</p>
+
+<h3>What the score is made of</h3>
+<p>This is the detail that decides the whole comparison, so it is worth being exact about it. On <span class="mono">Qwen3-Reranker</span>, the published implementation scores a pair with the <strong>raw logit difference</strong> <span class="mono">logit(&quot;yes&quot;) &minus; logit(&quot;no&quot;)</span> read at the final non-padding position. The model card is explicit about the consequence: <em>&ldquo;By default, scores are raw logit differences. To get 0-1 probability scores, pass a Sigmoid activation function.&rdquo;</em> That sigmoid is a squashing function, not a calibration step &mdash; it puts the number in a range, it does not give it a meaning.</p>
+
+<p>Older pair-classification rerankers work the same way: a single relevance logit, optionally pushed through a sigmoid. And the failure mode of treating that as a probability is documented well enough to quote directly &mdash; raw reranker outputs are logits, and they are <strong>not comparable across models or across queries</strong>. A score of 0.82 from one query says nothing about a score of 0.82 from another.</p>
+
+<div class="callout warn"><span class="lab">The trap everyone falls into once</span>Both families return a floating-point number between 0 and 1, so the two look interchangeable in a log file. They are not. One is a monotone transform of a logit that you may <strong>sort by</strong>; the other is a probability that was trained to mean something. Put a threshold on the first without fitting a mapping first and you have written a bug that only shows up on production traffic.</div>
+
+<h3>How the field is actually shaped in 2026</h3>
+<p>Two architectural generations sit side by side. The classic generation scores one pair at a time. The newer <strong>listwise</strong> generation scores a whole list of documents in one pass, which is a direct attack on the <em>k</em>-forward-passes cost &mdash; Jina Reranker v3.5 is the current poster child at 0.6B parameters with an 8K&ndash;32K listwise window, and it reportedly rivals models many times its size on BEIR. A third approach, <strong>late interaction</strong> (ColBERT-style), pre-computes per-token document embeddings once and only does the expensive comparison at query time, which is what makes million-document corpora tractable.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Reranker</th><th class="num">Size</th><th class="num">Context</th><th>Flavour</th></tr></thead>
+<tbody>
+<tr><td>Jina Reranker v3.5</td><td class="num">0.6B</td><td class="num">8K&ndash;32K</td><td>Listwise &mdash; scores a list in one pass</td></tr>
+<tr><td>Qwen3-Reranker-0.6B / 4B / 8B</td><td class="num">0.6B&ndash;8B</td><td class="num">32K</td><td>Causal yes/no logit per pair, instruction-conditioned</td></tr>
+<tr><td>BGE-Reranker-v2-M3</td><td class="num">568M</td><td class="num">512+</td><td>XLM-RoBERTa, 100+ languages, the default everywhere</td></tr>
+<tr><td>BGE-Reranker-v2.5-Gemma2</td><td class="num">~2B</td><td class="num">2K&ndash;8K</td><td>Reasoning backbone, scores contradictions</td></tr>
+<tr><td>mxbai-rerank-large-v2</td><td class="num">~1.5&ndash;2B</td><td class="num">2K+</td><td>RL-tuned to cut false positives</td></tr>
+<tr><td>Zerank-2</td><td class="num">~1.7&ndash;4B</td><td class="num">Extended</td><td>Instruction-conditioned, tops Agentset ELO</td></tr>
+<tr><td>cross-encoder/ms-marco-MiniLM-L-6-v2</td><td class="num">&mdash;</td><td class="num">512</td><td>The classic pair classifier</td></tr>
+<tr><td>cross-encoder/ms-marco-TinyBERT-L-2</td><td class="num">4M</td><td class="num">512</td><td>Ultra-fast CPU scoring</td></tr>
+</tbody>
+</table></div>
+
+<p class="small">Sizes, context windows and flavours as published by each project and tabulated in this site&rsquo;s reranker ranking (updated 4 August 2026). Note what the table has in common: every entry is <em>bounded by a context window per pair</em>, and none of them promises that a score means anything beyond the list it just scored.</p>
+
+<h2 class="ch" id="s3"><span class="chno">03</span> — What a decision model does</h2>
+<p class="ch-sub">One state, many typed questions, one distribution per question.</p>
+
+<p>A decision model takes a block of <strong>state</strong> &mdash; a support ticket, a pull request, a log line, a game frame &mdash; plus a set of <strong>typed questions</strong> about that state, and returns a probability for each option you defined. It never writes text, so there is nothing to parse: your schema is the output space.</p>
+
+<p>The three primitives are the whole interface. <strong>Choice</strong> picks one of up to 255 described options and returns the full distribution over them. <strong>Noul</strong> asks a yes/no question and returns a single probability. <strong>Score</strong> places the state on an ordinal rubric of 2&ndash;10 described levels and returns the probability-weighted position. Labels arrive at request time, so adding a category means editing a dictionary, not retraining.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Model</th><th class="num">Size</th><th>Backbone</th><th>Note</th></tr></thead>
+<tbody>
+<tr><td>Jev</td><td class="num">undisclosed</td><td>Causal, closed</td><td>The reference; 32k state plus longest question</td></tr>
+<tr><td>Von</td><td class="num">395M</td><td>ModernBERT encoder</td><td>Best open zero-shot entrant; CPU, under 15 ms</td></tr>
+<tr><td>Laya</td><td class="num">421M</td><td>ModernBERT + head</td><td>100+ languages; fine-tune it, don&rsquo;t zero-shot it</td></tr>
+<tr><td>Kev</td><td class="num">0.8B&ndash;9B</td><td>Qwen3.5/3.8 + LoRA</td><td>Serves the same wire contract as the hosted API</td></tr>
+<tr><td>SemIf</td><td class="num">none added</td><td>Frozen Qwen3.5-4B</td><td>Trains nothing; reads option logits directly</td></tr>
+<tr><td>Nimble</td><td class="num">9B</td><td>Qwen3.5-9B + LoRA</td><td>Published contrastive data recipe; 8,192 context</td></tr>
+<tr><td>Rizzo Flow</td><td class="num">4B / 1.7B</td><td>Spark-X2.5 + LoRA</td><td>llama.cpp, default 8,192 context, built-in abstention</td></tr>
+</tbody>
+</table></div>
+
+<p>The detail that separates these from rerankers is <strong>why</strong> they output probabilities rather than scores. They are trained against a proper scoring rule &mdash; a reward that peaks at the truth rather than at confidence &mdash; so a model that reports 0.8 is being pushed, during training, toward actually being right 80% of the time. A reranker is trained to <em>order</em> relevant above irrelevant, and ordering does not care what the numbers are, only how they sort.</p>
+
+<div class="callout ok"><span class="lab">Why this is not a free lunch</span>Calibration is a property of a population of predictions, not of a single answer, and it moves with your data. The independent evaluation of Jev found its choice probabilities well calibrated and its binary probabilities ranking well but sitting badly against a fixed 0.5 threshold. So even here the rule stands: <strong>fit the temperature on your own labelled data</strong> before any number drives an action. The difference is that you are tuning a real probability, not rescuing a logit.</div>
+
+<h2 class="ch" id="s4"><span class="chno">04</span> — The differences that matter</h2>
+<p class="ch-sub">Six axes. Two of them are technicalities; four decide which one you want.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Axis</th><th>Reranker</th><th>Decision model</th></tr></thead>
+<tbody>
+<tr><td><strong>What is scored</strong></td><td>One (query, document) pair at a time</td><td>One (state, question) pair &mdash; many questions against one shared state</td></tr>
+<tr><td><strong>What comes back</strong></td><td>A single scalar per document</td><td>A distribution over the options you wrote, plus expected values</td></tr>
+<tr><td><strong>Competitive or independent</strong></td><td>Independent &mdash; every document can score high</td><td>Mutually exclusive &mdash; probabilities sum to 1</td></tr>
+<tr><td><strong>Training target</strong></td><td>Ordering over relevance labels</td><td>A proper scoring rule, so the number is calibrated</td></tr>
+<tr><td><strong>Typical k</strong></td><td>50&ndash;100 candidates in, 5&ndash;10 out &mdash; designed to scale up</td><td>A handful of questions &mdash; designed to batch horizontally</td></tr>
+<tr><td><strong>Output contract</strong></td><td>A sort order</td><td>Typed JSON: a label, a probability, an abstention</td></tr>
+</tbody>
+</table></div>
+
+<h3>The row everyone skips: competitive or independent</h3>
+<p>This is the most quietly consequential difference in the table, so it deserves its own paragraph. A reranker scores each document on its own merits: if all 100 candidates are relevant, all 100 can score 0.9, because nothing forces the scores to compete.</p>
+
+<p>A decision model&rsquo;s <strong>Choice</strong> is a softmax over the options. If you hand it 10 candidate documents as 10 options, it must distribute its probability mass <em>across</em> them &mdash; it will confidently tell you which one is best even when every one of them is irrelevant, and the moment you add an 11th bad option the other ten shift. For picking a single winner that is exactly what you want. For judging a set of candidates where the correct answer may be <em>&ldquo;none of these&rdquo;</em>, it is a trap &mdash; and the workaround (adding an explicit &ldquo;none of them is relevant&rdquo; option) is a workaround, not a design.</p>
+
+<div class="callout danger"><span class="lab">The softmax trap, in one line</span>Ask a Choice which document is most relevant and it <strong>must</strong> pick one. Ask a reranker which documents are relevant and it will cheerfully say none of them. If your pipeline can legitimately return an empty result set, that difference is the whole decision.</div>
+
+<h2 class="ch" id="s5"><span class="chno">05</span> — Calibration, the real divide</h2>
+<p class="ch-sub">Where a ranking instrument and a measuring instrument come apart.</p>
+
+<p>Everything up to here has been about shape. This chapter is about meaning, and it is the reason the substitution tests come out asymmetric.</p>
+
+<p>A reranker&rsquo;s job is to produce an <strong>ordering</strong>. Given one query and one list, the only thing you do with the scores is sort them and take the top <em>k</em>. For that job, calibration is irrelevant &mdash; multiplying every score by 7 changes nothing about the sort. So rerankers are not trained for it, and their scores are not comparable across queries: a 0.9 on one query and a 0.4 on another can describe equally relevant documents.</p>
+
+<p>A decision model&rsquo;s job is to produce a <strong>threshold</strong>. The moment an application says <em>&ldquo;act when the probability exceeds 0.8&rdquo;</em>, the number stops being an ordering and starts being a measurement, and it has to survive being compared to outcomes. That requires the reward to peak at the truth: a proper scoring rule such as the log score or the Brier score, where reporting 0.7 when the true rate is 0.7 scores better than reporting 0.9 or 0.5. A 0/1 reward on a sampled answer has no such property &mdash; it peaks at 1.0 regardless of the truth &mdash; which is precisely why you cannot get calibration by accident.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>You want to&hellip;</th><th>With a reranker</th><th>With a decision model</th></tr></thead>
+<tbody>
+<tr><td>Put the best candidate first</td><td><strong>Native.</strong> That is what it is for</td><td>Works for a short list, wastes the probability</td></tr>
+<tr><td>Return nothing when nothing fits</td><td>Not possible without fitting a cutoff</td><td><strong>Native.</strong> Abstention is part of the contract</td></tr>
+<tr><td>Act only above 0.8 confidence</td><td>Not possible without fitting a calibrator</td><td><strong>Native</strong>, after a temperature fit on your labels</td></tr>
+<tr><td>Compare confidence across requests</td><td>Not meaningful</td><td>Meaningful by construction, drifts with domain</td></tr>
+<tr><td>Return a label a program can switch on</td><td>Sort order only</td><td><strong>Native.</strong> Typed JSON, no parsing</td></tr>
+</tbody>
+</table></div>
+
+<p class="small">The middle column is not a criticism of rerankers &mdash; nobody chose a badly designed contract. It is that &ldquo;rank these for me&rdquo; and &ldquo;tell me how likely this is&rdquo; are different questions, and only one of them has an ordering for an answer.</p>
+
+<div class="callout info"><span class="lab">If you genuinely need a threshold and only have a reranker</span>You can have one, but you pay for it: collect labelled pairs from your own traffic, fit a calibrator &mdash; Platt scaling, isotonic regression, or a temperature fit &mdash; and refit whenever the model, the prompt or the data drifts. This is entirely legitimate and it is what careful teams do. It is also exactly the work that a model trained on a proper scoring rule does for you during training instead.</div>
+
+<h2 class="ch" id="s6"><span class="chno">06</span> — Compute shape</h2>
+<p class="ch-sub">Both skip generation. Only one of them gets cheaper as you ask more questions.</p>
+
+<p>It would be easy to assume that a decision model&rsquo;s advantage is &ldquo;no decode loop&rdquo;. It is not, because <strong>rerankers have no decode loop either</strong> &mdash; they also read a single position and stop. So the interesting question is what happens to cost as the amount of work grows.</p>
+
+<p>For a reranker the cost is <em>k</em> forward passes over <em>k</em> (query, document) pairs, and the query is repeated in every one of them. Batch them and you amortise the launches, not the arithmetic. Listwise models fix part of this by scoring a list at once, and late-interaction models pre-compute the document side entirely &mdash; both are real answers, and both narrow the gap this section used to own.</p>
+
+<p>For a decision model the state is prefilled once and the questions branch off it, sharing its key/value cells instead of copying them, read at one position each. The measured shape of that is flat in the question count:</p>
+
+<ul>
+<li><strong>2 options 76&nbsp;ms, 200 options 75.5&nbsp;ms</strong> &mdash; the option list barely registers.</li>
+<li><strong>5,000 questions over a 22.8k-token state in 1.8&nbsp;s</strong> &mdash; batching, not serialisation.</li>
+<li><strong>One prefill plus two micro-batches</strong> for 8 yes/no questions over a 218-token contract, 136&nbsp;ms total, instead of eight separate passes.</li>
+<li>Reusing one long state across many criteria lifted throughput from <strong>2.33 to 20.03 decisions per second</strong> in SemIf&rsquo;s measurement.</li>
+</ul>
+
+<div class="callout warn"><span class="lab">The honest limitation on &ldquo;flat&rdquo;</span>Flatness applies to <em>questions about shared state</em>, not to state you have not paid for yet. If your 100 candidates are 500 tokens each, someone pays for 50,000 tokens of prefill either way &mdash; the decision model does not get that for free, and at that size it is also over the 8,192 context of most open models (Jev documents 32k). The real asymmetry is the one that matters for this article: <strong>many short questions over one long document is where a decision model wins outright.</strong> Many long documents each needing their own judgement is a reranker&rsquo;s shape, and listwise models have already closed most of it.</div>
+
+<h2 class="ch" id="s7"><span class="chno">07</span> — Test A: can a decision model replace your reranker?</h2>
+<p class="ch-sub">Short list: yes, with conditions. Real retrieval: no.</p>
+
+<p>Let us be concrete. You have a query and ten short candidate passages, and you want the best one &mdash; or you want to know whether any of them is good enough to use. There are two ways to put that to a decision model.</p>
+
+<pre><code># Option 1 — one Choice over the candidates: cheap, competitive
+{"state": {"query": "does the refund policy cover partial refunds?"},
+ "questions": {"best_doc": {"type": "choice",
+   "criteria": {"doc_1": "&lt;passage&gt;", "doc_2": "&lt;passage&gt;", ...}}}}
+
+# Option 2 — one Noul per candidate in a single request: independent,
+#            each returns a probability you can threshold
+{"state": {"query": "...", "doc_1": "&lt;passage&gt;", "doc_2": "&lt;passage&gt;"},
+ "questions": {"relevant_1": {"type": "noul", "instructions": "Is doc_1 on topic?"},
+               "relevant_2": {"type": "noul", "instructions": "Is doc_2 on topic?"}}}</code></pre>
+
+<p>Option 2 is the one worth noticing. The state is prefilled once, the questions are isolated from each other by design &mdash; a question cannot see a sibling&rsquo;s answer &mdash; so each candidate is judged <strong>independently</strong> and returns its own calibrated probability. That is the property the reranker also has, plus the property the reranker lacks. You can also ask, in the same single request, things a reranker has no way to express: <em>is it relevant</em>, <em>is it authoritative</em>, <em>is it stale</em>, <em>should we ship it</em>.</p>
+
+<h3>Where it stops working</h3>
+<ul>
+<li><strong>Candidate count.</strong> A Choice caps at 255 options, and that is before context. Retrieval workloads are sized in the hundreds. The measured 200-candidate run below got there with one Noul per document in six shared batches rather than one Choice &mdash; which works, but charges you a question and its share of context per candidate.</li>
+<li><strong>Token budget per question.</strong> Laya&rsquo;s options for a single question must fit a <strong>192-token budget in total</strong> &mdash; which is exactly why a 77-label problem leaves three or four tokens per label. Ten full passages will not fit that budget in any of these models.</li>
+<li><strong>Context per pair.</strong> Qwen3-Reranker takes 32K <em>per pair</em>. The decision models default to 8,192 (Nimble, Rizzo Flow) or document 32k including the longest question (Jev), and Laya&rsquo;s English checkpoint truncates the state at 512 tokens in the ONNX client.</li>
+<li><strong>Independent scoring.</strong> Option 1 hits the softmax trap from chapter 4. Option 2 avoids it, but you are now running one question per candidate and paying for the question suffixes.</li>
+<li><strong>Ecosystem.</strong> Rerankers are wired into FlagEmbedding, sentence-transformers, every RAG framework, and support late interaction and pre-computed document embeddings. Decision models have no recall stage at all &mdash; you still need something else to produce the candidates.</li>
+</ul>
+
+<figure>
+  <img src="decision-vs-reranker-context.png" alt="Bar chart of published context limits comparing rerankers per query-document pair against decision models for the whole state: Qwen3-Reranker 4B and 8B and Jev at 32,768 tokens, Nimble 9B and Rizzo Flow 4B at 8,192, and BGE-Reranker-v2-M3 and the Laya English ONNX client at 512" width="2160" height="1473" loading="lazy" decoding="async">
+  <figcaption>The budgets are not measured the same way, and that is the point: a reranker gets its window <em>per pair</em>, re-reading each document from scratch, while a decision model spends one window across a shared state plus every question asked against it. Ten passages do not fit a 192-token option budget, and one long document costs a decision model most of its window &mdash; which is where the substitution test stops.</figcaption>
+</figure>
+
+<h3>What has actually been measured</h3>
+
+<p>Up to here the substitution test has been argued from contracts. Third parties have now run part of it, and the numbers are worth having in front of you. In September 2026 the search team at Opine took 64 sales queries, built one candidate window per query (the top 60 and the top 200 from their own hybrid retrieval), graded every candidate with an independent model (GPT-6 Astra), and ranked the <em>same</em> window several ways: with Jev used as a reranker &mdash; one Noul question per document, batches of 20&ndash;30 &mdash; against dedicated cross-encoders (Cohere Rerank 3.5, 4 Fast and 4 Pro, Voyage Rerank 3) and against frontier LLMs ranking the whole list at once (GPT-6 Luna, GPT-6 Sol, Claude Opus 5.5).</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Same candidate set, same grader</th><th class="num">Decision model as reranker (Jev)</th><th class="num">Best dedicated cross-encoder</th><th class="num">Frontier LLMs</th></tr></thead>
+<tbody>
+<tr><td>Recall@20 gain over hybrid search, 60 candidates</td><td class="num"><strong>+12 pts</strong></td><td class="num">+7 (Voyage Rerank 3)</td><td class="num">GPT-6 Luna +11; Sol and Opus 2&ndash;3 pts higher</td></tr>
+<tr><td>Recall@20 gain, 200 candidates</td><td class="num"><strong>+17 pts</strong></td><td class="num">not reported at that window</td><td class="num">&mdash;</td></tr>
+<tr><td>nDCG@20, 200 candidates</td><td class="num">0.876</td><td class="num">0.815 (Voyage Rerank 3)</td><td class="num">0.864 (Luna); Sol and Opus ~0.92</td></tr>
+<tr><td>Median latency per search</td><td class="num">0.4 s parallel (0.9 s at 60, 1.9 s at 200 sequential)</td><td class="num">0.3&ndash;0.7 s</td><td class="num">&mdash;</td></tr>
+<tr><td>Cost per 1,000 searches</td><td class="num">$0.80 at 60, $2.19 at 200</td><td class="num">list prices</td><td class="num">significantly higher</td></tr>
+<tr><td>Top-20 overlap with the best frontier model</td><td class="num">57% (Opus), 58% (Sol)</td><td class="num">&mdash;</td><td class="num">Opus and Sol agree 72%</td></tr>
+</tbody>
+</table></div>
+
+<p class="small">Opine, September 2026 &mdash; 64 sales-related queries, 60- and 200-result windows from one hybrid retriever, documents graded by GPT-6 Astra rather than by people. A second, smaller measurement from MindStudio in the same month put a decision-model rerank step on top of a plain BM25 baseline and moved <strong>top-1 accuracy from 21% to 54%</strong> without touching the retriever, at about 17 decisions per second sequentially (roughly 40 s per batch), falling to 7.6 s with 64 requests in flight. Both are small-n, LLM-graded evaluations run by teams using the model rather than by its makers &mdash; Opine calls its own a &ldquo;vibe check&rdquo; and lists human label validation among its next steps &mdash; so read the magnitudes as indicative and the ordering as the interesting part.</p>
+
+<p>Notice as well what the table does <em>not</em> cover: no test touched the recall stage, none went past 200 candidates, none ran multilingual corpora or pre-computable embeddings, and all of them sat inside the limits listed above (roughly 1,000-character documents, a window that fits a shared state). The measured numbers firm up the shortlist half of the verdict; they do not probe the retrieval half, which remains an argument from structure.</p>
+
+<div class="callout warn"><span class="lab">The verdict on Test A</span>For a <strong>shortlist of a handful of short passages where you want a threshold or an abstention</strong>, a decision model replaces a reranker well, and gives you back something the reranker cannot. For the <strong>retrieval job itself</strong> &mdash; hundreds of candidates, long chunks, multilingual recall, pre-computable embeddings &mdash; it does not, and you should not want it to. The honest recommendation is that they sit in sequence: rerank to a shortlist, then decide. <strong>Measured, the first half now has numbers behind it</strong>: on Opine&rsquo;s 64-query window the decision model beat every dedicated cross-encoder at 60 candidates (+12 vs +7 Recall@20 points) inside their latency band and under $1 per 1,000 searches &mdash; while the second half stays an argument from structure, because nobody has published that test.</div>
+
+<h2 class="ch" id="s8"><span class="chno">08</span> — Test B: can a reranker replace a decision model?</h2>
+<p class="ch-sub">The shorter test, because the answer is shorter.</p>
+
+<p>A reranker is not as fixed as it first appears. Its instruction field lets you define what &ldquo;relevant&rdquo; means for this query, and instruction-conditioned models like Zerank-2 take that seriously. So you can point one at a binary proposition: set the instruction to <em>&ldquo;an urgent customer support ticket&rdquo;</em> and read its yes/no logit. That is, near enough, what Qwen3-Reranker does internally on every pair.</p>
+
+<p>So it fakes one binary decision. What it cannot fake:</p>
+
+<ul>
+<li><strong>Calibration.</strong> You get a logit. You cannot threshold it without fitting a mapping, so the number cannot drive an action on its own.</li>
+<li><strong>Typed output.</strong> No label to switch on, no expected value on a rubric, no probability per option &mdash; one scalar per pair, and the scalar only orders.</li>
+<li><strong>Multiple questions over shared state.</strong> A decision model returns a state, five independent answers and five abstention flags in one request. The reranker returns five pairs&rsquo; worth of scores from five inputs.</li>
+<li><strong>Abstention.</strong> There is no &ldquo;I cannot tell from this state&rdquo; in a relevance score, and no way for a threshold to express &ldquo;this is out of domain&rdquo; without a fit behind it.</li>
+<li><strong>Rubrics.</strong> &ldquo;How severe is this incident, 1&ndash;5?&rdquo; has no document to rank and no ordering to produce. It has an answer.</li>
+</ul>
+
+<h3>What each family is willing to publish</h3>
+
+<p>There is a measured version of this verdict, and it is a measurement of <em>what gets measured</em>. Decision models publish calibration error next to accuracy, because their numbers are meant to be thresholds. On the JevBench v1.4 board Von 1.2 posts a sealed-half <strong>expected calibration error of 0.107</strong> against Laya&rsquo;s 0.172, under one protocol. Laya&rsquo;s own model card reports <strong>0.766 accuracy, Brier 0.062 and ECE 0.213</strong> over 2,000 decisions, breaks it down by primitive (noul 0.857, choice 0.733, score 0.723) and then warns in its own limits section that the confidence is still uncalibrated and should be refit on held-out data. Jev&rsquo;s figures, as quoted in that same card, are accuracy 0.727 with ECE 0.144. Latency is reported per decision: Von runs a p50 of 0.096 s on four vCPUs under OpenVINO and 0.023 s on an A10G, and 32.8 ms p50 across the 38-benchmark, ~150k-request Decision Index.</p>
+
+<p>Reranker boards, by contrast, publish ordering and only ordering. BEIR reports nDCG@10 &mdash; the Jina Reranker v3 paper quotes <strong>61.94 nDCG@10</strong> as the best among the rerankers it evaluated &mdash; and no expected calibration error, no Brier score and no cutoff quality appears anywhere in the standard tables. It is not an omission: a raw logit is not a probability until somebody fits a mapping, so the boards have no number they could report. That asymmetry <em>is</em> the Test B result, measured. You can audit whether a decision model&rsquo;s number may drive an action; for a reranker the audit does not exist until you have fitted the calibrator that the decision model was trained to make unnecessary.</p>
+
+<div class="callout danger"><span class="lab">The verdict on Test B</span>No. A reranker can imitate a single binary decision badly, and nothing else. If what you actually need is a ranking, a ranking model is the correct and cheaper tool; if what you need is a judgement with a number attached, the reranker will hand you a logit wearing a probability&rsquo;s clothing. That specific confusion is the most common way these two categories get mixed up in production. The measured form of &ldquo;no&rdquo; is the row that does not exist: nobody publishes a calibration error or a cutoff quality for a reranker, because until a mapping is fitted there is no probability to score &mdash; and the moment you fit one, you have rebuilt by hand the head the decision model ships with.</div>
+
+<h2 class="ch" id="s9"><span class="chno">09</span> — Where each one belongs</h2>
+<p class="ch-sub">They are not competitors. They are adjacent stages.</p>
+
+<p>Once the substitution tests are done, the placement is easy: the two models sit on either side of a boundary neither of them crosses.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Stage</th><th>Model</th><th>The job</th></tr></thead>
+<tbody>
+<tr><td><strong>Recall</strong></td><td>Embedding model / hybrid search</td><td>Turn a corpus into 50&ndash;100 plausible candidates</td></tr>
+<tr><td><strong>Precision</strong></td><td><strong>Reranker</strong></td><td>Order those candidates, keep the top 5&ndash;10</td></tr>
+<tr><td><strong>Generation</strong></td><td>Frontier LLM</td><td>Write the answer from the retrieved context</td></tr>
+<tr><td><strong>Arbitration</strong></td><td><strong>Decision model</strong></td><td>Route, guardrail, verify and threshold &mdash; around the model, not over the corpus</td></tr>
+</tbody>
+</table></div>
+
+<p>The distinction to carry away is one of <em>direction</em>. A reranker looks <strong>outward</strong> at a candidate set that the world supplied and asks which of those matters. A decision model looks at a state you assembled and asks a question you formulated. Retrieval is a problem with an answer set already in hand; judgement is a problem where you have to define the options first. Same mechanism, opposite direction of travel.</p>
+
+<div class="callout ok"><span class="lab">Where they genuinely overlap</span>Exactly one place: <strong>a small candidate set plus a decision about it.</strong> &ldquo;Which of these five approaches should we take?&rdquo; &ldquo;Is any of these three documents safe to show a customer?&rdquo; Both families answer that, and a decision model answers it with an extra property you will eventually want. Everywhere else they are complements rather than substitutes &mdash; and in an agent harness the reranker&rsquo;s only appearance is normally inside memory retrieval, where it was going to live anyway.</div>
+
+<figure>
+  <img src="decision-vs-reranker-pipeline.png" alt="Four-stage pipeline showing where each model sits: recall by an embedding model producing 50 to 100 candidates, precision by the reranker keeping the top 5 to 10, generation by a frontier model that writes the answer, and arbitration by the decision model that routes, guards, verifies and thresholds around the model" width="2160" height="1833" loading="lazy" decoding="async">
+  <figcaption>The two families never meet, because they face opposite directions. A reranker looks outward at candidates the world supplied and asks which of those matters; a decision model looks at a state you assembled and answers a question you formulated. Same mechanism, opposite direction of travel.</figcaption>
+</figure>
+
+<h2 class="ch" id="s10"><span class="chno">10</span> — Pick by job</h2>
+<p class="ch-sub">The shortest useful table in the article.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>If you want&hellip;</th><th>Use</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>50&ndash;100 retrieved chunks trimmed to the top 5&ndash;10</td><td><strong>Reranker</strong></td><td>Designed for it; listwise models make it cheap</td></tr>
+<tr><td>Long documents, 32K per pair</td><td><strong>Reranker</strong></td><td>Qwen3-Reranker takes 32K per pair today</td></tr>
+<tr><td>Millions of documents, pre-compute once</td><td><strong>Late-interaction reranker</strong></td><td>ColBERT-style embeddings are pre-computable</td></tr>
+<tr><td>Multilingual recall with one small model</td><td><strong>Reranker</strong></td><td>BGE-Reranker-v2-M3: 568M, 100+ languages, default everywhere</td></tr>
+<tr><td>Route a ticket into typed categories</td><td><strong>Decision model</strong></td><td>Labels at request time, probabilities per option</td></tr>
+<tr><td>Score on an ordinal rubric</td><td><strong>Decision model</strong></td><td>Score has no reranker equivalent</td></tr>
+<tr><td>Act only when confidence clears 0.8</td><td><strong>Decision model</strong></td><td>Calibrated by construction, after a local fit</td></tr>
+<tr><td>Return nothing when nothing qualifies</td><td><strong>Decision model</strong></td><td>Abstention is native; a reranker must be fitted first</td></tr>
+<tr><td>Many checks over one long document in one call</td><td><strong>Decision model</strong></td><td>One prefill, questions nearly free</td></tr>
+<tr><td>&ldquo;Is this document relevant?&rdquo; for a shortlist, then decide</td><td><strong>Both, in that order</strong></td><td>Rerank to shortlist, then judge with thresholds</td></tr>
+</tbody>
+</table></div>
+
+<h2 class="ch" id="s11"><span class="chno">11</span> — FAQ</h2>
+<p class="ch-sub">The five questions that come up every time.</p>
+
+<h3>Is a reranker just a decision model with one question?</h3>
+<p>Architecturally, closer than the naming suggests: both read logits at one position and generate nothing. Contractually, no. One returns a scalar that only orders, trained to rank; the other returns a distribution that means something, trained on a proper scoring rule. The difference is not the architecture, it is the target.</p>
+
+<h3>Should I threshold a reranker score?</h3>
+<p>Not as it stands. Reranker outputs are raw logits, not comparable across models or queries, and a sigmoid only squashes them. If you need a cutoff, fit a calibrator on your own labelled pairs and refit on drift. If you need a threshold often, that is a signal you wanted a decision model.</p>
+
+<h3>Could a decision model do my RAG reranking?</h3>
+<p>For a handful of short candidates, yes &mdash; and at that scale the answer is now measured rather than argued: in Opine&rsquo;s 64-query test a decision model reranking 60&ndash;200 candidates beat every dedicated cross-encoder it faced on Recall@20 and nDCG@20, at 0.4 s median latency and under $1 per 1,000 searches. For the retrieval job, no: candidate counts, the 192-token option budget, context limits, independent scoring and the absence of recall-stage tooling all say no. Rerank to a shortlist, then decide.</p>
+
+<h3>Do both really generate zero tokens?</h3>
+<p>Yes, and it is the reason they get confused. Neither pays a decode loop, so neither has output that grows with answer length, and neither produces text you have to parse. It is the single strongest thing the two families have in common &mdash; and the reason &ldquo;it gives me a number in 0&ndash;1&rdquo; feels like a shared contract when it is not.</p>
+
+<h3>Which one is cheaper?</h3>
+<p>It depends on the shape of the work, not the model. A reranker costs you one forward per candidate and nothing else. A decision model costs a prefill over the state and then almost nothing per question. So: many questions about one shared state favours the decision model; many independent long documents favour the reranker, especially listwise ones.</p>
+
+<h2 class="ch" id="sources"><span class="chno">12</span> — Sources</h2>
+<p class="ch-sub">Where each claim came from.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>#</th><th>Source</th><th>Used for</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Qwen/Qwen3-Reranker model cards (0.6B / 4B / 8B) and the NVIDIA NeMo reranker component docs</td><td>The raw logit difference <span class="mono">logit(&quot;yes&quot;) &minus; logit(&quot;no&quot;)</span>, and the card&rsquo;s &ldquo;pass a Sigmoid to get 0-1&rdquo; caveat</td></tr>
+<tr><td>2</td><td>AIMultiple reranker benchmark; published guidance on reranking deployments</td><td>Causal yes/no scoring, and the warning that raw outputs are not comparable across models or queries</td></tr>
+<tr><td>3</td><td>This site, <a href="../guides/best-ai-reranker-models-ultimate-ranking-2026.html">Top 20 Reranker Models 2026</a> (4 Aug 2026)</td><td>The reranker table, listwise and late-interaction flavours, the 50&rarr;10 practice, pair ordering</td></tr>
+<tr><td>4</td><td>This site, <a href="top-embedding-reranker-ocr-models-2026.html">Embedding, Reranker &amp; OCR Models 2026</a></td><td>Reranker sizes, licences and hardware requirements</td></tr>
+<tr><td>5</td><td>This site, <a href="system-one-decision-models-deep-dive.html">System One decision models deep dive</a></td><td>The decision-model family, primitives, KV-sharing mechanism and hosting paths</td></tr>
+<tr><td>6</td><td>jabr <em>classifier-benchmark</em> (CC0), v2 suite: 49 tasks / 866 cases</td><td>The independent accuracy numbers behind the decision models discussed</td></tr>
+<tr><td>7</td><td>Deu&szlig;er, Sparrenberg &amp; Sifa, <em>Evaluating and Benchmarking the System One Model Jev</em> (arXiv:2609.37647)</td><td>32k state limit, 255-option Choice, price, and the calibration/selective-prediction findings</td></tr>
+<tr><td>8</td><td>Laya ONNX client README (<span class="mono">receptron/laya</span>) and Laya model cards</td><td>The 192-token option budget and the 512-token state truncation</td></tr>
+<tr><td>9</td><td>Rizzo Flow, SemIf, Nimble and Kev repositories</td><td>The batching, throughput and context figures quoted in chapter 6</td></tr>
+<tr><td>10</td><td>Opine, <a href="https://tryopine.com/blog/jev-as-reranker"><em>Using Jev to improve search quality</em></a> (September 2026)</td><td>The same-candidate-set head-to-head in chapter 7: Recall@20 and nDCG@20 at 60 and 200 candidates, latency, cost per 1,000 searches, top-20 overlap</td></tr>
+<tr><td>11</td><td>MindStudio, <a href="https://www.mindstudio.ai/blog/jev-reranker-rag"><em>JEV as a Steerable Reranker</em></a> (21 September 2026)</td><td>BM25 top-1 accuracy 21% &rarr; 54% with a decision-model rerank step; ~17 decisions/s sequential, 40 s &rarr; 7.6 s at 64-way concurrency</td></tr>
+<tr><td>12</td><td>Von model card (<span class="mono">wfzyx/von</span>, Hugging Face), JevBench v1.4 board</td><td>Sealed ECE 0.107 vs Laya 0.172; 0.096 s p50 on 4 vCPU, 0.023 s on A10G; Decision Index p50 32.8 ms over ~150k requests</td></tr>
+<tr><td>13</td><td>Laya typed-decisions model card (<span class="mono">convaiinnovations/laya-typed-decisions</span>)</td><td>Accuracy 0.766, Brier 0.062, ECE 0.213, the per-primitive breakdown, the card&rsquo;s own uncalibrated-confidence warning, and Jev&rsquo;s quoted 0.727 / ECE 0.144</td></tr>
+<tr><td>14</td><td>Ma et al., <em>jina-reranker-v3: Last but Not Late Interaction</em> (arXiv:2509.25085)</td><td>61.94 nDCG@10 on BEIR &mdash; the ordering-only metric reranker boards report, and the reason chapter 8&rsquo;s calibration row is empty</td></tr>
+<tr><td>15</td><td>This site, <a href="../scripts/benchmark-substitution.py">scripts/benchmark-substitution.py</a></td><td>The runnable protocol behind chapters 7&ndash;8: one shared candidate window, seeded fit/eval split, threshold, abstention, agreement and latency reporting, with an offline <span class="mono">--self-test</span> for its metric core</td></tr>
+</tbody>
+</table></div>
+
+<p class="small">Assembled 6 October 2026. Reranker sizes and context windows are as published by each project; the reranker ranking was last updated 4 August 2026 and will have moved. Decision-model calibration figures are the projects&rsquo; own unless the source is named as independent. The verdicts in chapters 7 and 8 are ours &mdash; but they no longer rest on argument alone: third parties have now ranked both families over the same candidate window (Opine, MindStudio) and published the numbers quoted in chapter 7, and the calibration row in chapter 8 is filled in from the model cards themselves. What still does not exist is a formal two-family study with human-labelled relevance at retrieval scale; the protocol for one &mdash; build the window once, split queries into fit and eval halves, report ranking, cutoff quality, abstention, agreement and latency &mdash; ships with this site as <a href="../scripts/benchmark-substitution.py">scripts/benchmark-substitution.py</a>, and its metric core can be verified offline with <span class="mono">--self-test</span> before any model or dataset is involved.</p>
+
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<!-- ==================== RELATED POSTS ==================== -->
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Decision Models vs Rerankers">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
+<section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
+  <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
+    <a href="system-one-decision-models-deep-dive.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Jev and the seven open clones</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The decision-model side of this comparison, taken apart in full: architecture, KV cache, hosting and the independent benchmark.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="../guides/best-ai-reranker-models-ultimate-ranking-2026.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Top 20 Reranker Models 2026</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The reranker side, ranked: Jina v3.5, Qwen3-Reranker, BGE-Reranker-v2-M3 and the rest, with sizes, context and licences.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="top-embedding-reranker-ocr-models-2026.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Embeddings, Rerankers and OCR 2026</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The retrieval stack around both of these: what each stage contributes to what a model can actually see.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+  </div>
+</section>
+
+<button id="backTop" title="Back to top" aria-label="Back to top" style="position:fixed;bottom:26px;right:22px;z-index:70;width:44px;height:44px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:19px;box-shadow:0 4px 16px rgba(15,23,42,.16);display:none;">&#8593;</button>
+
+<script>
+(function(){
+  var btn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('decision-vs-reranker-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+  } catch(e) {}
+  if (btn) btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.innerHTML = '&#9788;'; }
+    else { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+    try { localStorage.setItem('decision-vs-reranker-theme', dark ? 'light' : 'dark'); } catch(e) {}
+  });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function onScroll(){
+    var y = window.scrollY + 120, best = 0;
+    for (var i = 0; i < targets.length; i++) {
+      if (targets[i] && targets[i].offsetTop <= y) best = i;
+    }
+    links.forEach(function(a, i){ a.classList.toggle('active', i === best); });
+    var bt = document.getElementById('backTop');
+    if (bt) bt.style.display = (window.scrollY > 900) ? 'block' : 'none';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  var backTop = document.getElementById('backTop');
+  if (backTop) backTop.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+<script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+</body>
+</html>

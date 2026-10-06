@@ -558,6 +558,14 @@ class ContactForm {
         
         // Initialize event listeners
         this.initEventListeners();
+
+        // Per-post "need help" buttons open this form pre-filled for that article
+        document.addEventListener('click', (e) => {
+            const trigger = e.target && e.target.closest ? e.target.closest('[data-contact-open]') : null;
+            if (!trigger) return;
+            e.preventDefault();
+            this.openForPost(trigger.getAttribute('data-contact-subject') || '');
+        });
     }
     
     /**
@@ -652,6 +660,31 @@ class ContactForm {
         }
     }
     
+    /**
+     * Open the form from a per-post help button, pre-filling the subject
+     */
+    openForPost(subject) {
+        if (!this.form) {
+            return;
+        }
+
+        if (subject && this.fields.subject) {
+            this.fields.subject.value = subject;
+            this.fields.subject.classList.remove('form-input--error', 'error');
+            this.fields.subject.setAttribute('aria-invalid', 'false');
+
+            const subjectError = document.getElementById('contact-subject-error');
+            if (subjectError) {
+                subjectError.textContent = '';
+                subjectError.style.display = 'none';
+            }
+        }
+
+        if (!this.state.isOpen) {
+            this.openForm();
+        }
+    }
+
     /**
      * Open the contact form
      */

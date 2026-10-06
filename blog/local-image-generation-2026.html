@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Local Image Generation Models 2026: FLUX, Qwen-Image and SDXL on Your Own GPU</title>
+<meta name="description" content="Eight open-weight image generation models compared on the axes that decide the download: prompt adherence, text rendering, VRAM floors, step counts and licences. FLUX.1 and FLUX.2, Qwen-Image, SDXL, SD 3.5 and Z-Image Turbo — with the two non-commercial licences that decide what you can ship.">
+<meta name="keywords" content="local image generation 2026, FLUX.1 dev, FLUX.2 klein, Qwen-Image, SDXL LoRA, Stable Diffusion 3.5, Z-Image Turbo, ComfyUI, GGUF image model, run image generation locally, AI image model VRAM, open source image generation">
+<meta name="author" content="Local AI Zone">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Local Image Generation Models 2026: FLUX, Qwen-Image and SDXL on Your Own GPU",
+  "alternativeHeadline": "Eight open-weight diffusion models, their VRAM floors, and the licences that decide what you may ship",
+  "description": "A licence-first ranking of the local image generation models of 2026: parameters, release dates, commercial terms, minimum VRAM, step counts and the one job each model is actually for, plus the runner tooling and a pick-by-job table.",
+  "author": {"@type": "Person", "name": "Hussain Nazary"},
+  "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
+  "datePublished": "2026-10-06",
+  "dateModified": "2026-10-06",
+  "keywords": "FLUX, Qwen-Image, SDXL, Stable Diffusion, Z-Image, ComfyUI, image generation, local AI, GGUF, quantisation, 2026",
+  "articleSection": "Ranking Guide",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 3120,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/local-image-generation-2026.html",
+  "about": [
+    {"@type": "Thing", "name": "Image generation"},
+    {"@type": "Thing", "name": "Diffusion models"},
+    {"@type": "Thing", "name": "Model quantisation"},
+    {"@type": "Thing", "name": "Local inference"},
+    {"@type": "Thing", "name": "Software licences"}
+  ],
+  "isPartOf": {
+    "@type": "Blog",
+    "name": "Local AI Zone — Blog",
+    "url": "https://local-ai-zone.github.io/blog.html"
+  },
+  "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
+}
+</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the best local image generation model in 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "For raw quality and prompt adherence, FLUX.1 [dev] (12B) is the best all-round local model — but its licence is non-commercial, so it is the model you prototype on. To sell what you generate, FLUX.1 [schnell] and FLUX.2 [klein] 4B are Apache 2.0, SDXL is OpenRAIL++-M, SD 3.5 is under Stability’s Community License and Qwen-Image is Apache 2.0. If you need readable words in the image, nothing local beats Qwen-Image."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I sell images generated with a local model?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "With the Apache 2.0 models — FLUX.1 [schnell], FLUX.2 [klein] 4B, Qwen-Image, Z-Image Turbo — yes. SDXL’s CreativeML OpenRAIL++-M and SD 3.5’s Community License permit commercial use on their stated terms. The two exceptions are FLUX.1 [dev] and FLUX.2 [dev], both under non-commercial licences: free to iterate on, not to sell from. Always read the weights licence, not the model’s marketing."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much VRAM do I need to run image generation locally?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "SDXL runs in 6–8 GB, which is the cheapest door in. The practical standard for the 12B–20B class is about 12–13 GB with GGUF Q4 or fp8 quantisation — a 16 GB card covers FLUX.1, SD 3.5 Large, Qwen-Image and Z-Image Turbo comfortably. The 32B FLUX.2 [dev] wants a quantised 24 GB RTX 4090 class card. Published floors vary by a gigabyte or two depending on whether text encoders are counted."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which local model renders readable text in images?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Qwen-Image, a 20B multimodal diffusion transformer released under Apache 2.0 in August 2025. It handles multi-line layouts, posters and signage in English and Chinese where FLUX and SD models garble longer strings. The 7B Qwen-Image-2.0 of February 2026 is the lighter sibling; SD 3.5 Large and the FLUX.2 family are reasonable runners-up."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which runner should I use — ComfyUI or Automatic1111?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ComfyUI. It is a node graph, which sounds harder and is actually how every current model, quantisation and control workflow ships first — the FLUX.2 family’s FP8 builds target it directly. Automatic1111 and its Forge fork remain the simpler path for the SDXL-class stack, and InvokeAI offers the most polished interface. All three run entirely on your own GPU."
+      }
+    }
+  ]
+}</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+    {"@type": "ListItem", "position": 3, "name": "Local Image Generation Models 2026", "item": "https://local-ai-zone.github.io/blog/local-image-generation-2026.html"}
+  ]
+}
+</script>
+
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/local-image-generation-2026.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/local-image-generation-2026.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/local-image-generation-2026.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/local-image-generation-2026.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="theme-color" content="#4f46e5">
+<meta property="og:title" content="Local Image Generation Models 2026">
+<meta property="og:description" content="Eight open-weight diffusion models on your own GPU: FLUX for prompt adherence, Qwen-Image for words in the pixels, SDXL for the LoRA ecosystem — and the two licences that decide what you may ship.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/local-image-generation-2026.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/local-image-hero.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Image generation run locally: the eight open-weight models of 2026 compared on licence, VRAM and what each is for">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Local Image Generation Models 2026">
+<meta name="twitter:description" content="Eight open-weight diffusion models, their real VRAM floors and their licences: FLUX, Qwen-Image, SDXL, SD 3.5 and Z-Image Turbo on hardware you own.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/local-image-hero.png">
+<meta name="twitter:image:alt" content="The 2026 local image generation field at a glance: eight models, one GPU, no per-image bill">
+
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<style>
+:root{--bg:#f6f7f9;--paper:#ffffff;--ink:#1a2233;--ink-soft:#46506a;--ink-faint:#7c86a0;--line:#e3e7ee;--accent:#4f46e5;--accent-soft:#eef2ff;--accent-2:#0d9488;--warn-bg:#fff7ed;--warn-line:#fdba74;--warn-ink:#9a3412;--ok-bg:#f0fdf4;--ok-line:#86efac;--ok-ink:#166534;--info-bg:#eff6ff;--info-line:#93c5fd;--info-ink:#1e3a8a;--danger-bg:#fef2f2;--danger-line:#fca5a5;--danger-ink:#991b1b;--code-bg:#0d1117;--code-ink:#d7dde7;--side-bg:#0e1526;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#4f46e5;--mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,monospace;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif}
+html[data-theme='dark']{--bg:#0b0f1a;--paper:#111827;--ink:#e5e9f2;--ink-soft:#b8c2d9;--ink-faint:#7c8aa5;--line:#242f47;--accent:#818cf8;--accent-soft:#1e2440;--accent-2:#2dd4bf;--warn-bg:#2a1c0e;--warn-line:#9a5b21;--warn-ink:#fdba74;--ok-bg:#0d2418;--ok-line:#2f7a4f;--ok-ink:#86efac;--info-bg:#101d33;--info-line:#2b4d8a;--info-ink:#93c5fd;--danger-bg:#2a1214;--danger-line:#8a3a3f;--danger-ink:#fca5a5;--side-bg:#0a0f1e;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#6366f1}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.shell{display:flex;min-height:100vh}
+aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
+main{flex:1;min-width:0;display:flex;justify-content:center}
+.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
+#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
+#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35}
+#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
+#toc nav a{display:block;padding:5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
+#toc nav a:hover{background:var(--side-hover);color:#fff}
+#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
+#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
+#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
+#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
+.theme-btn{position:fixed;top:16px;right:20px;z-index:80;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:17px;line-height:1;box-shadow:0 2px 10px rgba(15,23,42,.12)}
+h1,h2,h3,h4{line-height:1.25;color:var(--ink)}
+.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
+.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
+.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px}
+.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
+.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--ink-soft)}
+p{margin:0 0 18px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid #c7d2fe}
+a:hover{border-bottom-color:var(--accent)}
+ul,ol{margin:0 0 18px;padding-left:26px}
+li{margin-bottom:7px}
+li::marker{color:var(--accent);font-weight:600}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+.small{font-size:13.5px;color:var(--ink-soft)}
+.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#3730a3;overflow-wrap:anywhere}
+html[data-theme='dark'] .mono,html[data-theme='dark'] code:not(pre code){background:#1c2438;border-color:#2c3752;color:#a5b4fc}
+.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
+.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
+.cover h1 .thin{color:var(--accent)}
+.cover .sub{font-size:19px;color:var(--ink-soft);max-width:660px;line-height:1.6;margin:0 0 30px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
+.cover .meta b{color:var(--ink-soft);font-weight:600}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:34px 0 8px}
+.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+html[data-theme='dark'] .statgrid .cell{background:linear-gradient(180deg,#141b2e,#10162a)}
+.statgrid .cell .v{font-size:23px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
+.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
+.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;margin:0 0 20px}
+pre code{background:none;border:none;padding:0;color:inherit;font-size:inherit}
+.tblwrap{overflow-x:auto;margin:0 0 22px}
+figure{margin:30px 0 34px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+figure figcaption{font-size:13.5px;color:var(--ink-faint);line-height:1.6;margin-top:13px;padding-left:14px;border-left:3px solid #c7d2fe}
+html[data-theme='dark'] figure figcaption{border-left-color:#312e81}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);font-weight:700}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+h2.ch{scroll-margin-top:20px}
+h3,h4{scroll-margin-top:70px}
+@media(max-width:1000px){aside#toc{display:none}.page{padding:22px 22px 90px}.cover h1{font-size:34px}}
+</style>
+</head>
+<body>
+<button id="themeBtn" class="theme-btn" title="Toggle theme" aria-label="Toggle dark mode">&#9788;</button>
+
+<div class="shell">
+<aside id="toc">
+  <div class="brand">
+    <div class="t">Local Image Generation 2026</div>
+    <div class="s">Eight models, one GPU</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Foundations</div>
+    <a href="#s1"><span class="num">01</span>The modality local kept</a>
+    <a href="#s2"><span class="num">02</span>The specification table</a>
+    <div class="part">The decisions</div>
+    <a href="#s3"><span class="num">03</span>The licence decides first</a>
+    <a href="#s4"><span class="num">04</span>Words in the pixels</a>
+    <a href="#s5"><span class="num">05</span>Speed, steps and VRAM</a>
+    <div class="part">Ecosystem</div>
+    <a href="#s6"><span class="num">06</span>The LoRA moat</a>
+    <a href="#s7"><span class="num">07</span>Quantisation is the norm</a>
+    <div class="part">Operating them</div>
+    <a href="#s8"><span class="num">08</span>Running it</a>
+    <a href="#s9"><span class="num">09</span>Pick by job</a>
+    <a href="#s10"><span class="num">10</span>FAQ</a>
+    <a href="#sources"><span class="num">11</span>Sources</a>
+    <div class="toc-foot">Every claim attributed. Numbers dated 6 October 2026.</div>
+  </nav>
+</aside>
+
+<main>
+<div class="page">
+
+<div class="cover">
+  <span class="kicker">Ranking &middot; Image generation</span>
+  <h1>Image generation, <span class="thin">locally</span></h1>
+  <p class="sub">Eight open-weight models, one GPU, no per-image bill. FLUX for prompt adherence, Qwen-Image for words in the pixels, SDXL for the LoRA ecosystem — and two licences hiding in the middle of the list that decide what you are actually allowed to ship. All of it runs on hardware you already own.</p>
+  <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
+    <span><b>Published</b> 6 October 2026</span>
+    <span><b>Models named</b> 10</span>
+    <span><b>Reading time</b> ~17 min</span>
+    <span><b>Level</b> Expert</span>
+  </div>
+  <div class="statgrid">
+    <div class="cell"><div class="v">32B</div><div class="k">FLUX.2 [dev] &mdash; the quality ceiling</div></div>
+    <div class="cell"><div class="v">8 steps</div><div class="k">Z-Image Turbo, ~2.3 s on a 4090</div></div>
+    <div class="cell"><div class="v">20B</div><div class="k">Qwen-Image &mdash; Apache, the text renderer</div></div>
+    <div class="cell"><div class="v">6&ndash;8 GB</div><div class="k">SDXL: oldest, smallest, biggest LoRA library</div></div>
+    <div class="cell"><div class="v">2</div><div class="k">models here whose output you may not sell</div></div>
+    <div class="cell"><div class="v">0</div><div class="k">per-image fees, all eight models</div></div>
+  </div>
+</div>
+
+<h2 class="ch" id="s1"><span class="chno">01</span> — The modality local kept</h2>
+<p class="ch-sub">Language models raced ahead. Diffusion quietly stayed in reach.</p>
+
+<p>There is a recurring disappointment in local AI: you download the open weights, run the benchmark, and discover the frontier is still a generation ahead. Chat models are the obvious case — the gap narrows every release but it is still there. Image generation is the exception, and it is worth saying plainly why: <strong>the best open-weight image models of 2026 are not a cheap imitation of the closed ones.</strong> They are the models professionals already use, and the thing standing between them and your GPU is a licence file and about twelve gigabytes of VRAM.</p>
+
+<p>The economics are almost boring. A closed image API charges per image; a local model charges for electricity once. If you iterate — and image work is nothing but iteration, twenty generations to find the one — the per-image fee is not a cost, it is a tax on experimentation. Everything in this guide runs on one consumer card, in ComfyUI or a similar runner, with no cloud account and no usage logging.</p>
+
+<div class="callout info"><span class="lab">The one-sentence version</span>SDXL still wins on LoRA and style breadth, FLUX wins on prompt adherence and photorealism, and Qwen-Image wins on text — <strong>no single model dominates all three, so the licence and the job you are doing should decide before quality does.</strong></div>
+
+<h2 class="ch" id="s2"><span class="chno">02</span> — The specification table</h2>
+<p class="ch-sub">Parameters, release dates, licences and the VRAM people actually run them at.</p>
+
+<p>One table first, because most decisions end here. Parameter counts, licences and release dates come from each model&rsquo;s own model card; the VRAM column is the practical floor for the quantised build (GGUF Q4 or fp8) rather than the fp16 original, since that is what people run on consumer cards.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Model</th><th class="num">Params</th><th>Released</th><th>Licence (commercial?)</th><th class="num">Min VRAM</th><th>Best at</th></tr></thead>
+<tbody>
+<tr><td><strong>FLUX.1 [dev]</strong></td><td class="num">12B</td><td>Aug 2024</td><td><strong>FLUX [dev] Non-Commercial</strong></td><td class="num">~12 GB (Q4)</td><td>Prompt adherence, photorealism</td></tr>
+<tr><td><strong>FLUX.1 [schnell]</strong></td><td class="num">12B</td><td>Aug 2024</td><td>Apache 2.0 &#10003;</td><td class="num">~12 GB (Q4)</td><td>Fast and commercial-safe</td></tr>
+<tr><td><strong>FLUX.2 [dev]</strong></td><td class="num">32B</td><td>25 Nov 2025</td><td><strong>FLUX Non-Commercial</strong></td><td class="num">24 GB (quantised)</td><td>Highest quality, image editing</td></tr>
+<tr><td><strong>FLUX.2 [klein]</strong></td><td class="num">4B</td><td>Jan 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~13 GB</td><td>Sub-second generation</td></tr>
+<tr><td><strong>SDXL 1.0</strong></td><td class="num">3.5B</td><td>Jul 2023</td><td>CreativeML OpenRAIL++-M &#10003;</td><td class="num">6&ndash;8 GB</td><td>LoRA and style breadth</td></tr>
+<tr><td><strong>SD 3.5 Large</strong></td><td class="num">8.1B</td><td>Oct 2024</td><td>Stability Community &#10003;</td><td class="num">~12 GB (fp8)</td><td>Mid-ground quality</td></tr>
+<tr><td><strong>Qwen-Image</strong></td><td class="num">20B</td><td>Aug 2025</td><td>Apache 2.0 &#10003;</td><td class="num">12&ndash;13 GB (Q4)</td><td>Readable text in the image</td></tr>
+<tr><td><strong>Z-Image Turbo</strong></td><td class="num">6B</td><td>27 Nov 2025</td><td>Apache 2.0 &#10003;</td><td class="num">&lt;16 GB</td><td>Speed on a modest card</td></tr>
+</tbody>
+</table></div>
+
+<figure>
+  <img src="image-models-field.png" alt="Grid of eight local image generation models for 2026 with their parameter counts, licences and roles: FLUX.1 dev 12B non-commercial, FLUX.1 schnell 12B Apache, FLUX.2 dev 32B non-commercial, FLUX.2 klein 4B Apache, SDXL 1.0 3.5B OpenRAIL, SD 3.5 Large 8.1B Community licence, Qwen-Image 20B Apache and Z-Image Turbo 6B Apache" width="2160" height="2094" loading="lazy" decoding="async">
+  <figcaption>The licence column decides before quality does. Both FLUX [dev] models are the models you prototype on, not the ones you ship — while their distilled siblings carry the same lineage under Apache 2.0.</figcaption>
+</figure>
+
+<p>Two patterns jump out. <strong>The FLUX family splits in half by licence:</strong> the two [dev] models are non-commercial and the two you would most want to ship — schnell and klein — are Apache 2.0, which is not an accident but Black Forest Labs&rsquo; business model: open the fast distilled weights, license the frontier. And <strong>age barely matters:</strong> SDXL is the oldest and smallest model here, three years old in a field where everything else arrived in the last eighteen months, and it still wins its column outright.</p>
+
+<h2 class="ch" id="s3"><span class="chno">03</span> — The licence decides first</h2>
+<p class="ch-sub">Two models in that table cannot produce images you may sell. Here is how to remember which.</p>
+
+<p>Licences in this space are not paperwork, they are the first branch of the decision tree. An image model that cannot be used commercially is not a cheaper model — it is a prototype tool, and everything you make with it is a draft.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Tier</th><th>Models</th><th>What it means</th></tr></thead>
+<tbody>
+<tr><td><strong>Sell freely</strong></td><td>FLUX.1 [schnell], FLUX.2 [klein] 4B, Qwen-Image, Z-Image Turbo (Apache 2.0)</td><td>Commercial use is granted by the weights licence itself — no revenue ceiling, no attribution gymnastics.</td></tr>
+<tr><td><strong>Sell on stated terms</strong></td><td>SDXL 1.0 (CreativeML OpenRAIL++-M), SD 3.5 Large (Stability Community License)</td><td>Commercial use permitted under each licence&rsquo;s own conditions — read them once before shipping, they differ.</td></tr>
+<tr><td><strong>Prototype only</strong></td><td>FLUX.1 [dev], FLUX.2 [dev]</td><td>Weights are free to download and run; the licence forbids commercial use. The best two models on raw quality, both of them.</td></tr>
+</tbody>
+</table></div>
+
+<div class="callout danger"><span class="lab">The trap, stated once</span><strong>FLUX.2 [dev] is the strongest freely available image model of 2026 — and you may not sell what it makes.</strong> So the practical order is: pick by job first (chapter 9), confirm the licence second, look at quality third. A team that starts from the leaderboard ends up building a product on a non-commercial model, which is exactly how &ldquo;free to run&rdquo; turns into a conversation with a lawyer. The closed FLUX.2 [pro] tier exists above all of this, and none of the eight models in this guide needs it.</div>
+
+<h2 class="ch" id="s4"><span class="chno">04</span> — Words in the pixels</h2>
+<p class="ch-sub">The one capability where local models stopped matching and started winning.</p>
+
+<p>Ask any diffusion model for an image containing words — a poster, a sign, an infographic — and older models garble the letters the moment the string gets long. This is the capability where the open field is not merely competitive but ahead: <strong>Qwen-Image, a 20B multimodal diffusion transformer open-sourced on 5 August 2025, was engineered specifically for native text rendering.</strong></p>
+
+<p>It handles multi-line layouts, paragraph-level text, posters and signage in both alphabetic languages and logographic ones — English and Chinese — far more reliably than any FLUX or SD model, where letters dissolve in longer strings. It is Apache 2.0, so the output is yours to sell, and community GGUF quants bring it to 12&ndash;13 GB at Q4, which fits a 16 GB card. The trade is speed: at 20B and roughly 20&ndash;30 steps it is the slowest model in this guide, so drafts on something distilled and final renders here.</p>
+
+<p>If your work is graphic-design-adjacent at all — ads, thumbnails, anything with words baked into the pixels — Qwen-Image is the model to reach for, and the lighter 7B Qwen-Image-2.0 of February 2026 is the faster sibling to reach for afterwards.</p>
+
+<div class="callout ok"><span class="lab">The three-way split, in one line</span><strong>FLUX</strong> follows long spatial prompts best, <strong>Qwen-Image</strong> renders text, <strong>SDXL</strong> has a style for everything already LoRA&rsquo;d. Three different jobs, three different winners — and no model that does all three.</div>
+
+<h2 class="ch" id="s5"><span class="chno">05</span> — Speed, steps and VRAM</h2>
+<p class="ch-sub">Diffusion cost is steps &times; model size. Two 2026 releases cut both factors at once.</p>
+
+<p>The wall-clock time of an image is not mysterious: cost scales with step count multiplied by model size. A four-step 4B model does a small fraction of the work of a 28-step 32B one, and the ranking below reflects that arithmetic more than any quality difference. Two releases in the 2026 window changed the calculus for modest GPUs:</p>
+
+<ul>
+<li><strong>Z-Image Turbo (6B, 27 Nov 2025)</strong> — step-distilled to eight inference steps, with Alibaba reporting about 2.3 seconds for a 1024&sup2; image on an RTX 4090, and a footprint designed to stay under 16 GB. Apache 2.0, with a LoRA ecosystem still in its infancy.</li>
+<li><strong>FLUX.2 [klein] (4B, Jan 2026)</strong> — four steps, end-to-end inference under a second on an RTX 3090 or 4070, Apache 2.0, inheriting the FLUX prompt-following strengths in a tiny body.</li>
+</ul>
+
+<figure>
+  <img src="image-models-vram.png" alt="Bar chart of minimum VRAM for each local image generation model: SDXL 1.0 at 6 to 8 GB, FLUX.1 dev and schnell at about 12 GB, SD 3.5 Large about 12 GB, Qwen-Image 12 to 13 GB, FLUX.2 klein about 13 GB, Z-Image Turbo under 16 GB and FLUX.2 dev at 24 GB" width="2160" height="1806" loading="lazy" decoding="async">
+  <figcaption>Practical floors for quantised builds, not fp16 theory. A 12 GB card — the last-generation mid-range — covers five of these seven rows; the 32B ceiling needs the 24 GB class.</figcaption>
+</figure>
+
+<p>Published VRAM floors deserve one honest footnote: sources disagree by a gigabyte or two because they count different things. FLUX.2 [klein] is quoted at about 8 GB in some roundups and about 13 GB in others — the difference is whether the text encoders are inside the number. Treat the figures as bands, not boundaries, and expect a quantised build to land at the lower end of its band.</p>
+
+<div class="callout warn"><span class="lab">The speed-quality rule of thumb</span>Distilled and turbo models (Z-Image, klein, schnell) trade a little fidelity for roughly a <strong>4&ndash;8&times; speedup</strong> over the big 20&ndash;32B models. Iterate on a turbo model, render finals on FLUX.1 [dev] or Qwen-Image — and if you are on a 24 GB card wanting the absolute ceiling, FLUX.2 [dev] waits at the end of that pipeline, non-commercial licence and all.</div>
+
+<h2 class="ch" id="s6"><span class="chno">06</span> — The LoRA moat</h2>
+<p class="ch-sub">Why the oldest model in this guide refuses to die.</p>
+
+<p>Every year a new base model arrives with better prompt adherence, and every year SDXL keeps the crown for something the benchmarks do not measure: <strong>the ecosystem.</strong> Released July 2023 under the permissive CreativeML OpenRAIL++-M licence, it accumulated the largest library of community LoRAs, fine-tuned checkpoints and ControlNets of any local model by a wide margin. Want a specific aesthetic, a character, a niche style? It almost certainly already exists for SDXL and almost certainly does not for FLUX.2 or Qwen-Image.</p>
+
+<p>That is a real capability, not nostalgia: style breadth is the axis where new models are weakest (their LoRA libraries are measured in months, SDXL&rsquo;s in years), and it is why a 3.5B model from 2023 still sits in the pick-by-job table for stylised work. Raw prompt adherence trails FLUX and native text rendering is weak — but for LoRA-driven, ControlNet-controlled work at 6&ndash;8 GB, nothing in this guide displaces it.</p>
+
+<p>The runner matters as much as the model here. <strong>ComfyUI</strong> — a node graph where you connect model, text encoder, prompt and sampler as explicit edges — is how every current model and quantised workflow ships first; the FLUX.2 FP8 builds target it directly. <strong>Automatic1111</strong> and its <strong>Forge</strong> fork remain the simpler path for the SDXL-class stack, and <strong>InvokeAI</strong> is the most polished interface of the three. All of them are local processes over your own GPU.</p>
+
+<h2 class="ch" id="s7"><span class="chno">07</span> — Quantisation is the norm</h2>
+<p class="ch-sub">The thing that made 20B and 32B models a consumer proposition.</p>
+
+<p>The VRAM column in chapter 2 is only that low because of quantisation, and it is worth being explicit about the mechanism since it is the same trick the rest of this site covers for language models. Diffusion weights compressed to GGUF Q4 or fp8 lose very little visible quality — the guardrails on the optimiser we run for these images (mean pixel difference under 2.5 of 255, size reduction of at least 15% before a quant is accepted) are the same instinct applied at page scale — and they take a 20B model from &ldquo;workstation&rdquo; to &ldquo;16 GB card&rdquo;.</p>
+
+<p>The hardware vendors noticed: <strong>NVIDIA shipped FP8 builds of the FLUX.2 family for RTX GPUs on 25 November 2025, stating a 40% performance gain</strong> alongside the VRAM reduction, delivered for ComfyUI. That is the moment quantisation stopped being a workaround and became the distribution format. If you want the full vocabulary — GGUF versus EXL2 versus AWQ versus GPTQ, and which to pick per hardware tier — this site has the standalone guide.</p>
+
+<div class="callout info"><span class="lab">What to download, first time</span>Start quantised and only go bigger if you can see the difference. <strong>12 GB card:</strong> FLUX.1 [schnell] at Q4 — Apache, four steps, the safest first download. <strong>16 GB:</strong> Qwen-Image at Q4 for text-heavy work, or Z-Image Turbo for speed. <strong>24 GB:</strong> FLUX.2 [dev] quantised for the ceiling, licence permitting. SDXL at 6&ndash;8 GB is the fallback that runs on anything.</div>
+
+<h2 class="ch" id="s8"><span class="chno">08</span> — Running it</h2>
+<p class="ch-sub">A node graph for production, a Python pipeline for scripts.</p>
+
+<p>The interactive path is ComfyUI: install it, drop a quantised checkpoint into the models directory, load a workflow. For automation — batch renders, a service behind an API — the same models come up through diffusers in a few lines. FLUX.1 [schnell] is the right first pipeline because it is Apache 2.0 and distilled to four steps:</p>
+
+<pre><code># FLUX.1 [schnell]: Apache 2.0, 4 steps, ~12 GB at Q4 / ~24 GB fp16
+pip install diffusers transformers accelerate
+
+import torch
+from diffusers import FluxPipeline
+
+pipe = FluxPipeline.from_pretrained(
+    "black-forest-labs/FLUX.1-schnell", torch_dtype=torch.bfloat16
+)
+pipe.enable_model_cpu_offload()          # keeps a 16-24 GB card happy
+
+image = pipe(
+    "a wireframe illustration of a home server rack, technical drawing style",
+    height=1024, width=1024,
+    guidance_scale=0.0,                  # schnell is distilled: no CFG
+    num_inference_steps=4,               # four steps, not twenty-eight
+).images[0]
+image.save("output.png")</code></pre>
+
+<p>Two details in that snippet are load-bearing. <span class="mono">guidance_scale=0.0</span> is not a typo — distilled FLUX builds skip classifier-free guidance, which is where much of the speedup hides. And <span class="mono">enable_model_cpu_offload()</span> moves layers between CPU and GPU so that a model whose weights exceed your VRAM still completes, at the cost of some speed. For GGUF checkpoints specifically, ComfyUI&rsquo;s GGUF loader (or the <span class="mono">gguf</span> diffusers extension) is the standard route; the quantised community builds of Qwen-Image and FLUX ship there first.</p>
+
+<div class="callout warn"><span class="lab">One install caveat</span>Nothing in this chapter needs a cloud account, but everything needs a current PyTorch build with your GPU&rsquo;s backend — and the FP8 paths are NVIDIA-only. On AMD or Apple Silicon, GGUF and bf16 routes work, the advertised FP8 speedups do not.</div>
+
+<h2 class="ch" id="s9"><span class="chno">09</span> — Pick by job</h2>
+<p class="ch-sub">The shortest useful table in the article.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>If you want&hellip;</th><th>Use</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Best prompt adherence and photorealism, non-commercial</td><td><strong>FLUX.1 [dev]</strong></td><td>The consensus all-round quality pick since Aug 2024 — prototype only</td></tr>
+<tr><td>Sell what you generate, same lineage</td><td><strong>FLUX.1 [schnell]</strong> or <strong>FLUX.2 [klein]</strong></td><td>Apache 2.0 distilled builds: fast, commercial-safe, same DNA</td></tr>
+<tr><td>Readable words, posters, signage</td><td><strong>Qwen-Image</strong></td><td>20B MMDiT built for text rendering, English and Chinese, Apache 2.0</td></tr>
+<tr><td>Anime, a style, a character LoRA</td><td><strong>SDXL 1.0</strong></td><td>The largest LoRA/ControlNet library by a wide margin, 6&ndash;8 GB</td></tr>
+<tr><td>Drafts in under a second</td><td><strong>Z-Image Turbo</strong> or <strong>FLUX.2 [klein]</strong></td><td>8 and 4 distilled steps; both Apache, both 12&ndash;16 GB cards</td></tr>
+<tr><td>Mid-ground quality with a mature pipeline</td><td><strong>SD 3.5 Large</strong></td><td>8.1B at ~12 GB fp8, text rendering well above SDXL</td></tr>
+<tr><td>The absolute ceiling, licence permitting</td><td><strong>FLUX.2 [dev]</strong></td><td>32B generation and editing on a quantised 4090 — non-commercial</td></tr>
+<tr><td>Image editing, not just generation</td><td><strong>FLUX.2 [dev]</strong></td><td>The 32B family supports editing as well as generation — same licence caveat</td></tr>
+</tbody>
+</table></div>
+
+<h2 class="ch" id="s10"><span class="chno">10</span> — FAQ</h2>
+<p class="ch-sub">The five questions that come up every time.</p>
+
+<h3>What is the best local image generation model in 2026?</h3>
+<p>For raw quality and prompt adherence, FLUX.1 [dev] (12B) is the best all-round local model — but its licence is non-commercial, so it is the model you prototype on. To sell what you generate, FLUX.1 [schnell] and FLUX.2 [klein] 4B are Apache 2.0, SDXL is OpenRAIL++-M, SD 3.5 is under Stability&rsquo;s Community License and Qwen-Image is Apache 2.0. If you need readable words in the image, nothing local beats Qwen-Image.</p>
+
+<h3>Can I sell images generated with a local model?</h3>
+<p>With the Apache 2.0 models — FLUX.1 [schnell], FLUX.2 [klein] 4B, Qwen-Image, Z-Image Turbo — yes. SDXL&rsquo;s CreativeML OpenRAIL++-M and SD 3.5&rsquo;s Community License permit commercial use on their stated terms. The two exceptions are FLUX.1 [dev] and FLUX.2 [dev], both under non-commercial licences: free to iterate on, not to sell from. Always read the weights licence, not the model&rsquo;s marketing.</p>
+
+<h3>How much VRAM do I need to run image generation locally?</h3>
+<p>SDXL runs in 6&ndash;8 GB, which is the cheapest door in. The practical standard for the 12B&ndash;20B class is about 12&ndash;13 GB with GGUF Q4 or fp8 quantisation — a 16 GB card covers FLUX.1, SD 3.5 Large, Qwen-Image and Z-Image Turbo comfortably. The 32B FLUX.2 [dev] wants a quantised 24 GB RTX 4090 class card. Published floors vary by a gigabyte or two depending on whether text encoders are counted.</p>
+
+<h3>Which local model renders readable text in images?</h3>
+<p>Qwen-Image, a 20B multimodal diffusion transformer released under Apache 2.0 in August 2025. It handles multi-line layouts, posters and signage in English and Chinese where FLUX and SD models garble longer strings. The 7B Qwen-Image-2.0 of February 2026 is the lighter sibling; SD 3.5 Large and the FLUX.2 family are reasonable runners-up.</p>
+
+<h3>Which runner should I use — ComfyUI or Automatic1111?</h3>
+<p>ComfyUI. It is a node graph, which sounds harder and is actually how every current model, quantisation and control workflow ships first — the FLUX.2 family&rsquo;s FP8 builds target it directly. Automatic1111 and its Forge fork remain the simpler path for the SDXL-class stack, and InvokeAI offers the most polished interface. All three run entirely on your own GPU.</p>
+
+<h2 class="ch" id="sources"><span class="chno">11</span> — Sources</h2>
+<p class="ch-sub">Where each claim came from.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>#</th><th>Source</th><th>Used for</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>LocalAIMaster, <em>Best Local AI Image Models 2026: FLUX vs SDXL vs Qwen</em> (20 Jun 2026)</td><td>The specification table: parameters, licences, release dates, practical VRAM floors, step counts and the Z-Image/klein timing figures</td></tr>
+<tr><td>2</td><td>Black Forest Labs repositories and model cards (FLUX.1 [dev] / [schnell], FLUX.2 [dev] / [klein])</td><td>The licence split between the [dev] and Apache tiers, parameter counts, and the 25 Nov 2025 / Jan 2026 release dates</td></tr>
+<tr><td>3</td><td>Qwen-Image model card and repository (5 Aug 2025); Qwen-Image-2.0 (Feb 2026)</td><td>The 20B MMDiT architecture, Apache 2.0 licence and the text-rendering claims in chapter 4</td></tr>
+<tr><td>4</td><td>Alibaba Tongyi Z-Image Turbo release (27 Nov 2025)</td><td>6B parameters, 8-step distillation, the ~2.3 s / 1024&sup2; / RTX 4090 figure and the under-16 GB design target</td></tr>
+<tr><td>5</td><td>Stability AI: SDXL CreativeML OpenRAIL++-M licence; SD 3.5 Large (Oct 2024) Community License</td><td>The SDXL column, its July 2023 date, and the commercial terms in chapter 3</td></tr>
+<tr><td>6</td><td>NVIDIA blog, <em>FLUX.2 image generation models now released</em> (25 Nov 2025)</td><td>The FP8 RTX builds, the stated 40% performance gain, and ComfyUI as the delivery target</td></tr>
+<tr><td>7</td><td>Thundercompute, <em>Best Open-Source Image Generation Models (2026)</em> (26 Jun 2026)</td><td>Cross-check on FLUX.2 [klein]&rsquo;s VRAM floor — the source of the band-versus-boundary footnote in chapter 5</td></tr>
+<tr><td>8</td><td>ComfyUI, Automatic1111, Forge and InvokeAI repositories</td><td>The runner comparison in chapters 6 and 10</td></tr>
+<tr><td>9</td><td>This site, <a href="quantization-formats-guide.html">GGUF vs EXL2 vs AWQ vs GPTQ</a></td><td>The quantisation vocabulary and the pick-per-hardware-tier guidance referenced in chapter 7</td></tr>
+<tr><td>10</td><td>This site, <a href="local-voice-models-2026.html">Text-to-Speech &amp; Speech-to-Text Models 2026</a></td><td>The sibling modality guide — same licence-first method applied to voice</td></tr>
+</tbody>
+</table></div>
+
+<p class="small">Assembled 6 October 2026. Licences change: the FLUX tier structure and Stability&rsquo;s community terms have both moved before and will move again, so re-read the weights licence before shipping, not this page. VRAM figures are practical floors for quantised builds on consumer cards and vary with text encoders, attention implementation and how much headroom your runner keeps. Step counts and timings are each project&rsquo;s own published figures except where noted; we did not re-benchmark eight models on one card, and the ordering — not the absolute seconds — is what carries to your hardware.</p>
+
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<!-- ==================== RELATED POSTS ==================== -->
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Local Image Generation Models 2026">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
+<section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
+  <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
+    <a href="local-voice-models-2026.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Text-to-Speech &amp; Speech-to-Text 2026</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The sibling modality: the open-weight voice stack ranked on blind listening tests and word error rate, with the same licence-first method.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="quantization-formats-guide.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">GGUF vs EXL2 vs AWQ vs GPTQ</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">Chapter 7 in depth: which quantisation format for which hardware tier, and why the fp8/quantised route is now the normal path.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="how-much-local-ai-costs-2026.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">How Much Does Local AI Cost?</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The hardware and electricity math behind &ldquo;no per-image bill&rdquo;: what a generation box actually costs to own.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+  </div>
+</section>
+
+<button id="backTop" title="Back to top" aria-label="Back to top" style="position:fixed;bottom:26px;right:22px;z-index:70;width:44px;height:44px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:19px;box-shadow:0 4px 16px rgba(15,23,42,.16);display:none;">&#8593;</button>
+
+<script>
+(function(){
+  var btn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('local-image-2026-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+  } catch(e) {}
+  if (btn) btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.innerHTML = '&#9788;'; }
+    else { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+    try { localStorage.setItem('local-image-2026-theme', dark ? 'light' : 'dark'); } catch(e) {}
+  });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function onScroll(){
+    var y = window.scrollY + 120, best = 0;
+    for (var i = 0; i < targets.length; i++) {
+      if (targets[i] && targets[i].offsetTop <= y) best = i;
+    }
+    links.forEach(function(a, i){ a.classList.toggle('active', i === best); });
+    var bt = document.getElementById('backTop');
+    if (bt) bt.style.display = (window.scrollY > 900) ? 'block' : 'none';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  var backTop = document.getElementById('backTop');
+  if (backTop) backTop.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+<script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+</body>
+</html>

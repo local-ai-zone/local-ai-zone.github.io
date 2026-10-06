@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Traffic - Local AI Zone</title>
+    <meta name="description" content="A transparent look at how people find Local AI Zone through Google Search and Bing, refreshed automatically from the Search Console and Bing Webmaster APIs.">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="googlebot" content="noindex, nofollow">
+    <meta name="bingbot" content="noindex, nofollow">
+    <link rel="canonical" href="https://local-ai-zone.github.io/traffic.html">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/contact-form.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/theme-overrides.css">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--background-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        .container {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .header a {
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+        .header img {
+            width: 80px;
+            margin-bottom: 10px;
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin: 0;
+            color: var(--text-primary);
+        }
+        .nav {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 1.1em;
+        }
+        .nav a:hover,
+        .nav a.active {
+            color: var(--accent-primary);
+        }
+
+        [hidden] {
+            display: none !important;
+        }
+
+        /* Hero */
+        .hero-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .hero-section .subheadline {
+            font-size: 1.2em;
+            color: var(--text-secondary);
+            margin: 0 auto;
+            max-width: 720px;
+        }
+
+        /* Live stats */
+        .live-section {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+        .live-section h2 {
+            margin-top: 0;
+            font-size: 1.4em;
+        }
+        .live-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+        .live-card {
+            background-color: var(--background-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            text-align: center;
+        }
+        .live-value {
+            font-size: 1.9em;
+            font-weight: 700;
+            color: var(--accent-primary);
+            line-height: 1.2;
+        }
+        .live-label {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        .live-meta {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin-top: 14px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 18px;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .live-meta a {
+            color: var(--accent-primary);
+        }
+        .setup-note {
+            margin-top: 14px;
+            padding: 14px;
+            border-left: 4px solid var(--accent-primary);
+            background-color: var(--background-primary);
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        .setup-note code {
+            background: rgba(127, 127, 127, 0.15);
+            padding: 1px 5px;
+            border-radius: 4px;
+        }
+
+        /* Auto-refreshed search performance */
+        .data-section {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin-bottom: 40px;
+        }
+        .data-section h2 {
+            margin: 0 0 6px;
+            font-size: 1.4em;
+        }
+        .data-sub {
+            color: var(--text-secondary);
+            margin: 0 0 10px;
+        }
+        .data-meta {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+            margin: 0 0 20px;
+        }
+        .snapshot-error {
+            border-left: 4px solid #f59e0b;
+            background-color: var(--background-primary);
+            border-radius: 4px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 14px;
+            margin-bottom: 26px;
+        }
+        .stat-card {
+            background-color: var(--background-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--accent-primary);
+            line-height: 1.2;
+        }
+        .stat-label {
+            font-size: 0.85em;
+            color: var(--text-secondary);
+        }
+        .stat-sub {
+            font-size: 0.75em;
+            color: var(--text-secondary);
+            opacity: 0.85;
+        }
+        .engine-block {
+            margin-bottom: 28px;
+        }
+        .engine-block:last-child {
+            margin-bottom: 0;
+        }
+        .engine-block h3 {
+            font-size: 1.15em;
+            margin: 0 0 4px;
+        }
+        .engine-meta {
+            font-size: 0.82em;
+            color: var(--text-secondary);
+            margin: 0 0 10px;
+        }
+        .chart-wrap {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px;
+            background-color: var(--background-primary);
+            margin-bottom: 14px;
+            color: var(--text-primary);
+        }
+        .chart-wrap svg {
+            width: 100%;
+            height: 180px;
+            display: block;
+        }
+        .chart-empty {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+            margin: 6px 0;
+        }
+        .query-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88em;
+        }
+        .query-table th,
+        .query-table td {
+            text-align: left;
+            padding: 7px 10px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .query-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .query-table td.num,
+        .query-table th.num {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+        .query-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Screenshot sections */
+        .platform-section {
+            margin-bottom: 50px;
+        }
+        .platform-section h2 {
+            font-size: 1.6em;
+            color: var(--accent-primary);
+            border-bottom: 2px solid var(--accent-primary);
+            padding-bottom: 10px;
+        }
+        .platform-section > p {
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+        .shot-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 28px;
+        }
+        figure.shot {
+            margin: 0;
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        figure.shot a {
+            display: block;
+        }
+        figure.shot img {
+            width: 100%;
+            height: auto;
+            display: block;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: #fff;
+        }
+        figure.shot figcaption {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        figure.shot figcaption strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 4px;
+        }
+        .shot-tag {
+            display: inline-block;
+            font-size: 0.75em;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--accent-primary);
+            border: 1px solid var(--accent-primary);
+            border-radius: 999px;
+            padding: 2px 10px;
+            margin-bottom: 6px;
+        }
+
+        /* Methodology */
+        .notes-section {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        .notes-section h2 {
+            margin-top: 0;
+            color: var(--accent-primary);
+            font-size: 1.4em;
+        }
+        .notes-section ul {
+            padding-left: 20px;
+        }
+        .notes-section li {
+            margin-bottom: 8px;
+        }
+        .page-footer {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.9em;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+        }
+        .page-footer a {
+            color: var(--accent-primary);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <a href="index.html">
+                <img src="logo.svg" alt="Local AI Zone Logo">
+                <h1>Local AI Zone</h1>
+            </a>
+            <!-- Theme Switcher -->
+            <button id="theme-toggle-button" class="theme-switcher" aria-label="Toggle dark mode">
+                <span class="icon sun-icon">☀️</span>
+                <span class="icon moon-icon">🌙</span>
+            </button>
+        </div>
+
+        <nav class="nav">
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+            <a href="services.html">Services</a>
+            <a href="blog.html">Blog</a>
+            <a href="traffic.html" class="active">Traffic</a>
+        </nav>
+
+        <!-- Hero -->
+        <div class="hero-section">
+            <h2>Search Traffic</h2>
+            <p class="subheadline">An open look at how people discover Local AI Zone through Google and
+                Bing search. The performance figures below are pulled straight from the Google Search
+                Console and Bing Webmaster Tools APIs.</p>
+        </div>
+
+        <!-- Live traffic -->
+        <section class="live-section" aria-labelledby="live-heading">
+            <h2 id="live-heading">📈 Live Site Traffic</h2>
+            <div class="live-grid" data-gc-live>
+                <div class="live-card">
+                    <div class="live-value" id="gc-total">—</div>
+                    <div class="live-label">Total visits (all time)</div>
+                </div>
+                <div class="live-card">
+                    <div class="live-value" id="gc-page">—</div>
+                    <div class="live-label">Visits to this page</div>
+                </div>
+            </div>
+            <div class="setup-note" id="gc-setup" hidden>
+                <strong>Live counter not configured yet.</strong>
+                Create a free account at
+                <a href="https://www.goatcounter.com" target="_blank" rel="noopener">goatcounter.com</a>,
+                enable "Allow adding visitor counts on your website" in the site settings, then set your
+                site code in <code>js/goatcounter.js</code> (the <code>GOATCOUNTER_CODE</code> value)
+                and the counters above will fill in automatically. The same setting turns on
+                site-wide tracking for every page.
+            </div>
+            <div class="live-meta">
+                <span id="gc-status">Loading live counts…</span>
+                <span>Last checked: <span id="gc-updated">—</span></span>
+            </div>
+        </section>
+
+        <!-- Search performance, refreshed automatically from the APIs -->
+        <section class="data-section" aria-labelledby="perf-heading">
+            <h2 id="perf-heading">📊 Search Performance</h2>
+            <p class="data-sub">Refreshed automatically every day from the Google Search Console and
+                Bing Webmaster Tools APIs by a scheduled GitHub Action — no manual screenshots.</p>
+            <p class="data-meta" id="snapshot-meta">Loading snapshot…</p>
+
+            <div class="snapshot-error" id="snapshot-error" hidden></div>
+
+            <div class="stat-grid" id="stat-grid" hidden></div>
+            <div id="engine-blocks" hidden></div>
+        </section>
+
+        <!-- Manual captures: AI visibility has no public API; the classic dashboards are kept for reference -->
+        <section class="platform-section" aria-labelledby="manual-heading">
+            <h2 id="manual-heading">🗂️ Dashboard Captures (manual)</h2>
+            <p>Neither Google Search Console nor Bing Webmaster Tools exposes its AI-search visibility
+                report through a public API, so those two stay as manual snapshots taken from the
+                dashboards. The classic web-search dashboards from the same sessions are included for
+                reference.</p>
+            <div class="shot-grid">
+                <figure class="shot">
+                    <a href="search_Traffic/google_search_web_traffic.png" target="_blank" rel="noopener">
+                        <img src="search_Traffic/google_search_web_traffic.png"
+                            alt="Google Search Console web search performance report for local-ai-zone.github.io showing clicks, impressions, click-through rate and average position"
+                            loading="lazy" decoding="async">
+                    </a>
+                    <figcaption>
+                        <span class="shot-tag">Google · Web Search</span>
+                        <strong>Google web results</strong>
+                        The classic Search Console performance view — the same clicks and impressions
+                        the automated snapshot above pulls from the API.
+                    </figcaption>
+                </figure>
+                <figure class="shot">
+                    <a href="search_Traffic/bing_web_traffic.png" target="_blank" rel="noopener">
+                        <img src="search_Traffic/bing_web_traffic.png"
+                            alt="Bing Webmaster Tools search performance report for local-ai-zone.github.io showing clicks, impressions, click-through rate and average position"
+                            loading="lazy" decoding="async">
+                    </a>
+                    <figcaption>
+                        <span class="shot-tag">Bing · Web Search</span>
+                        <strong>Bing web results</strong>
+                        Bing Webmaster Tools' classic traffic view, mirroring the API-fed Bing block
+                        above.
+                    </figcaption>
+                </figure>
+                <figure class="shot">
+                    <a href="search_Traffic/google_ai_index.png" target="_blank" rel="noopener">
+                        <img src="search_Traffic/google_ai_index.png"
+                            alt="Google Search Console report showing how local-ai-zone.github.io performs in Google AI search features"
+                            loading="lazy" decoding="async">
+                    </a>
+                    <figcaption>
+                        <span class="shot-tag">Google · AI Search</span>
+                        <strong>Google AI results</strong>
+                        Visibility in Google's AI-powered search experiences, tracked separately from
+                        classic web search.
+                    </figcaption>
+                </figure>
+                <figure class="shot">
+                    <a href="search_Traffic/bing_ai_index.png" target="_blank" rel="noopener">
+                        <img src="search_Traffic/bing_ai_index.png"
+                            alt="Bing Webmaster Tools report showing how local-ai-zone.github.io appears in Bing AI search features"
+                            loading="lazy" decoding="async">
+                    </a>
+                    <figcaption>
+                        <span class="shot-tag">Bing · AI Search</span>
+                        <strong>Bing AI results</strong>
+                        How the site surfaces in Bing's AI-powered search and answer experiences.
+                    </figcaption>
+                </figure>
+            </div>
+        </section>
+
+        <!-- Methodology -->
+        <section class="notes-section" aria-labelledby="notes-heading">
+            <h2 id="notes-heading">About this data</h2>
+            <ul>
+                <li><strong>Search performance is automated.</strong> A scheduled GitHub Action calls
+                    the Search Console and Bing Webmaster APIs daily and commits a JSON snapshot that
+                    this page reads at load time. The daily charts and top queries above come from that
+                    snapshot.</li>
+                <li><strong>Google data lags by about two days.</strong> The window ends two days
+                    before today so a partial final day never drags the numbers down.</li>
+                <li><strong>Bing reports queries in weekly buckets.</strong> Its API returns one row per
+                    query per week with no date-range parameter, so top-query figures are aggregated
+                    across the whole window.</li>
+                <li><strong>If a provider fails, the last good data stays.</strong> A failed refresh
+                    keeps the previous snapshot for that provider and records the error rather than
+                    blanking the page.</li>
+                <li><strong>The dashboard captures are manual.</strong> The screenshots above are
+                    point-in-time captures: the AI-visibility reports have no public API, and the
+                    classic web-search dashboards are included from the same sessions.</li>
+                <li><strong>Live counts use GoatCounter.</strong> GoatCounter is a privacy-friendly,
+                    cookie-free analytics service. Its counter endpoint is cached for up to four hours,
+                    so those numbers are near-live rather than real-time.</li>
+                <li><strong>Search clicks and site visits differ.</strong> Search Console and Bing count
+                    search clicks and impressions, while GoatCounter counts actual visits to the site,
+                    so the two will never match exactly.</li>
+            </ul>
+        </section>
+
+        <footer class="page-footer">
+            <p>Data from Google Search Console, Bing Webmaster Tools and GoatCounter. This page is
+                excluded from search indexes.</p>
+            <p><a href="index.html">← Back to Local AI Zone</a></p>
+        </footer>
+    </div>
+
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button"
+            class="contact-tab-button"
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel"
+         class="contact-form-panel"
+         role="dialog"
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close"
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text"
+                       id="contact-name"
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error"
+                     class="form-error"
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email"
+                       id="contact-email"
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error"
+                     class="form-error"
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text"
+                       id="contact-subject"
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error"
+                     class="form-error"
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message"
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error"
+                     class="form-error"
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+    <script src="js/components/contact-form.js"></script>
+    <script src="js/theme-switcher.js"></script>
+    <script src="js/traffic-live.js"></script>
+    <script src="js/traffic-snapshot.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+<script src="/js/goatcounter.js" defer></script>
+</body>
+</html>

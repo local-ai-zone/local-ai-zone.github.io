@@ -192,6 +192,7 @@
 <link rel="stylesheet" href="../css/blog-article.css">
 <link rel="stylesheet" href="../css/theme.css">
 <link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
 <link rel="icon" href="../logo.svg" type="image/svg+xml">
 <style>
 :root {
@@ -472,6 +473,7 @@ html[data-theme='dark'] .src-block{background:#101728}
     <div class="cell"><div class="v">384+1</div><div class="k">Experts per MoE layer, V4.1-Flash</div></div>
   </div>
   <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
     <span><b>Scope:</b> Dense SwiGLU &rarr; DeepSeekMoE &rarr; aux-loss-free &rarr; MTP &rarr; FP4/Engram &middot; 2023&ndash;2026</span>
     <span><b>Goal:</b> account for every expert, every gate, and every load-balancing trick</span>
     <span><b>Read time:</b> ~60 minutes</span>
@@ -1322,11 +1324,43 @@ Andrey Lukyanenko, &ldquo;DeepSeek-V4 Review&rdquo; (Apr 24, 2026 &mdash; V4 exp
 Compiled September 2026 &middot; Single-file HTML &middot; All figures cited inline &middot; Independent technical analysis; not affiliated with or endorsed by DeepSeek. Configs, papers, and pricing verified against primary sources at compilation time; check the official documentation before making deployment or purchasing decisions.
 </div>
 
-</div><!-- /page -->
+</div>
+<section id="faq" class="article-section faq">
+<h2>Frequently asked questions</h2>
+<h3>What is DeepSeekMoE?</h3>
+<p>DeepSeekMoE is DeepSeek's Mixture-of-Experts architecture, introduced in January 2024. It replaces each transformer layer's single dense feed-forward network with many fine-grained routed experts plus a small set of always-on shared experts. In its 16.4B-parameter instantiation it matched LLaMA2-7B with roughly 40% of the computation.</p>
+<h3>How does DeepSeek balance its experts without an auxiliary loss?</h3>
+<p>DeepSeek-V3 replaced the three auxiliary balance losses used in V2 with a per-expert bias term added to the routing affinity. The bias is adjusted by a fixed control rule rather than by gradient descent, so expert load is balanced without the quality penalty an auxiliary loss imposes on the language-model objective.</p>
+<h3>What is Multi-Token Prediction (MTP) in DeepSeek-V3?</h3>
+<p>Multi-Token Prediction adds modules that predict several future tokens at each position. In DeepSeek-V3 the same MTP modules are reused at inference time as the draft heads for speculative decoding, where they reach an 85-90% token acceptance rate and about 1.8x decode throughput.</p>
+<h3>How large is DeepSeek-V3's MoE and how much of it runs per token?</h3>
+<p>DeepSeek-V3 has 671B total parameters and activates approximately 37B per token — about 5.5% — using 256 routed experts and 1 shared expert per layer, trained in FP8 on 14.8T tokens for 2.788M H800 GPU-hours.</p>
+<h3>What is new in DeepSeek-V4.1-Flash's feed-forward design?</h3>
+<p>DeepSeek-V4.1-Flash makes the feed-forward path asymmetric: a 552B-parameter multimodal MoE with 384 routed experts and 1 shared expert per layer activates 8B parameters per token during prefill and 16B during decode. It adds a 196B-parameter conditional-memory module called Engram, built from multi-head hashing and context-aware gating, and stores expert weights in FP4.</p>
+</section>
+
+<!-- /page -->
 </main>
 </div><!-- /shell -->
 
 <!-- ==================== RELATED POSTS ==================== -->
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: From One Giant FFN to 384 Tiny Experts">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
 <section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
   <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
@@ -1413,5 +1447,132 @@ Compiled September 2026 &middot; Single-file HTML &middot; All figures cited inl
 })();
 </script>
 <script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
 </body>
 </html>

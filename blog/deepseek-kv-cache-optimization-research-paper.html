@@ -192,6 +192,7 @@
 <link rel="stylesheet" href="../css/blog-article.css">
 <link rel="stylesheet" href="../css/theme.css">
 <link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
 <link rel="icon" href="../logo.svg" type="image/svg+xml">
 <style>
 :root {
@@ -472,6 +473,7 @@ html[data-theme='dark'] .src-block{background:#101728}
     <div class="cell"><div class="v">30+</div><div class="k">Cited papers, reports &amp; kernels</div></div>
   </div>
   <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
     <span><b>Scope:</b> MHA &rarr; GQA &rarr; MLA &rarr; DSA &rarr; CSA/HCA &rarr; CSA2 &middot; 2023&ndash;2026</span>
     <span><b>Goal:</b> account for every byte of DeepSeek's KV cache, model by model</span>
     <span><b>Read time:</b> ~60 minutes</span>
@@ -1313,11 +1315,43 @@ alphaXiv digest of the V4.1-Flash report (Sept 2026) &middot; Simon Willison on 
 Compiled September 2026 &middot; Single-file HTML &middot; All figures cited inline &middot; Independent technical analysis; not affiliated with or endorsed by DeepSeek. Configs, papers, and pricing verified against primary sources at compilation time; check the official documentation before making deployment or purchasing decisions.
 </div>
 
-</div><!-- /page -->
+</div>
+<section id="faq" class="article-section faq">
+<h2>Frequently asked questions</h2>
+<h3>What is Multi-head Latent Attention (MLA)?</h3>
+<p>MLA is the attention design DeepSeek introduced in DeepSeek-V2 (May 2024). Instead of caching per-head keys and values, it caches a single 512-dimensional compressed latent plus a 64-dimensional rotary key per token — 576 cached elements per layer — and reconstructs the per-head keys and values on demand. The V2 paper reports a 93.3% KV cache reduction and a 5.76x maximum generation throughput versus DeepSeek 67B.</p>
+<h3>What is DeepSeek Sparse Attention (DSA)?</h3>
+<p>DSA is the sparse-attention mechanism shipped experimentally in DeepSeek-V3.2-Exp (September 2025). A 64-head lightning indexer scores every cached token cheaply and selects the top 2,048, so only those entries pay the full MLA cost. This cuts the bytes read per decode step by roughly 5x at 131K context.</p>
+<h3>What is the lightning indexer in DeepSeek Sparse Attention?</h3>
+<p>The lightning indexer is DSA's cheap scoring stage: 64 multi-query heads that score every cached token so the model can select the top 2,048 to attend to. Because it scores all tokens but only selects a few, it shrinks the bytes read per decode step without shrinking what must be stored.</p>
+<h3>How small is DeepSeek-V4.1-Flash's KV cache?</h3>
+<p>890 bytes per token in HBM, down from roughly 390 KB per token for DeepSeek's 2023 models — a 438x reduction. It is achieved with CSA2 cross-layer KV reuse, 4-bit MXFP4 cache storage, and replaying instead of persisting sliding-window state, which also gives one-eighth the persistent SSD footprint of V4-Flash.</p>
+<h3>What is CSA2 in DeepSeek-V4.1-Flash?</h3>
+<p>CSA2 (Compressed Sparse Attention 2) is the attention design in DeepSeek-V4.1-Flash. It adds a third compression axis — reusing KV entries across layers through Full, Reindex and Reuse modes — on top of CSA's 4x token pooling and HCA's 128x pooling, and stores the cache in 4-bit MXFP4.</p>
+</section>
+
+<!-- /page -->
 </main>
 </div><!-- /shell -->
 
 <!-- ==================== RELATED POSTS ==================== -->
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: From 390 KB to 890 Bytes">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
 <section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
   <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
@@ -1404,5 +1438,132 @@ Compiled September 2026 &middot; Single-file HTML &middot; All figures cited inl
 })();
 </script>
 <script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
 </body>
 </html>

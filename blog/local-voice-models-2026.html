@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Text-to-Speech &amp; Speech-to-Text Models 2026: The Open-Weight Voice Stack</title>
+<meta name="description" content="Twenty-seven open and closed voice models ranked on two independent boards: the Artificial Analysis Speech Arena for text-to-speech, the Open ASR Leaderboard for transcription. Elo figures, word error rates, licences that decide what you can ship, VRAM floors, and the commands to run them locally.">
+<meta name="keywords" content="text to speech models 2026, speech to text models 2026, local TTS, local STT, Kokoro, Breeze TTS 2, Step Audio EditX, Chatterbox, Whisper large-v3, Parakeet, Moonshine, Voxtral, voice cloning local, open source voice AI, self-hosted transcription, WER, TTS Arena">
+<meta name="author" content="Local AI Zone">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Text-to-Speech & Speech-to-Text Models 2026: The Open-Weight Voice Stack",
+  "alternativeHeadline": "Twenty-seven voice models, two independent boards, and the licences that decide what you can ship",
+  "description": "A ranked guide to the open-weight text-to-speech and speech-to-text models you can self-host in 2026: Speech Arena Elo, Open ASR Leaderboard word error rates and real-time factors, licence traps, VRAM floors, serving tools and a pick-by-job table.",
+  "author": {"@type": "Person", "name": "Hussain Nazary"},
+  "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
+  "datePublished": "2026-10-06",
+  "dateModified": "2026-10-06",
+  "keywords": "text to speech, speech to text, speech recognition, ASR, TTS, Kokoro, Breeze TTS 2, Step Audio EditX, Chatterbox, Whisper, Parakeet, Moonshine, Voxtral, 2026",
+  "articleSection": "Ranking Guide",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 4519,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/local-voice-models-2026.html",
+  "about": [
+    {"@type": "Thing", "name": "Text-to-speech"},
+    {"@type": "Thing", "name": "Speech-to-text"},
+    {"@type": "Thing", "name": "Voice cloning"},
+    {"@type": "Thing", "name": "Automatic speech recognition"},
+    {"@type": "Thing", "name": "Local inference"}
+  ],
+  "isPartOf": {
+    "@type": "Blog",
+    "name": "Local AI Zone — Blog",
+    "url": "https://local-ai-zone.github.io/blog.html"
+  },
+  "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
+}
+</script>
+<script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is the best open-source text-to-speech model in 2026?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "On blind listening tests, Breeze TTS 2 leads open weights at 1,215 Elo and is the first open model to outrank ElevenLabs Eleven v3. Its weights are non-commercial, so the highest-ranked model you can ship is Step Audio EditX at 1,102 under Apache 2.0. If you want a voice with no GPU at all, Kokoro 82M scores 1,060 on a laptop CPU."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I use these voice models in a commercial product?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Depends entirely on the weights licence, not the marketing. Ship-safe: Step Audio EditX and Qwen3-TTS (Apache 2.0), Kokoro and Maya1 (Apache 2.0), Chatterbox and GLM-TTS (MIT), Zonos (Apache 2.0). Non-commercial: Breeze TTS 2, Fish Audio S2 Pro and Higgs Audio V3 (research licences), Voxtral TTS (CC BY-NC), XTTS v2 (CPML). Microsoft even withdrew VibeVoice’s MIT licence."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Whisper still the best speech-to-text model?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not on English averages. On eight identical English test sets, NVIDIA Parakeet TDT 0.6B v3 scores 6.32% word error rate against Whisper large-v3’s 7.44%, and a 245M-parameter Moonshine model beats Whisper with six times fewer parameters. Whisper remains the right default when you need its roughly 99 languages — Parakeet covers 25 European languages only — and you should run it through faster-whisper rather than stock."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Do I need a GPU to run voice models locally?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Kokoro 82M and VoxCPM2 both generate speech on a CPU, and Moonshine and Vosk transcribe on a CPU or a Raspberry Pi. A GPU only changes throughput: batch transcription of an archive, or serving a real-time voice endpoint where the bigger models and their streaming builds live."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Why do voice agents sound broken if word error rates are this low?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Because live conversation is not the test set. Vanilla Whisper does not stream and hallucinates during silence, accent penalties run five to six times the headline word error rate, and no open model knows what your agent just said — transcription is always cold. Real-time voice needs turn detection and partial results on top of the model, which is why the streaming story matters more than the leaderboard position."
+      }
+    }
+  ]
+}</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+    {"@type": "ListItem", "position": 3, "name": "Text-to-Speech & Speech-to-Text Models 2026", "item": "https://local-ai-zone.github.io/blog/local-voice-models-2026.html"}
+  ]
+}
+</script>
+
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/local-voice-models-2026.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/local-voice-models-2026.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/local-voice-models-2026.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/local-voice-models-2026.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="theme-color" content="#4f46e5">
+<meta property="og:title" content="Text-to-Speech &amp; Speech-to-Text Models 2026">
+<meta property="og:description" content="Open-weight voice in 2026: a 3B model now outranks ElevenLabs on a blind Elo board, and a 600M transcriber beats Whisper large-v3 on identical audio. 27 models, two leaderboards, every licence checkable.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/local-voice-models-2026.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/local-voice-hero.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Voice, run locally: the open-weight text-to-speech and speech-to-text models of 2026, ranked on blind listening tests and word error rate">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Text-to-Speech &amp; Speech-to-Text Models 2026">
+<meta name="twitter:description" content="Twenty-seven voice models on two independent boards: Speech Arena Elo, Open ASR word error rates, licences and VRAM floors — all runnable on your own hardware.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/local-voice-hero.png">
+<meta name="twitter:image:alt" content="Voice models run locally: the 2026 open-weight TTS and STT field at a glance">
+
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<style>
+:root{--bg:#f6f7f9;--paper:#ffffff;--ink:#1a2233;--ink-soft:#46506a;--ink-faint:#7c86a0;--line:#e3e7ee;--accent:#4f46e5;--accent-soft:#eef2ff;--accent-2:#0d9488;--warn-bg:#fff7ed;--warn-line:#fdba74;--warn-ink:#9a3412;--ok-bg:#f0fdf4;--ok-line:#86efac;--ok-ink:#166534;--info-bg:#eff6ff;--info-line:#93c5fd;--info-ink:#1e3a8a;--danger-bg:#fef2f2;--danger-line:#fca5a5;--danger-ink:#991b1b;--code-bg:#0d1117;--code-ink:#d7dde7;--side-bg:#0e1526;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#4f46e5;--mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,monospace;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif}
+html[data-theme='dark']{--bg:#0b0f1a;--paper:#111827;--ink:#e5e9f2;--ink-soft:#b8c2d9;--ink-faint:#7c8aa5;--line:#242f47;--accent:#818cf8;--accent-soft:#1e2440;--accent-2:#2dd4bf;--warn-bg:#2a1c0e;--warn-line:#9a5b21;--warn-ink:#fdba74;--ok-bg:#0d2418;--ok-line:#2f7a4f;--ok-ink:#86efac;--info-bg:#101d33;--info-line:#2b4d8a;--info-ink:#93c5fd;--danger-bg:#2a1214;--danger-line:#8a3a3f;--danger-ink:#fca5a5;--side-bg:#0a0f1e;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#6366f1}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.shell{display:flex;min-height:100vh}
+aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
+main{flex:1;min-width:0;display:flex;justify-content:center}
+.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
+#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
+#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35}
+#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
+#toc nav a{display:block;padding:5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
+#toc nav a:hover{background:var(--side-hover);color:#fff}
+#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
+#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
+#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
+#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
+.theme-btn{position:fixed;top:16px;right:20px;z-index:80;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:17px;line-height:1;box-shadow:0 2px 10px rgba(15,23,42,.12)}
+h1,h2,h3,h4{line-height:1.25;color:var(--ink)}
+.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
+.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
+.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px}
+.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
+.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--ink-soft)}
+p{margin:0 0 18px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid #c7d2fe}
+a:hover{border-bottom-color:var(--accent)}
+ul,ol{margin:0 0 18px;padding-left:26px}
+li{margin-bottom:7px}
+li::marker{color:var(--accent);font-weight:600}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+.small{font-size:13.5px;color:var(--ink-soft)}
+.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#3730a3;overflow-wrap:anywhere}
+html[data-theme='dark'] .mono,html[data-theme='dark'] code:not(pre code){background:#1c2438;border-color:#2c3752;color:#a5b4fc}
+.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
+.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
+.cover h1 .thin{color:var(--accent)}
+.cover .sub{font-size:19px;color:var(--ink-soft);max-width:660px;line-height:1.6;margin:0 0 30px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
+.cover .meta b{color:var(--ink-soft);font-weight:600}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:34px 0 8px}
+.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+html[data-theme='dark'] .statgrid .cell{background:linear-gradient(180deg,#141b2e,#10162a)}
+.statgrid .cell .v{font-size:23px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
+.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
+.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;margin:0 0 20px}
+pre code{background:none;border:none;padding:0;color:inherit;font-size:inherit}
+.tblwrap{overflow-x:auto;margin:0 0 22px}
+figure{margin:30px 0 34px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+figure figcaption{font-size:13.5px;color:var(--ink-faint);line-height:1.6;margin-top:13px;padding-left:14px;border-left:3px solid #c7d2fe}
+html[data-theme='dark'] figure figcaption{border-left-color:#312e81}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);font-weight:700}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+h2.ch{scroll-margin-top:20px}
+h3,h4{scroll-margin-top:70px}
+@media(max-width:1000px){aside#toc{display:none}.page{padding:22px 22px 90px}.cover h1{font-size:34px}}
+</style>
+</head>
+<body>
+<button id="themeBtn" class="theme-btn" title="Toggle theme" aria-label="Toggle dark mode">&#9788;</button>
+
+<div class="shell">
+<aside id="toc">
+  <div class="brand">
+    <div class="t">Text-to-Speech &amp; Speech-to-Text</div>
+    <div class="s">The 2026 voice stack</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Foundations</div>
+    <a href="#s1"><span class="num">01</span>Voice stopped being cloud-only</a>
+    <a href="#s2"><span class="num">02</span>Two boards, two questions</a>
+    <div class="part">Text to speech</div>
+    <a href="#s3"><span class="num">03</span>The Elo leaderboard</a>
+    <a href="#s4"><span class="num">04</span>Licences, not marketing</a>
+    <div class="part">Speech to text</div>
+    <a href="#s5"><span class="num">05</span>The error-rate table</a>
+    <a href="#s6"><span class="num">06</span>Where transcription breaks</a>
+    <a href="#s7"><span class="num">07</span>Streaming vs batch</a>
+    <div class="part">Operating them</div>
+    <a href="#s8"><span class="num">08</span>Running it</a>
+    <a href="#s9"><span class="num">09</span>The cost math</a>
+    <a href="#s10"><span class="num">10</span>Pick by job</a>
+    <a href="#s11"><span class="num">11</span>FAQ</a>
+    <a href="#sources"><span class="num">12</span>Sources</a>
+    <div class="toc-foot">Every claim attributed. Numbers dated 6 October 2026.</div>
+  </nav>
+</aside>
+
+<main>
+<div class="page">
+
+<div class="cover">
+  <span class="kicker">Ranking &middot; Voice AI</span>
+  <h1>Text to speech <span class="thin">&amp;</span> speech to text</h1>
+  <p class="sub">Open-weight voice crossed two lines this year. A 3B model now outranks ElevenLabs on a blind listening board, and a 600M-parameter transcriber beats Whisper large-v3 over identical audio. Here are the models that matter, what each is actually for, which licences you can ship under, and the commands to run them on hardware you already own.</p>
+  <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
+    <span><b>Published</b> 6 October 2026</span>
+    <span><b>Models named</b> 31</span>
+    <span><b>Reading time</b> ~23 min</span>
+    <span><b>Level</b> Expert</span>
+  </div>
+  <div class="statgrid">
+    <div class="cell"><div class="v">1,215</div><div class="k">best open TTS Elo &mdash; past ElevenLabs v3</div></div>
+    <div class="cell"><div class="v">82M</div><div class="k">Kokoro: a top-six voice on a laptop CPU</div></div>
+    <div class="cell"><div class="v">6.32%</div><div class="k">best open English word error rate</div></div>
+    <div class="cell"><div class="v">3,332&times;</div><div class="k">its real-time factor, vs Whisper&rsquo;s 146</div></div>
+    <div class="cell"><div class="v">3 of 7</div><div class="k">arena leaders you cannot ship</div></div>
+    <div class="cell"><div class="v">143&times;</div><div class="k">hosted open vs ElevenLabs, per character</div></div>
+  </div>
+</div>
+
+<h2 class="ch" id="s1"><span class="chno">01</span> — Voice stopped being cloud-only</h2>
+<p class="ch-sub">Two model families, one privacy problem, and a year that changed the answer.</p>
+
+<p>Voice is two problems wearing one word. <strong>Text-to-speech</strong> turns written text into audio: narration for a video, a voice for an agent, a read-aloud layer for an app. <strong>Speech-to-text</strong> runs it backwards: meetings, dictation, subtitles, call notes. For most of the last decade the practical answer to both was an API — pay per character on the way out, pay per hour on the way in, and send every sentence you ever wanted spoken, and every recording you own, to somebody else&rsquo;s data centre.</p>
+
+<p>That trade has two costs, and only one of them shows up on an invoice. The monetary one is easy to see: ElevenLabs charges $100 per million characters for its flagship, Eleven v3. The other cost is that dictated audio is the most personal data there is — contracts read aloud, medical notes, recordings of other people — and it leaves the building every time you use it. Both costs point the same direction: at some volume, running the model yourself stops being a hobby and becomes the obvious move.</p>
+
+<p>What made 2026 the year to write this guide is that the quality argument evaporated. On blind listening tests, an open 3B model now beats the best closed voice on the market. On the standard English transcription benchmark, a 600M-parameter model beats the default that is eight times its size. Neither result was true a year ago.</p>
+
+<div class="callout info"><span class="lab">The one-sentence version</span>For TTS, pick from a blind Elo board but filter by licence first — <strong>the best-ranked open model you can commercially ship is Step Audio EditX, not the leader.</strong> For STT, stop reading model sizes: <strong>parameter count has stopped predicting accuracy</strong>, the 99-language default is no longer the most accurate one, and the honest numbers are five to six times worse than every published average the moment real people speak.</div>
+
+<p>A note on the rumour mill before the tables: there is no DeepSeek voice model — DeepSeek V4 is text-only — and no GLM voice model beyond GLM-TTS&rsquo;s Chinese-English release. The Chinese-lab open voice models that actually exist are Qwen3-TTS and GLM-TTS, and both appear below.</p>
+
+<h2 class="ch" id="s2"><span class="chno">02</span> — Two boards, two questions</h2>
+<p class="ch-sub">One measures whether humans like the sound. The other measures whether the words are right.</p>
+
+<p>Voice quality does not have one number, it has two, and they answer different questions.</p>
+
+<p>The first is the <strong>Artificial Analysis Speech Arena</strong>, which is the useful signal for text-to-speech. Listeners hear two clips of the same sentence without knowing which model made each one and pick the better one; Elo accumulates from thousands of those blind votes. A vendor cannot train against it, because it measures whether a human prefers the sound, not whether a metric went up. There are now two boards: the main <em>Provider Voices</em> arena, where each model competes with its own built-in voices, and the <em>Controlled Voice</em> arena added in July 2026, which hands every model the same eight cloned voices so that only the cloning is being compared. Chapter 3 shows why that split changes the ranking.</p>
+
+<p>The second is the <strong>Hugging Face Open ASR Leaderboard</strong>, which is the useful signal for transcription. Every model runs over the same eight English test sets in one harness, and the two columns that matter are word error rate (WER, lower is better) and real-time factor (RTFx, how many seconds of audio it transcribes per second of compute, higher is better). Its long-form benchmark adds accented and dialect speech, and its multilingual benchmark covers German, French, Italian, Spanish and Portuguese. This is also the only table in this article whose numbers we did not have to take on trust from a vendor — they come from the leaderboard&rsquo;s own result files.</p>
+
+<div class="callout warn"><span class="lab">How to read every number below</span>Vendor figures are labelled as vendor figures. The arena Elo is independent but moves daily — scores here are from late August 2026. The ASR leaderboard CSV was retrieved on 18 August 2026. RTFx is measured with batching on evaluation hardware: <strong>you will not see 3,332&times; on a laptop transcribing one file</strong>, because a single file cannot fill a batch. What survives to your machine is the ordering, and the ordering is the point.</div>
+
+<h2 class="ch" id="s3"><span class="chno">03</span> — The Elo leaderboard</h2>
+<p class="ch-sub">Fifteen text-to-speech models, ranked by blind listening tests, with the licence in the same row.</p>
+
+<p>Here is the board as it stood in late August 2026. The two closed models are shown as reference points, because the interesting fact about this table is where the open weights sit relative to them.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Model</th><th class="num">Elo</th><th>Licence</th><th>Known for</th></tr></thead>
+<tbody>
+<tr><td>Cartesia Sonic 3.6 <span class="small">(closed, reference)</span></td><td class="num">1,283</td><td>Closed</td><td>Overall board leader; the gap to open weights is now 68 points, down from 118 in July</td></tr>
+<tr><td><strong>Breeze TTS 2</strong> (BreezeBlue, 3B)</td><td class="num">1,215</td><td><strong>Research &mdash; non-commercial</strong></td><td>First open weights past ElevenLabs; cloning, voice design and voice direction; weights published 25 Aug 2026</td></tr>
+<tr><td>ElevenLabs Eleven v3 <span class="small">(closed, reference)</span></td><td class="num">1,177</td><td>Closed</td><td>$100 per million characters</td></tr>
+<tr><td>Fish Audio S2 Pro (4B + 400M)</td><td class="num">1,125</td><td><strong>Research &mdash; non-commercial</strong></td><td>15,000 inline prosody tags, 80+ languages, released 9 Mar 2026</td></tr>
+<tr><td><strong>Step Audio EditX</strong> (StepFun, 3B)</td><td class="num">1,102</td><td>Apache 2.0</td><td>Highest-ranked model you can ship; edit emotion in token space; 14+ emotions, 30+ styles</td></tr>
+<tr><td>Voxtral TTS (Mistral)</td><td class="num">1,082</td><td>CC BY-NC 4.0</td><td>3-second cloning; first place on the Controlled Voice board (1,010)</td></tr>
+<tr><td>Magpie-Multilingual 357M (NVIDIA)</td><td class="num">1,066</td><td>NVIDIA Open Model</td><td>Nine languages in 357M parameters</td></tr>
+<tr><td><strong>Kokoro 82M v1.0</strong> (hexgrad)</td><td class="num">1,060</td><td>Apache 2.0</td><td>Runs on a laptop CPU, fixed voice bank, no cloning</td></tr>
+<tr><td>Maya1 (Maya Research)</td><td class="num">1,045</td><td>Apache 2.0</td><td>Design a speaker from a written description, no reference audio</td></tr>
+<tr><td>Higgs Audio V3 (Boson AI)</td><td class="num">1,042</td><td><strong>Research &mdash; non-commercial</strong></td><td>100+ languages with published word error rates</td></tr>
+<tr><td>Chatterbox (Resemble AI)</td><td class="num">1,020</td><td>MIT</td><td>Cloning from short reference audio, emotion control, 23 languages</td></tr>
+<tr><td>Zonos-v0.1 (Zyphra)</td><td class="num">1,000</td><td>Apache 2.0</td><td>44 kHz output from 6 GB of VRAM</td></tr>
+<tr><td>Qwen3-TTS (Alibaba)</td><td class="num">not yet scored</td><td>Apache 2.0</td><td>0.6B and 1.7B sizes, 10 languages, 5M+ downloads</td></tr>
+<tr><td>VoxCPM2 (OpenBMB)</td><td class="num">not yet scored</td><td>Apache 2.0</td><td>2B, 30 languages, 48 kHz, runs on a CPU</td></tr>
+<tr><td>GLM-TTS (Z.ai)</td><td class="num">not yet scored</td><td>MIT</td><td>Chinese/English, 0.89 CER on its own evaluation</td></tr>
+</tbody>
+</table></div>
+
+<figure>
+  <img src="voice-tts-arena.png" alt="Bar chart of Artificial Analysis Speech Arena Elo for open-weight text-to-speech models in August 2026: Cartesia Sonic 3.6 at 1283 as a closed reference, Breeze TTS 2 at 1215 ahead of ElevenLabs Eleven v3 at 1177, Fish Audio S2 Pro 1125, Step Audio EditX 1102, Voxtral TTS 1082, Kokoro 82M 1060, Chatterbox 1020 and Zonos-v0.1 at 1000" width="2160" height="2178" loading="lazy" decoding="async">
+  <figcaption>Blind pairwise votes, no vendor present. Breeze TTS 2 sits 90 Elo clear of the pack and is the first open-weight model ever to outrank ElevenLabs&rsquo; flagship — but three of the seven open models in this chart cannot be used commercially, which is chapter 4&rsquo;s problem.</figcaption>
+</figure>
+
+<p>Three readings of that table are worth having before the licences. <strong>Size has stopped predicting quality:</strong> Kokoro is 82M parameters and sits sixth, ahead of models fifty times larger, while NVIDIA&rsquo;s 357M Magpie outranks it. The trillion-parameter arms race that defines open-weight language models is simply not happening in speech. <strong>The leader&rsquo;s lead is partly its voices:</strong> on the Controlled Voice arena, where everyone clones the same eight voices, Breeze&rsquo;s 90-point margin becomes a three-way tie at 1,000&ndash;1,010 — its built-in voices are excellent, its cloning ordinary. <strong>And the frontier is still ahead:</strong> closed Cartesia Sonic 3.6 tops the overall board at 1,283, a 68-point gap over the best open weights where it was 118 in July. Open is catching, in public, one release at a time.</p>
+
+<div class="callout ok"><span class="lab">The ship-safe pick</span><strong>Step Audio EditX.</strong> Apache 2.0, third on the board at 1,102, and the highest-ranked open model whose weights you can put in a commercial product without asking anyone. It is an audio-editing model that also does TTS — generate a take, adjust the emotion, adjust it again, because edits happen in token space rather than through waveform surgery. Two honest caveats: it is tuned for clips under 30 seconds, so long narration means chunking, and upstream has been quiet since April 2026.</div>
+
+<h2 class="ch" id="s4"><span class="chno">04</span> — Licences, not marketing</h2>
+<p class="ch-sub">The word &ldquo;open-source&rdquo; appears on products whose weights you may not legally ship.</p>
+
+<p>This is the part of the voice market that got worse over the summer of 2026, and it is where teams get hurt. The weights licence and the code licence are frequently different, the paper licence is frequently different from both, and the product page&rsquo;s headline is frequently different from all three.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Tier</th><th>Models</th><th>What it means</th></tr></thead>
+<tbody>
+<tr><td><strong>Ship it</strong></td><td>Step Audio EditX, Kokoro, Maya1, Zonos, Qwen3-TTS, VoxCPM2 (Apache 2.0); Chatterbox, GLM-TTS (MIT)</td><td>Commercial use permitted by the weights licence itself. Check NVIDIA&rsquo;s Open Model terms for Magpie before shipping.</td></tr>
+<tr><td><strong>Research only</strong></td><td>Breeze TTS 2, Fish Audio S2 Pro, Higgs Audio V3 (research licences); Voxtral TTS (CC BY-NC 4.0); XTTS v2 (CPML)</td><td>Weights are downloadable and runnable, commercial use needs written authorisation. Breeze&rsquo;s inference code is Apache 2.0 — that covers the code, not the weights.</td></tr>
+<tr><td><strong>Withdrawn</strong></td><td>VibeVoice 7B (Microsoft)</td><td>Scores 969 and was released under MIT — a licence that has since been withdrawn. Treat any copy you find as unlicensed.</td></tr>
+</tbody>
+</table></div>
+
+<div class="callout danger"><span class="lab">Three traps, in order of subtlety</span><strong>One:</strong> Fish Audio&rsquo;s product page says &ldquo;now open-source&rdquo; while the weights sit under a research licence — and its arXiv paper is CC BY 4.0, which is the paper&rsquo;s licence, not the weights&rsquo;. <strong>Two:</strong> Breeze TTS 2 leads every chart you will see, and its weights require written authorisation from the licensor for any commercial use. <strong>Three:</strong> Microsoft withdrew VibeVoice&rsquo;s MIT grant after release, so &ldquo;it was MIT&rdquo; is not a licence. When a headline and a licence file disagree, only one of them is enforceable.</div>
+
+<p>There is a matching trap one chapter down in speech-to-text: Moonshine&rsquo;s English weights are permissive, but its non-English weights are non-commercial above $1M revenue. A transcription product that quietly adds a second language can cross a licence line without ever changing models.</p>
+
+<h2 class="ch" id="s5"><span class="chno">05</span> — The error-rate table</h2>
+<p class="ch-sub">Eight identical English test sets, one harness, twelve models — and a scaling story that broke.</p>
+
+<p>For transcription the question is not whether people like the sound, it is whether the words are right. The table below is the English short-form benchmark from the Open ASR Leaderboard: average word error rate across eight test sets, with real-time factor alongside. Lower WER is better; higher RTFx is faster.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Model</th><th class="num">Params</th><th class="num">Avg WER</th><th class="num">RTFx</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><strong>NVIDIA Parakeet TDT 0.6B v3</strong></td><td class="num">0.6B</td><td class="num">6.32</td><td class="num">3,333</td><td>Best on both axes; 25 European languages; token-and-duration transducer head</td></tr>
+<tr><td>Mistral Voxtral Small 24B</td><td class="num">24B</td><td class="num">6.62</td><td class="num">54</td><td>Forty times Parakeet&rsquo;s size, still behind; 8 named languages</td></tr>
+<tr><td>Moonshine streaming-medium</td><td class="num">0.245B</td><td class="num">6.66</td><td class="num">&mdash;</td><td>Beats Whisper with 6&times; fewer parameters; best on meeting audio (AMI 10.68)</td></tr>
+<tr><td>Mistral Voxtral Mini 3B</td><td class="num">4.7B</td><td class="num">7.05</td><td class="num">110</td><td>Audio-native LLM &mdash; also answers questions about the audio; ~9.5 GB</td></tr>
+<tr><td><strong>OpenAI Whisper large-v3</strong></td><td class="num">1.55B</td><td class="num">7.44</td><td class="num">146</td><td>The default; ~99 languages; wants ~10 GB of VRAM</td></tr>
+<tr><td>Whisper large-v3-turbo</td><td class="num">0.8B</td><td class="num">7.83</td><td class="num">200</td><td>Same weights, fewer layers &mdash; the cheap speed move inside the family</td></tr>
+<tr><td>Moonshine base</td><td class="num">0.0615B</td><td class="num">9.99</td><td class="num">566</td><td>The CPU and streaming pick; 61.5M parameters</td></tr>
+<tr><td>Moonshine tiny</td><td class="num">0.0271B</td><td class="num">12.65</td><td class="num">753</td><td>The floor of the field &mdash; and still transcribes in real time</td></tr>
+<tr><td>faster-whisper (large-v3 weights)</td><td class="num">1.55B</td><td class="num">7.44*</td><td class="num">&mdash;</td><td>CTranslate2 reimplementation: 16 s against stock&rsquo;s 2 m 23 s on a 13-minute file at int8 (vendor benchmark)</td></tr>
+<tr><td>NVIDIA Canary-Qwen 2.5B</td><td class="num">2.5B</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td>English-accuracy leader on public leaderboards; transcription plus translation in one model</td></tr>
+<tr><td>Qwen3-ASR (Alibaba)</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td>Mandarin and multilingual strength; the pick when traffic skews Asian</td></tr>
+<tr><td>Vosk</td><td class="num">tiny</td><td class="num">&mdash;</td><td class="num">&mdash;</td><td>Streams on a Raspberry Pi, 20+ languages, accuracy trails the field by a wide margin</td></tr>
+</tbody>
+</table></div>
+
+<p>*faster-whisper runs the same weights as Whisper large-v3, so its accuracy is the row above&rsquo;s — what changes is the runtime.</p>
+
+<figure>
+  <img src="voice-stt-wer.png" alt="Bar chart of average word error rate on eight English test sets: Parakeet TDT 0.6B v3 at 6.32 percent from 0.6 billion parameters, Voxtral Small 24B at 6.62, Moonshine streaming-medium 245M at 6.66, Whisper large-v3 1.55B at 7.44, Whisper turbo 7.83, Moonshine base 9.99 and Moonshine tiny 12.65, showing smaller models beating larger ones" width="2160" height="1878" loading="lazy" decoding="async">
+  <figcaption>Shorter is better. The argument of this chart is not the ranking but the labels: a 600M model leads, a 245M model beats the 1.55B default, and a 24B model lands second. If you have been sizing your transcription model the way you size a language model, stop.</figcaption>
+</figure>
+
+<div class="callout info"><span class="lab">The scaling story broke</span>Three facts fall out of that table in order. <strong>Parameter count stopped predicting accuracy:</strong> the 600M model wins, a 245M model beats the 1.55B default, a 24B model comes second. <strong>LibriSpeech-clean is a dead metric:</strong> every model above 1B lands between 1.59 and 2.10 on it, because clean read speech is solved — the columns that still separate models are AMI (meetings) and Earnings22 (real business audio). And <strong>the reason for the speed gap is architectural:</strong> Whisper is an encoder-decoder that generates text token by token in 30-second windows; Parakeet is a FastConformer transducer that predicts durations and skips ahead, so it never pays a per-token autoregressive cost.</div>
+
+<h2 class="ch" id="s6"><span class="chno">06</span> — Where transcription breaks</h2>
+<p class="ch-sub">The section the ranking pages skip, because it requires looking past the average.</p>
+
+<p>Every word-error rate in chapter 5 was measured on broadcast-register English. Real audio does not sound like that, and the penalty is not small. Compare each model&rsquo;s score on TEDLIUM (professional talks) against CORAAL (a corpus of African American English), from the leaderboard&rsquo;s long-form benchmark:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Model</th><th class="num">TEDLIUM WER</th><th class="num">CORAAL WER</th><th class="num">Penalty</th></tr></thead>
+<tbody>
+<tr><td>Parakeet TDT 0.6B v3</td><td class="num">2.77</td><td class="num">15.57</td><td class="num">5.6&times;</td></tr>
+<tr><td>Whisper large-v3-turbo</td><td class="num">3.23</td><td class="num">17.87</td><td class="num">5.5&times;</td></tr>
+<tr><td>Whisper large-v3</td><td class="num">3.15</td><td class="num">18.89</td><td class="num">6.0&times;</td></tr>
+</tbody>
+</table></div>
+
+<p>Roughly one word in six is wrong on dialect speech for the best model here, and the ordering flips when you remove that column: without CORAAL, Whisper large-v3 leads at 8.67 against Parakeet&rsquo;s 9.10. Which model is better depends on whose voice you are transcribing. Four more failure modes belong on the same page:</p>
+
+<ul>
+<li><strong>Meetings.</strong> AMI errors run four to six times higher than clean read speech for every model — overlapping speech and far-field microphones are their own skill. No model here does speaker diarisation; they will happily merge two people into one run-on paragraph. WhisperX is the usual diarisation layer on top.</li>
+<li><strong>Silence.</strong> Whisper hallucinates during pauses and music — it was trained on 30-second segments and will confidently fill an empty one, often with a subtitle-farm credit line. Transducer models like Parakeet emit nothing when there is nothing. If you see invented repeated phrases, that is a specific, fixable class of bug, not a bad model.</li>
+<li><strong>Long files.</strong> Whisper chunks at 30 seconds and stitches, which is where timestamp drift creeps in. Parakeet&rsquo;s card states up to 24 minutes with full attention (measured on an A100 80GB) or three hours with local attention — a vendor figure, with the hardware it was measured on. Everything longer needs a chunking strategy.</li>
+<li><strong>Licences at the edge.</strong> Moonshine&rsquo;s non-English weights turn non-commercial above $1M revenue (chapter 4), and Parakeet covers 25 European languages only — outside that set it produces nothing usable, so &ldquo;fastest and most accurate&rdquo; quietly becomes &ldquo;English and European only&rdquo;.</li>
+</ul>
+
+<div class="callout warn"><span class="lab">Budget for human correction</span>If your audio is interviews, oral history, community recordings, customer calls or anything that is not broadcast-register English, assume the marketing WER does not apply to you. The honest planning number is the dialect column, not the headline average — and a model that is 0.7 points better on the average while being 3 points better on your actual audio is the right model.</div>
+
+<h2 class="ch" id="s7"><span class="chno">07</span> — Streaming vs batch</h2>
+<p class="ch-sub">A transcription model and a voice-agent engine are not the same product.</p>
+
+<p>Chapter 5 ranked models on batch accuracy, which is the right axis for archives and the wrong axis for conversation. A live voice agent needs three things the benchmark does not measure: <strong>partial results while the user is still speaking</strong>, <strong>turn detection</strong> so it knows when they are done, and <strong>sub-second latency</strong> — a two-second pause reads as broken, whatever the final transcript says.</p>
+
+<p>Vanilla Whisper fails the first requirement outright: it does not stream natively, and its chunking workarounds give you sentence-level latency at best. Vosk streams in real time on a Raspberry Pi but its accuracy trails the big models by a wide margin. The middle of the field — Parakeet, Canary, Qwen3-ASR — is transducer-based and naturally emits partials, but wiring one into a conversation still means owning turn detection yourself. Moonshine is the model actually built for the dictation case: 61.5M parameters, low latency, designed for the CPU path.</p>
+
+<p>There is a fourth requirement that no open model satisfies today, and it is worth knowing about because it explains where the commercial edge is. A model transcribing cold has no idea what your agent just asked. If the agent asked for an order number, the transcription cannot be biased toward hearing digits. AssemblyAI published the counter-example: feeding their streaming model the agent&rsquo;s side of the conversation cut word error rate by 10.2% across 20,000 voice-agent files and dropped error rates on critical utterances — emails, order numbers, names — from 26% to 9%. That is a vendor&rsquo;s own benchmark of their own product, and it should be read as such; the underlying point stands, and it is the next gap for the open stack to close.</p>
+
+<div class="callout info"><span class="lab">The practical rule</span>Batch archive on a GPU? Take the chapter 5 ranking as-is. Real-time conversation? The ranking is roughly irrelevant next to three questions: does the model stream, does it emit nothing during silence, and who is providing turn detection. That combination — not raw accuracy — is what you are actually buying.</div>
+
+<h2 class="ch" id="s8"><span class="chno">08</span> — Running it</h2>
+<p class="ch-sub">Two snippets that work on hardware you own, and the four serving paths worth knowing.</p>
+
+<p>Everything in this article has a local install measured in minutes. Speech on the CPU first — Kokoro is 82M parameters, Apache 2.0, and needs no GPU at all:</p>
+
+<pre><code># Kokoro: 82M parameters, Apache 2.0, CPU-only synthesis
+pip install kokoro soundfile
+
+from kokoro import KPipeline
+import soundfile as sf
+
+pipeline = KPipeline(lang_code='a')          # 'a' = American English
+for i, chunk in enumerate(pipeline('Voice models now run on the hardware you own.')):
+    sf.write(f'chunk-{i}.wav', chunk.audio, 24000)   # 24 kHz output</code></pre>
+
+<p>Transcription through the Whisper weights, with the CTranslate2 runtime that makes stock Whisper bearable:</p>
+
+<pre><code># faster-whisper: same large-v3 weights, int8, a fraction of the memory
+pip install faster-whisper
+
+from faster_whisper import WhisperModel
+model = WhisperModel('large-v3', device='cuda', compute_type='int8')
+segments, info = model.transcribe('meeting.mp3')
+for segment in segments:
+    print(f'[{segment.start:6.1f}s] {segment.text}')</code></pre>
+
+<p>For anything beyond a script, four serving paths cover the field. <strong>Kokoro-FastAPI</strong> is the fastest route to a working OpenAI-compatible speech endpoint. <strong>LocalAI</strong> has the broadest model coverage behind one API — point it at your model directory and speak the standard <span class="mono">/v1/audio/speech</span> route. <strong>vLLM-Omni</strong> is the production GPU serving path for the new generation of TTS models (Voxtral, Fish). <strong>llama.cpp-omni</strong> runs VoxCPM2 as GGUF on CPU, Metal, CUDA or Vulkan, with no PyTorch in the stack at all. On the transcription side, <span class="mono">whisper.cpp</span> plays the same role for people who want a binary and a model file instead of a Python environment.</p>
+
+<div class="callout warn"><span class="lab">Maintenance is part of running it</span>One warning from the field: the faster-whisper repository was last pushed in November 2025 while NVIDIA&rsquo;s and Moonshine&rsquo;s toolchains are actively maintained. It still works and remains the pragmatic way to run Whisper — but &ldquo;free to run&rdquo; includes the cost of noticing when the ecosystem moves on without you.</div>
+
+<h2 class="ch" id="s9"><span class="chno">09</span> — The cost math</h2>
+<p class="ch-sub">Where self-hosting genuinely wins, and where the free model is a trap.</p>
+
+<p>On the way out — speech synthesis — the arithmetic is stark. The best-value hosted open model runs about <strong>$0.70 per million characters</strong>; ElevenLabs charges <strong>$100</strong> for its flagship. That is a 143&times; gap before you count the option of running it yourself, where the marginal character costs electricity. For narration, accessibility read-aloud, notifications and agent voices — all workloads where consistency beats novelty — a 143&times; margin is the difference between a feature and a budget line.</p>
+
+<p>On the way in — transcription — the picture is more honest. Managed transcription sits around $0.21 per hour of audio for a current commercial model (AssemblyAI&rsquo;s published rate), and the self-hosting argument has to survive three costs that never appear on a model card: GPUs that scale with traffic, the engineering time to add what the base model lacks — diarisation, language coverage, a chunking strategy — and the upgrades required every time the frontier moves, which in ASR it does every few months. The most common failure mode is a team self-hosting Whisper, discovering the total cost of ownership was not the budget they wrote down, and quietly moving back.</p>
+
+<div class="callout ok"><span class="lab">The honest summary</span>Self-hosting wins decisively on <strong>TTS</strong> — fixed, low-variance, CPU-friendly workloads where the per-character fees of an API are pure rent. It wins on <strong>STT</strong> when you have steady volume and a GPU that is already paid for, and it loses when you have bursty volume and no ops appetite. The rule of thumb: synthesise locally, and benchmark transcription against the $0.21-per-hour number before assuming free is free.</div>
+
+<h2 class="ch" id="s10"><span class="chno">10</span> — Pick by job</h2>
+<p class="ch-sub">The shortest useful table in the article.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>If you want&hellip;</th><th>Use</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Narration with no GPU at all</td><td><strong>Kokoro 82M</strong></td><td>1,060 Elo, Apache 2.0, laptop CPU, no cloning</td></tr>
+<tr><td>A commercial voice product, shipping now</td><td><strong>Step Audio EditX</strong></td><td>Highest Elo you can ship (Apache 2.0); emotion editing in token space</td></tr>
+<tr><td>Cloned narrator, non-commercial</td><td><strong>Voxtral TTS</strong></td><td>First on the Controlled Voice board; CC BY-NC limits it to non-commercial use</td></tr>
+<tr><td>Cloned voice, commercial</td><td><strong>Chatterbox</strong></td><td>MIT, emotion control, 23 languages</td></tr>
+<tr><td>A voice described in words, not sampled</td><td><strong>Maya1</strong></td><td>Voice design from text, Apache 2.0</td></tr>
+<tr><td>Emotion-rich short clips, Apache only</td><td><strong>Step Audio EditX</strong> or <strong>Qwen3-TTS</strong></td><td>EditX for performance control; Qwen3-TTS for 10 languages at 0.6B/1.7B</td></tr>
+<tr><td>English batch transcription on a GPU</td><td><strong>Parakeet TDT 0.6B v3</strong></td><td>6.32% WER at 3,333&times; real-time; 25 European languages</td></tr>
+<tr><td>The 99-language default</td><td><strong>Whisper large-v3</strong> via <strong>faster-whisper</strong></td><td>Only model with broad coverage; run the CTranslate2 runtime, not stock</td></tr>
+<tr><td>Dictation, CPU or Raspberry Pi</td><td><strong>Moonshine base</strong></td><td>61.5M parameters, built for streaming, 566&times; real-time</td></tr>
+<tr><td>Meetings with overlapping speakers</td><td><strong>Moonshine streaming-medium</strong> + <strong>WhisperX</strong></td><td>Best AMI score in the field (10.68); diarisation layered on top</td></tr>
+<tr><td>Questions about the audio, not a transcript</td><td><strong>Voxtral Mini 3B</strong></td><td>Audio-native LLM: transcribe and interrogate in one model</td></tr>
+<tr><td>Mandarin-first traffic</td><td><strong>Qwen3-ASR</strong></td><td>Strong on Asian languages where Parakeet produces nothing usable</td></tr>
+</tbody>
+</table></div>
+
+<h2 class="ch" id="s11"><span class="chno">11</span> — FAQ</h2>
+<p class="ch-sub">The five questions that come up every time.</p>
+
+<h3>What is the best open-source text-to-speech model in 2026?</h3>
+<p>On blind listening tests, Breeze TTS 2 leads open weights at 1,215 Elo and is the first open model to outrank ElevenLabs Eleven v3. Its weights are non-commercial, so the highest-ranked model you can <em>ship</em> is Step Audio EditX at 1,102 under Apache 2.0. If you want a voice with no GPU at all, Kokoro 82M scores 1,060 on a laptop CPU.</p>
+
+<h3>Can I use these voice models in a commercial product?</h3>
+<p>Depends entirely on the weights licence, not the marketing. Ship-safe: Step Audio EditX and Qwen3-TTS (Apache 2.0), Kokoro and Maya1 (Apache 2.0), Chatterbox and GLM-TTS (MIT), Zonos (Apache 2.0). Non-commercial: Breeze TTS 2, Fish Audio S2 Pro and Higgs Audio V3 (research licences), Voxtral TTS (CC BY-NC), XTTS v2 (CPML). Microsoft even withdrew VibeVoice&rsquo;s MIT licence.</p>
+
+<h3>Is Whisper still the best speech-to-text model?</h3>
+<p>Not on English averages. On eight identical English test sets, NVIDIA Parakeet TDT 0.6B v3 scores 6.32% word error rate against Whisper large-v3&rsquo;s 7.44%, and a 245M-parameter Moonshine model beats Whisper with six times fewer parameters. Whisper remains the right default when you need its roughly 99 languages — Parakeet covers 25 European languages only — and you should run it through faster-whisper rather than stock.</p>
+
+<h3>Do I need a GPU to run voice models locally?</h3>
+<p>No. Kokoro 82M and VoxCPM2 both generate speech on a CPU, and Moonshine and Vosk transcribe on a CPU or a Raspberry Pi. A GPU only changes throughput: batch transcription of an archive, or serving a real-time voice endpoint where the bigger models and their streaming builds live.</p>
+
+<h3>Why do voice agents sound broken if word error rates are this low?</h3>
+<p>Because live conversation is not the test set. Vanilla Whisper does not stream and hallucinates during silence, accent penalties run five to six times the headline word error rate, and no open model knows what your agent just said — transcription is always cold. Real-time voice needs turn detection and partial results on top of the model, which is why the streaming story matters more than the leaderboard position.</p>
+
+<h2 class="ch" id="sources"><span class="chno">12</span> — Sources</h2>
+<p class="ch-sub">Where each claim came from.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>#</th><th>Source</th><th>Used for</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Artificial Analysis Speech Arena leaderboards (Provider Voices and Controlled Voice), scores read late August 2026, via Pinggy&rsquo;s self-hosted TTS roundup (26 Aug 2026)</td><td>Every Elo figure in chapter 3 and Fig. 1; the 68-point open/closed gap; the Controlled Voice reshuffle</td></tr>
+<tr><td>2</td><td>Pinggy, <em>Best Open Source Self-Hosted Text-to-Speech Models in 2026</em> (26 Aug 2026)</td><td>Licences and release dates per model; Breeze&rsquo;s VRAM floors (7.7 GiB eager / 12 GB stated minimum); the $0.70-vs-$100 hosted comparison; the serving tools in chapter 8</td></tr>
+<tr><td>3</td><td>huggingface/open_asr_leaderboard, <span class="mono">en_shortform.csv</span>, <span class="mono">en_longform.csv</span> and <span class="mono">multilingual.csv</span>, retrieved 18 Aug 2026, via LocalAIMaster&rsquo;s one-file comparison (13 Sep 2026)</td><td>Chapter 5&rsquo;s WER and RTFx table, Fig. 2, the CORAAL penalty table, the multilingual averages and the &ldquo;without CORAAL&rdquo; flip</td></tr>
+<tr><td>4</td><td>AssemblyAI, <em>Top 8 open source STT options for voice applications in 2026</em> (30 Sep 2026)</td><td>Model roles in chapter 5 (Canary, Qwen3-ASR, Vosk, Wav2Vec2), the streaming requirements in chapter 7, and the agent-context figures explicitly labelled as the vendor&rsquo;s own benchmark</td></tr>
+<tr><td>5</td><td>SYSTRAN <span class="mono">faster-whisper</span> benchmark and repository status</td><td>The int8 16 s vs 2 m 23 s comparison on the 13-minute test file (vendor benchmark) and the November 2025 maintenance warning</td></tr>
+<tr><td>6</td><td>Model cards and repositories: hexgrad/kokoro, resemble-ai/chatterbox, Zyphra/Zonos, StepFun, Mistral AI (Voxtral), Qwen (Qwen3-TTS), Zhipu (GLM-TTS), OpenBMB (VoxCPM2), Moonshine (craftlm)</td><td>Parameter counts, licences, language lists, Moonshine&rsquo;s $1M non-English clause, and the sample commands in chapter 8</td></tr>
+<tr><td>7</td><td>NVIDIA model cards and NeMo documentation (Parakeet TDT, Canary-Qwen, Magpie)</td><td>The transducer architecture explanation, Parakeet&rsquo;s language set and long-file limits (vendor figures), Magpie&rsquo;s licence</td></tr>
+<tr><td>8</td><td>openai/whisper README and model card</td><td>Whisper large-v3&rsquo;s 1,550M parameters, ~99 languages, and the 30-second segmentation that explains its silence hallucinations</td></tr>
+<tr><td>9</td><td>This site, <a href="top-embedding-reranker-ocr-models-2026.html">Top Embedding, Reranker &amp; OCR Models 2026</a></td><td>The sibling infrastructure ranking this guide is modelled on</td></tr>
+<tr><td>10</td><td>This site, <a href="local-image-generation-2026.html">Local Image Generation Models 2026</a></td><td>The other half of the local modality stack — same licence-first method, different board</td></tr>
+</tbody>
+</table></div>
+
+<p class="small">Assembled 6 October 2026. Arena Elo moves with every batch of votes; the scores here are from late August 2026 and the board will have shifted. ASR figures come from the Open ASR Leaderboard&rsquo;s own result files retrieved 18 August 2026. Where a number is a vendor&rsquo;s claim — Parakeet&rsquo;s long-file limits, faster-whisper&rsquo;s speed ratio, AssemblyAI&rsquo;s context gains — it is labelled as one. Rankings are ours; the licences are the projects&rsquo;.</p>
+
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<!-- ==================== RELATED POSTS ==================== -->
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Text-to-Speech &amp; Speech-to-Text Models 2026">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
+<section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
+  <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
+    <a href="local-image-generation-2026.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Local Image Generation 2026</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The other modality local has kept: FLUX, Qwen-Image and SDXL on your own GPU, with the same licence-first method.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="top-embedding-reranker-ocr-models-2026.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Embeddings, Rerankers &amp; OCR 2026</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The retrieval side of the local stack — the same ranking treatment for the models that feed an agent rather than speak to a human.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="how-much-local-ai-costs-2026.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">How Much Does Local AI Cost?</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The cost survey this article&rsquo;s chapter 9 leans on: hardware, electricity and maintenance, with real-world numbers.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+  </div>
+</section>
+
+<button id="backTop" title="Back to top" aria-label="Back to top" style="position:fixed;bottom:26px;right:22px;z-index:70;width:44px;height:44px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:19px;box-shadow:0 4px 16px rgba(15,23,42,.16);display:none;">&#8593;</button>
+
+<script>
+(function(){
+  var btn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('local-voice-2026-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+  } catch(e) {}
+  if (btn) btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.innerHTML = '&#9788;'; }
+    else { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+    try { localStorage.setItem('local-voice-2026-theme', dark ? 'light' : 'dark'); } catch(e) {}
+  });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function onScroll(){
+    var y = window.scrollY + 120, best = 0;
+    for (var i = 0; i < targets.length; i++) {
+      if (targets[i] && targets[i].offsetTop <= y) best = i;
+    }
+    links.forEach(function(a, i){ a.classList.toggle('active', i === best); });
+    var bt = document.getElementById('backTop');
+    if (bt) bt.style.display = (window.scrollY > 900) ? 'block' : 'none';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  var backTop = document.getElementById('backTop');
+  if (backTop) backTop.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+<script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+</body>
+</html>

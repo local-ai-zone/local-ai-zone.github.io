@@ -526,6 +526,7 @@ ${showCopyBlock ? `
 </div>
 </div>
 </div>
+<script src="/js/goatcounter.js" defer></script>
 </body>
 </html>`;
     }

@@ -23,6 +23,15 @@ Live site: [https://local-ai-zone.github.io](https://local-ai-zone.github.io)
 - **Hardware Calculator**: Estimates RAM/CPU/GPU requirements from quantization
 - **Slug Unification**: Single canonical slug function shared by page generation and sitemap
 
+## 📈 Search Traffic
+
+Search performance is public. A scheduled GitHub Action pulls Google Search Console and Bing Webmaster Tools data daily into `data/traffic-snapshot.json`, and [`traffic.html`](traffic.html) renders it live — see [local-ai-zone.github.io/traffic.html](https://local-ai-zone.github.io/traffic.html). Site visits are counted with privacy-friendly [GoatCounter](https://www.goatcounter.com/), and AI-search visibility is captured manually because neither engine exposes it through an API.
+
+| Google Search Console | Bing Webmaster Tools |
+|---|---|
+| ![Google Search Console web search traffic](search_Traffic/google_search_web_traffic.png) | ![Bing Webmaster Tools web search traffic](search_Traffic/bing_web_traffic.png) |
+| ![Google AI search visibility](search_Traffic/google_ai_index.png) | ![Bing AI search visibility](search_Traffic/bing_ai_index.png) |
+
 ## 💡 Example Project: A Local AI Agent
 
 Want to see a complete local AI agent you can run today? **GGUF Loader** is a production desktop application — a LangGraph-powered, plan-driven agent with a developer-style inline process UI. No cloud, no subscriptions, no data leaves your machine.
@@ -95,6 +104,7 @@ Works on **Windows, Linux, and macOS**. Install with `pip install ggufloader` or
 | **Daily GGUF Model Data Update** | 23:59 UTC | Runs the fetcher, commits `gguf_models.json` (model-count floor guard prevents catalog-collapse regressions) |
 | **Pre-render Model Pages** | 02:00 UTC | Regenerates static pages in `models/` |
 | **SEO Optimization** | 03:00 UTC | Regenerates `sitemap.xml` and metadata |
+| **Update Search Traffic Data** | 06:17 UTC | Pulls Search Console + Bing Webmaster data into `data/traffic-snapshot.json` for `traffic.html` (GoatCounter counts visits) |
 
 **Note**: The Node-based workflows (`Pre-render`, `SEO`) run scripts that import only Node built-ins and local modules — they no longer install any npm packages (no `npm ci`, no Puppeteer). Only the Python dependency (`huggingface_hub`, `tqdm`) is installed in the daily update workflow.
 

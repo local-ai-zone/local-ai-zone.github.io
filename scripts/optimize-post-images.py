@@ -10,7 +10,10 @@ os.chdir(r"E:\local-ai-zone.github.io")
 files = sorted(glob.glob("blog/september-2026-*.png") + glob.glob("blog/deepseek-kv-*.png")
                + glob.glob("blog/deepseek-moe-*.png") + glob.glob("blog/context-*.png")
                + glob.glob("blog/ai-agent-*.png") + glob.glob("blog/how-to-build-ai-agent-hero.png")
-               + glob.glob("blog/bonsai-2-27b-*.png") + glob.glob("blog/bonsai-ternary-*.png"))
+               + glob.glob("blog/bonsai-2-27b-*.png") + glob.glob("blog/bonsai-ternary-*.png")
+               + glob.glob("blog/october-*.png") + glob.glob("blog/system-one-*.png") + glob.glob("blog/decision-vs-reranker-*.png")
+               + glob.glob("blog/local-voice-*.png") + glob.glob("blog/voice-*.png")
+               + glob.glob("blog/local-image-*.png") + glob.glob("blog/image-models-*.png"))
 
 total_before = total_after = 0
 print(f"{'file':52} {'before':>9} {'after':>9} {'saved':>7}  mode")

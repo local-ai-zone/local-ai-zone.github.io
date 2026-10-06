@@ -40,6 +40,17 @@ const SLOTS = {
     pad: 240,
     settle: 1800,
   },
+  october: {
+    out: 'blog/october-2026-local-models-dashboard.png',
+    page: 'index.html',
+    note: 'the site\'s own GGUF model browser — search the box for "Qwen3.8 Flash Next" (or Clef) before shooting so the grid shows the October uploads',
+    width: 1600,
+    height: 900,
+    waitFor: '.premium-model-card',
+    align: '.premium-model-card',
+    pad: 240,
+    settle: 1800,
+  },
   ffn: {
     out: 'blog/deepseek-moe-expert-parallel-gpus.png',
     url: 'http://127.0.0.1:8080',

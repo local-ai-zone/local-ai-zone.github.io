@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System One Decision Models: Jev and the 7 Open Alternatives — Architecture, KV Cache, Hosting Deep Dive</title>
+<meta name="description" content="TypeSafe's Jev returns typed decisions instead of text. This deep dive covers its reconstructed architecture, how the KV cache is shared across questions, RLCD calibration, and the seven open alternatives — Laya, Nimble, Kev, SemIf, Rizzo Flow, Von and NanoJev — with hosting commands, agent integration patterns, the independent benchmark, and the honest caveats. Every figure is attributed to a primary source.">
+<meta name="keywords" content="Jev, TypeSafe, System One model, Laya, Nimble, Kev, SemIf, Rizzo Flow, Von, NanoJev, decision model, typed decisions, KV cache, RLCD, calibrated probabilities, llama.cpp, MLX, local inference, agents, OpenJev, ModernBERT, Qwen3.5, decision transformers">
+<meta name="author" content="Local AI Zone">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "System One Decision Models: Jev and the 7 Open Alternatives — Architecture, KV Cache, Hosting Deep Dive",
+  "alternativeHeadline": "How a model that never writes a token returns calibrated decisions — and how to run the open versions yourself",
+  "description": "A deep dive on the System One decision-model wave: TypeSafe's closed Jev, its reverse-engineered architecture and RLCD training target, how the KV cache is prefilled once and shared across parallel questions, and the seven open alternatives (Laya, Nimble, Kev, SemIf, Rizzo Flow, Von, NanoJev) with their backbones, hosting commands, agent patterns and an honest reading of the benchmarks.",
+  "author": {"@type": "Person", "name": "Hussain Nazary"},
+  "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
+  "datePublished": "2026-10-06",
+  "dateModified": "2026-10-06",
+  "keywords": "Jev, System One, Laya, Nimble, Kev, SemIf, Rizzo Flow, Von, NanoJev, KV cache, RLCD, decision models, local inference, agents, 2026",
+  "articleSection": "Deep Dive",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 9000,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html",
+  "about": [
+    {"@type": "Thing", "name": "System One models"},
+    {"@type": "Thing", "name": "Jev"},
+    {"@type": "Thing", "name": "KV cache"},
+    {"@type": "Thing", "name": "Model calibration"},
+    {"@type": "Thing", "name": "Local LLM inference"},
+    {"@type": "Thing", "name": "AI agents"}
+  ],
+  "isPartOf": {
+    "@type": "Blog",
+    "name": "Local AI Zone — Blog",
+    "url": "https://local-ai-zone.github.io/blog.html"
+  },
+  "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {"@type": "Question", "name": "What is a System One model?", "acceptedAnswer": {"@type": "Answer", "text": "A System One model answers typed questions about a block of state in one parallel pass and returns a probability for every option you defined, instead of generating text. It never writes a token, so there is no output to parse. Jev from TypeSafe AI is the first public one; the name comes from Kahneman's fast, intuitive System 1."}},
+    {"@type": "Question", "name": "How does the KV cache work in these models?", "acceptedAnswer": {"@type": "Answer", "text": "The shared state is prefilled once and its key/value cells are reused by every question, which cannot see each other's answers. Each question is a short suffix that appends a few cells and is answered by reading the logits of the allowed answer letters at one position. There is no decode loop, so the cache never grows while answering and the number of questions is nearly free."}},
+    {"@type": "Question", "name": "Can I run a Jev alternative locally?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Kev, SemIf, Rizzo Flow, Laya, Von and NanoJev all ship local servers, several exposing TypeSafe's own POST /v1/systemone contract so existing SDK code works by changing a base URL. Rizzo Flow and Nimble run on llama.cpp or MLX; Von and Laya are encoder models that serve from a CPU."}},
+    {"@type": "Question", "name": "Are the open alternatives as accurate as Jev?", "acceptedAnswer": {"@type": "Answer", "text": "Not zero-shot. On the independent 49-task jabr benchmark Jev scores 0.966 macro accuracy against 0.720 for the best open entrant, Von. After fine-tuning on your own labelled data the open models are competitive on that domain, and they win outright on latency, cost and control."}}
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+    {"@type": "ListItem", "position": 3, "name": "System One Decision Models Deep Dive", "item": "https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html"}
+  ]
+}
+</script>
+
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="theme-color" content="#4f46e5">
+<meta property="og:title" content="System One Decision Models: Jev and the 7 Open Alternatives — Deep Dive">
+<meta property="og:description" content="How a model that never writes a token returns calibrated decisions, and how to run the open versions — Laya, Nimble, Kev, SemIf, Rizzo Flow, Von, NanoJev — on your own hardware.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/system-one-decision-models-hero.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Jev and the seven open clones: a decision model that returns calibrated probabilities instead of text, with the independent 0.966 versus 0.720 accuracy gap">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="System One Decision Models: Jev and the 7 Open Alternatives">
+<meta name="twitter:description" content="Jev's reconstructed architecture, how the KV cache is shared across parallel questions, hosting commands, agent patterns and an honest reading of the benchmarks.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/system-one-decision-models-hero.png">
+<meta name="twitter:image:alt" content="Jev and the seven open clones: how a model that never writes a token returns calibrated decisions, and how to run the open alternatives locally">
+
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<style>
+:root{--bg:#f6f7f9;--paper:#ffffff;--ink:#1a2233;--ink-soft:#46506a;--ink-faint:#7c86a0;--line:#e3e7ee;--accent:#4f46e5;--accent-soft:#eef2ff;--accent-2:#0d9488;--warn-bg:#fff7ed;--warn-line:#fdba74;--warn-ink:#9a3412;--ok-bg:#f0fdf4;--ok-line:#86efac;--ok-ink:#166534;--info-bg:#eff6ff;--info-line:#93c5fd;--info-ink:#1e3a8a;--danger-bg:#fef2f2;--danger-line:#fca5a5;--danger-ink:#991b1b;--code-bg:#0d1117;--code-ink:#d7dde7;--side-bg:#0e1526;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#4f46e5;--mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,monospace;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif}
+html[data-theme='dark']{--bg:#0b0f1a;--paper:#111827;--ink:#e5e9f2;--ink-soft:#b8c2d9;--ink-faint:#7c8aa5;--line:#242f47;--accent:#818cf8;--accent-soft:#1e2440;--accent-2:#2dd4bf;--warn-bg:#2a1c0e;--warn-line:#9a5b21;--warn-ink:#fdba74;--ok-bg:#0d2418;--ok-line:#2f7a4f;--ok-ink:#86efac;--info-bg:#101d33;--info-line:#2b4d8a;--info-ink:#93c5fd;--danger-bg:#2a1214;--danger-line:#8a3a3f;--danger-ink:#fca5a5;--side-bg:#0a0f1e;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#6366f1}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.shell{display:flex;min-height:100vh}
+aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
+main{flex:1;min-width:0;display:flex;justify-content:center}
+.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
+#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
+#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35}
+#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
+#toc nav a{display:block;padding:5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
+#toc nav a:hover{background:var(--side-hover);color:#fff}
+#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
+#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
+#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
+#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
+.theme-btn{position:fixed;top:16px;right:20px;z-index:80;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:17px;line-height:1;box-shadow:0 2px 10px rgba(15,23,42,.12)}
+h1,h2,h3,h4{line-height:1.25;color:var(--ink)}
+.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
+.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
+.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px}
+.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
+.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--ink-soft)}
+p{margin:0 0 18px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid #c7d2fe}
+a:hover{border-bottom-color:var(--accent)}
+ul,ol{margin:0 0 18px;padding-left:26px}
+li{margin-bottom:7px}
+li::marker{color:var(--accent);font-weight:600}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+.small{font-size:13.5px;color:var(--ink-soft)}
+.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#3730a3;overflow-wrap:anywhere}
+html[data-theme='dark'] .mono,html[data-theme='dark'] code:not(pre code){background:#1c2438;border-color:#2c3752;color:#a5b4fc}
+.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
+.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
+.cover h1 .thin{color:var(--accent)}
+.cover .sub{font-size:19px;color:var(--ink-soft);max-width:660px;line-height:1.6;margin:0 0 30px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
+.cover .meta b{color:var(--ink-soft);font-weight:600}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:34px 0 8px}
+.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+html[data-theme='dark'] .statgrid .cell{background:linear-gradient(180deg,#141b2e,#10162a)}
+.statgrid .cell .v{font-size:23px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
+.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
+.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;margin:0 0 20px}
+pre code{background:none;border:none;padding:0;color:inherit;font-size:inherit}
+.tblwrap{overflow-x:auto;margin:0 0 22px}
+figure{margin:30px 0 34px}
+figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
+figure figcaption{font-size:13.5px;color:var(--ink-faint);line-height:1.6;margin-top:13px;padding-left:14px;border-left:3px solid #c7d2fe}
+html[data-theme='dark'] figure figcaption{border-left-color:#312e81}
+table{border-collapse:collapse;width:100%;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
+th{background:var(--accent-soft);font-weight:700}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+h2.ch{scroll-margin-top:20px}
+h3,h4{scroll-margin-top:70px}
+@media(max-width:1000px){aside#toc{display:none}.page{padding:0 22px 90px}.cover h1{font-size:34px}}
+</style>
+</head>
+<body>
+<button id="themeBtn" class="theme-btn" title="Toggle theme" aria-label="Toggle dark mode">&#9788;</button>
+
+<div class="shell">
+<aside id="toc">
+  <div class="brand">
+    <div class="t">System One Decision Models</div>
+    <div class="s">Jev + 7 open alternatives</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Foundations</div>
+    <a href="#s1"><span class="num">01</span>Why decisions, not text</a>
+    <a href="#s2"><span class="num">02</span>What Jev actually is</a>
+    <a href="#s3"><span class="num">03</span>The architecture, decoded</a>
+    <a href="#s4"><span class="num">04</span>How the KV cache works</a>
+    <div class="part">The eight models</div>
+    <a href="#s5"><span class="num">05</span>Jev</a>
+    <a href="#s6"><span class="num">06</span>Laya &amp; Von (encoders)</a>
+    <a href="#s7"><span class="num">07</span>Kev, Nimble &amp; SemIf</a>
+    <a href="#s8"><span class="num">08</span>Rizzo Flow &amp; NanoJev</a>
+    <div class="part">Operating them</div>
+    <a href="#s9"><span class="num">09</span>Hosting them yourself</a>
+    <a href="#s10"><span class="num">10</span>Using them in agents</a>
+    <a href="#s11"><span class="num">11</span>Performance, honestly read</a>
+    <a href="#s12"><span class="num">12</span>Choosing, and calibration</a>
+    <a href="#faq"><span class="num">13</span>FAQ</a>
+    <a href="#sources"><span class="num">14</span>Sources</a>
+  </nav>
+  <div class="toc-foot">Local AI Zone research &middot; October 2026</div>
+</aside>
+
+<main>
+<div class="page">
+
+<div class="cover">
+  <span class="kicker">Deep Dive &middot; System One Models</span>
+  <h1>Jev and the seven open clones: <span class="thin">a model that never writes a token</span></h1>
+  <p class="sub">On 15 September 2026 TypeSafe AI shipped Jev — a model that reads a block of state, answers typed questions with probabilities, and generates nothing. Within a week, seven open projects had rebuilt the idea. This is how the architecture works, how the KV cache is shared, how to host each one, how to use them inside agents, and what the numbers really say.</p>
+  <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
+    <span><b>Published</b> 6 October 2026</span>
+    <span><b>Models covered</b> 8</span>
+    <span><b>Reading time</b> ~35 min</span>
+    <span><b>Level</b> Expert</span>
+  </div>
+  <div class="statgrid">
+    <div class="cell"><div class="v">0</div><div class="k">output tokens</div></div>
+    <div class="cell"><div class="v">70&ndash;500 ms</div><div class="k">Jev per call</div></div>
+    <div class="cell"><div class="v">0.966 vs 0.720</div><div class="k">Jev vs best open (49-task bench)</div></div>
+    <div class="cell"><div class="v">5.21&times;</div><div class="k">faster than JSON generation</div></div>
+    <div class="cell"><div class="v">&lt;15 ms</div><div class="k">Von on CPU</div></div>
+    <div class="cell"><div class="v">~144 KiB</div><div class="k">KV per token (4B)</div></div>
+  </div>
+</div>
+
+<h2 class="ch" id="s1"><span class="chno">01</span> — Why decisions, not text</h2>
+<p class="ch-sub">The case for a model whose job is a number, not a sentence.</p>
+
+<p>Most of what software asks a model to do is small, repeated and boring: route this ticket, flag this message, rate this severity, does this clause permit a refund. None of those decisions ever needed prose. Shipping them to a frontier model meant paying for a paragraph you then parsed back into an <span class="mono">if</span> statement — and that shape is wrong three times over. It is slow, because generation is sequential. It is expensive, because you pay for output tokens you throw away. And it is unreliable, because a substring of free text has to be coaxed into a schema with a parser that can fail.</p>
+
+<p>A System One model removes all three problems by refusing to generate at all. You hand it a block of <strong>state</strong> — a support ticket, a DOM, a game frame, a log line — plus a list of <strong>typed questions</strong>, and for each question you define the candidate answers. It returns a probability distribution over exactly those answers. There is no string to parse and no way for the model to return something outside your schema, because your schema <em>is</em> the output space.</p>
+
+<p>TypeSafe co-founder Diogo Almeida calls it a &ldquo;frontier-intelligence function call.&rdquo; The description that stuck is simpler: <strong>a smart <span class="mono">if</span> statement.</strong> The name &ldquo;System One&rdquo; is borrowed from Kahneman's split between fast, intuitive judgement and slow, deliberate reasoning; the claim is that a pretrained transformer is at its best reading something and making a judgement in one step, so that is the part worth keeping.</p>
+
+<div class="callout info"><span class="lab">The trade in one line</span>As TypeSafe put it, &ldquo;instead of sacrificing size, we sacrificed text generation for composability.&rdquo; Jev is not a small model and not an LLM. It gives up generation and gets speed, cost and a clean interface in return.</div>
+
+<h3>The three question types map onto three control-flow constructs</h3>
+<p>Jev has exactly three primitives, and each maps cleanly onto code you already write:</p>
+<ul>
+<li><strong>Choice</strong> &rarr; a <span class="mono">switch</span> on an enum. Up to 255 options, each with a description and criteria you supply at request time. You get back the chosen option and the full distribution.</li>
+<li><strong>Score</strong> &rarr; a sort or a threshold. Ordered levels low to high; you get the expected value and the spread, so you can sort by it.</li>
+<li><strong>Noul</strong> &rarr; an <span class="mono">if</span>. A yes/no question returning a single probability.</li>
+</ul>
+
+<p>Two consequences matter more than the primitive list. First, <strong>the labels live at request time</strong>, not in training: the options, their descriptions and the criteria all arrive with the call, so unlike a classic classifier the model was never trained on your specific categories and needs no training step on your side. Second, <strong>everything is a probability</strong> — even a Choice's chosen value is just the top of a distribution you also receive in full, which is what lets you set thresholds instead of trusting a single label.</p>
+
+<h3>Why this pattern suddenly needed its own models</h3>
+<p>The blunt version of the criticism is fair: <em>this is a zero-shot classifier, and encoders have done that for years.</em> What changed in September 2026 is not the idea but the packaging. Three things made decision models worth a dedicated architecture:</p>
+<ul>
+<li><strong>Cost at scale.</strong> TypeSafe's own figures — $0.042 per million input tokens with output free — make &ldquo;run everything through a model&rdquo; viable for dark data nobody could previously afford: 500 emails classified for 3.5&nbsp;cents, internal linking across 586 pages for $0.21.</li>
+<li><strong>Latency in a loop.</strong> Real-time uses — a browser agent choosing the next action, a game frame scored before the next render — need a decision inside a frame budget, which a decode loop cannot meet.</li>
+<li><strong>Thresholds that mean something.</strong> Once a decision drives an automated action, the number has to be trustworthy. If a model says 0.95 about things that are true only 70% of the time, every threshold you set is wrong. This is the actual novelty, and it is a training-target problem, not an inference one — which is why it gets its own chapter.</li>
+</ul>
+
+<h2 class="ch" id="s2"><span class="chno">02</span> — What Jev actually is</h2>
+<p class="ch-sub">A closed, hosted service with an open interface — and the one number its clones cannot match.</p>
+
+<p>Jev launched on 15 September 2026 and had a 100,000-person waitlist within a week. It is closed: no weights, no paper, no reward function, no training code. What <em>is</em> public is the interface, and it is that interface the open ecosystem copied.</p>
+
+<p>The performance that got the attention: <strong>70&ndash;500&nbsp;ms per call</strong>, output tokens that cost nothing, and a latency profile that is <em>flat in the number of questions and options</em> (2 options 76&nbsp;ms, 200 options 75.5&nbsp;ms; 5,000 questions on a 22.8k-token state in 1.8&nbsp;s) and <strong>linear only in the length of the state</strong> (~59&nbsp;ms + 5.5&nbsp;ms per 1k tokens). That signature — flat in questions, linear in state — is the entire architecture story in one observation, and Chapter 4 unpacks it.</p>
+
+<h3>RLCD: the training target, not an algorithm</h3>
+<p>TypeSafe trains Jev with something it calls <strong>RLCD</strong> — Reinforcement Learning for Calibrated Decisions. The name invites the wrong reading. On the Latent Space podcast Almeida pushed back on the idea that it names an algorithm, comparing it to &ldquo;RLHF&rdquo;: that term now names a <em>task</em> (instruction following), not the PPO algorithm from the original paper. RLCD names a north star the same way.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Target</th><th>North star</th><th>Reward</th><th>Output</th></tr></thead>
+<tbody>
+<tr><td>RLHF</td><td>Please humans</td><td>A preference model trained on rater comparisons</td><td>Free text</td></tr>
+<tr><td>RLVR</td><td>Pass a verifier</td><td>A programmatic check: tests pass, answer matches</td><td>Free text, often long chains of thought</td></tr>
+<tr><td><strong>RLCD</strong></td><td><strong>Be reliable for programs</strong></td><td><strong>Agreement between stated probability and actual outcome</strong></td><td><strong>Typed values + a probability for every option</strong></td></tr>
+</tbody>
+</table></div>
+
+<p>A model is <em>calibrated</em> when, across everything it called 80% likely, about 80% actually happens. That is a property of groups of predictions, not of any single answer, and TypeSafe's own docs say so. The standard summary statistic is ECE (expected calibration error): bucket predictions by stated confidence and average the gap between confidence and observed accuracy. Zero is perfect.</p>
+
+<p>The argument for why RLHF actively destroys this is the most interesting part. A model trained to emit long strings for a reward model faces a lopsided penalty: a visible error — a wrong fact stated plainly — is easy to catch and punished hard, while a subtle error that reads well is barely punished. The safest policy under that reward is to be <strong>hyperconfident</strong>: put nearly all the probability on the most typical answer and drop the alternatives. Almeida compares it to GANs, which learned to make sharp images by mode dropping. Chat models are the GAN in this analogy; that is why you cannot simply read the softmax of a chat model and call it a decision model.</p>
+
+<p>RLVR does not help either, and the math is short. Suppose the true rate of an answer is <span class="mono">q = 0.7</span> and the model reports <span class="mono">p</span>. A 0/1 reward on a sampled answer is a straight line in <span class="mono">p</span>, so its maximum is at <span class="mono">p = 1.0</span> — it pushes toward certainty regardless of the truth. A log score peaks at <span class="mono">p = 0.7</span>, and so does the Brier score. Rewards with that property are called <strong>strictly proper scoring rules</strong>, and since RLCD's stated goal is probabilities that match outcome frequencies, some proper scoring rule is almost certainly at its core — the one thing the community broadly agrees on.</p>
+
+<div class="callout warn"><span class="lab">Where the &ldquo;reinforcement&rdquo; probably lives</span>When the correct answer is known, the gradient of the log score is just ordinary cross-entropy — no policy gradients or PPO required. So the reinforcement, if any, is in <em>where outcomes come from</em>: environments where the model's own action changes what happens next (games, browser agents), delayed outcomes shared across questions, and above all the <strong>data loop</strong> — generate tasks, find where the model is miscalibrated, generate more tasks there, retrain. TypeSafe says the moat is data, all of it synthetic and built for breadth rather than to mirror real traffic.</div>
+
+<h3>The number the clones cannot match</h3>
+<p>Open reproductions match Jev's accuracy and even its average calibration error on their own benchmarks. What they cannot yet match is <strong>confidence ordering</strong> — how well it ranks its right answers above its wrong ones. That ranking decides how much work you can safely automate at a given error budget, and temperature scaling cannot fix it, because re-scaling a ranking that is already wrong keeps it wrong. It is the honest reason to still reach for the hosted model, and it is measured in Chapter 11.</p>
+
+<h2 class="ch" id="s3"><span class="chno">03</span> — The architecture, decoded</h2>
+<p class="ch-sub">Nobody has Jev's weights. A black-box reconstruction converged on a design the clones now share.</p>
+
+<p>TypeSafe has said only that it is &ldquo;a new model architecture, a parallel sampler, and a training method we call RLCD.&rdquo; Everything else comes from outside. The most-cited source is Archer Hume's September 2026 essay <em>Jev's Architecture Unmasked</em>, built on roughly 10,000 API probes, and it is worth pausing on how such a reconstruction is even possible: you can learn a great deal about a black box by varying one input at a time and measuring. Latency is the primary instrument.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Probe</th><th>Result</th><th>What it implies</th></tr></thead>
+<tbody>
+<tr><td>Plant a &ldquo;secret code&rdquo; in a sibling question vs in the state</td><td>Sibling P&nbsp;=&nbsp;0.00 (5/5); state 0.90&ndash;0.92</td><td>Questions cannot see each other; all of them see the state</td></tr>
+<tr><td>Latency vs number of options</td><td>2 options 76&nbsp;ms, 200 options 75.5&nbsp;ms</td><td>Options are read as a list, not decoded one at a time</td></tr>
+<tr><td>Latency vs number of questions</td><td>5,000 questions on a 22.8k-token state in 1.8&nbsp;s</td><td>State computed once; branches batched</td></tr>
+<tr><td>Latency vs state length</td><td>Linear: ~59&nbsp;ms + 5.5&nbsp;ms per 1k tokens</td><td>One prefill over the state</td></tr>
+<tr><td>Add a junk option that itself scores 0.00</td><td>Odds between real options still shift (10/10)</td><td>Options are read as a list, not scored independently</td></tr>
+<tr><td>Reverse the option order</td><td>P(tech support) 0.84&ndash;0.89 &rarr; 0.93&ndash;0.96</td><td>Order-sensitive: shuffle options when you calibrate thresholds</td></tr>
+</tbody>
+</table></div>
+
+<p>What that converges on is not exotic. The base is almost certainly a pretrained causal transformer — the tokenizer's closest public match is the Qwen family, matching 348 of 415 probes — post-trained end to end for the decision interface. The novelty is not in the trunk; it is in the <strong>serving and readout design on top of it</strong>, which is exactly why a weekend was enough to copy the <em>interface</em> and why the <em>quality</em> (which lives in the data) was not.</p>
+
+<h3>The shared recipe</h3>
+<p>Every model in this article implements some subset of the same six moves. This is the mental model to carry through the rest of the piece:</p>
+<ol>
+<li><strong>Encode the state once.</strong> The state sits at the start of the prompt and is prefilled a single time into the KV cache.</li>
+<li><strong>Turn every question into multiple choice.</strong> Each candidate answer is mapped to one uppercase letter, and the tokenizer is checked at request time so every letter is exactly <em>one</em> token in context. 26 letters &rarr; at most 26 answer slots per question (more only by splitting into stages).</li>
+<li><strong>Branch the questions off the shared state.</strong> The branches reuse the state's cache cells rather than copying them, and their text runs together in one unpadded micro-batch.</li>
+<li><strong>Read only the answer letters.</strong> One position per question: the logits of the allowed letters, nothing else. Nothing is sampled.</li>
+<li><strong>Turn logits into typed output in plain code.</strong> Softmax, optional temperature, expected values for scores and numbers, abstention policy, schema-validated JSON. No decode loop, no output parsing, no JSON repair.</li>
+<li><strong>Calibrate per domain.</strong> Fit a temperature on labelled data from your own traffic, bound to the exact weights, precision, runtime and prompt version.</li>
+</ol>
+
+<div class="callout ok"><span class="lab">Why &ldquo;zero generated tokens&rdquo; is still not zero latency</span>Prefill and the question branches still cost compute. Rizzo Flow measures about 50&nbsp;ms for one short decision and about 1&nbsp;s for 21 questions over a 2,000-token state on an RTX 5060 Ti at 8-bit. The saving is that you never pay the <em>sequential</em> cost of a decode loop — the part that scales with how long the answer is.</div>
+
+<h2 class="ch" id="s4"><span class="chno">04</span> — How the KV cache works</h2>
+<p class="ch-sub">Prefill once, share the cells, read one position. This is the mechanism the whole family is built on.</p>
+
+<p>In a normal transformer, every token you <em>generate</em> adds a row to the key/value cache: the model appends a token, attends over everything cached so far, and repeats — one sequential forward pass per output token. The cache grows as you talk, and the wall-clock time is set by the length of the answer. That is the cost structure decision models are designed to delete.</p>
+
+<p>A System One model breaks it in three places, and it is worth understanding each because they explain almost every latency number in this article.</p>
+
+<figure>
+  <img src="system-one-kv-cache-flow.png" alt="Diagram of the shared KV cache: the state is prefilled once into the cache, every question branches off those same cells in one unpadded micro-batch, and the answer is read from the logits of the allowed option letters at a single position, which leaves each question unable to read a sibling question's contents" width="2160" height="2124" loading="lazy" decoding="async">
+  <figcaption>The whole mechanism in one picture. The state is charged once, the questions share its cells rather than copying them, and nothing is generated — so the cache never grows while the model answers. That is why latency is flat in the number of questions and options, and linear only in the length of the state.</figcaption>
+</figure>
+
+<h3>1. The state is prefilled exactly once</h3>
+<p>Because every question branches from the same state, and because <em>questions cannot see each other's answers</em> (the secret-code probe above — a code hidden in a sibling question is read at P&nbsp;=&nbsp;0.00, while the same code in the state is read at 0.9), the state's K/V cells are computed a single time and reused by every question. This is why Jev's latency is flat in the number of questions and options and linear only in state length. You pay for the state once; everything after that is nearly free.</p>
+
+<h3>2. Questions share the state's cells instead of copying them</h3>
+<p>Each question is a short suffix appended logically after the state. In Rizzo Flow's description, the branches &ldquo;share the state's KV cache cells instead of copying them,&rdquo; and their texts run together in one unpadded micro-batch. The cost of N questions is therefore <strong>one prefill plus a handful of micro-batches</strong>, not N full passes. Rizzo Flow's own worked example: eight yes/no questions over a 218-token contract cost <em>one prefill plus two micro-batches</em>, 136&nbsp;ms of inference in total, rather than eight separate passes. SemIf reports the same effect from the other direction — reusing one long state across many criteria lifted throughput from <strong>2.33 to 20.03 decisions per second</strong>.</p>
+
+<div class="callout info"><span class="lab">Two ways to implement it — pick deliberately</span><strong>Shared-context (parallel) scoring</strong> — process the shared context once, then score all fields/questions in parallel. This is what Rizzo Flow, Jev and Nimble's MLX <span class="mono">ParallelScorer</span> do, and it is the cheapest. <strong>Per-field full-prompt scoring</strong> — score each field with the full prompt, re-processing the shared context every time. Simpler to implement, measurably slower; Nimble's CUDA scorer documents exactly this trade, so on CUDA it re-reads the context per field while the MLX path reads it once.</div>
+
+<h3>3. There is no decode loop — the answer is a single position</h3>
+<p>This is the part that makes the cache <em>stop growing</em>. Each candidate answer is one token, and the model reads the logits over the allowed answer letters at the last prompt position for that question. Softmax those logits and you have the distribution. Nothing is sampled, so there is no output token to append, so the cache does not grow while the model is &ldquo;answering.&rdquo; &ldquo;Zero generated tokens&rdquo; is not marketing — it is a statement about the compute graph.</p>
+
+<h3>What it means for memory</h3>
+<p>Because the cache is sized by the state and not by the number of questions, adding questions is nearly free in memory; what costs memory is how long the state is. Rizzo Flow publishes the figure: on its 4B model the KV cache costs roughly <strong>144 KiB per token</strong>, reserved at startup — about 1.4&nbsp;GiB at the default 8,192-token limit and about 4.8&nbsp;GiB at 32k. That is the real ceiling on how large a state you can afford, and it is why several projects cap the state and reject oversized inputs rather than silently truncating them.</p>
+
+<p>Two practical corollaries fall out of this, and both come straight from TypeSafe's own usage advice:</p>
+<ul>
+<li><strong>Put long context in the state once, then ask about it by ID.</strong> Because the state is charged a single time, a long conversation or log can go into the state with an ID on every message, and you then ask one cheap question per ID.</li>
+<li><strong>Keep arithmetic, dates and counting in code.</strong> TypeSafe's own &ldquo;jaggedness&rdquo; page lists math, counting and date comparison as weaknesses. Compute the number of days in Python, put the result in the state, and ask the model only about the result.</li>
+</ul>
+
+<h3>The encoder shortcut: no cache at all</h3>
+<p>Laya and Von sidestep the KV cache entirely by using a <em>bidirectional encoder</em> instead of a causal decoder. A bidirectional pass has no notion of &ldquo;what comes next&rdquo;, so there is no cache to grow and no decode loop to avoid — one non-causal forward pass produces everything. That is why they are the CPU-friendly end of this table: a 395M encoder like Von serves decisions from a CPU in under 15&nbsp;ms with no GPU and no cache management. The trade is context length and world knowledge; the causal-decoder models read much longer, richer state.</p>
+
+<figure>
+  <img src="system-one-eight-models.png" alt="Grid of the eight System One decision models: Jev hosted and closed, Von and Laya on ModernBERT encoders, Kev and SemIf on Qwen bases, Nimble as a published data recipe, Rizzo Flow on llama.cpp, and NanoJev at 0.6B for control loops" width="2160" height="2241" loading="lazy" decoding="async">
+  <figcaption>The cast, before the per-model chapters. The interface is the same everywhere; the bets underneath are not — hosted and closed, an encoder with no cache at all, LoRA on a causal trunk, or no training at all. Star counts and repository figures were read on 6 October 2026.</figcaption>
+</figure>
+
+<h2 class="ch" id="s5"><span class="chno">05</span> — Jev</h2>
+<p class="ch-sub">Closed, hosted, and still the accuracy reference. The one to measure against, not to run.</p>
+
+<div class="tblwrap"><table>
+<tbody>
+<tr><th>Backbone</th><td>Undisclosed; a pretrained causal transformer, Qwen-family tokenizer is the closest public match</td></tr>
+<tr><th>Interface</th><td>Typed questions: Choice (up to 255 options), Score (ordered levels), Noul (yes/no)</td></tr>
+<tr><th>Training</th><td>RLCD — a proper scoring rule over synthetic data</td></tr>
+<tr><th>Latency / price</th><td>70&ndash;500 ms per call; $0.042 per M input tokens; output free</td></tr>
+<tr><th>Availability</th><td>Closed, hosted, waitlist</td></tr>
+<tr><th>Independent score</th><td>0.966 macro accuracy on the 49-task jabr benchmark</td></tr>
+</tbody>
+</table></div>
+
+<p>Jev's place in this article is as the reference point. You cannot self-host it, you cannot read its weights, and you should treat its published numbers — and every clone's — as self-reported. But it is the model every other project benchmarks against, and it is the one whose <em>interface</em> the rest of them reproduce, so understanding its usage pattern is what lets you understand the clones.</p>
+
+<p>The usage pattern is where Jev is genuinely opinionated. The advice is to <strong>decompose, then threshold</strong>: rather than asking &ldquo;should I refuse here?&rdquo;, ask a separate specific question for each situation where you would want to refuse, then combine the answers in code. Each question gets its own threshold, set from real labelled examples, and the threshold should scale with the cost of being wrong — above it code acts, below it the case goes to a human, a bigger model, or a request for more context. That turns prompt tuning back into ordinary software engineering: when the model misses a case, you add a question and a test case, and it stays fixed.</p>
+
+<p>There is also one evaluation of Jev that is neither a vendor claim nor a community probe: a University of Bonn, Lamarr Institute and Fraunhofer IAIS group ran jev-1.13.0 zero-shot over <strong>37 public datasets and 346,009 requests for under $10 of API spend</strong>, with Qwen3.8-27B and Gemma-4-E4B scored on identical requests as controls. Jev beat Qwen3.8-27B on 27 of the 37 datasets, reached 95&ndash;99% accuracy on IMDB, SST-2, HellaSwag and ARC, and 86.7% on Belebele across 122 languages. Its choice probabilities came out well calibrated and supported selective prediction — the first third-party confirmation of the property this whole category is sold on — with one caveat worth knowing: the binary probabilities rank well but sit poorly against a fixed 0.5 threshold, so a hardcoded cutoff on a Noul is the wrong way to read them. The losses cluster where the vendor's own weakness list says they do, on fine-grained, noisy and rubric-style labels. One result cuts the other way, though: Jev answered MMLU's calculation-heavy questions <em>more</em> accurately than the rest (94% vs 91%), where both open models found them harder, and the authors treat that as a possible sign of memorisation rather than as evidence of arithmetic skill.</p>
+
+<div class="callout warn"><span class="lab">Where Jev is weak</span>System Two work — multi-step maths, planning — and literal reading. TypeSafe publishes a &ldquo;jaggedness&rdquo; page listing maths, counting and date comparison as weaknesses. The weakest reported category was trading bots, which several people measured at worse than a coin flip.</div>
+
+<h2 class="ch" id="s6"><span class="chno">06</span> — Laya and Von: the encoder end</h2>
+<p class="ch-sub">Two ModernBERT backbones that answer from a CPU, and the star-count trap.</p>
+
+<h3>Laya — the one everybody starred</h3>
+<p>Laya is the flagship by attention: <strong>31,100 GitHub stars</strong> read from the GitHub API on 6 October 2026, Apache-2.0, published on 18 September 2026 by Nandakishor M — the weights under the Convai Innovations organisation, the code repository under his own account — and the only one of the eight you install with a single <span class="mono">pip install laya</span>. Its <strong>421M parameters sit on a ModernBERT-large backbone with a decision head on top</strong>, and a 322M multilingual checkpoint covers 100+ languages, with a router that picks between them by detecting the script in under a millisecond.</p>
+
+<p>Its speed is the selling point: <strong>39.5&nbsp;ms per question on a Tesla T4</strong>, or 7.2&nbsp;ms with ten batched. On an M3 Pro with no GPU acceleration, the README quickstart measured 66&nbsp;ms median for all three questions in one pass. Version 0.3.7 cut checkpoint loading roughly tenfold and added <span class="mono">laya-serve</span>, a FastAPI server speaking the same <span class="mono">POST /v1/systemone</span> protocol as Jev.</p>
+
+<div class="callout danger"><span class="lab">Read the fine print on the headline number</span>Laya's README is unusually candid: its <em>base</em> checkpoints score 0.362 and 0.342 on the typed-decisions benchmark against a 0.318 random baseline and a 0.461 majority-class baseline — near chance. The headline 0.766, which beats Jev's published 0.727, comes from <span class="mono">laya-typed-decisions</span>, fine-tuned on that benchmark's own training split. Treat Laya as a fast base you specialise on your own data, not a zero-shot replacement. It is also weak on large option sets: 0.425 against Jev's 0.870 on Banking77's 77 labels, because the options share a fixed 192&ndash;256 token budget and each label only gets three or four tokens.</div>
+
+<h3>Von — the accuracy leader nobody starred</h3>
+<p>Von sits at the other end of the attention-to-quality curve. It is a <strong>395M non-autoregressive model on a ModernBERT-Large encoder</strong> (Apache-2.0), which — being an encoder — picks an option, judges a condition or rates a level in <strong>one bidirectional forward pass</strong>, serves from a CPU in under 15&nbsp;ms, and ships Python and TypeScript clients as <span class="mono">von-sdk</span> on pip and npm behind a <span class="mono">/v1/systemone</span> server. On the independent benchmark it is the <em>best open entrant</em> at 0.720 — with 857 stars against Laya's 31,100, which is the clearest reminder in this whole article that stars measure attention, not accuracy.</p>
+
+<p>Von's recorded failure mode is worth naming because it is representative of encoder-based decision models generally: it <strong>collapses to one mode on unfamiliar domains</strong> — given state it was not built for, it keeps returning the same answer. Encoder models have less world knowledge to fall back on than a 9B causal trunk, and that shows up as exactly this kind of collapse.</p>
+
+<h2 class="ch" id="s7"><span class="chno">07</span> — Kev, Nimble and SemIf: the drop-in middle</h2>
+<p class="ch-sub">Qwen backbones, Jev's exact wire format, and the most careful evaluations of the group.</p>
+
+<h3>Kev — the drop-in with the honest evals</h3>
+<p>Kev is a family of <strong>rank-16 LoRA adapters plus a small pointer head on Qwen3.5 (and Qwen3.8) bases at 0.8B, 4B and 9B</strong>, from Jared Palmer, Apache-2.0 at 8,556 stars (GitHub API, 6 October 2026). Its crucial property is that it serves TypeSafe's own <span class="mono">POST /v1/systemone</span> contract, so the official SDK works against it after changing a base URL — code written for the hosted API points at <span class="mono">localhost</span> instead.</p>
+
+<p>Kev publishes the most careful evaluation of the group, including where it loses: Kev-9B scores <strong>0.822 on held-out new sources against Jev's 0.857</strong>, its confident-error rate is 4.0% against 3.7%, and the share of decisions you could automate at a 5% error budget is 0.45&ndash;0.57 against Jev's 0.70. Knowledge questions are the big gap — MMLU 0.74 against 0.90 — and that gap belongs to the base model, not the adapter.</p>
+
+<p>Its data recipe is the part worth stealing. Kev builds examples as <strong>minimal pairs with labels computed by code</strong>: write the rule, generate the facts, compute the correct label, then render it as text — and for every example create a variant that changes one decisive fact so the label flips. It adds a third variant that <em>removes</em> the decisive fact entirely and trains toward a uniform distribution, which is what teaches a model not to be confident when the evidence is not there. The measured effect: of items that are genuinely unknowable, Kev-9B answered only <strong>5% at &ge;&nbsp;0.9 confidence</strong>, against 9% for Jev and 26% for an earlier Kev without those records.</p>
+
+<h3>Nimble — the open recipe, contrastive data and all</h3>
+<p>Bespoke Labs' Nimble is explicitly <strong>a data, model and recipe</strong> rather than a product: <em>&ldquo;we did not distill from Jev. The point is to show how to curate data, how to train, and to serve such a model.&rdquo;</em> It applies LoRA to <strong>Qwen3.5-9B</strong> (rank 16, learning rate 5e-5, effective batch 8, one epoch, BF16) and was built in a day. The latest checkpoint takes an 8,192-token context and up to 255 choices per field.</p>
+
+<p>Its serving section documents the KV behaviour in plain language: <em>&ldquo;Process the context and schema once (prefill the KV-cache), then obtain the scores for the tokens we care about.&rdquo;</em> Its <span class="mono">ParallelScorer</span> on MLX processes the shared context once and scores all fields in parallel; its CUDA scorer scores each field on its own with the full prompt each time. Because each field is scored separately, one field cannot see the answer to another.</p>
+
+<p>The contribution is <strong>contrastive data curation</strong>: write two examples that are nearly identical, differing in one relevant fact (at most eight words changed in Nimble's recipe), where that difference changes the correct answer. From the pairs, the model learns <em>which evidence should change its decision</em>. On its 324-example held-out set, Bespoke-Nimble-9B matched 292 (90.12%) against Jev 1.13.0's 302 (93.21%) — 17 more than the untuned 27B it was compared against, and 10 fewer than Jev. The authors are blunt that the labels are synthetic and the test is narrow, from only six source families.</p>
+
+<h3>SemIf — no new model, just read the logits</h3>
+<p>SemIf (formerly OpenJev) makes the purest argument: <strong>take a frozen open-weight model you already host, declare your options, and read their probabilities off the logits without sampling a single answer token.</strong> It trains nothing. On one RTX 3090 with a frozen Qwen3.5-4B, one state and 21 binary criteria, direct typed logits took <strong>1.023&nbsp;s with zero output tokens</strong>, while an autoregressive JSON array of the same 21 answers took 5.332&nbsp;s and 111 output tokens — <strong>5.21&times; longer</strong>. Reusing one long state across many criteria pushed throughput from 2.33 to 20.03 decisions per second.</p>
+
+<p>On quality, its 4B baseline reaches 0.845 modal agreement with TypeSafe's published results against Jev's 0.883 on a 102-row aligned subset, and a quantized Qwen3.8-27B bridge hits 0.958 balanced accuracy on 144 authored decisions. It wants a GPU that holds a 4B model in BF16, but there is a llama.cpp CPU backend, MLX and MPS for Apple Silicon, and a WebGPU demo that runs in a browser tab. Its native context claim is the largest here: Qwen3.5-4B supports 262k tokens natively (about 1M with YaRN), though SemIf's default limit is 4,096.</p>
+
+<div class="callout info"><span class="lab">The one-line summary of this trio</span><strong>Kev</strong> if you want your existing Jev code to keep working untouched. <strong>SemIf</strong> if you already run an open-weight model and want decisions from it for free. <strong>Nimble</strong> if what you actually want is the data-curation recipe to train your own.</div>
+
+<h2 class="ch" id="s8"><span class="chno">08</span> — Rizzo Flow and NanoJev: two special cases</h2>
+<p class="ch-sub">One optimised for developer ergonomics and honest numbers; one built for the tightest loop of all.</p>
+
+<h3>Rizzo Flow — the most transparent of the eight</h3>
+<p>Rizzo Flow is a local-first implementation of Jev's <em>programming model</em> — by its own statement it does <strong>not</strong> reproduce Jev's proprietary architecture or its RLCD training. It reproduces the interface with an open model and, since 25 September 2026, its own LoRA fine-tune for typed decisions. The default is <strong>Spark-X2.5-4B</strong> (Apache-2.0, from XHToken), with a 1.7B sibling; it runs on <strong>llama.cpp</strong>, so the hardware can be an Apple, NVIDIA, AMD or Intel GPU, or no GPU at all.</p>
+
+<p>The KV story is documented better here than anywhere else. The state sits at the start of the prompt and is prefilled once; every question branches from it and the branches <strong>share the state's KV cache cells rather than copying them</strong>; the branch texts run in one unpadded micro-batch. The README even draws it:</p>
+
+<pre><code>state (text or JSON)
+  └─ prefill once → KV cache
+       ├─ question 1 ─┐
+       ├─ question 2 ─┤→ logits of the answer letters only (A, B, C …)
+       └─ question N ─┘       └─ softmax → typed JSON</code></pre>
+
+<p>It reserves the cache at startup at roughly 144&nbsp;KiB per token on the 4B, and publishes benchmark numbers with their caveats attached — including a table that puts <em>its own fine-tune below Jev</em> in accuracy while beating it on probability shape. On the typed-decisions test split (400 cases, 2,000 decisions), the base Spark-X2.5-4B scored 0.574 accuracy with an ECE of 0.349; the Rizzo Flow fine-tune reached 0.648 with an ECE of 0.112, and the Q4_K_M quantisation tied Q8_0 at 0.650. Jev 1.13.0's card reports 0.727 with an ECE that is not given.</p>
+
+<p>It also ships the two demos that make the latency concrete: a playground with probability bars and timings, and <strong>Snake</strong>, where every move is one <span class="mono">POST /v1/decisions</span> — 140 moves in 25.6&nbsp;s, about 5.5 per second, roughly 150&nbsp;ms per round trip and zero generated tokens. One caveat the author adds himself: with only the ASCII grid the 4B model died within 26 moves, because a 4B model does not read a grid spatially — the game had to hand it pre-computed sensors and leave only the choice to the model.</p>
+
+<h3>NanoJev — 0.6B, for control loops, and the one that beats Jev at something</h3>
+<p>NanoJev is the outlier and the only project here with published evidence of beating Jev outright. It is a <strong>Qwen3-0.6B backbone with decision heads</strong> trained on four game environments, aimed squarely at the control-loop case behind TypeSafe's own Doom demo — a decision inside a frame budget.</p>
+
+<p>On the held-out test set, one shared checkpoint scores <strong>128/128 on ViZDoom Basic against Jev's 56/128</strong>, and 27/128 on the harder Predict Position task against Jev's 11/128. It solves a 50&times;50 maze in 225 attempts where Jev needs 2,738 — though Jev still wins that maze test set 7/10 to 4/10, and the two tie 8/8 on Snake.</p>
+
+<div class="callout warn"><span class="lab">Read that for exactly what it is</span>A model trained on 18,760 decision questions from four games, evaluated on those <em>same four games</em>, with weights and dataset public. That is strong evidence a 0.6B purpose-trained model can outrun a frontier decision API inside a tight loop, and <strong>no evidence at all</strong> that it will triage your support tickets. Its inference script also expects CUDA, so there is no Apple Silicon path today.</div>
+
+<h2 class="ch" id="s9"><span class="chno">09</span> — Hosting them yourself</h2>
+<p class="ch-sub">Concrete paths for each model, plus the interface trick that makes migration a one-line change.</p>
+
+<p>The single most useful fact for hosting any of these is that most of them speak <strong>TypeSafe's own <span class="mono">POST /v1/systemone</span></strong> contract. Kev, Rizzo Flow, Von, Laya and SemIf all expose it, which means code written against the hosted API survives the move to localhost by changing a base URL — and a shadow-traffic migration becomes possible: point a copy of production at the local server, log what it <em>would</em> have decided, and compare it against what Jev actually returned.</p>
+
+<h3>Pick your runtime by hardware</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>You have</th><th>Use</th><th>Models that fit</th></tr></thead>
+<tbody>
+<tr><td>No GPU / laptop CPU</td><td>Encoder (ONNX/CPU) or llama.cpp CPU</td><td>Von (&lt;15 ms), Laya (66 ms M3 Pro), SemIf (llama.cpp CPU)</td></tr>
+<tr><td>Apple Silicon</td><td>MLX / Metal</td><td>Kev (47 ms), Nimble (<span class="mono">ParallelScorer</span>), Laya, Rizzo Flow</td></tr>
+<tr><td>NVIDIA GPU</td><td>llama.cpp CUDA, or SGLang for scale</td><td>Rizzo Flow (tested on RTX 5060 Ti), Kev, Nimble (<span class="mono">CudaScorer</span>), SemIf</td></tr>
+<tr><td>AMD / Intel GPU</td><td>Vulkan, ROCm/HIP or SYCL via llama.cpp</td><td>Rizzo Flow (Vulkan tested; ROCm/SYCL builds on request)</td></tr>
+</tbody>
+</table></div>
+
+<h3>Rizzo Flow — four commands</h3>
+<p>The most self-contained quickstart in the group; nothing is compiled and no GPU toolkit is installed, because it downloads a prebuilt llama.cpp runtime for your machine.</p>
+<pre><code>git clone https://github.com/Rizzo-AI-Academy/rizzo-flow &amp;&amp; cd rizzo-flow
+uv sync --locked            # four small Python packages, seconds
+uv run rizzo download       # llama.cpp runtime + Rizzo Flow 4B Q8_0 (~4.4 GB)
+uv run rizzo serve          # → http://127.0.0.1:8017/playground</code></pre>
+<p>Then call it — the state goes in once, the questions come back as probabilities:</p>
+<pre><code>curl http://127.0.0.1:8017/v1/systemone \
+  -H 'Content-Type: application/json' \
+  -d '{"state": "Help! My payouts have been failing for 3 days.",
+       "model": "rizzo-latest",
+       "questions": {"is_urgent": {"type": "noul",
+         "instructions": "Does this convey urgency?"}}}'</code></pre>
+<p>A 1.7B option (<span class="mono">--size 1.7b</span>, 1.8 GB) loads faster but loses accuracy; the Q4_K_M 4B at 2.6 GB is the better small choice. Set <span class="mono">RIZZO_API_KEY</span> before starting to require bearer auth, and note that the servers are open by default.</p>
+
+<h3>Kev — swap one URL</h3>
+<pre><code>git clone https://github.com/jaredpalmer/kev.git &amp;&amp; cd kev
+uv sync --extra serve
+KEV_DTYPE=bf16 uv run --extra serve python -m kev.serve --run jaredpalmer/kev-0.8b --port 8009</code></pre>
+<p>The official TypeSafe SDK then points at <span class="mono">http://localhost:8009</span>. Set <span class="mono">KEV_API_KEY</span> before exposing the port.</p>
+
+<h3>Nimble — prepare weights, then score</h3>
+<p>Nimble needs a one-time merge step because its MLX runner cannot load a LoRA adapter folder directly (and does not support quantised weights). Unquantised, the 9B weights alone are about 18 GB, and the merge needs extra RAM and disk on top.</p>
+<pre><code>python3.12 -m venv .cache/venvs/nimble &amp;&amp; source .cache/venvs/nimble/bin/activate
+python -m pip install torch==2.8.0 -r requirements/training.txt
+# download + merge the adapter once, then:
+python -c "from nimble.scoring.parallel_scorer import ParallelScorer; ..."  # MLX path</code></pre>
+
+<h3>Laya and Von — the CPU endpoints</h3>
+<pre><code>pip install laya          # then: laya-serve  (FastAPI on /v1/systemone)</code></pre>
+<pre><code>pip install von-sdk       # or: npm i von-sdk</code></pre>
+
+<h3>SemIf — read logits off a model you already run</h3>
+<p>If you already serve Qwen3.5-4B, SemIf adds no weights to download; it is a baseline that reads typed option probabilities straight from that model's logits. CPU, MLX/MPS and a browser WebGPU demo are all supported.</p>
+
+<div class="callout warn"><span class="lab">Security and operations, briefly</span>These local servers are <strong>open by default</strong> — bind them to loopback and set the API key before you tunnel or expose them. Pin your runtime: Rizzo Flow pins llama.cpp to a specific release and the GGUF files by commit and sha256, and its bindings are tied to one header commit. And remember that quantisation and hardware <em>change probabilities</em>: CUDA, Vulkan and Metal round differently, so a calibration is bound to the exact runtime, backend and file it was fitted on.</div>
+
+<h2 class="ch" id="s10"><span class="chno">10</span> — Using them in agents</h2>
+<p class="ch-sub">Where a decision model belongs in a harness — and the four families people actually shipped.</p>
+
+<p>Decision models do not replace an agent's reasoning model. They replace the <em>small, repeated, boring</em> calls that sit around it, and this is where they earn their keep. TypeSafe sorts reported use into four families, and the community added a fifth within days:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Family</th><th>What it looks like</th><th>Reported example</th></tr></thead>
+<tbody>
+<tr><td><strong>Dark data</strong></td><td>Classify or tag piles nobody could afford to run an LLM over</td><td>500 emails for 3.5&nbsp;cents; SEO internal linking across 586 pages for $0.21</td></tr>
+<tr><td><strong>Coding agents</strong></td><td>Routing, skill selection, guardrails inside a harness</td><td>A model router; shell-command risk checks (&ldquo;irreversible&rdquo; at low confidence &rarr; ask a human)</td></tr>
+<tr><td><strong>Real-time</strong></td><td>A decision inside the loop, under a latency budget</td><td>Browser agent booking flights in 7&nbsp;s for $0.0039; Doom at about 10 calls/s</td></tr>
+<tr><td><strong>Verify everything</strong></td><td>Cheap typed checks on another model's output</td><td>PR review with 14 typed checks at $0.00007 per PR</td></tr>
+<tr><td><strong>Smart software</strong></td><td>The model as a programming primitive</td><td>Voice-controlled computer use; language features as decision calls</td></tr>
+</tbody>
+</table></div>
+
+<h3>The four integration patterns that matter</h3>
+<p>Almost every agent use reduces to one of these, and each maps to a specific mechanism in the architecture:</p>
+<ol>
+<li><strong>Routing.</strong> A <span class="mono">Choice</span> over your destinations, with the destination descriptions sent at request time. Because the labels live in the request, you add a new route by editing a dictionary, not by retraining. This is the pattern that turned a Claude Code-style harness into a tiered system: cheap decisions local, hard work to the frontier model.</li>
+<li><strong>Guardrails.</strong> A <span class="mono">Noul</span> per risky action (&ldquo;is this shell command irreversible?&rdquo;), with a threshold set from labelled examples. The rule from Chapter 5 applies directly: ask <em>many</em> specific questions rather than one vague one, because each gets its own threshold and a miss becomes a missing question you can add and test.</li>
+<li><strong>Verification.</strong> Cheap typed checks over another model's output — the &ldquo;14 checks per PR&rdquo; pattern. This is where the cost asymmetry is most extreme: a decision costs a fraction of a cent and returns a schema-guaranteed answer, so you can afford to check every step of an expensive chain instead of sampling.</li>
+<li><strong>Per-message judgement.</strong> Put a long conversation or log in the state <em>once</em> with an ID per message, then ask one question per ID. The KV economics from Chapter 4 make this nearly free, and it is the clearest example of why the shared-cache design exists.</li>
+</ol>
+
+<div class="callout ok"><span class="lab">The one architectural consequence for harnesses</span>Because questions are isolated — a sibling's answer cannot influence another question — you can ask dozens of independent questions in one request and combine them in code. That is the opposite of chain-of-thought, where each step must see the last. It means your harness gets parallelism for free, and it means consistency across questions is <em>your</em> job: the models cannot check that &ldquo;department = billing&rdquo; and &ldquo;needs human review = false&rdquo; are jointly sensible. Validate combinations in code.</div>
+
+<h2 class="ch" id="s11"><span class="chno">11</span> — Performance, honestly read</h2>
+<p class="ch-sub">Every project wins on its own benchmark. The useful number comes from somewhere else.</p>
+
+<p>This is the chapter that decides whether you adopt one of these. The trap is obvious once stated: <strong>every project benchmarks itself against Jev on a suite it chose, and every one wins on its own suite.</strong> Vendor numbers here are hypotheses, not results, and the same caution applies to TypeSafe's figures.</p>
+
+<h3>The independent benchmark</h3>
+<p>The number to remember comes from elsewhere: the jabr classifier benchmark, running <strong>49 tasks and 866 cases</strong> across compliance, triage, legal, DevOps, linguistics and safety.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>System</th><th class="num">Macro accuracy (49 tasks)</th><th>Size</th></tr></thead>
+<tbody>
+<tr><td>TypeSafe Jev (hosted)</td><td class="num">0.966</td><td>Undisclosed</td></tr>
+<tr><td><strong>Von (open)</strong></td><td class="num">0.720</td><td>395M</td></tr>
+<tr><td>GLiNER2 (open)</td><td class="num">0.684</td><td>~300M</td></tr>
+<tr><td>Laya (open)</td><td class="num">0.583</td><td>421M</td></tr>
+</tbody>
+</table></div>
+
+<p class="small">Read the suite's limits before you quote it. Its 866 cases are <em>synthetic</em> — generated and cross-checked by a committee of LLMs rather than drawn from production traffic — so they measure whether the interface works, not whether it works on your data, and the repository says plainly that nothing stops a model from training on the test cases. It also scores six backends, not four: the table above is the four with published headline numbers, and the suite additionally runs GLiNER2.5-Decide, a decision-tuned variant of GLiNER2, and jeff, a 576M GLiFormer. A smaller v1 suite of 8 tasks and 78 cases exists too, and the ordering is identical with a wider gap: Jev 0.972, Von 0.927, GLiNER2 0.785, Laya 0.619.</p>
+
+<p>That is a <strong>25-point gap on out-of-domain tasks</strong>, with a distinct recorded failure mode for each: Von collapses to one mode on unfamiliar domains, GLiNER2 over-triggers on keywords, Laya compresses rating scales. In-domain, after a fine-tune on your own labels, the open models are competitive; out-of-domain and zero-shot, they are not close. The honest framing is that <strong>these projects win on latency, price and control, not on out-of-the-box accuracy.</strong></p>
+
+<figure>
+  <img src="system-one-accuracy-latency-trade.png" alt="Horizontal bar chart of mean latency per task on the jabr v2 suite: TypeSafe Jev at 330 milliseconds and 0.966 macro accuracy, GLiNER2 at 73 milliseconds and 0.684, Von 1.1 at 53 milliseconds and 0.720, and Laya at 46 milliseconds and 0.583" width="2160" height="1380" loading="lazy" decoding="async">
+  <figcaption>The same benchmark read the other way round: what the accuracy costs you in time. Von is roughly six times faster than Jev and about 25 accuracy points behind it — and it beats GLiNER2 on both axes, which is why the recommendation in this article is Von rather than one of the other encoders. Jev costs about $0.000014 per call on this suite; the local models cost nothing but your own hardware.</figcaption>
+</figure>
+
+<h3>Their own numbers, with the caveats attached</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>Model</th><th>Backbone</th><th class="num">Reported score</th><th>The caveat</th></tr></thead>
+<tbody>
+<tr><td>Jev 1.13.0</td><td>Undisclosed</td><td class="num">0.727</td><td>Its own card; not independently re-measured; the reference others quote</td></tr>
+<tr><td>Nimble 9B</td><td>Qwen3.5-9B + LoRA</td><td class="num">90.12% (292/324)</td><td>Its own held-out set; synthetic labels; six source families</td></tr>
+<tr><td>Rizzo Flow 4B</td><td>Spark-X2.5-4B + LoRA</td><td class="num">0.648 acc / 0.112 ECE</td><td>Still below Jev's 0.727; measured on one RTX 5060 Ti</td></tr>
+<tr><td>Kev 9B</td><td>Qwen3.5-9B + LoRA</td><td class="num">0.822</td><td>Held-out new sources; MMLU gap is the base model's</td></tr>
+<tr><td>Laya (base)</td><td>ModernBERT-large 421M</td><td class="num">0.362 / 0.342</td><td>Near chance zero-shot; the 0.766 headline is fine-tuned on the benchmark's own split</td></tr>
+<tr><td>SemIf 4B</td><td>Frozen Qwen3.5-4B</td><td class="num">0.845</td><td>Modal agreement on a 102-row subset; no training at all</td></tr>
+<tr><td>NanoJev 0.6B</td><td>Qwen3-0.6B + heads</td><td class="num">128/128 ViZDoom</td><td>Trained and evaluated on the same four games</td></tr>
+</tbody>
+</table></div>
+
+<h3>The dimension that is not accuracy: calibration and ordering</h3>
+<p>If you are setting thresholds, raw accuracy is the wrong metric. What you need is <strong>how much work you can automate at a given error budget</strong>, and that depends on how well the model orders its confidence. Kev's honest numbers make the point: at a 5% error budget, Kev-9B lets you automate 0.45&ndash;0.57 of decisions against Jev's 0.70. Same ballpark of accuracy, very different amount of automation — because Jev ranks its right answers above its wrong ones better, and temperature scaling cannot fix a wrong ranking.</p>
+
+<p>Rizzo Flow's table shows the other half of the calibration story: the fine-tune did not mainly raise accuracy (+0.074, from 0.574 to 0.648), it <strong>reshaped the probabilities</strong> (ECE 0.349 &rarr; 0.112, Brier 0.480 &rarr; 0.205, KL 2.899 &rarr; 0.452). The base model put 0.9999 on its pick even when it was wrong; the fine-tune learned to spread probability when the evidence is split. That is the difference between a model you can threshold and one you cannot.</p>
+
+<h2 class="ch" id="s12"><span class="chno">12</span> — Choosing, and the calibration rule</h2>
+<p class="ch-sub">A decision table, and the one step nobody can do for you.</p>
+
+<h3>Pick by deployment story, not by star count</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>If you want…</th><th>Use</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Your existing Jev code to keep working untouched</td><td><strong>Kev</strong></td><td>Same wire API; change a base URL</td></tr>
+<tr><td>Decisions from a model you already host</td><td><strong>SemIf</strong></td><td>Trains nothing; reads logits off a frozen model</td></tr>
+<tr><td>The best open zero-shot accuracy</td><td><strong>Von</strong></td><td>Leads the independent benchmark; CPU, &lt;15&nbsp;ms</td></tr>
+<tr><td>Small, CPU-friendly, multilingual, and you will fine-tune</td><td><strong>Laya</strong></td><td>421M encoder, 100+ languages, one <span class="mono">pip install</span></td></tr>
+<tr><td>Decisions inside a tight control loop</td><td><strong>NanoJev</strong></td><td>The only project with evidence at that latency</td></tr>
+<tr><td>The data recipe to train your own</td><td><strong>Nimble</strong></td><td>Contrastive curation, published end to end</td></tr>
+<tr><td>Developer ergonomics and transparent numbers</td><td><strong>Rizzo Flow</strong></td><td>Four-command setup, documented caveats</td></tr>
+<tr><td>The accuracy reference to measure against</td><td><strong>Jev</strong></td><td>Hosted; the benchmark everyone else reports against</td></tr>
+</tbody>
+</table></div>
+
+<h3>The calibration rule</h3>
+<p>Whatever you pick, one step is non-negotiable if the probabilities are going to drive automated action: <strong>fit the temperature on your own labelled data.</strong> Even after a fine-tune, the probabilities are not calibrated for a workload the model has never seen, and thresholds designed for Jev's confidence do not transfer. Rizzo Flow builds this in — per primitive, bound to a fingerprint of weights, precision, runtime, backend and prompt version, so a fit made on CUDA does not load on Vulkan. You need labelled data from your domain, a separate calibration set, and a held-out test.</p>
+
+<p>And then the caveat that outranks everything else in this article: these projects are days old. A figure has gone stale in a day. You should treat every published number, including the vendors', as a hypothesis — shadow production traffic against a candidate, log what it would have decided, and compare it with what you run today before you switch anything.</p>
+
+<h2 class="ch" id="faq"><span class="chno">13</span> — FAQ</h2>
+<p class="ch-sub">Short answers to the questions that come up first.</p>
+
+<h3>Do I still need an LLM if I use one of these?</h3>
+<p>Yes. A decision model answers typed questions about state you give it; it cannot write, plan or reason in steps. It replaces the small classifier calls around your LLM, not the LLM. The common architecture is a frontier model for the hard steps and decision models for routing, guardrails and verification.</p>
+
+<h3>Why is it so much faster than asking an LLM for JSON?</h3>
+<p>Three reasons, all from Chapter 4: the state is prefilled once and shared across every question, the questions run in parallel rather than sequentially, and nothing is generated — the answer is read from one position's logits. SemIf measured the whole effect at 5.21&times; for the same 21 decisions.</p>
+
+<h3>Can these models abstain?</h3>
+<p>Yes, and you should let them. Rizzo Flow's native API adds a built-in <span class="mono">__insufficient__</span> option by default, plus out-of-range options for numeric questions; when those win, the value is null and the status says why. Kev trains abstention deliberately: it adds examples with the decisive fact removed and trains toward a uniform distribution, which cut confident answers on unknowable items from 26% to 5%.</p>
+
+<h3>How long a state can they read?</h3>
+<p>It depends entirely on the model. Rizzo Flow's Spark-X2.5 base supports 1M tokens natively but defaults to 8,192 per question. SemIf's Qwen3.5-4B supports 262k natively. Nimble's latest checkpoint takes 8,192. Jev documents 32k for state plus longest question. In practice your ceiling is KV memory, not the architecture's claim.</p>
+
+<h3>Is a fine-tuned BERT not just as good?</h3>
+<p>For one fixed task where you have labels, often yes — that is a fair criticism and it was made repeatedly. The difference is that these models take <em>arbitrary, request-time</em> options with no training step, so you get one model for many tasks and can change the options without retraining. If your label set never changes, a small trained classifier is a reasonable and cheaper answer.</p>
+
+<h2 class="ch" id="sources"><span class="chno">14</span> — Sources</h2>
+<p class="ch-sub">Where each claim came from, so you can check the fast-moving ones yourself.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>#</th><th>Source</th><th>Used for</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>TypeSafe AI launch post, docs and &ldquo;jaggedness&rdquo; page; Diogo Almeida on the Latent Space podcast (21 Sep 2026)</td><td>Jev's interface, RLCD framing, strengths and weaknesses</td></tr>
+<tr><td>2</td><td>Archer Hume, <em>Jev's Architecture Unmasked</em> (17 Sep 2026), ~10,000 API probes; Elon Salfati's re-check (41/49 claims)</td><td>The architecture reconstruction and the probe table</td></tr>
+<tr><td>3</td><td>Saulius blog, <em>Jev and RLCD</em> (Sep 2026)</td><td>RLCD vs RLHF/RLVR, proper scoring rules, confidence-ordering argument</td></tr>
+<tr><td>4</td><td>Pinggy, <em>Best Open Source Jev Alternatives</em> (23 Sep 2026)</td><td>Laya / Kev / SemIf / NanoJev details, and the late-September star counts that have since been superseded</td></tr>
+<tr><td>5</td><td>DataCamp, <em>Top 7 Open-Source TypeSafe Jev Alternatives</em> (23 Sep 2026)</td><td>Project list and comparison dimensions</td></tr>
+<tr><td>6</td><td>Rizzo Flow GitHub (<span class="mono">Rizzo-AI-Academy/rizzo-flow</span>) and its README benchmarks</td><td>KV-cache sharing, 144 KiB/token, typed-decisions table, quickstart, Snake</td></tr>
+<tr><td>7</td><td>Bespoke Nimble GitHub (<span class="mono">bespokelabsai/nimble</span>)</td><td>Contrastive data curation, KV prefill wording, scorers, held-out eval</td></tr>
+<tr><td>8</td><td>Kev GitHub (<span class="mono">jaredpalmer/kev</span>) and its published evaluations</td><td>LoRA family, /v1/systemone compatibility, honest eval figures</td></tr>
+<tr><td>9</td><td>Von GitHub (<span class="mono">wfzyx/von</span>) and the ONNX community build</td><td>ModernBERT encoder, one bidirectional pass, CPU latency</td></tr>
+<tr><td>10</td><td>SemIf / OpenJev GitHub (<span class="mono">TheoLeeCJ/SemIf-OpenJev</span>)</td><td>Frozen-model logit reading, the 5.21&times; measurement, backends</td></tr>
+<tr><td>11</td><td>Laya (Convai Innovations) README and model cards</td><td>421M encoder, multilingual checkpoint, base-model caveat, Banking77 result</td></tr>
+<tr><td>12</td><td>NanoJev model card and benchmark (<span class="mono">unified-games-v1</span>)</td><td>Qwen3-0.6B heads, ViZDoom and maze results, training-set caveat</td></tr>
+<tr><td>13</td><td>yibie, <em>awesome-jev</em> curated list; Latent Space AINews, <em>Here are 6 Clones of Jev in 2 days</em></td><td>Project discovery, counts and dates</td></tr>
+<tr><td>14</td><td>Deu&szlig;er, Sparrenberg &amp; Sifa, <em>Evaluating and Benchmarking the System One Model Jev</em> (arXiv:2609.37647; University of Bonn, Lamarr Institute, Fraunhofer IAIS)</td><td>Independent 37-dataset evaluation of jev-1.13.0: 346,009 requests, calibration, selective prediction and the MMLU arithmetic result</td></tr>
+<tr><td>15</td><td>jabr <em>classifier-benchmark</em> (CC0) — v2 suite, 49 tasks / 866 cases, plus <span class="mono">results/benchmark.md</span></td><td>The independent 0.966 / 0.720 / 0.684 / 0.583 table, the v1 suite and the per-model failure modes</td></tr>
+</tbody>
+</table></div>
+
+<p class="small">Assembled 6 October 2026, three weeks after Jev's launch. Several projects update daily and licenses, star counts and benchmark numbers will have moved — the star counts quoted here were read from the GitHub API on 6 October 2026 and already sit well above the late-September figures that were widely reported; licenses quoted in this article (Apache-2.0, MIT) are as published by each project at the time of writing. Self-reported figures are attributed to the project that published them and are not independent measurements unless said so. Where a number could not be attributed to a primary source, it is labelled as reported rather than stated as fact.</p>
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<!-- ==================== RELATED POSTS ==================== -->
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: System One Decision Models">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
+<section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
+  <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
+    <a href="deepseek-kv-cache-optimization-research-paper.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">From 390 KB to 890 Bytes</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The deeper story of KV-cache compression — the other half of why these models are cheap to run.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="how-to-build-an-ai-agent-step-by-step-guide.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">How to Build an AI Agent</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The harness these decision calls slot into: planning, tools, approval gates and routing.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="quantization-formats-guide.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">GGUF vs EXL2 vs AWQ vs GPTQ</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">Why the quantisation you pick changes these models' probabilities, not just their size.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+  </div>
+</section>
+
+<button id="backTop" title="Back to top" aria-label="Back to top" style="position:fixed;bottom:26px;right:22px;z-index:70;width:44px;height:44px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:19px;box-shadow:0 4px 16px rgba(15,23,42,.16);display:none;">&#8593;</button>
+
+<script>
+(function(){
+  var btn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('systemone-paper-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+  } catch(e) {}
+  if (btn) btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.innerHTML = '&#9788;'; }
+    else { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+    try { localStorage.setItem('systemone-paper-theme', dark ? 'light' : 'dark'); } catch(e) {}
+  });
+
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function onScroll(){
+    var y = window.scrollY + 120, best = 0;
+    for (var i = 0; i < targets.length; i++) {
+      if (targets[i] && targets[i].offsetTop <= y) best = i;
+    }
+    links.forEach(function(a, i){ a.classList.toggle('active', i === best); });
+    var bt = document.getElementById('backTop');
+    if (bt) bt.style.display = (window.scrollY > 900) ? 'block' : 'none';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  var backTop = document.getElementById('backTop');
+  if (backTop) backTop.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+<script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+</body>
+</html>

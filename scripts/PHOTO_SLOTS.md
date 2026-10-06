@@ -1,6 +1,6 @@
 # Photo slots — capture workflow
 
-Six posts carry a prepared, commented-out `<figure>` waiting for a **real** screenshot or
+Seven posts carry a prepared, commented-out `<figure>` waiting for a **real** screenshot or
 photo. Everything except the pixels is already written: the slot knows its filename, its
 aspect ratio, its alt text and its caption.
 
@@ -12,6 +12,7 @@ python scripts/install-post-photo.py --check     # validate what is already live
 | slot | post | target file | what the frame should show |
 |---|---|---|---|
 | `dispatch` | September 2026 dispatch | `september-2026-local-models-dashboard.png` | the model browser's card grid, or a desk shot of the rig |
+| `october` | October 2026 dispatch | `october-2026-local-models-dashboard.png` | the model browser filtered/searching the October uploads |
 | `kv` | KV cache paper | `deepseek-kv-cache-disk-hit.png` | a serving log showing cache reuse between two turns |
 | `ffn` | FFN/MoE paper | `deepseek-moe-expert-parallel-gpus.png` | GPU utilisation during a MoE forward pass |
 | `context` | Context management paper | `agent-context-compaction-notes.png` | an agent's notes file beside its context meter |
@@ -72,6 +73,20 @@ card grid actually sits 240px down the viewport, then shoots 1600×900.
 frame, which ones, and the final `scrollY`. `0/60 model cards visible` or `scrollY 0` means the
 shot framed the landing hero — which is not what this slot's caption describes. (An earlier
 attempt shipped the hero by mistake; that report exists so it cannot happen twice.)
+
+### `october` — the same grid, filtered to the October uploads
+```bash
+node scripts/capture-post-screenshots.js --slot=october
+```
+Same geometry as `dispatch`: serves this checkout, loads `index.html`, waits for
+`.premium-model-card` and realigns. What makes this frame different is the *filter* — the
+caption is about the October uploads, so type `Qwen3.8 Flash Next` (or `Clef`) into the model
+search box on the live page before shooting, or pass `--scroll` to land on a different region,
+so the two dispatches do not run the identical picture.
+
+**Read the report before publishing**, exactly as with `dispatch`: `0/N model cards visible`
+or `scrollY 0` means it framed the landing hero rather than the grid, and the run should be
+discarded rather than captioned.
 
 ### `kv` — a cache hit in a serving log
 ```bash

@@ -1,0 +1,137 @@
+name: Update Search Traffic Data
+
+# Pulls Google Search Console and Bing Webmaster Tools traffic into
+# data/traffic-snapshot.json, which traffic.html renders at runtime.
+#
+# Required repository secrets:
+#   GSC_SERVICE_ACCOUNT_JSON  Service-account key JSON. The service-account email
+#                             must be added as a user on the Search Console property.
+#   BING_API_KEY              Bing Webmaster Tools -> Settings -> API access -> API key
+#
+# Optional repository variables:
+#   GSC_SITE_URL              Defaults to https://local-ai-zone.github.io/
+#   BING_SITE_URL             Defaults to https://local-ai-zone.github.io/
+
+on:
+  schedule:
+    # Daily at 06:17 UTC — off the hour to avoid the busiest GitHub Actions slot.
+    - cron: '17 6 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  update-traffic:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Pull latest changes before processing
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git pull --rebase origin main || git pull origin main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch traffic data
+        id: fetch
+        env:
+          GSC_SERVICE_ACCOUNT_JSON: ${{ secrets.GSC_SERVICE_ACCOUNT_JSON }}
+          GSC_SITE_URL: ${{ vars.GSC_SITE_URL }}
+          BING_API_KEY: ${{ secrets.BING_API_KEY }}
+          BING_SITE_URL: ${{ vars.BING_SITE_URL }}
+          TRAFFIC_DAYS: '90'
+          TRAFFIC_OUTPUT: data/traffic-snapshot.json
+        run: |
+          # --allow-partial: a Google outage must not block a Bing-only refresh,
+          # because the script preserves the previous good section on failure.
+          node scripts/fetch-traffic-data.js --allow-partial
+
+      - name: Verify snapshot integrity
+        id: verify
+        run: |
+          SNAPSHOT="data/traffic-snapshot.json"
+
+          if [ ! -f "$SNAPSHOT" ]; then
+            echo "❌ $SNAPSHOT missing"
+            exit 1
+          fi
+
+          if ! node -e "JSON.parse(require('fs').readFileSync('$SNAPSHOT','utf8'))"; then
+            echo "❌ $SNAPSHOT is not valid JSON"
+            exit 1
+          fi
+
+          # Sanity guard: the snapshot must carry at least one provider with a
+          # numeric click count, otherwise the page would render empty charts.
+          node -e "
+            const s = JSON.parse(require('fs').readFileSync('$SNAPSHOT','utf8'));
+            const ok = [s.google, s.bing].some(p => p && typeof p.clicks === 'number');
+            if (!ok) { console.error('❌ snapshot has no usable provider data'); process.exit(1); }
+            console.log('✅ snapshot ok — google:', s.google ? s.google.clicks : 'n/a',
+                        'bing:', s.bing ? s.bing.clicks : 'n/a',
+                        'range:', s.range.startDate, '→', s.range.endDate);
+          "
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          # Stage first: on the very first run the snapshot is untracked, and
+          # `git diff --quiet <path>` reports no changes for untracked files — which
+          # would mean the initial snapshot never got committed.
+          git add data/traffic-snapshot.json
+          if git diff --cached --quiet -- data/traffic-snapshot.json; then
+            echo "No traffic changes detected"
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Traffic changes detected"
+            echo "changes=true" >> $GITHUB_OUTPUT
+            git diff --cached --stat -- data/traffic-snapshot.json || true
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          git add data/traffic-snapshot.json
+          COMMIT_MSG="Automated traffic snapshot update $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+          Refreshed Google Search Console and Bing Webmaster Tools data for
+          traffic.html from the last 90 days."
+
+          git commit -m "$COMMIT_MSG" || {
+            echo "Nothing to commit"
+            exit 0
+          }
+
+          git push origin main || {
+            echo "Push failed, pulling latest changes and retrying..."
+            git pull --rebase origin main
+            git push origin main
+          }
+
+      - name: Trigger GitHub Pages deployment
+        if: steps.check_changes.outputs.changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.repos.requestPagesBuild({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+              console.log('GitHub Pages rebuild triggered');
+            } catch (error) {
+              console.log('Error triggering Pages rebuild:', error.message);
+            }
