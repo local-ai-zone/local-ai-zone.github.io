@@ -425,7 +425,22 @@ async function main() {
     });
 
     if (!snapshot.google && !snapshot.bing) {
-        console.error('❌ No data available from either provider and no previous snapshot to keep.');
+        // Nothing can be published. Name the providers that were actually *configured*
+        // and why each failed, so the workflow log says what to fix rather than only
+        // that something broke.
+        const configured = [];
+        if (process.env.GSC_SERVICE_ACCOUNT_JSON || process.env.GSC_SERVICE_ACCOUNT_FILE) {
+            configured.push('Google Search Console');
+        }
+        if (process.env.BING_API_KEY) configured.push('Bing Webmaster Tools');
+
+        if (!configured.length) {
+            console.error('❌ No traffic provider is configured, so there is nothing to publish. '
+                + 'Add the GSC_SERVICE_ACCOUNT_JSON and/or BING_API_KEY repository secret '
+                + '(see the header of .github/workflows/update-traffic.yml), then re-run the workflow.');
+        } else {
+            console.error(`❌ ${configured.join(' + ')} returned no data and no previous snapshot exists to keep: ${errors.join('; ')}`);
+        }
         process.exit(1);
     }
 
