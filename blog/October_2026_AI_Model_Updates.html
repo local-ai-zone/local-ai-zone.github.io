@@ -40,7 +40,7 @@
     <meta property="og:image:alt" content="October 2026 AI Model Updates: eight specialist releases in three days, no frontier launch, and the cost-per-task ledger">
     <meta property="article:author" content="Hussain Nazary">
     <meta property="article:published_time" content="2026-10-03T00:00:00Z">
-    <meta property="article:modified_time" content="2026-10-06T00:00:00Z">
+    <meta property="article:modified_time" content="2026-10-07T00:00:00Z">
     <meta property="article:section" content="AI Models">
     <meta property="article:tag" content="AI Model Releases">
     <meta property="article:tag" content="LLM Pricing">
@@ -64,9 +64,9 @@
       "author": {"@type": "Person", "name": "Hussain Nazary"},
       "publisher": {"@type": "Organization", "name": "Local AI Zone"},
       "datePublished": "2026-10-03",
-      "dateModified": "2026-10-06",
+      "dateModified": "2026-10-07",
       "proficiencyLevel": "Expert",
-      "wordCount": 12100,
+      "wordCount": 12365,
       "image": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/blog/october-2026-ai-model-updates-hero.png", "width": 1200, "height": 630},
       "dependencies": "Gemini API, Claude API, OpenAI API, Cloudflare Workers AI, Microsoft AI, Amazon Strands Agents",
       "about": [
@@ -85,6 +85,7 @@
       "@type": "FAQPage",
       "mainEntity": [
         {"@type": "Question", "name": "What AI models were released in October 2026?", "acceptedAnswer": {"@type": "Answer", "text": "The first three days produced eight models from five vendors, every one a specialist rather than a frontier generalist: Cloudflare's Clef (27B) and Clef-flash (9B) decision models, Amazon Strands Labs' Strands Decider 2B, Microsoft AI's MAI-Voice-2.1, MAI-Voice-2.1-Flash and MAI-Transcribe-2-Streaming, Tavus's Griffin-Lite video preview, and Bilibili's Index-Translate-35B-A3B-preview. Four of the eight carry Apache 2.0 licences with public weights."}},
+        {"@type": "Question", "name": "What is Mistral Large 4 (Le Chonk)?", "acceptedAnswer": {"@type": "Answer", "text": "Mistral Large 4 — nicknamed Le Chonk — is Mistral AI's frontier model, previewed October 6, 2026. It has 1 trillion total parameters with 49 billion active per token, is natively multimodal, and was trained from scratch on 3,800 NVIDIA Grace Blackwell GPUs in Mistral's own European datacenters. Access is a guardrailed preview API on Mistral Studio only: no price, licence, context window or architecture details were published, and Mistral says weights ship by the end of October, with Reuters reporting October 27."}},
         {"@type": "Question", "name": "Did OpenAI release GPT-6.1 Astra in October 2026?", "acceptedAnswer": {"@type": "Answer", "text": "No. OpenAI shipped GPT-6.1 Sol at DevDay on September 29, 2026 but no GPT-6.1 Astra, and the Wall Street Journal reported that the Astra release had been cancelled after internal safety tests. GPT-6 Astra from September 3 remains OpenAI's most capable model on its own evaluations."}},
         {"@type": "Question", "name": "What is Gemini 4 Argon and can you use it?", "acceptedAnswer": {"@type": "Answer", "text": "Gemini 4 Argon is Google's first Gemini 4 frontier model, announced September 30, 2026. It is rolling out only to vetted cyber defenders through the Fairwind Program, with paid API customers and Google AI Ultra subscribers next and no published date. Introductory pricing is $2 per million input tokens and $10 per million output tokens with cached input 95% off, against a standard $4/$20. It writes up to 1M output tokens in one response, up from 64K."}},
         {"@type": "Question", "name": "What is GPT-6.1 Sol?", "acceptedAnswer": {"@type": "Answer", "text": "GPT-6.1 Sol is the model OpenAI released at DevDay on September 29, 2026. It is priced at the same $2/$10 per million tokens as GPT-6 Sol with cached input halved to $0.10, and OpenAI describes it as near-Astra intelligence at one-fifth of Astra's token prices. Artificial Analysis scores it 51.8 on Intelligence Index v4.3.2 at $0.72 per index task — the cheapest run in the top tier — with LiveBench Reasoning at 92.63, 0.02 behind GPT-6 Astra. It is available in ChatGPT Work and Codex, not in ChatGPT's chat window."}},
@@ -241,22 +242,22 @@
                 </a>
                 <h1 class="article-title">October 2026 AI Model Updates: The Full Dispatch</h1>
                 <div class="article-meta">
-                    <span class="article-date">October 3, 2026 (Updated October 6, 2026)</span>
+                    <span class="article-date">October 3, 2026 (Updated October 7, 2026)</span>
                     <span class="article-author">By Hussain Nazary</span>
                     <span class="article-category">Monthly Dispatch</span>
-                    <span class="article-read-time">📖 59 min read</span>
+                    <span class="article-read-time">📖 62 min read</span>
                 </div>
             </div>
         </header>
         <div class="article-content">
             <h1 id="october-2026-ai-model-updates">October 2026 AI Model Updates: Every Launch, Access Change, and Price Move</h1>
             <blockquote>
-                <p><strong>TL;DR</strong> — October opened with no frontier launch at all. The first three days produced eight models from five vendors and every one of them is a specialist: decision models from Cloudflare and Amazon, a voice and transcription stack from Microsoft, a full-duplex video preview from Tavus, and an open-weight translator from Bilibili's Index team. The frontier news was an access change and an absence. Google's Gemini 4 Argon — announced September 30 — has a published price and is reaching only vetted cyber defenders through the Fairwind Program, with no general availability date. OpenAI shipped no GPT-6.1 Astra; the Wall Street Journal reported the release was cancelled after internal safety tests. What did ship at the frontier came in the last three days of September: Claude Sonnet 5.5 (September 28) put 56.0 on the Artificial Analysis Intelligence Index at Sonnet's $2/$10, and DevDay's GPT-6.1 Sol (September 29) put 51.8 there for $0.72 a task — the cheapest run in the top tier. Cost per completed task, not cost per token, is now the number that decides routing.</p>
+                <p><strong>TL;DR</strong> — October opened with no frontier launch at all. The first three days produced eight models from five vendors and every one of them is a specialist: decision models from Cloudflare and Amazon, a voice and transcription stack from Microsoft, a full-duplex video preview from Tavus, and an open-weight translator from Bilibili's Index team. The frontier news was an access change and an absence. Google's Gemini 4 Argon — announced September 30 — has a published price and is reaching only vetted cyber defenders through the Fairwind Program, with no general availability date. OpenAI shipped no GPT-6.1 Astra; the Wall Street Journal reported the release was cancelled after internal safety tests. Then on October 6 Mistral previewed its own frontier entry: Mistral Large 4 — a 1-trillion-parameter, 49-billion-active multimodal mixture of experts — reachable only through a guardrailed Mistral Studio preview, with weights promised before the month ends. What did ship at the frontier came in the last three days of September: Claude Sonnet 5.5 (September 28) put 56.0 on the Artificial Analysis Intelligence Index at Sonnet's $2/$10, and DevDay's GPT-6.1 Sol (September 29) put 51.8 there for $0.72 a task — the cheapest run in the top tier. Cost per completed task, not cost per token, is now the number that decides routing.</p>
             </blockquote>
             <div class="key-takeaway">
                 <h3>🚀 Key Takeaway</h3>
-                <p><strong>October 2026 is the first month this year where the frontier's biggest story is a boundary rather than a model.</strong> Argon is real, scores level with GPT-6 Astra, and cannot be bought. GPT-6.1 Astra does not exist on any published calendar. Meanwhile the October 1 specialist wave is the more useful signal: two infrastructure companies shipped open-weight decision models on the same day, and a model that answers a typed question with a probability in tens of milliseconds is precisely the thing that lets you stop sending trivial calls to a frontier API.</p>
-                <p style="margin-top: 15px;">This dispatch consolidates the September 27 – October 6 window: the run-up the September dispatch's September 26 dateline missed, DevDay and the cancelled release, the gated flagship, the eight-model opening ledger, the decision-model category it created, the open-weight and local releases — including a 180-billion-parameter model published as a laptop-sized GGUF — and the shift from price per token to <em>cost per completed task</em> as the metric teams actually route on. All figures come from primary announcements, vendor pages and independent trackers, and every model is attributed to the page its date was read from. Coverage window: September 27 – October 6, 2026; last verified October 6, 2026.</p>
+                <p><strong>October 2026 is the first month this year where the frontier's biggest story is a boundary rather than a model.</strong> Argon is real, scores level with GPT-6 Astra, and cannot be bought. GPT-6.1 Astra does not exist on any published calendar. Meanwhile the October 1 specialist wave is the more useful signal: two infrastructure companies shipped open-weight decision models on the same day, and a model that answers a typed question with a probability in tens of milliseconds is precisely the thing that lets you stop sending trivial calls to a frontier API. The one frontier-scale entry after that opening week — Mistral Large 4, previewed October 6 — arrives behind the same kind of boundary: a guardrailed Studio preview with no published price, licence or architecture, and weights due by the end of the month.</p>
+                <p style="margin-top: 15px;">This dispatch consolidates the September 27 – October 6 window: the run-up the September dispatch's September 26 dateline missed, DevDay and the cancelled release, the gated flagship, the October 6 Mistral Large 4 preview, the eight-model opening ledger, the decision-model category it created, the open-weight and local releases — including a 180-billion-parameter model published as a laptop-sized GGUF — and the shift from price per token to <em>cost per completed task</em> as the metric teams actually route on. All figures come from primary announcements, vendor pages and independent trackers, and every model is attributed to the page its date was read from. Coverage window: September 27 – October 6, 2026; last verified October 7, 2026.</p>
             </div>
             <div class="article-section">
                 <h2 class="section-title">At a Glance</h2>
@@ -268,6 +269,10 @@
                     <div style="text-align: center;">
                         <div class="stat-number">4 of 8</div>
                         <div class="stat-label">Carry Apache 2.0 licences with public weights: Clef, Clef-flash, Strands Decider 2B, Index-Translate-35B</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">1T / 49B</div>
+                        <div class="stat-label">Mistral Large 4 (Le Chonk), previewed October 6: 1 trillion parameters with 49B active, natively multimodal — Studio preview only until the weights ship</div>
                     </div>
                     <div style="text-align: center;">
                         <div class="stat-number">52.6 AA</div>
@@ -387,9 +392,15 @@
                     <p>The life-sciences model moves from free research preview to a priced endpoint: $5 per million input tokens, $0.50 cached, $25 output. Cache-write pricing does not apply, and access stays limited to approved research through OpenAI's trusted-access program — the same shape as Argon's Fairwind gate and the first time this month a model's <em>price</em> changed without a model being released.</p>
                 </div>
                 <div class="model-release">
+                    <div class="model-badge">Oct 6</div>
+                    <div class="model-badge" style="background: #ff7000;">Mistral</div>
+                    <h3>Mistral Large 4 previewed — “Le Chonk”</h3>
+                    <p>Mistral AI previewed its fourth-generation flagship: <strong>1 trillion total parameters with 49 billion active</strong> per token — about 4.9% — natively multimodal, and trained from scratch on 3,800 NVIDIA Grace Blackwell GPUs in Mistral's own European datacenters. The only route in is a guardrailed preview API on Mistral Studio; no price, licence, context window or architecture details were published. Mistral says weights arrive by the end of the month — Reuters reported October 27 — and training covers 160+ languages including every EU official language. <a href="mistral-large-4-deep-dive.html">Our deep dive</a> works through the benchmark claims and what the size means for local runs.</p>
+                </div>
+                <div class="model-release">
                     <div class="model-badge">Oct 3–6</div>
                     <h3>Verification window</h3>
-                    <p>No further vendor-dated general releases. The October 1–3 ledger holds at eight models and five vendors; the corroboration-only listings on OpenRouter stay listings. Every figure in this dispatch was read on October 3 and re-verified on October 6.</p>
+                    <p>Beyond Mistral's October 6 preview, no further vendor-dated general releases. The October 1–3 ledger holds at eight models and five vendors — a preview with no general availability, price or weights is not a release; the corroboration-only listings on OpenRouter stay listings. Every figure in this dispatch was read on October 3, re-verified on October 6, and the Mistral preview was read on October 7.</p>
                 </div>
                 <blockquote>
                     <p><strong>Read the timeline this way:</strong> the nine most important days in this dispatch are September 28 to October 2. Two frontier models shipped in that stretch, one frontier model was announced but withheld, one was cancelled, and eight specialists arrived. Only the specialists were available to everyone.</p>
@@ -485,7 +496,7 @@
                 <p>Three models appeared on OpenRouter inside the window with no vendor release page located: Unbiased's Pareto 26.10 Preview on October 1 (1.05M context, $0.80 input and $3.20 output per million tokens), Apodex 1.1 Mini on October 1 (262K context, free tier), and InclusionAI's Ling 3.1 Flash on October 2 (262K context, free). They are recorded as listings, not releases, and excluded from the count — a listing time is not a launch date. That distinction matters more than it sounds: most of the "eight models this week" claims you will read elsewhere are counting listings and releases together.</p>
                 <p>Three September releases sit just outside the September dispatch's September 26 dateline and belong in this ledger as context rather than as October news: Together's Tev1 4B experimental (September 23, GitHub and Hugging Face, listed on OpenRouter September 30), Inception's Mercury Decide (OpenRouter September 30, no vendor page located), and Bilibili's dense Index-Translate 2B and 9B (Hugging Face since September 28), which the October 2 preview extends.</p>
                 <h3>Who shipped nothing in this window</h3>
-                <p>The quietest part of the ledger is the absence list, and it is long enough to be the month's second signal. DeepSeek, Alibaba, Z.ai and Moonshot shipped no new model between September 27 and October 6, and DeepSeek's rates were unchanged through the window — <a href="../models/deepseek-v4-pro-0813.html" class="model-link">V4-Pro-0813</a> and V4.1-Flash remain current at their August–September prices, peak and off-peak structure intact. Meta, Mistral, Cohere, IBM, NVIDIA, Upstage, LG and Tencent also released nothing. SpaceXAI's Grok 4.8 remains unreleased against community estimates of September or October, Meta's Muse Spark 1.4 was not announced, and Anthropic's Haiku 5.5 is still "in the coming weeks" with no date. After September's twenty-plus releases in two weeks, the first week of October produced eight specialist models and no frontier launch — a cadence change, not a slowdown in the industry's capacity.</p>
+                <p>The quietest part of the ledger is the absence list, and it is long enough to be the month's second signal. DeepSeek, Alibaba, Z.ai and Moonshot shipped no new model between September 27 and October 6, and DeepSeek's rates were unchanged through the window — <a href="../models/deepseek-v4-pro-0813.html" class="model-link">V4-Pro-0813</a> and V4.1-Flash remain current at their August–September prices, peak and off-peak structure intact. Meta, Cohere, IBM, NVIDIA, Upstage, LG and Tencent also released nothing — Mistral's own October 6 entry does not lift it out of this list, because a guardrailed preview with no general availability, no price and no weights is announced rather than released, which places it beside Argon in the gated column instead of the ledger. SpaceXAI's Grok 4.8 remains unreleased against community estimates of September or October, Meta's Muse Spark 1.4 was not announced, and Anthropic's Haiku 5.5 is still "in the coming weeks" with no date. After September's twenty-plus releases in two weeks, the first week of October produced eight specialist models and no frontier launch — a cadence change, not a slowdown in the industry's capacity.</p>
                 <p>Alibaba's absence has the most interesting explanation attached to it. At its Apsara Conference in Hangzhou on September 22, the Qwen team said the next-generation family <strong>is currently in training</strong> and previewed four names on stage — Qwen 4 Max, Qwen 4 Flash, Qwen 4 Plus and an open-weight <strong>Qwen 4 27B</strong> — alongside a roadmap projecting 5 to 10 trillion parameters for Qwen 4.5 and Qwen 5. As of October 6 there is no release date, no price, no benchmarks and no downloadable weights for any of them. That matters directly for section 10: <strong><a href="../models/qwen3-8-flash-next.html" class="model-link">Qwen3.8-Flash-Next</a> is still the newest Qwen anyone can download</strong>, and its own model card describes it as an early preview of the architecture Qwen 4 will use — which is why an August release remains the centre of gravity for local Qwen work in October rather than a leftover.</p>
                 <div class="trend-card">
                     <h3>A note on dating, because it decides what the numbers mean</h3>
@@ -628,6 +639,8 @@
                         <tr><td>Oct 1–3 (done)</td><td>Eight specialist releases, five vendors</td><td>Four under Apache 2.0, including the two decision models and an open-weight translator with 150 languages.</td></tr>
                         <tr><td>Oct 2 (done)</td><td>POCKET-Darwin-180B published</td><td>A 180B mixture of experts as a four-bit GGUF; the compression-plus-streaming pattern now applies an order of magnitude above Bonsai 2's 27B.</td></tr>
                         <tr><td>Oct 5 (done)</td><td>gpt-rosalind-research billing begins</td><td>A free research-preview endpoint becomes $5 / $25 per 1M with cache writes excluded — a price change with no model release attached.</td></tr>
+                        <tr><td>Oct 6 (done)</td><td>Mistral Large 4 previewed</td><td>1 trillion parameters with 49B active, natively multimodal — reachable only through a guardrailed Mistral Studio preview, with no published price, licence or architecture.</td></tr>
+                        <tr><td>Oct 27</td><td>Mistral Large 4 weights, reported</td><td>Mistral says weights ship by the end of October; Reuters reported October 27. The date a preview turns into something the local ecosystem can quantise and run.</td></tr>
                         <tr><td>On or by Oct 15</td><td>Haiku 4.5's earliest possible retirement</td><td>The date that has the community expecting Claude Haiku 5.5 on or before it. Anthropic has confirmed no date, price, context window or benchmarks for Haiku 5.5 — only "in the coming weeks". This is the sub-$1 tier where GPT-6 Luna's $0.07 per task currently has no Claude answer.</td></tr>
                         <tr><td>No date</td><td>Grok 4.8 and Muse Spark 1.4</td><td>Both unreleased. Community estimates for Grok 4.8 range across September and October with no official date; Meta has announced nothing after Muse Spark 1.3.</td></tr>
                         <tr><td>No date</td><td>Qwen 4 Max / Flash / Plus / 27B</td><td>Announced in training at Apsara on September 22, 2026, with an open-weight 27B tier promised and a 5&ndash;10T-parameter roadmap behind it. No date, price, benchmarks or weights yet — Qwen3.8-Flash-Next remains the newest downloadable Qwen and previews the architecture.</td></tr>
@@ -640,10 +653,10 @@
                     </tbody>
                 </table>
                 </div>
-                <p><em>Dates from vendor pricing pages and announcements. Argon's general availability and any Astra replacement are unconfirmed by their vendors as of October 6, 2026.</em></p>
+                <p><em>Dates from vendor pricing pages and announcements. Argon's general availability and any Astra replacement are unconfirmed by their vendors as of October 7, 2026.</em></p>
                 <div class="key-takeaway">
                     <h3>📌 The week in one paragraph</h3>
-                    <p>October 2026 opened by separating capability from availability more sharply than any month this year. The best measured model Google has ever shipped — level with GPT-6 Astra, with the lowest hallucination rate Artificial Analysis has recorded — reached nobody who had not applied for it, and OpenAI's next flagship-grade release did not arrive at all after internal safety testing. What did reach everyone was eight specialist models in three days, four of them open-weight, and a 180-billion-parameter model published as a GGUF that streams off a laptop SSD. Meanwhile the two frontier models that shipped in the window's run-up — Claude Sonnet 5.5 and GPT-6.1 Sol — both competed on cost per completed task rather than capability, and both won on it. The practical reading for anyone building is that routing, effort level, caching and cheap local checks now decide more of your bill and your quality than model selection does; the strategic reading is that a roadmap which depends on a named model arriving on a named date is carrying risk the vendor has stopped underwriting.</p>
+                    <p>October 2026 opened by separating capability from availability more sharply than any month this year. The best measured model Google has ever shipped — level with GPT-6 Astra, with the lowest hallucination rate Artificial Analysis has recorded — reached nobody who had not applied for it, and OpenAI's next flagship-grade release did not arrive at all after internal safety testing. What did reach everyone was eight specialist models in three days, four of them open-weight, and a 180-billion-parameter model published as a GGUF that streams off a laptop SSD. October 6 added Mistral Large 4 — a 1-trillion-parameter frontier model announced behind a guardrailed preview API with weights promised by month's end, which is availability by announcement only. Meanwhile the two frontier models that shipped in the window's run-up — Claude Sonnet 5.5 and GPT-6.1 Sol — both competed on cost per completed task rather than capability, and both won on it. The practical reading for anyone building is that routing, effort level, caching and cheap local checks now decide more of your bill and your quality than model selection does; the strategic reading is that a roadmap which depends on a named model arriving on a named date is carrying risk the vendor has stopped underwriting.</p>
                 </div>
             </div>
             <div class="article-section">
@@ -651,6 +664,10 @@
                 <div class="trend-card">
                     <h3>What AI models were released in October 2026?</h3>
                     <p>The first three days produced eight models from five vendors, and every one of them is a specialist rather than a frontier generalist: Cloudflare's Clef (27B) and Clef-flash (9B) decision models (October 1), Amazon Strands Labs' Strands Decider 2B (October 1), Microsoft AI's MAI-Voice-2.1, MAI-Voice-2.1-Flash and MAI-Transcribe-2-Streaming (October 1), Tavus's Griffin-Lite research preview (October 1), and Bilibili's Index-Translate-35B-A3B-preview (October 2). Four of the eight carry Apache 2.0 licences with public weights: both Clef models, Strands Decider 2B, and Index-Translate-35B. On the open-weight side the month's notable addition after that is POCKET-Darwin-180B, a four-bit GGUF of Darwin-180B-RSI-R3 published October 2.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What is Mistral Large 4 (Le Chonk)?</h3>
+                    <p>Mistral Large 4 — nicknamed Le Chonk — is Mistral AI's frontier model, previewed October 6, 2026: 1 trillion total parameters with 49 billion active per token, natively multimodal, trained from scratch on 3,800 NVIDIA Grace Blackwell GPUs in Mistral's own European datacenters. Access is a guardrailed preview API on Mistral Studio only — no price, licence, context window or architecture details were published — and Mistral says weights ship by the end of October, with Reuters reporting October 27. Until those weights land there is nothing to download or self-host; <a href="mistral-large-4-deep-dive.html">our deep dive</a> covers the benchmark claims and the local-run arithmetic.</p>
                 </div>
                 <div class="trend-card">
                     <h3>Did OpenAI release GPT-6.1 Astra in October 2026?</h3>
@@ -708,6 +725,9 @@
             <div class="article-section">
                 <h2 class="section-title" id="sources">Sources</h2>
                 <ul>
+                    <li><strong>[Official]</strong> Mistral AI — "Mistral Large 4," mistral.ai/news/mistral-large-4, Oct 6, 2026 (1T total and 49B active parameters, natively multimodal, 3,800 Grace Blackwell GPUs in Mistral's own EU datacenters, 160+ training languages, guardrailed Studio preview, weights by end of month)</li>
+                    <li><strong>[Press]</strong> TechCrunch — Mistral Large 4 coverage, Oct 6, 2026 (training run reported at roughly 4,000 Grace Blackwell GPUs in Mistral's own European datacenters; preview-only access)</li>
+                    <li><strong>[Press]</strong> Reuters — Mistral Large 4 coverage, Oct 6, 2026 (weights to be published by end of month, October 27 reported)</li>
                     <li><strong>[Official]</strong> Google — "Gemini 4 Argon: our next era of frontier intelligence," blog.google, Sep 30, 2026 (introductory $2 / $10, cached input 95% off, 1M output tokens, Fairwind Program, DeepSWE v1.1 77.9%, AutomationBench 51.3%, LVBench 91.7%, CWE-bench v1 68%, 300 TiB memory analysis, libgav1 Rust port)</li>
                     <li><strong>[Official]</strong> OpenAI — "Introducing GPT-6.1 Sol," openai.com, Sep 29, 2026; "DevDay 2026 Recap," openai.com, Sep 29, 2026 ($2 / $10, cached input $0.10, one-fifth of Astra's token prices)</li>
                     <li><strong>[Official]</strong> OpenAI — DevDay 2026 keynote announcements, San Francisco, Sep 29, 2026 (dots, ChatGPT Space, Ultrafast mode, Pro 500, Decisions API preview, Codex Cloud, Codex Security Cloud, Sign in with ChatGPT)</li>
@@ -751,11 +771,16 @@
                     <li><strong>[Independent]</strong> DeepSeek status pages — deepseek.ai/blog and modemguides.com, verified October 2026 (V4-Pro-0813 and V4.1-Flash remain current, peak and off-peak pricing unchanged through the window; no October release)</li>
                     <li><strong>[Independent]</strong> Artificial Analysis — provider benchmarking for Gemini 4 Argon (high), artificialanalysis.ai/models/gemini-4-argon/providers, read Oct 6, 2026 ($2.00 per 1M input on the lowest-priced provider during the introductory period)</li>
                 </ul>
-                <p style="margin-top: 30px;"><em>Independently researched from primary and independent sources. All benchmark figures and prices belong to their respective publishers; deltas, the access ledger and the cost-per-task reading are Local AI Zone compilations. Vendor claims are attributed to the vendor and marked as such. Coverage window: September 27 – October 6, 2026; last verified October 6, 2026.</em></p>
+                <p style="margin-top: 30px;"><em>Independently researched from primary and independent sources. All benchmark figures and prices belong to their respective publishers; deltas, the access ledger and the cost-per-task reading are Local AI Zone compilations. Vendor claims are attributed to the vendor and marked as such. Coverage window: September 27 – October 6, 2026; last verified October 7, 2026.</em></p>
             </div>
             <div class="article-section">
                 <h2 class="section-title">Related Posts</h2>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <a href="mistral-large-4-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Mistral Large 4 (Le Chonk): 1T Parameters, 49B Active</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The October 6 preview in full: architecture, benchmark claims, the unpublished rows, and what the size arithmetic means for running it locally.</p>
+                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                    </a>
                     <a href="September_2026_AI_Model_Updates.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
                         <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">September 2026 AI Model Updates</h3>
                         <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The month before this one: Opus 5.5, GPT-6 Sol and Luna, the twenty-plus late-September wave, and the price floor at $0.10/$0.50.</p>
@@ -777,7 +802,7 @@
                 <h2 class="section-title">About the Author</h2>
                 <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
                 <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
-                <p style="margin-top: 30px;"><em>Last Updated: October 6, 2026 | Monthly Dispatch Series</em></p>
+                <p style="margin-top: 30px;"><em>Last Updated: October 7, 2026 | Monthly Dispatch Series</em></p>
             </div>
         </div>
         <!-- Need help with this post? -->
