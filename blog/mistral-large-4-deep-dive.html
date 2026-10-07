@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mistral Large 4 (Le Chonk): A 1 Trillion-Parameter Deep Dive - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+    
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Mistral Large 4, codenamed Le Chonk: a 1 trillion-parameter natively multimodal MoE with 49B active parameters, previewing on Mistral Studio from October 6, 2026 with weights landing end of month. Full benchmarks, training stack, safety story, and what it takes to run it locally.">
+    <meta name="keywords" content="Mistral Large 4, Le Chonk, ML4, Mistral AI, 1 trillion parameter model, 49B active parameters, open-weight model, European AI, Mistral Studio, agentic coding, cybersecurity AI, multimodal model, GGUF, local AI">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Mistral Large 4 (Le Chonk): 1T Parameters, 49B Active">
+    <meta property="og:description" content="Mistral's 1 trillion-parameter multimodal MoE, previewed October 6, 2026. Cyber, coding and agent benchmarks, 3,800 Grace Blackwell GPUs, and the arithmetic of running a 1T model locally.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive-hero.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Mistral Large 4 Deep Dive - Local AI Zone">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-10-07T00:00:00Z">
+    <meta property="article:modified_time" content="2026-10-07T00:00:00Z">
+    <meta property="article:section" content="AI Models">
+    <meta property="article:tag" content="Mistral Large 4">
+    <meta property="article:tag" content="Le Chonk">
+    <meta property="article:tag" content="Mistral AI">
+    <meta property="article:tag" content="1T Parameters">
+    <meta property="article:tag" content="Open-Weight Models">
+    <meta property="article:tag" content="Mixture of Experts">
+    <meta property="article:tag" content="AI Benchmarks">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive.html">
+    <meta name="twitter:title" content="Mistral Large 4 (Le Chonk): 1T Parameters, 49B Active">
+    <meta name="twitter:description" content="Inside Mistral's 1T-parameter multimodal MoE: benchmarks, training stack, safety story, and the local-run arithmetic.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive-hero.png">
+    <meta name="twitter:image:alt" content="Mistral Large 4 Deep Dive">
+    
+    <!-- Additional AEO/GEO Meta Tags -->
+    <meta name="application-name" content="Local AI Zone">
+    <meta name="msapplication-TileColor" content="#7c3aed">
+    <meta name="theme-color" content="#7c3aed">
+    <meta name="article-publisher" content="https://local-ai-zone.github.io">
+    <meta name="article-content-ttl" content="P1Y">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive.html">
+    
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive.html">
+    
+    <style>
+        .back-to-blog { display: inline-flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-weight: 600; margin: 0 0 30px 0; padding: 10px 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; backdrop-filter: blur(8px); transition: all 0.3s ease; position: relative; z-index: 1; }
+        .back-to-blog:hover { background: rgba(255,255,255,0.28); transform: translateX(-3px); }
+        .article-content { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        .article-content h1 { font-size: 2.2em; color: #1e40af; margin: 40px 0 15px; padding-bottom: 10px; border-bottom: 3px solid #e5e7eb; }
+        .article-content h2 { font-size: 1.6em; color: #1e40af; margin: 35px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .article-content h3 { font-size: 1.3em; color: #374151; margin: 28px 0 10px; }
+        .article-content h4 { font-size: 1.1em; color: #4b5563; margin: 20px 0 8px; }
+        .article-content p { margin-bottom: 1.2em; line-height: 1.8; }
+        .article-content ul, .article-content ol { margin: 12px 0 12px 24px; }
+        .article-content li { margin-bottom: 6px; line-height: 1.7; }
+        .article-content table { margin: 24px 0; width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .article-content table th { background: #1e40af; color: white; padding: 10px 12px; text-align: left; font-weight: 600; border: 1px solid #1e40af; }
+        .article-content table td { padding: 10px 12px; border: 1px solid #e5e7eb; text-align: left; }
+        .article-content table tr:nth-child(even) td { background: #f9fafb; }
+        .article-content table tr:hover td { background: #eff6ff; }
+        .article-content blockquote { border-left: 4px solid #2563eb; background: #eff6ff; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-style: normal; }
+        .article-content blockquote p { margin-bottom: 0.5em; }
+        .article-content blockquote p:last-child { margin-bottom: 0; }
+        .article-content code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: "Courier New", monospace; }
+        .article-content pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        .article-content pre code { background: none; color: inherit; padding: 0; }
+        .article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; }
+        .article-content em { color: #6b7280; }
+        .article-content strong { color: #111827; }
+        .article-content a { color: #2563eb; text-decoration: none; }
+        .article-content a:hover { text-decoration: underline; }
+        .article-content hr { border: none; border-top: 2px solid #e5e7eb; margin: 40px 0; }
+        .article-header::before { display: none !important; }
+        .article-header .article-title { text-shadow: none !important; }
+        .article-header .container { background: transparent !important; }
+        .premium-header { position: static !important; }
+        
+        /* Dark mode overrides */
+        html[data-theme='dark'] .article-content table th { background: #4c1d95; color: #e2e8f0; border-color: #6d28d9; }
+        html[data-theme='dark'] .article-content table td { border-color: #374151; color: #e2e8f0; }
+        html[data-theme='dark'] .article-content table tr:nth-child(even) td { background: #1e1e2e; }
+        html[data-theme='dark'] .article-content table tr:hover td { background: #2d1b69; }
+        html[data-theme='dark'] .article-content blockquote { background: rgba(37, 99, 235, 0.1); border-left-color: #60a5fa; color: #e2e8f0; }
+        html[data-theme='dark'] .article-content code { background: #2d2d3d; color: #e2e8f0; }
+        html[data-theme='dark'] .article-content a { color: #60a5fa; }
+        html[data-theme='dark'] .article-content strong { color: #f3f4f6; }
+        html[data-theme='dark'] .article-content em { color: #9ca3af; }
+        html[data-theme='dark'] .article-content hr { border-top-color: #374151; }
+        html[data-theme='dark'] .article-content h1 { color: #93c5fd; border-bottom-color: #374151; }
+        html[data-theme='dark'] .article-content h2 { color: #93c5fd; border-bottom-color: #374151; }
+        html[data-theme='dark'] .article-content h3 { color: #e2e8f0; }
+        html[data-theme='dark'] .article-content h4 { color: #d1d5db; }
+    
+        /* Dark mode table overrides */
+        html[data-theme='dark'] table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table td { background: #1e1e2e !important; color: #e2e8f0 !important; border-color: #374151 !important; }
+        html[data-theme='dark'] table tr:nth-child(even) td { background: #252535 !important; }
+        html[data-theme='dark'] table tr:nth-child(odd) td { background: #1e1e2e !important; }
+        html[data-theme='dark'] table tr:hover td { background: rgba(124, 58, 237, 0.1) !important; }
+        html[data-theme='dark'] table { border-color: #374151 !important; }
+</style>
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Mistral Large 4: Inside Le Chonk, a 1 Trillion-Parameter Multimodal MoE",
+        "alternativeHeadline": "1 Trillion Parameters, 49 Billion Active, Open Weights Coming End of October",
+        "description": "Technical deep dive into Mistral Large 4 (Le Chonk): a 1T-parameter, 49B-active natively multimodal MoE previewed October 6, 2026, with cyber, coding, agent and multimodal benchmarks, the RL training stack, and what it would take to run locally.",
+        "image": "https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive-hero.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-10-07T00:00:00Z",
+        "dateModified": "2026-10-07T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive.html"
+        },
+        "keywords": "Mistral Large 4, Le Chonk, ML4, 1 trillion parameters, open-weight model, European AI, agentic coding, multimodal",
+        "articleSection": "AI Models",
+        "wordCount": 5642,
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "about": {
+            "@type": "Thing",
+            "name": "Mistral Large 4",
+            "description": "Mistral AI's 1 trillion-parameter, 49B-active multimodal mixture-of-experts model, codenamed Le Chonk"
+        },
+        "mentions": [
+            {"@type": "SoftwareApplication", "name": "Mistral Studio", "applicationCategory": "DeveloperApplication"},
+            {"@type": "SoftwareApplication", "name": "Mistral Forge", "applicationCategory": "DeveloperApplication"}
+        ],
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
+    }
+    </script>
+    
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is Mistral Large 4?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Mistral Large 4, nicknamed Le Chonk, is Mistral AI's flagship mixture-of-experts model with 1 trillion total parameters and 49 billion active parameters per token. It is natively multimodal, was previewed on October 6, 2026, and is available today through the Mistral Studio API with open weights due by the end of October 2026."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can you run Mistral Large 4 locally?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Not yet. The weights are not published until the end of October 2026, so today the only access is the hosted preview API. Once released, 1 trillion parameters implies roughly 2 TB at BF16, about 1 TB at 8-bit and about 500 GB at 4-bit before KV cache, which puts practical local inference on multi-GPU servers or very large unified-memory machines rather than ordinary desktops."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is Mistral Large 4 open source?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "It is an open-weight model, not open source in the licence sense yet: Mistral has committed to releasing the weights by the end of October 2026, but the licence terms and full architecture details have not been published at the time of writing."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does Mistral Large 4 compare to other frontier models?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Mistral reports a 49.8% Coding Agent Index score ahead of DeepSeek V4 Pro 0813 and Qwen3.8 Max, a 59.9% AutomationBench score ahead of Kimi K3, and a blind human coding evaluation of 3.74 out of 5 behind Claude Opus 5 at 4.22 but ahead of GLM-5.3 at 3.60. On cybersecurity tasks it ranks among the top five models globally, and on visual grounding it edges GPT-6-Astra on Dense 200."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "When are the Mistral Large 4 weights released?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Mistral says the weights ship by the end of October 2026, with coverage of the announcement citing October 27. Until then the model is served as a public preview API on Mistral Studio while Mistral red-teams it with cybersecurity partners and state authorities."
+                }
+            }
+        ]
+    }
+    </script>
+    
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "Mistral Large 4 Deep Dive", "item": "https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive.html"}
+        ]
+    }
+    </script>
+</head>
+<body class="blog-article-page">
+
+    <header class="premium-header blog-header">
+
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">Mistral Large 4: Technical Deep Dive</h1>
+                <div class="article-meta">
+                    <span class="article-date">October 7, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Technical Analysis</span>
+                    <span class="article-read-time">📖 29 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+            <h1 id="mistral-large-4-inside-le-chonk-a-1-trillion-parameter-multimodal-moe">Mistral Large 4: Inside Le Chonk, a 1 Trillion-Parameter Multimodal MoE</h1>
+<blockquote>
+<p><strong>TL;DR</strong> — Mistral opened a public preview of <strong>Mistral Large 4</strong> (internally <strong>Le Chonk</strong>) on <strong>October 6, 2026</strong>. It is a 1 trillion-parameter mixture-of-experts model that activates 49 billion parameters per token, is natively multimodal, and was trained from scratch on 3,800 NVIDIA Grace Blackwell GPUs inside Mistral's own European datacenters. Today it is reachable only through the hosted preview API on Mistral Studio; the weights are promised "by the end of the month," with reporting citing <strong>October 27</strong>. Mistral claims state-of-the-art results among open models on cybersecurity and legal work, top-five placement on the Artificial Analysis Cyber Index, a 49.8% Coding Agent Index score ahead of DeepSeek V4 Pro and Qwen3.8 Max, and a blind human coding rating of 3.74/5 — second only to Claude Opus 5. This post breaks down what is actually confirmed, what is withheld, the full benchmark sheet, the RL training stack, the safety argument, and the arithmetic of what it would take to run a 1T-parameter model on your own hardware.</p>
+</blockquote>
+<hr />
+<h2 id="1-what-mistral-large-4-actually-is">1. What Mistral Large 4 Actually Is</h2>
+<p>Mistral has a naming habit that trips people up. Every generation mixes very large models, deliberately small ones, and specialist variants under labels that do not map cleanly onto each other. Mistral Large 4 cuts through that: this is the flagship, the successor to the Mistral Large line, and it is the biggest model Mistral has ever built. The company's own announcement opens with the informal name first — <em>"Unofficially ML4, very officially: le Chonk"</em> — a reference to the one trillion parameters sitting inside it.</p>
+<p>The launch shape matters more than the launch day. Three things shipped simultaneously, and only one of them is a model you can use.</p>
+<ul>
+<li><strong>A hosted public preview.</strong> The Mistral Studio API serves the model today, behind Mistral's own guardrails, on the same European infrastructure the model was trained on.</li>
+<li><strong>A commitment to open weights.</strong> The release date given in the announcement is <em>"by the end of this month"</em>; contemporaneous reporting puts the public availability at <strong>October 27, 2026</strong>. The weights are not downloadable now.</li>
+<li><strong>A red-teaming window.</strong> Between preview and weights, Mistral is running the model "in real-world settings with cybersecurity leaders, vetted partners, and state authorities," who get the same weights with reduced moderation and expanded cyber capabilities.</li>
+</ul>
+<p>That third item is unusual enough to be worth sitting with. Mistral is shipping a preview that is deliberately more capable — and deliberately less filtered — than what the general public can reach, to a hand-picked group, before the weights go public. The stated logic is defensive: provider-level refusals block legitimate vulnerability research and incident response, and losing access to a capability mid-incident is itself a security risk. It is also the clearest signal yet that Mistral sees this model as a strategic asset rather than a product release.</p>
+<p>The positioning is equally explicit. Mistral frames ML4 as the answer to a market split between closed models that can be unplugged and open models that are mostly made in China — President Macron's "third way in AI" made concrete. TechCrunch quotes Mistral's VP of Science, Pierre Stock, on why an open-weight release matters even before it ships: an open-weight model <em>"is easier to audit."</em></p>
+<h3 id="11-the-spec-sheet-at-a-glance">1.1 The Spec Sheet at a Glance</h3>
+<p>Everything in this table is either stated in Mistral's announcement or reported by TechCrunch and Reuters. Rows Mistral has not published say so, because several details people expect from a spec sheet simply do not exist yet.</p>
+<table>
+<thead>
+<tr>
+<th>Spec</th>
+<th>Mistral Large 4</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Announced</strong></td>
+<td>October 6, 2026 (public preview)</td>
+</tr>
+<tr>
+<td><strong>Codename</strong></td>
+<td>Le Chonk (ML4 internally)</td>
+</tr>
+<tr>
+<td><strong>Total parameters</strong></td>
+<td>1 trillion</td>
+</tr>
+<tr>
+<td><strong>Active parameters per token</strong></td>
+<td>49 billion (≈4.9% of the network per forward pass)</td>
+</tr>
+<tr>
+<td><strong>Architecture</strong></td>
+<td>Mixture-of-experts, natively multimodal — layer count, expert count and attention type unpublished</td>
+</tr>
+<tr>
+<td><strong>Modality</strong></td>
+<td>Text + image, with visual grounding called out as a headline capability</td>
+</tr>
+<tr>
+<td><strong>Training hardware</strong></td>
+<td>3,800 NVIDIA Grace Blackwell GPUs (TechCrunch cites ~4,000)</td>
+</tr>
+<tr>
+<td><strong>Training location</strong></td>
+<td>Mistral's own datacenters in Europe; preview served from the same infrastructure</td>
+</tr>
+<tr>
+<td><strong>Training data</strong></td>
+<td>A significant share multilingual, spanning 160+ languages including every official EU language</td>
+</tr>
+<tr>
+<td><strong>Context window</strong></td>
+<td>Unpublished</td>
+</tr>
+<tr>
+<td><strong>Licence</strong></td>
+<td>Unpublished — weights promised by end of October 2026</td>
+</tr>
+<tr>
+<td><strong>Access today</strong></td>
+<td>Preview API on Mistral Studio (hosted, guardrailed)</td>
+</tr>
+<tr>
+<td><strong>Weights release</strong></td>
+<td>End of month; October 27 per Reuters</td>
+</tr>
+<tr>
+<td><strong>Pricing</strong></td>
+<td>Unpublished for the preview</td>
+</tr>
+<tr>
+<td><strong>Funding context</strong></td>
+<td>€3B Series D (largest European tech equity round); Samsung-led round at €21B valuation, ASML-led Series C</td>
+</tr>
+</tbody>
+</table>
+<p>Sources: <a href="https://mistral.ai/news/mistral-large-4/">Mistral's announcement</a>, <a href="https://techcrunch.com/2026/10/06/mistrals-new-1t-model-aims-to-leapfrog-closed-and-open-rivals/">TechCrunch, October 6, 2026</a>, and <a href="https://www.reuters.com/world/china/mistral-ceo-says-new-ai-model-beats-chinese-ones-some-areas-2026-10-06/">Reuters, October 6, 2026</a>.</p>
+<h3 id="12-where-ml4-fits-in-mistrals-lineup">1.2 Where ML4 Fits in Mistral's Lineup</h3>
+<p>Mistral ships several families at once, and they are not tiers of the same thing. Getting this wrong is how people end up trying to run the wrong model.</p>
+<ul>
+<li><strong>Mistral Large</strong> — the frontier flagship. ML4 is the fourth generation, and the first where the "Large" label means a trillion-parameter MoE rather than a dense model in the low hundreds of billions.</li>
+<li><strong>Ministral</strong> — the genuinely small models, built for on-device and latency-sensitive work. This is the branch that matters for laptops and edge hardware.</li>
+<li><strong>Magistral</strong> — the reasoning line, tuned for step-by-step problem solving rather than raw scale.</li>
+<li><strong>Devstral</strong> — the coding line, and historically Mistral's most popular open-weight release among developers running models locally.</li>
+<li><strong>Mistral Small</strong> — the workhorse small-to-mid model that people actually deploy in production at reasonable cost.</li>
+</ul>
+<p>Mistral's announcement explicitly says ML4 "will serve as the foundation for a new generation of specialized and optimized Mistral models." Read literally, that means today's specialised releases are about to be replaced by ML4-derived versions of them — which is the most important sentence in the announcement for anyone who runs models locally, because those derivatives, not the trillion-parameter parent, are the ones that will fit on desktop hardware.</p>
+<hr />
+<h2 id="2-architecture">2. Architecture</h2>
+<p>This is where a normal deep dive would tell you the layer count, the expert count, the attention mechanism and the hidden dimension. Mistral has not published any of it. The announcement says "we will share further details on the model architecture, additional benchmarks, and our post-training methodology" when the weights drop, and TechCrunch reports the same: benchmark results were still pending at launch.</p>
+<p>What can be said with confidence is arithmetic and inference rather than disclosure.</p>
+<ul>
+<li><strong>1 trillion total, 49 billion active</strong> means roughly <strong>4.9% of the network fires per token</strong>. That is a sparsity profile in the same family as DeepSeek's and Qwen's frontier MoEs — deep enough that serving cost tracks the active parameters, not the total.</li>
+<li><strong>"Natively multimodal"</strong> is Mistral's phrasing, and they use it carefully: the model was trained for image understanding rather than having a vision tower bolted on afterwards. Their showcase use cases — grounding dense natural scenes, verifying mechanical parts in engineering drawings, retrieving evidence from PDFs, scanning gigapixel satellite imagery — are perception tasks that need vision in the pre-training mix, not a post-hoc adapter.</li>
+<li><strong>Efficiency is part of the claim.</strong> Stock told TechCrunch ML4 was trained on ~4,000 GPUs, "two to three times less than our Chinese competitors, and significantly less than the closed source competitors." A 1T-parameter model trained on that budget implies aggressive MoE routing and a data/optimisation recipe doing real work — or a model that is 1T on paper and far cheaper to train than the raw parameter count suggests.</li>
+</ul>
+<p>For readers used to open-weight releases, the honest summary is: <strong>the architecture section of this post will be obsolete in about three weeks.</strong> Mistral has committed to publishing the details alongside the weights, which is exactly why this post focuses on what is verifiable now — behaviour, benchmarks, and the local-run arithmetic — rather than speculating about layer counts that a config file will contradict.</p>
+<h3 id="21-what-the-49b-active-figure-implies">2.1 What the 49B Active Figure Implies</h3>
+<p>Active parameters determine serving cost; total parameters determine memory. Those two numbers pulling apart by 20x is the entire economic story of this model.</p>
+<p>At 49B active per token, ML4's per-token compute is in the neighbourhood of a mid-size dense model — comparable to models people already run on single high-end GPUs or fast hosted endpoints. But all one trillion parameters must be resident somewhere, because the router picks different experts for every token. That is why the local-run numbers in section 6 are dominated by storage and memory bandwidth rather than raw FLOPs.</p>
+<p>It also explains Mistral's infrastructure story. Serving a 1T-parameter MoE at preview scale "on that same infrastructure" — 3,800 Grace Blackwell GPUs — is a datacenter problem, and Grace Blackwell is chosen precisely because NVLink-class interconnect is what keeps expert all-to-all traffic from becoming the bottleneck. Anyone attempting the same workload on consumer hardware inherits that bandwidth problem in miniature.</p>
+<hr />
+<h2 id="3-benchmarks">3. Benchmarks</h2>
+<p>Mistral published a capability-by-capability breakdown rather than a single leaderboard table, which is a choice worth respecting: it is easier to check, and each claim names an independent evaluation. Below is every number Mistral disclosed, grouped by domain, with the important caveats attached.</p>
+<h3 id="31-cybersecurity">3.1 Cybersecurity</h3>
+<p>This is the strongest and most specific claim in the announcement.</p>
+<ul>
+<li><strong>Artificial Analysis Cyber Index:</strong> top five models globally, and leading open-weight models developed outside China by a wide margin.</li>
+<li><strong>Vulnerability reproduction and patching:</strong> <strong>82%</strong> on the test that asks a model to reproduce a real vulnerability in open-source software and then patch it — the highest score of any model, closed or open.</li>
+<li><strong>Cybench:</strong> <strong>93%</strong> of the 40 challenges drawn from security competitions, one of the highest scores reported for an open-weight model.</li>
+</ul>
+<p>The comparison Mistral draws is the interesting part: Claude Opus 5.5 and GPT-6 Astra score <em>near zero</em> on the reproduction test, not because they lack the capability but because they refuse the task. Defending software starts with proving a flaw is real, and that is exactly the work safety filters block. Mistral also notes its own model refuses cyber-malicious requests more than any previous Mistral model — top scores on defence, highest refusal rate among open-weight models on JailbreakBench, StrongREJECT and AgentHarm cyber prompts. If that combination holds up independently, it is a genuinely differentiated position: capable where defenders need capability, restrictive where attackers want it.</p>
+<h3 id="32-agentic-coding">3.2 Agentic Coding</h3>
+<table>
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>ML4 Preview</th>
+<th>Context</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>DeepSWE v1.1</td>
+<td><strong>61.7%</strong></td>
+<td>Software engineering tasks</td>
+</tr>
+<tr>
+<td>SWE-Atlas-QnA</td>
+<td><strong>59.4%</strong></td>
+<td>Repository understanding</td>
+</tr>
+<tr>
+<td>Terminal-Bench 4</td>
+<td><strong>28.3%</strong></td>
+<td>Complex terminal workflows</td>
+</tr>
+<tr>
+<td>Coding Agent Index (combined)</td>
+<td><strong>49.8%</strong></td>
+<td>Ahead of DeepSeek V4 Pro 0813 and Qwen3.8 Max</td>
+</tr>
+</tbody>
+</table>
+<p>Mistral also ran a blind human evaluation with Surge AI: professional annotators rated outputs from five models on a 1–5 scale with identities hidden. ML4 Preview scored <strong>3.74</strong>, second of five — behind Claude Opus 5 (4.22), ahead of GLM-5.3 (3.60), Kimi K3 (3.59) and GLM-5.2 (3.40).</p>
+<p>Two caveats carry equal weight here. The blind human eval is the more trustworthy signal, because it is hard to game and directly measures what a developer would accept as output. And "second of five" is not a sweep: on coding quality specifically, Claude Opus 5 retains a clear lead of nearly half a point. ML4's pitch on coding is open-weight leadership plus refusal-free operation, not best-in-class outright.</p>
+<h3 id="33-agents-multimodal-science-and-knowledge-work">3.3 Agents, Multimodal, Science and Knowledge Work</h3>
+<ul>
+<li><strong>AutomationBench:</strong> <strong>59.9%</strong> across 657 business workflows spanning Gmail, Google Sheets, Slack and Salesforce — ahead of Kimi K3, MiMo-V2.6-Pro and DeepSeek V4 Pro.</li>
+<li><strong>AA-Briefcase</strong> (long-horizon knowledge work producing spreadsheets, slides and PDFs): <strong>1,393 Elo</strong>, ahead of DeepSeek V4 Pro.</li>
+<li><strong>Visual grounding (Dense 200):</strong> <strong>42%</strong> versus GPT-6-Astra's 41% — one point, but a closed frontier model being the baseline makes it a notable claim.</li>
+<li><strong>Science (SciCode-Verified):</strong> state of the art among open-weight models; Mistral cites a full Hartree–Fock simulation generated in one shot.</li>
+<li><strong>Legal and finance:</strong> third-party evaluations by vals.ai on representative tasks found ML4 exceeding GPT-6-Astra in both; on HarveyAI's Legal Agent benchmark it outperforms all open-source models.</li>
+<li><strong>Safety:</strong> <strong>93.3%</strong> of attacks resisted on Lakera's public B3 AI Security Benchmark (no higher competitor scores reported), and <strong>1.691</strong> on KORA where 2 is the maximum "Exemplary."</li>
+</ul>
+<p><h3 id="34-how-ml4-sits-against-the-field">3.4 How ML4 Sits Against the Field</h3>
+<p>Laid out side by side with the models it competes with on the numbers Mistral disclosed, the shape of the claim becomes clearer — and narrower than the press coverage suggests.</p>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Coding agent index</th>
+<th>Blind human coding (1-5)</th>
+<th>Weights</th>
+<th>Note</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Mistral Large 4</strong></td>
+<td><strong>49.8%</strong></td>
+<td><strong>3.74</strong></td>
+<td>End of Oct 2026</td>
+<td>Preview API today; 1T/49B active</td>
+</tr>
+<tr>
+<td>Claude Opus 5</td>
+<td>not reported</td>
+<td>4.22</td>
+<td>Closed</td>
+<td>Leads the human coding eval outright</td>
+</tr>
+<tr>
+<td>GLM-5.3</td>
+<td>not reported</td>
+<td>3.60</td>
+<td>320B/18B, MIT</td>
+<td>Shipped Aug 26, 2026; 1M context</td>
+</tr>
+<tr>
+<td>Kimi K3</td>
+<td>not reported</td>
+<td>3.59</td>
+<td>Open</td>
+<td>Behind ML4 on AutomationBench too</td>
+</tr>
+<tr>
+<td>DeepSeek V4 Pro 0813</td>
+<td>below 49.8%</td>
+<td>not reported</td>
+<td>Open</td>
+<td>Also behind on AA-Briefcase</td>
+</tr>
+<tr>
+<td>Qwen3.8 Max</td>
+<td>below 49.8%</td>
+<td>not reported</td>
+<td>Open</td>
+<td>Coding Agent Index comparison</td>
+</tr>
+</tbody>
+</table>
+<p>Two honest readings of that table. Against other open-weight flagships, ML4 leads on the indices Mistral chose to publish — that is a real, if self-selected, lead. Against closed frontier models, the picture is mixed: Claude Opus 5 still wins the blind coding evaluation by almost half a point, and ML4's decisive advantages there are openness and refusal behaviour rather than raw quality. Note also that this comparison exists because Mistral published it; independent leaderboard runs from Artificial Analysis and peers arrive after launch and will include the tests Mistral did not lead.</p>
+<p>The pattern across all six domains is the same: ML4 is positioned as the best open-weight option outside China, competitive-but-not-dominant against closed frontier models, and outright leading where refusal behaviour — not capability — is the deciding factor. That is a coherent story. It is also the story of a model that knows exactly which market it is entering.</p>
+<hr />
+<h2 id="4-training-and-rl-at-scale">4. Training and RL at Scale</h2>
+<p>Two numbers in Mistral's announcement describe the whole training story: <strong>3,800 NVIDIA Grace Blackwell GPUs</strong> in Mistral's own European datacenters, and an RL fleet at <strong>3k GPUs producing roughly 33 billion tokens per day</strong>, of which around 16 billion are trainable completion tokens after filtering and masking.</p>
+<h3 id="41-from-scratch-on-own-hardware">4.1 From Scratch, on Own Hardware</h3>
+<p>ML4 was trained from scratch — not continued from a Mistral Large 3 checkpoint — and the announcement is explicit that this is "a significant milestone in our long-term investment across infrastructure, research and product development." The preview is served on the same hardware. In an industry where frontier training usually means renting hyperscaler capacity, owning the cluster is a strategic choice: it is what lets Mistral offer an end-to-end European deployment operating under European law and "independently of other digital service providers."</p>
+<p>The efficiency framing matters too. Stock's "two to three times less than our Chinese competitors" claim is a shot at both camps at once — it positions Mistral as the efficient frontier lab while underscoring that scale alone does not determine quality. Whether the claim survives independent scrutiny is unverifiable today, but the underlying fact (a European lab training a 1T-parameter model on ~4,000 GPUs) is not in dispute.</p>
+<h3 id="42-the-rl-stack">4.2 The RL Stack</h3>
+<p>The post-training section is the most technically revealing part of the announcement, because it describes a system rather than a result. Mistral's argument for reinforcement learning is stated plainly: a recipe tuned for yesterday's model leaves capability on the table, because ground-truth samples that once pushed a model to its limit will not anymore. RL adapts to the model as it improves — you train on the outcomes of the model's own attempts and raise task difficulty as it gets stronger.</p>
+<p>What they built to make that practical:</p>
+<ul>
+<li><strong>A shared, composable interface</strong> where a single training run combines tasks from single-turn chat and scientific problem solving through to safety alignment, factuality and long-horizon tool use.</li>
+<li><strong>Shared scaffolds and resources</strong> — code sandboxes, web search and external APIs — so environments reuse infrastructure instead of each building its own.</li>
+<li><strong>Composable verification:</strong> reward models, unit tests, LLM judges and static checks combined per task as needed.</li>
+<li><strong>An autoscaling actor fleet</strong> generating tens of thousands of rollouts in parallel while training proceeds asynchronously.</li>
+<li><strong>A long-trajectory pipeline</strong> supporting rollout budgets of millions of tokens across multiple context compactions, with explicit optimisations to keep staleness and off-policy drift low — the two things that normally destabilise long-horizon RL.</li>
+</ul>
+<pre><code>Single run @ ~3k GPUs
+  ├─ ~33B tokens / day generated
+  ├─ ~16B trainable completion tokens (after filtering + masking)
+  └─ Asynchronous: generation and training overlap, drift minimised
+</code></pre>
+<p>Mistral's stated result is that improvements transfer beyond the training environments to downstream evals, and that the RL run behind the preview <em>"is still in flight"</em> with <em>"no signs of saturation."</em> Read that as an expectation-setting signal: the model you can call today is a moving target, and the weights at end of month will not be the same weights Mistral was benchmarking last week.</p>
+<hr />
+<h2 id="5-inference-and-deployment">5. Inference and Deployment</h2>
+<p>Today, inference is entirely Mistral's problem, and the deployment story is unusually geopolitical.</p>
+<ul>
+<li><strong>Preview API on Mistral Studio</strong> — the only public access, served from Mistral's own European datacenters, with guardrails applied.</li>
+<li><strong>Multi-region availability</strong>, including a European deployment Mistral operates end-to-end under European law, independent of other digital service providers.</li>
+<li><strong>Mistral Forge</strong> for customization — and a notable detail: ML4 uses the same training, customization and RL environment Mistral sells to its customers, which means the Forge toolchain is battle-tested on the flagship itself.</li>
+<li><strong>No self-hosting yet.</strong> Weights, architecture details, additional benchmarks and post-training methodology all arrive together at end of month.</li>
+</ul>
+<p>For enterprises in regulated industries — finance, pharma, shipping, public sector, the sectors Mistral says it worked with while training ML4 — the European-end-to-end story is the actual product. Sovereignty here is not marketing gloss: it is the difference between an inference contract you can audit under your own jurisdiction and an API whose terms, region and availability are someone else's decision.</p>
+<p>The red-teaming window sits inside this section deliberately. Between now and weights release, access tiers are: general public (guardrailed preview) → vetted partners, cybersecurity leaders and state authorities (reduced moderation, expanded cyber capability) → everyone (open weights). Mistral's stated concern is that threat actors already jailbreak these models for offensive work, so defenders need systems that can match those capabilities without the same refusals. That is a defensible position and a genuinely new release pattern; it also means independent evaluation of the model's full capability is deferred until October 27.</p>
+<hr />
+<h2 id="6-can-you-run-mistral-large-4-locally">6. Can You Run Mistral Large 4 Locally?</h2>
+<p>This is the section Local AI Zone readers came for, so here is the short answer first: <strong>no, not today</strong> — the weights are not published — and <strong>probably not on a single desktop</strong> once they are. The numbers below are estimates computed from the one confirmed figure (1 trillion parameters) and standard quantisation arithmetic. Mistral has not published parameter precision, layer configuration, context length or licence, all of which move these figures by real amounts.</p>
+<h3 id="61-the-size-arithmetic">6.1 The Size Arithmetic</h3>
+<p>Model size in memory is approximately <code>parameters × bytes-per-parameter</code> for the weights, plus KV cache for the context, plus a little runtime overhead. With 1T parameters:</p>
+<table>
+<thead>
+<tr>
+<th>Precision</th>
+<th>Bytes/param</th>
+<th>Weights (est.)</th>
+<th>Practical implication</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BF16 / FP16</td>
+<td>2</td>
+<td><strong>≈ 2,000 GB (1.86 TiB)</strong></td>
+<td>Multi-node territory; not a workstation workload</td>
+</tr>
+<tr>
+<td>8-bit (INT8 / FP8)</td>
+<td>1</td>
+<td><strong>≈ 1,000 GB</strong></td>
+<td>8× 128 GB accelerators, or a pair of 512 GB boxes</td>
+</tr>
+<tr>
+<td>4-bit (Q4-class)</td>
+<td>0.5</td>
+<td><strong>≈ 500 GB</strong></td>
+<td>8× 64 GB cards; or 512 GB+ of unified memory at a stretch</td>
+</tr>
+<tr>
+<td>2-bit (aspirational)</td>
+<td>0.25</td>
+<td><strong>≈ 250 GB</strong></td>
+<td>Quality cost on a 1T model is an open question</td>
+</tr>
+</tbody>
+</table>
+<p><em>All figures are estimates pending the weights. KV cache is additional and scales with context length and batch size — for a frontier model it can easily add tens of gigabytes at long context.</em></p>
+<p><h3 id="611-what-hardware-could-actually-host-it">6.1.1 What Hardware Could Actually Host It</h3>
+<p>Turning the 4-bit estimate into machines, assuming ~500 GB of weights plus KV cache and runtime overhead. This is planning arithmetic, not a compatibility list — no hardware has run the model yet.</p>
+<table>
+<thead>
+<tr>
+<th>Configuration</th>
+<th>Usable memory</th>
+<th>Q4 (≈500 GB) fit?</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Consumer GPU (24-32 GB)</td>
+<td>24-32 GB</td>
+<td><strong>No</strong></td>
+<td>Even offloaded, weights are 15-20x too large</td>
+</tr>
+<tr>
+<td>2× RTX 4090 / 5090</td>
+<td>48-64 GB</td>
+<td><strong>No</strong></td>
+<td>Handles 30-70B dense MoEs comfortably</td>
+</tr>
+<tr>
+<td>Apple Mac Studio, 128-192 GB</td>
+<td>128-192 GB unified</td>
+<td><strong>No</strong></td>
+<td>Would need ~4x the largest shipping config</td>
+</tr>
+<tr>
+<td>4× Mac Studio Ultra (512 GB)</td>
+<td>512 GB unified</td>
+<td><strong>Marginal</strong></td>
+<td>Weights alone leave little for KV cache; bandwidth shared across chips</td>
+</tr>
+<tr>
+<td>8× A100/H100 80 GB</td>
+<td>640 GB</td>
+<td><strong>Yes</strong></td>
+<td>Standard 8-GPU node; interconnect matters for MoE all-to-all</td>
+</tr>
+<tr>
+<td>8× RTX 6000 Ada 96 GB</td>
+<td>768 GB</td>
+<td><strong>Yes</strong></td>
+<td>Single workstation-class box, datacenter power</td>
+</tr>
+<tr>
+<td>NVIDIA GB200/B200 node</td>
+<td>Up to 1.4+ TB</td>
+<td><strong>Yes</strong></td>
+<td>Where Mistral itself serves it; Grace Blackwell chosen for bandwidth</td>
+</tr>
+</tbody>
+</table>
+<p>Read the table with one caveat in mind: MoE serving is memory-bandwidth bound, so a configuration that technically holds the weights can still be painfully slow if expert tensors spread across slow links. That is why the realistic enthusiast path is not "buy more cards" — it is Mistral's own stated plan for specialised derivatives, or a quantisation tier below 4-bit once someone has measured the quality cost on a 1T network.</p>
+<p>For scale: a Q4 file for a 235B-parameter MoE lands near 120 GB, which people already run on 2× A100 80 GB or a 192 GB Mac. ML4 at Q4 is roughly <strong>four times that</strong>. The active-parameter count of 49B does not shrink the download — every expert must be on disk and reachable — but it does mean compute per token is modest relative to memory pressure, which is exactly the profile where MoE offloading helps.</p>
+<h3 id="62-what-the-release-will-actually-look-like">6.2 What the Release Will Actually Look Like</h3>
+<p>When the weights land, expect the usual ecosystem moves within days, in this order:</p>
+<ol>
+<li><strong>Raw safetensors</strong> on Hugging Face, with the licence and config that finally settle architecture, context length and supported dtypes.</li>
+<li><strong>Quantised conversions</strong> (GGUF from the llama.cpp and Unsloth pipelines, plus AWQ/GPTQ for vLLM-class serving) — but note the practical ceiling: a Q4 GGUF of a 1T model is a ~500 GB download, so the audience for the unsharded file is datacenter-adjacent, not laptop.</li>
+<li><strong>Serving support</strong> in vLLM and llama.cpp for whatever routing and attention design Mistral used — MoE implementations have historically lagged the first release by days to weeks.</li>
+<li><strong>Expert offload and distributed paths</strong> — llama.cpp's expert-offload mode, multi-node split inference, and cloud-local clusters are the realistic ways enthusiasts touch this model before someone publishes a genuinely smaller derivative.</li>
+</ol>
+<h3 id="63-what-to-run-until-then">6.3 What to Run Until October 27</h3>
+<p>If you want frontier-class open-weight behaviour today, the honest answer is that the current crop is very good and ML4 does not change what fits on your hardware until the weights exist:</p>
+<ul>
+<li><strong>24–32 GB cards:</strong> GLM-5.3-Flash (320B/18B at Q4), DeepSeek V4 Flash (284B/13B) and Qwen3.8-class MoEs remain the sweet spot.</li>
+<li><strong>72–96 GB (or 2× 48 GB):</strong> Q4–Q5 of the larger open flagships.</li>
+<li><strong>Need Mistral specifically:</strong> their own open-weight releases — Ministral, Magistral and Devstral — are downloadable now and cover small, reasoning and coding use cases.</li>
+<li><strong>Need it now, anyway:</strong> the preview API is live on Mistral Studio, and hosted ML4 endpoints will appear in aggregators before the weights do.</li>
+</ul>
+<p>The checklist to run when the files drop: confirm the licence (Mistral has used both Apache-2.0 and its own research licence, and the terms decide commercial use), check whether routing is standard top-k MoE (determines how quickly llama.cpp/vLLM catch up), measure the real KV-cache footprint at your target context, and look for an official distilled or specialised variant — Mistral has said ML4 "will serve as the foundation for a new generation of specialized and optimized Mistral models," and those derivatives are far likelier to fit on a desktop than the 1T parent.</p>
+<hr />
+<h2 id="7-api-and-developer-usage">7. API and Developer Usage</h2>
+<p>The preview is reachable today through Mistral Studio, using Mistral's existing API surface, with model access gated behind an account rather than an API key you can paste anywhere. Three practical points for developers:</p>
+<ul>
+<li><strong>Pricing for the preview has not been published.</strong> Treat any per-token figure you see circulating as unconfirmed until Mistral posts a rate card.</li>
+<li><strong>The model will move under you.</strong> Mistral describes the preview as continuing to improve and the RL run as ongoing, so pin a version where the API allows it and re-run your evals before the weights land.</li>
+<li><strong>Enterprise customization runs through Forge</strong>, which uses the same RL and fine-tuning environment the flagship was trained with — relevant if you are evaluating Mistral for a regulated workload rather than a weekend project.</li>
+</ul>
+<p><h3 id="71-how-to-evaluate-the-preview-today">7.1 How to Evaluate the Preview Today</h3>
+<p>While the weights are pending, the preview API is the only honest way to form your own view. A useful evaluation does not need a benchmark harness:</p>
+<ol>
+<li><strong>Run your own tasks, not demo prompts.</strong> Take three to five real workloads from your week — a stubborn bug, a document to summarise, a chart to read, a patch to review — and run them identically across ML4, your current default and one other open-weight model.</li>
+<li><strong>Test the refusal boundary explicitly.</strong> ML4's differentiating claim is capability where closed models decline. Try the legitimate edge cases you actually hit: reproducing a vulnerability in your own dependency, writing an exploit proof-of-concept for a system you own, analysing a sample you are authorised to handle. Note where it complies and where it does not.</li>
+<li><strong>Check the modal path.</strong> Visual grounding is the headline multimodal claim — feed it a dense engineering drawing, a scan-heavy PDF or a satellite-style image and ask for something specific rather than a description.</li>
+<li><strong>Pin what you measure.</strong> Mistral says the model is still improving under an active RL run, so record the date and model identifier with any result. Yesterday's preview score is not next week's.</li>
+</ol>
+<p>Context length, tool-calling format, structured-output support and rate limits are all details the announcement does not cover. They are the first things to check in the docs when you sign in, and the first things this post will update once they are public.</p>
+<hr />
+<h2 id="8-safety-red-teaming-and-the-open-by-design-argument">8. Safety, Red-Teaming and the Open-by-Design Argument</h2>
+<p>Most launches treat safety as a footnote. ML4 treats it as the release mechanism, and three separate threads are tangled together in it.</p>
+<p><strong>The refusal asymmetry.</strong> Mistral's headline cyber result — 82% on vulnerability reproduction and patching, the highest of any model — exists in direct contrast to Claude Opus 5.5 and GPT-6 Astra scoring near zero on the same test because they decline the task. Mistral's framing is that defenders need to prove flaws are real, and safety filters written for the general case block that work. The mirror claim is that ML4 still refuses malicious cyber requests more than any other open-weight model: the highest refusal rate measured across JailbreakBench, StrongREJECT and AgentHarm cyber prompts, alongside 93.3% resistance on Lakera's B3 benchmark and a KORA score of 1.691 out of 2.</p>
+<p><strong>The gated preview.</strong> Between now and weights release, vetted partners, cybersecurity leaders and state authorities receive the same model with reduced moderation and expanded cyber capabilities. Mistral's stated reason is defensive parity: threat actors already jailbreak frontier models for offensive work, so defenders should not be the only ones constrained. This is the first mainstream release pattern where the fully capable model ships to hand-picked organisations before the public, and it means independent evaluation of ML4's maximum capability is deferred until the weights exist.</p>
+<p><strong>Open weights as the safety answer.</strong> The counterintuitive move is Mistral's answer to "isn't this dangerous?" — release the weights. Stock's rationale is auditability: an open-weight model can be inspected, controlled and deployed under your own policies, and for security operations that sovereignty is the point. You can disagree with the trade-off, but the logic is internally consistent: capability that a provider can revoke mid-incident is itself a risk.</p>
+<p>What is genuinely new here is not any single number. It is that Mistral has made <em>where</em> and <em>to whom</em> a model is released part of the safety case rather than an afterthought of it.</p>
+<hr />
+<h2 id="9-strategic-context">9. Strategic Context</h2>
+<p>ML4 lands in the middle of a funding and geopolitical story that predates it.</p>
+<ul>
+<li><strong>€3B Series D</strong> — described by Mistral as the largest equity round ever raised by a European technology company. Samsung led it at a <strong>€21B valuation</strong>; ASML, the Dutch lithography giant, led the earlier Series C. Both backers are chip-adjacent, and Stock told TechCrunch that chip design is one of ML4's optimised use cases — ASML and Samsung are not passive investors here.</li>
+<li><strong>European infrastructure as product.</strong> Trained in Mistral's own European datacenters, previewed from the same hardware, with a European deployment operated end-to-end under European law. For public-sector and regulated buyers, that is the differentiator against both American closed models and Chinese open ones.</li>
+<li><strong>160+ languages</strong> in the training mix, including every official language of the European Union. A genuinely multilingual flagship is a competitive edge in exactly the market Mistral is targeting.</li>
+<li><strong>The "third way" pitch.</strong> Macron's framing — Europe between US closed models and Chinese open models — is the thesis ML4 is built to prove. Beating Chinese open models on capability while beating closed models on openness and auditability is the only square that fits that framing.</li>
+</ul>
+<p>The risk is equally clear. A 1T-parameter model trained on Mistral's own 3,800-GPU fleet is expensive to run and expensive to improve, and Mistral has said the RL run is still climbing. The roadmap that funded this — a foundation for "a new generation of specialized and optimized Mistral models" — implies the flagship is the marketing event while the smaller derivatives are the products.</p>
+<hr />
+<h2 id="10-whats-still-missing">10. What's Still Missing</h2>
+<p>Published claims notwithstanding, this launch is unusually incomplete, and it is worth being precise about what you cannot know yet.</p>
+<ul>
+<li><strong>Architecture.</strong> Layer count, expert configuration, attention design, hidden dimension, vocabulary, context window — none published. Mistral says these come with the weights.</li>
+<li><strong>The weights themselves.</strong> The single most important artefact is three weeks away, and until then "open-weight" describes an intention, not a downloadable artefact.</li>
+<li><strong>Licence.</strong> Apache-2.0 vs Mistral's own research licence decides commercial self-hosting. Unknown today.</li>
+<li><strong>Pricing.</strong> No published rate card for the preview API.</li>
+<li><strong>Independent benchmarks.</strong> Every number here is Mistral's, from Mistral's own evaluations or vendors they engaged. Artificial Analysis and the broader leaderboard ecosystem will publish their own runs — including the ones Mistral did not lead.</li>
+<li><strong>Full capability evaluation.</strong> Deferred by design: the unrestricted model is in red-team hands until end of month.</li>
+<li><strong>Memory footprint at context.</strong> No KV-cache or context-length data means the local-run numbers in section 6 are floor estimates, not budgets.</li>
+</ul>
+<p>None of that makes the announcement hollow — the capability numbers are specific, sourced and testable in three weeks. It does mean this is a preview in the literal sense, and readers should treat it as an early look rather than a final review.</p>
+<h3 id="101-what-will-be-updated-when-the-weights-land">10.1 What Gets Updated When the Weights Land</h3>
+<p>This post is written to be revisited rather than rewritten. When the release ships, four rows in it change: the spec table in section 1 gains architecture, context window, licence and pricing; section 2 replaces its inferences with the published config; section 6 replaces estimates with measured file sizes and real load tests; and the local-run section gains the actual quantisation ladder the community produces. Until then, every number here is either attributed to Mistral, TechCrunch or Reuters, or labelled as arithmetic from the announced parameter count — nothing is filled in by guesswork.</p>
+<hr />
+<h2 id="11-bottom-line">11. Bottom Line</h2>
+<p>Mistral Large 4 is the most ambitious thing Mistral has shipped: a trillion-parameter, natively multimodal MoE trained from scratch on the company's own European hardware, released as an open-weight model with a preview API today and weights by the end of October. On the numbers Mistral published, it leads open-weight models outside China on cybersecurity, holds a genuine edge on legal and financial knowledge work, and sits second — behind Claude Opus 5 — on blind human coding evaluation while outperforming GLM-5.3 and Kimi K3 on the same test.</p>
+<p>For this site's readers the takeaway is narrower and more practical. Until the weights land, ML4 is an API-only model with unpublished pricing and architecture; it changes nothing about what you can run on your hardware this week. When the weights arrive, the arithmetic in section 6 is the conversation: roughly 500 GB at 4-bit for the full model, which puts genuine local inference on multi-GPU servers and very large unified-memory machines, with expert offload and — far more likely — Mistral's promised specialised derivatives as the realistic desktop path.</p>
+<p>The launch to watch is not October 6. It is October 27, and what the licence says.</p>
+<hr />
+<section id="faq" class="article-section faq">
+<h2>Frequently asked questions</h2>
+<h3>What is Mistral Large 4?</h3>
+<p>Mistral Large 4, nicknamed Le Chonk, is Mistral AI's flagship mixture-of-experts model with 1 trillion total parameters and 49 billion active parameters per token. It is natively multimodal, was previewed on October 6, 2026, and is available today through the Mistral Studio API with open weights due by the end of October 2026.</p>
+<h3>Can you run Mistral Large 4 locally?</h3>
+<p>Not yet. The weights are not published until the end of October 2026, so today the only access is the hosted preview API. Once released, 1 trillion parameters implies roughly 2 TB at BF16, about 1 TB at 8-bit and about 500 GB at 4-bit before KV cache, which puts practical local inference on multi-GPU servers or very large unified-memory machines rather than ordinary desktops.</p>
+<h3>Is Mistral Large 4 open source?</h3>
+<p>It is an open-weight model, not open source in the licence sense yet: Mistral has committed to releasing the weights by the end of October 2026, but the licence terms and full architecture details have not been published at the time of writing.</p>
+<h3>How does Mistral Large 4 compare to other frontier models?</h3>
+<p>Mistral reports a 49.8% Coding Agent Index score ahead of DeepSeek V4 Pro 0813 and Qwen3.8 Max, a 59.9% AutomationBench score ahead of Kimi K3, and a blind human coding evaluation of 3.74 out of 5 behind Claude Opus 5 at 4.22 but ahead of GLM-5.3 at 3.60. On cybersecurity tasks it ranks among the top five models globally, and on visual grounding it edges GPT-6-Astra on Dense 200.</p>
+<h3>When are the Mistral Large 4 weights released?</h3>
+<p>Mistral says the weights ship by the end of October 2026, with coverage of the announcement citing October 27. Until then the model is served as a public preview API on Mistral Studio while Mistral red-teams it with cybersecurity partners and state authorities.</p>
+</section>
+
+<div class="article-section">
+<h2 class="section-title">Related Posts</h2>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+<a href="glm-5-3-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+<h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">GLM-5.3-Flash</h3>
+<p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Z.ai's 320B/18B hybrid-attention MoE with 1M context and MIT licence — the clearest open-weight rival ML4 has to beat.</p>
+<span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+</a>
+<a href="deepseek-v4-1-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+<h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">DeepSeek V4.1 Flash</h3>
+<p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The Causal Encoder-Decoder architecture and CSA2 attention modes behind the open-weight model ML4 benchmarks against.</p>
+<span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+</a>
+<a href="October_2026_AI_Model_Updates.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+<h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">October 2026 Model Updates</h3>
+<p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Where ML4 sits in this month's release wave — eight specialist models, pricing shifts and cancelled flagships.</p>
+<span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+</a>
+</div>
+</div>
+
+<div class="article-section">
+<h2 class="section-title">About the Author</h2>
+<p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
+<p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+<p style="margin-top: 30px;"><em>Last Updated: October 7, 2026 | Version 1.0</em></p>
+</div>
+        </div>
+
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Mistral Large 4 (Le Chonk)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
+</article>
+
+    <script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+<!-- Contact Form Tab Button -->
+<button id="contact-tab-button" 
+        class="contact-tab-button" 
+        aria-label="Open contact form"
+        aria-expanded="false"
+        aria-controls="contact-form-panel"
+        type="button">
+    <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+        <polyline points="22,6 12,13 2,6" />
+    </svg>
+    <span class="contact-text">Contact</span>
+</button>
+
+<!-- Contact Form Panel -->
+<div id="contact-form-panel" 
+     class="contact-form-panel" 
+     role="dialog" 
+     aria-labelledby="contact-form-title"
+     aria-modal="true"
+     aria-hidden="true">
+    <div class="contact-form-header">
+        <h2 id="contact-form-title">Contact Us</h2>
+        <button class="contact-form-close" 
+                aria-label="Close contact form"
+                type="button">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18" />
+                <line x1="6" y1="6" x2="18" y2="18" />
+            </svg>
+        </button>
+    </div>
+
+    <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+        <div class="form-group">
+            <label for="contact-name" class="form-label">
+                Name <span class="required-indicator" aria-label="required">*</span>
+            </label>
+            <input type="text" 
+                   id="contact-name" 
+                   name="name"
+                   class="form-input"
+                   placeholder="Your name"
+                   required
+                   aria-required="true"
+                   aria-describedby="contact-name-error">
+            <div id="contact-name-error" 
+                 class="form-error" 
+                 role="alert"
+                 aria-live="polite"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="contact-email" class="form-label">
+                Email <span class="required-indicator" aria-label="required">*</span>
+            </label>
+            <input type="email" 
+                   id="contact-email" 
+                   name="email"
+                   class="form-input"
+                   placeholder="your.email@example.com"
+                   required
+                   aria-required="true"
+                   aria-describedby="contact-email-error">
+            <div id="contact-email-error" 
+                 class="form-error" 
+                 role="alert"
+                 aria-live="polite"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="contact-subject" class="form-label">
+                Subject <span class="required-indicator" aria-label="required">*</span>
+            </label>
+            <input type="text" 
+                   id="contact-subject" 
+                   name="subject"
+                   class="form-input"
+                   placeholder="What is this about?"
+                   required
+                   aria-required="true"
+                   aria-describedby="contact-subject-error">
+            <div id="contact-subject-error" 
+                 class="form-error" 
+                 role="alert"
+                 aria-live="polite"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="contact-message" class="form-label">
+                Message <span class="required-indicator" aria-label="required">*</span>
+            </label>
+            <textarea id="contact-message" 
+                      name="message"
+                      class="form-input form-textarea"
+                      rows="6"
+                      placeholder="Your message..."
+                      required
+                      aria-required="true"
+                      aria-describedby="contact-message-error"></textarea>
+            <div id="contact-message-error" 
+                 class="form-error" 
+                 role="alert"
+                 aria-live="polite"></div>
+        </div>
+
+        <button type="submit" class="form-submit" aria-label="Send message">
+            <span class="btn-text">Send Message</span>
+            <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                <circle cx="12" cy="12" r="10" opacity="0.25" />
+                <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+            </svg>
+        </button>
+    </form>
+
+    <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+<script>
+    // Initialize contact form
+    document.addEventListener('DOMContentLoaded', () => {
+        new ContactForm();
+    });
+</script>
+</body>
+</html>
+        </div>
