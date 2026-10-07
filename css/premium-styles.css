@@ -1042,7 +1042,10 @@ body {
     border-radius: var(--radius-sm);
     font-size: 0.68rem;
     font-weight: 600;
-    color: var(--neutral-700);
+    /* The field is painted white in both themes, so its text must stay dark:
+       var(--neutral-700) flips to #e5e5e5 under prefers-color-scheme: dark and
+       turns the label (and the native option list) into 1.26:1 light-on-white. */
+    color: #404040;
     font-family: var(--font-family);
     cursor: pointer;
     transition: var(--transition-fast);
@@ -1063,6 +1066,15 @@ body {
     outline: none;
     border-color: var(--primary-500);
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Native <option> lists are drawn by the OS, not by this control: they get the
+   system's white background but inherit the themed text colour, so a dark
+   scheme paints #e0e0e0-#e5e5e5 on white (1.3:1). Pin both sides. */
+.model-file-select option,
+.premium-select option {
+    color: #404040;
+    background-color: #ffffff;
 }
 
 /* Deep-link target flash (card located via #model=...&quant=...) */
