@@ -1,0 +1,122 @@
+name: Update GoatCounter Snapshot
+
+# Copies the public GoatCounter visitor counts into data/goatcounter-snapshot.json,
+# the same-origin copy the site falls back to when the third-party counter host is
+# blocked (content blocker, DNS filter, offline reader).
+#
+# No repository secrets are needed: the counter endpoint is public and read-only.
+# The site code comes from js/goatcounter.js, so a change there is picked up here.
+#
+# js/goatcounter.js (header badge) and js/traffic-live.js (traffic.html cards) always
+# try the live counters first and only read this file when those requests fail.
+
+on:
+  schedule:
+    # Every six hours, off the hour. GoatCounter itself caches counter responses for up
+    # to four hours, so refreshing faster than this would only rewrite identical data.
+    - cron: '23 */6 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  update-goatcounter:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+
+      - name: Pull latest changes before processing
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git pull --rebase origin main || git pull origin main
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Fetch GoatCounter counts
+        run: node scripts/fetch-goatcounter-snapshot.js
+
+      - name: Verify snapshot integrity
+        run: |
+          SNAPSHOT="data/goatcounter-snapshot.json"
+
+          if [ ! -f "$SNAPSHOT" ]; then
+            echo "❌ $SNAPSHOT missing"
+            exit 1
+          fi
+
+          # The script already refuses to write without a site total; this catches a
+          # snapshot that was committed in a broken state instead.
+          node -e "
+            const s = JSON.parse(require('fs').readFileSync('$SNAPSHOT','utf8'));
+            if (typeof s.total !== 'string' || !s.total) {
+              console.error('❌ snapshot has no site total');
+              process.exit(1);
+            }
+            const age = (Date.now() - new Date(s.generatedAt).getTime()) / 3600000;
+            console.log('✅ total', s.total, '· today', s.today || 'n/a',
+                        '· generated', s.generatedAt, '(' + age.toFixed(1) + 'h ago)');
+          "
+
+      - name: Check for changes
+        id: check_changes
+        run: |
+          # Stage first: on the very first run the snapshot is untracked, and
+          # `git diff --quiet <path>` reports no changes for untracked files — which
+          # would mean the initial snapshot never got committed.
+          git add data/goatcounter-snapshot.json
+          if git diff --cached --quiet -- data/goatcounter-snapshot.json; then
+            echo "No counter changes detected"
+            echo "changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "Counter changes detected"
+            echo "changes=true" >> $GITHUB_OUTPUT
+            git diff --cached --stat -- data/goatcounter-snapshot.json || true
+          fi
+
+      - name: Commit and push changes
+        if: steps.check_changes.outputs.changes == 'true'
+        run: |
+          git add data/goatcounter-snapshot.json
+          COMMIT_MSG="Automated GoatCounter snapshot update $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+          Refreshed the same-origin copy of the site's visitor counts, so the views
+          badge and the traffic page still show numbers when the third-party counter
+          host is unreachable."
+
+          git commit -m "$COMMIT_MSG" || {
+            echo "Nothing to commit"
+            exit 0
+          }
+
+          git push origin main || {
+            echo "Push failed, pulling latest changes and retrying..."
+            git pull --rebase origin main
+            git push origin main
+          }
+
+      - name: Trigger GitHub Pages deployment
+        if: steps.check_changes.outputs.changes == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.repos.requestPagesBuild({
+                owner: context.repo.owner,
+                repo: context.repo.repo
+              });
+              console.log('GitHub Pages rebuild triggered');
+            } catch (error) {
+              console.log('Error triggering Pages rebuild:', error.message);
+            }

@@ -18,6 +18,8 @@
     "start-local-server": "node scripts/start-local-server.js",
     "test": "node --test --test-concurrency=1 tests/slug-parity.test.js tests/shard-parts.test.js tests/shard-urls.test.js && python tests/run_all.py && python scripts/check-dispatch-coverage.py",
     "test:coverage": "python scripts/check-dispatch-coverage.py",
+    "check:counters": "node scripts/check-live-counters.js",
+    "check:counters:http": "node scripts/check-live-counters.js --no-browser",
     "audit:models": "python scripts/audit-unlinked-models.py",
     "test:slug": "node --test tests/slug-parity.test.js",
     "test:shard-parts": "node --test tests/shard-parts.test.js",

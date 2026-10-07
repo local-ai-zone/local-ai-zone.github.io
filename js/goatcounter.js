@@ -43,6 +43,27 @@
         return n < 10 ? '0' + n : String(n);
     }
 
+    /*
+     * Where the same-origin copy of the counts lives (written by
+     * scripts/fetch-goatcounter-snapshot.js). Resolved against this script's own URL
+     * rather than the page's, because pages live at every depth (models/, blog/,
+     * guides/, brands/, cpu/, …) and the site is also opened from sub-folders, where a
+     * root-relative path points at nothing. Every page includes this file as
+     * `js/goatcounter.js` next to a sibling `data/` directory, so this lands on the
+     * same file the live site serves while still working off the root.
+     */
+    function resolveSnapshotUrl() {
+        var self = document.currentScript;
+        if (self && self.src) {
+            try {
+                return new URL('../data/goatcounter-snapshot.json', self.src).href;
+            } catch (error) {
+                // Unparseable src (a data: or blob: include) — use the site-root path.
+            }
+        }
+        return '/data/goatcounter-snapshot.json';
+    }
+
     var config = {
         code: GOATCOUNTER_CODE,
         enabled: GOATCOUNTER_CODE.length > 0,
@@ -52,6 +73,10 @@
         counterUrl: function (path) {
             return this.base + '/counter/' + path + '.json';
         },
+        // Same-origin fallback, refreshed by scripts/fetch-goatcounter-snapshot.js. The
+        // counter host above is third-party, so a content blocker or a DNS filter deletes
+        // the badge entirely; this copy keeps a number on the page.
+        snapshotUrl: resolveSnapshotUrl(),
         // What the header badge shows: one entry per counter, each fetched on its
         // own so one failure cannot blank the badge. GoatCounter scopes a counter
         // to a date range with ?start=YYYY-MM-DD&end=YYYY-MM-DD.
@@ -121,6 +146,11 @@
             'width:.5em;height:.5em;border-radius:50%;background:#4CAF50;',
             'box-shadow:0 0 0 3px rgba(76,175,80,.28);flex:none;',
             '}',
+            // Grey marks the same-origin snapshot: the counts are real, but they are the
+            // last published copy rather than the near-live figure.
+            '#' + BADGE_ID + ' .gc-views-dot-cached{',
+            'background:#9e9e9e;box-shadow:0 0 0 3px rgba(158,158,158,.28);',
+            '}',
             '#' + BADGE_ID + '.gc-views-float{position:fixed;top:10px;right:10px;margin:0;z-index:9999;}',
             '@media (max-width:768px){',
             '#' + BADGE_ID + '{margin-left:8px;padding:5px 9px;font-size:.68em;}',
@@ -184,16 +214,27 @@
         return 0.2126 * color.r + 0.7152 * color.g + 0.0722 * color.b < 140;
     }
 
-    function mountBadge(parts) {
+    function formatStamp(value) {
+        var date = new Date(value);
+        return isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+    }
+
+    /* `snapshot` is the data/goatcounter-snapshot.json payload when the live counters
+     * could not be read, and undefined when they could. */
+    function mountBadge(parts, snapshot) {
         if (document.getElementById(BADGE_ID)) return;
         ensureStyles();
 
         var badge = document.createElement('span');
         badge.id = BADGE_ID;
-        badge.title = 'Pageviews recorded by GoatCounter — near-live, refreshed every few hours';
+        badge.title = snapshot
+            ? 'Pageviews recorded by GoatCounter — the live counters could not be reached, ' +
+              'so this is the last published snapshot' +
+              (snapshot.generatedAt ? ' from ' + formatStamp(snapshot.generatedAt) : '') + '.'
+            : 'Pageviews recorded by GoatCounter — near-live, refreshed every few hours';
 
         var dot = document.createElement('span');
-        dot.className = 'gc-views-dot';
+        dot.className = snapshot ? 'gc-views-dot gc-views-dot-cached' : 'gc-views-dot';
         dot.setAttribute('aria-hidden', 'true');
         badge.appendChild(dot);
 
@@ -277,7 +318,33 @@
                     shown.push({ count: data.count, label: specs[i].label });
                 }
             });
-            if (shown.length) mountBadge(shown);
+            if (shown.length) {
+                mountBadge(shown);
+                return;
+            }
+            loadSnapshot();
+        });
+    }
+
+    /*
+     * Every live counter failed — a content blocker, a DNS filter, or an offline reader.
+     * Fall back to the copy the repository publishes from its own origin so the counts
+     * survive instead of the badge silently disappearing.
+     */
+    function loadSnapshot() {
+        if (!config.snapshotUrl) return;
+        getJson(config.snapshotUrl).then(function (data) {
+            if (!data) return;
+            var parts = [];
+            if (typeof data.total === 'string' && data.total.length) {
+                parts.push({ count: data.total, label: 'Total Views' });
+            }
+            if (typeof data.today === 'string' && data.today.length) {
+                parts.push({ count: data.today, label: "Today's Views" });
+            }
+            if (parts.length) mountBadge(parts, data);
+        }).catch(function () {
+            // No snapshot to fall back on either: the badge simply stays absent.
         });
     }
 

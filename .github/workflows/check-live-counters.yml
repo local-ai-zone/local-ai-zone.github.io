@@ -1,0 +1,155 @@
+name: Live Counter Smoke Check
+
+# Answers one question on a schedule: are the site's pageview counters actually
+# working for visitors?
+#
+# The counters fail silently by design — if a read fails the badge simply does not
+# mount, and since the same-origin fallback landed it can instead mount from a stale
+# snapshot — so nothing on the site looks broken. This workflow runs
+# scripts/check-live-counters.js against the deployed site, in a real headless Chrome,
+# and files an issue when a counter stops working.
+
+on:
+  schedule:
+    # Daily at 04:47 UTC — off the hour, and ahead of update-traffic.yml (06:17) so a
+    # broken counter is reported before the day's other automation runs.
+    - cron: '47 4 * * *'
+  workflow_dispatch: # Allow manual triggering
+  push:
+    # Any change that can break the badge, the counters or the fallback copy.
+    paths:
+      - 'js/goatcounter.js'
+      - 'js/traffic-live.js'
+      - 'scripts/check-live-counters.js'
+      - 'data/goatcounter-snapshot.json'
+      - '.github/workflows/check-live-counters.yml'
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      # Puppeteer's Chrome download is ~150MB; caching it keeps this job quick and
+      # stops a flaky download from looking like a broken counter. Keyed on this file so
+      # changing the pinned version below starts a fresh download.
+      - name: Cache Puppeteer's browser
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/puppeteer
+          key: puppeteer-${{ runner.os }}-${{ hashFiles('.github/workflows/check-live-counters.yml') }}
+
+      # Installed into its own directory rather than the checkout: `npm ci` cannot run in
+      # this repository (package-lock.json is out of sync with package.json, which reports
+      # missing optional platform packages like @esbuild/* and fsevents), and resolving
+      # package.json in place would prune the checked-out node_modules the other jobs use.
+      # The version matches the puppeteer dependency the repository already declares.
+      - name: Install Puppeteer in an isolated directory
+        run: |
+          mkdir -p "$RUNNER_TEMP/puppeteer"
+          cd "$RUNNER_TEMP/puppeteer"
+          npm init -y > /dev/null
+          # The version the repository itself declares, read from package.json so it
+          # cannot drift out of step with the rest of the tooling. Read as a file rather
+          # than through require(), which resolves paths differently between platforms.
+          PUPPETEER_RANGE=$(node -e "console.log(JSON.parse(require('fs').readFileSync(process.env.GITHUB_WORKSPACE + '/package.json', 'utf8')).dependencies.puppeteer)")
+          echo "installing puppeteer@$PUPPETEER_RANGE"
+          npm install --no-audit --no-fund "puppeteer@$PUPPETEER_RANGE"
+
+      - name: Check the counters on the deployed site
+        id: smoke
+        env:
+          NODE_PATH: ${{ runner.temp }}/puppeteer/node_modules
+        # Two attempts per page: a page caught mid-deploy is not a broken counter.
+        # The exit code is turned into a verdict here so a check that could not run
+        # (exit 2: no browser, site unreachable) never files a counter-outage issue.
+        run: |
+          set +e
+          node scripts/check-live-counters.js --base https://local-ai-zone.github.io --attempts 2
+          code=$?
+          case $code in
+            0) verdict=ok ;;
+            1) verdict=broken ;;
+            *) verdict=could-not-run ;;
+          esac
+          echo "verdict=$verdict" >> "$GITHUB_OUTPUT"
+          echo "smoke check exit code $code -> verdict $verdict"
+          exit 0
+
+      - name: Fail the run when the check could not run
+        if: steps.smoke.outputs.verdict == 'could-not-run'
+        run: |
+          echo "::error title=smoke check::The check could not run (no browser, or a page would not load).%0AThis is a harness problem, not evidence that the counters are broken — the HTTP checks in the same run still stand."
+          exit 1
+
+      - name: Report the failure as an issue
+        if: steps.smoke.outputs.verdict == 'broken'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'Live counters are not working (automated smoke check)';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `The scheduled live-counter smoke check failed, which means visitors are not
+            being shown the pageview counts (or are not being counted at all).
+
+            ### What the check does
+            Loads real pages on the deployed site in headless Chrome and asserts that the
+            header views badge mounts with a number, that the number came from the **live**
+            counters, and that the same-origin snapshot still keeps a count on the page when
+            the counter host is unreachable.
+
+            ### Start here
+            1. **Run the check locally** — \`node scripts/check-live-counters.js\` prints which
+               layer failed: the snapshot file, the GoatCounter counter API, the count.js host,
+               or the badge in the browser.
+            2. **Counter API failures** — check that "Allow adding visitor counts on your
+               website" is still enabled in the GoatCounter site settings, and that
+               \`GOATCOUNTER_CODE\` in \`js/goatcounter.js\` is still correct.
+            3. **Snapshot failures** — \`update-goatcounter.yml\` refreshes
+               \`data/goatcounter-snapshot.json\` every six hours; check its recent runs.
+            4. **Badge failures** — confirm every page still includes \`js/goatcounter.js\`.
+
+            ### Run
+            ${runUrl}
+            `;
+
+            const existing = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'monitoring',
+            });
+            const open = existing.data.find((issue) => issue.title === title);
+
+            // One issue per outage: comment on the open one instead of filing a new issue
+            // every day the counters stay broken.
+            if (open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open.number,
+                body: `Still failing on ${new Date().toISOString()} — ${runUrl}`,
+              });
+              console.log(`Added a comment to open issue #${open.number}`);
+            } else {
+              const created = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: body,
+                labels: ['automation', 'bug', 'monitoring'],
+              });
+              console.log(`Opened issue #${created.data.number}`);
+            }

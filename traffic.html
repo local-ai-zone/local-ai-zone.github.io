@@ -404,6 +404,12 @@
                 and the counters above will fill in automatically. The same setting turns on
                 site-wide tracking for every page.
             </div>
+            <div class="setup-note" id="gc-load-error" hidden>
+                <strong>The live counter script did not load.</strong>
+                Visitors are still being counted — only this page's display is affected. Most pages ask for
+                it as <code>/js/goatcounter.js</code>, a path that only resolves when the site is served
+                from its root, so a copy opened from a sub-folder or another origin cannot reach it.
+            </div>
             <div class="live-meta">
                 <span id="gc-status">Loading live counts…</span>
                 <span>Last checked: <span id="gc-updated">—</span></span>
@@ -648,6 +654,6 @@
             new ContactForm();
         });
     </script>
-<script src="/js/goatcounter.js" defer></script>
+<script src="js/goatcounter.js" defer></script>
 </body>
 </html>

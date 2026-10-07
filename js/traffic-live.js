@@ -20,6 +20,21 @@
         return config && config.enabled && config.base ? config : null;
     }
 
+    /*
+     * Why the counters can be absent, and why the two reasons must read differently:
+     *   'missing'      js/goatcounter.js never ran — the site code it publishes is
+     *                  unavailable, so no counter URL can even be built. Telling the
+     *                  reader to "configure" the counter here would send them after a
+     *                  problem they do not have.
+     *   'unconfigured' a real setup gap: GOATCOUNTER_CODE is empty (or the shared config
+     *                  was published without it), so tracking is off by choice.
+     */
+    function configState() {
+        var config = window.LocalAIZoneGoatCounter;
+        if (!config) return 'missing';
+        return config.enabled && config.base ? 'ready' : 'unconfigured';
+    }
+
     function setText(id, value) {
         var el = document.getElementById(id);
         if (el) el.textContent = value;
@@ -40,6 +55,49 @@
         if (setup) setup.hidden = false;
         setText('gc-status', 'Live counter not configured');
         setText('gc-updated', '—');
+    }
+
+    /* The script that publishes the shared config is unreachable, so the cards stay
+     * visible with their placeholders and the note explains why they are empty. */
+    function showLoadFailureMessage() {
+        var note = document.getElementById('gc-load-error');
+        if (note) note.hidden = false;
+        setText('gc-status', 'Live counter script did not load — counts are unaffected');
+        setText('gc-updated', '—');
+    }
+
+    function stamp(value) {
+        var date = new Date(value);
+        return isNaN(date.getTime()) ? String(value) : date.toLocaleString();
+    }
+
+    /*
+     * The counter host is third-party, so a content blocker, a DNS filter or an
+     * offline reader deletes it. scripts/fetch-goatcounter-snapshot.js publishes the
+     * same figures from the site's own origin, so the cards can still show the last
+     * known counts — and say that is what they are.
+     */
+    function loadSnapshot(config, pagePath) {
+        if (!config.snapshotUrl) return;
+        getJson(config.snapshotUrl).then(function (data) {
+            if (!data) return;
+            var shown = [];
+            if (typeof data.total === 'string' && data.total.length) {
+                setText('gc-total', data.total);
+                shown.push('the site total');
+            }
+            var perPage = data.paths ? data.paths[pagePath] : null;
+            if (typeof perPage === 'string' && perPage.length) {
+                setText('gc-page', perPage);
+                shown.push('this page');
+            }
+            if (!shown.length) return;
+            setText('gc-status', 'Live counters unreachable — showing the snapshot published with the site' +
+                (data.generatedAt ? ' on ' + stamp(data.generatedAt) : '') + '.');
+            setText('gc-updated', data.generatedAt ? stamp(data.generatedAt) : '—');
+        }).catch(function () {
+            // Nothing to fall back on: the cards keep their placeholders.
+        });
     }
 
     function failReason(result) {
@@ -93,12 +151,20 @@
                 page !== null, failReason(pageResult)
             ));
             setText('gc-updated', new Date().toLocaleString());
+
+            // Readable status but no numbers at all: the host itself is unreachable.
+            if (total === null) loadSnapshot(config, pagePath);
         });
     }
 
     document.addEventListener('DOMContentLoaded', function () {
+        var state = configState();
         var config = getConfig();
-        if (!config) {
+        if (state === 'missing') {
+            showLoadFailureMessage();
+            return;
+        }
+        if (state === 'unconfigured' || !config) {
             showSetupMessage();
             return;
         }
