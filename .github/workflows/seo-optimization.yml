@@ -24,14 +24,14 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         
     # generate-seo.js only imports Node built-ins (fs, path) and the local
     # slug-utils module — no npm packages are needed, so skip npm ci.
     - name: Set up Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: '18'
         
@@ -149,7 +149,7 @@ jobs:
         
     - name: Trigger GitHub Pages deployment
       if: steps.check_seo_changes.outputs.changes == 'true'
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       with:
         script: |
           console.log('Triggering GitHub Pages rebuild for SEO updates...');
@@ -200,7 +200,7 @@ jobs:
         
     - name: Create issue on failure
       if: failure()
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       with:
         script: |
           const title = `SEO Optimization Failed - ${new Date().toISOString().split('T')[0]}`;

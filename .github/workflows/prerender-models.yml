@@ -27,12 +27,12 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Set up Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v5
       with:
         node-version: '18'
         
@@ -105,7 +105,7 @@ jobs:
         
     - name: Trigger GitHub Pages deployment
       if: steps.check_files.outputs.files_generated == 'true' && steps.commit_files.outputs.committed == 'true'
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       with:
         script: |
           console.log('Triggering GitHub Pages rebuild for pre-rendered pages...');
@@ -136,7 +136,7 @@ jobs:
         
     - name: Create issue on failure
       if: failure()
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       with:
         script: |
           const title = `Model Pre-rendering Failed - ${new Date().toISOString().split('T')[0]}`;

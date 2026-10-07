@@ -18,7 +18,7 @@ jobs:
     
     steps:
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0  # Fetch all history for proper rebasing
@@ -30,7 +30,7 @@ jobs:
         git pull --rebase origin main || git pull origin main
         
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
         python-version: '3.11'
         
@@ -209,7 +209,7 @@ jobs:
         
     - name: Trigger GitHub Pages deployment
       if: steps.check_changes.outputs.changes == 'true'
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       with:
         script: |
           console.log('Triggering GitHub Pages rebuild for data updates...');
@@ -226,7 +226,7 @@ jobs:
           
     - name: Create issue on failure
       if: failure()
-      uses: actions/github-script@v7
+      uses: actions/github-script@v8
       with:
         script: |
           const title = `Daily GGUF Data Update Failed - ${new Date().toISOString().split('T')[0]}`;
