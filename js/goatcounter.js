@@ -6,8 +6,8 @@
  * js/traffic-live.js reads the same config to show the counters on traffic.html.
  *
  * It also injects the small views badge into the header of every page — by
- * default "● 486,071 Total Views · 35 Today's Views", i.e. the all-time site
- * total and today's count side by side (HEADER_VIEWS_MODE picks which). The
+ * default "● 486,071 Total Views", i.e. the all-time site total only
+ * (HEADER_VIEWS_MODE picks whether today's count appears beside it). The
  * badge only appears once at least one counter endpoint answers, so pages stay
  * clean if the code is wrong or visitor counts are not shared yet.
  *
@@ -33,11 +33,11 @@
     var GOATCOUNTER_CODE = 'hussainnazary';
 
     /* What the header badge counts:
-     *   'both'  -> today's views AND the all-time site total (default)
-     *   'total' -> all-time pageviews for the whole site  -> "Total Views"
+     *   'total' -> all-time pageviews for the whole site  -> "Total Views" (current)
      *   'today' -> pageviews since midnight               -> "Today's Views"
+     *   'both'  -> today's views AND the all-time site total
      * Whatever fails to load is left out of the badge rather than shown as 0. */
-    var HEADER_VIEWS_MODE = 'both';
+    var HEADER_VIEWS_MODE = 'total';
 
     function pad(n) {
         return n < 10 ? '0' + n : String(n);
@@ -335,11 +335,13 @@
         if (!config.snapshotUrl) return;
         getJson(config.snapshotUrl).then(function (data) {
             if (!data) return;
+            // Same mode filter as viewsSpecs(), so the fallback never shows a count
+            // the live badge has been configured to hide.
             var parts = [];
-            if (typeof data.total === 'string' && data.total.length) {
+            if (HEADER_VIEWS_MODE !== 'today' && typeof data.total === 'string' && data.total.length) {
                 parts.push({ count: data.total, label: 'Total Views' });
             }
-            if (typeof data.today === 'string' && data.today.length) {
+            if (HEADER_VIEWS_MODE !== 'total' && typeof data.today === 'string' && data.today.length) {
                 parts.push({ count: data.today, label: "Today's Views" });
             }
             if (parts.length) mountBadge(parts, data);
