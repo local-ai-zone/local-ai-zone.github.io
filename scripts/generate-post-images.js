@@ -1193,6 +1193,516 @@ const IMAGES = [
     ],
     note: 'These are practical floors for quantised builds; the fp16 originals need more. NVIDIA shipped FP8 builds of the FLUX.2 family for RTX on 25 November 2025 with a stated 40% performance gain &mdash; quantisation is the normal path for image models now, not the workaround, and it is why a 20B model fits on a 16 GB card.',
   },
+
+  /* ================================================================== *
+   * Metadata heroes — one per post, generated from the post's own title,
+   * description, date and measured read-time/word-count/section stats.
+   * Added so no post falls back to the site-wide og-image.png.
+   * ================================================================== */
+  /* ---- Claude_Mythos_5.1_Technical_Analysis.html ---- */
+  {
+    file: 'claude-mythos-5-1-technical-analysis-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'Claude_Mythos_5.1_Technical_Analysis.html',
+    kicker: 'Technical analysis &middot; Anthropic',
+    title: 'Claude Mythos 5.1, dissected',
+    sub: 'One set of weights, two products. A deep technical analysis of Claude Mythos 5.1 &mdash; the safeguard-free twin of Claude Fable 5.1: benchmarks, architecture, the safeguards split, access programs, and safety&hellip;',
+    stats: [
+      { v: '55 min', k: 'Read time at 200 words per minute' },
+      { v: '10,979', k: 'Words in this post' },
+      { v: '20', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- Gemini_3.8_Flash_Technical_Breakdown.html ---- */
+  {
+    file: 'gemini-3-8-flash-technical-breakdown-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'Gemini_3.8_Flash_Technical_Breakdown.html',
+    kicker: 'Technical breakdown &middot; Google DeepMind',
+    title: 'Gemini 3.8 Flash, dissected',
+    sub: 'The third Flash release in six weeks &mdash; &rsquo;works harder&rsquo; by design. A deep technical breakdown of Gemini 3.8 Flash: benchmarks, the Flash Cyber variant, pricing economics, and the full API migration path.',
+    stats: [
+      { v: '54 min', k: 'Read time at 200 words per minute' },
+      { v: '10,877', k: 'Words in this post' },
+      { v: '18', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- ai-agents-mainstream-claude-cowork.html ---- */
+  {
+    file: 'ai-agents-mainstream-claude-cowork-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'ai-agents-mainstream-claude-cowork.html',
+    kicker: 'AI trends &middot; Agentic AI',
+    title: 'Agents go mainstream',
+    sub: 'AI agents have gone mainstream. Anthropic&rsquo;s Claude Cowork expanded to all paid accounts, and multi-agent experiments reveal emergent behaviors like turf wars. A deep dive into the state of agentic AI in August&hellip;',
+    stats: [
+      { v: '11 min', k: 'Read time at 200 words per minute' },
+      { v: '2,209', k: 'Words in this post' },
+      { v: '11', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- ai-inference-hardware-2026.html ---- */
+  {
+    file: 'ai-inference-hardware-2026-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'ai-inference-hardware-2026.html',
+    kicker: 'Hardware survey &middot; GPUs',
+    title: 'Inference hardware in 2026',
+    sub: 'Complete 2026 catalog of AI inference hardware across NVIDIA, AMD, Apple Silicon, Intel, Qualcomm, Google, AWS, and CPU options. Pricing, VRAM, throughput, and best-use guidance.',
+    stats: [
+      { v: '32 min', k: 'Read time at 200 words per minute' },
+      { v: '6,462', k: 'Words in this post' },
+      { v: '17', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- ai-updates-august-2026.html ---- */
+  {
+    file: 'ai-updates-august-2026-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'ai-updates-august-2026.html',
+    kicker: 'Monthly roundup &middot; August 2026',
+    title: 'August 2026 AI updates',
+    sub: 'Comprehensive guide to August 2026 AI advancements: 11+ model releases in 20 days including OX Alpha mystery model, Gemini 3.7 Flash, Muse Code with open weights, Seed 2.1 Turbo, and major updates to Claude Opus&hellip;',
+    stats: [
+      { v: '25 min', k: 'Read time at 200 words per minute' },
+      { v: '5,097', k: 'Words in this post' },
+      { v: '10', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- claude-fable-5-1-technical-breakdown.html ---- */
+  {
+    file: 'claude-fable-5-1-technical-breakdown-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'claude-fable-5-1-technical-breakdown.html',
+    kicker: 'Engineering deep dive &middot; Anthropic',
+    title: 'Claude Fable 5.1, in depth',
+    sub: 'One set of weights, two safeguard regimes - architecture, benchmarks, economics, migration, and safety, read for engineers.',
+    stats: [
+      { v: '48 min', k: 'Read time at 200 words per minute' },
+      { v: '9,604', k: 'Words in this post' },
+      { v: '16', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- deepseek-v4-1-flash-deep-dive.html ---- */
+  {
+    file: 'deepseek-v4-1-flash-deep-dive-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'deepseek-v4-1-flash-deep-dive.html',
+    kicker: 'Deep dive &middot; DeepSeek',
+    title: 'DeepSeek V4.1-Flash, in depth',
+    sub: 'Research-grade 12,000-word analysis: CED encoder-decoder, CSA2 attention, mHC residuals, FP4 KV cache, MoE gating, Engram memory, DSpark speculative decoding. Every technical detail verified and explained.',
+    stats: [
+      { v: '45 min', k: 'Read time at 200 words per minute' },
+      { v: '9,056', k: 'Words in this post' },
+      { v: '20', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- deepseek-v4-flash-deep-dive.html ---- */
+  {
+    file: 'deepseek-v4-flash-deep-dive-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'deepseek-v4-flash-deep-dive.html',
+    kicker: 'Deep dive &middot; DeepSeek V4',
+    title: 'DeepSeek V4 Flash, in depth',
+    sub: 'Technical deep-dive: DeepSeek V4 Flash (284B total / 13B active) with hybrid CSA+HCA attention, 1M-token native context, MIT license. 27% of V3.2 inference cost. $0.14/$0.28 per M tokens off-peak.',
+    stats: [
+      { v: '43 min', k: 'Read time at 200 words per minute' },
+      { v: '8,692', k: 'Words in this post' },
+      { v: '15', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- flash-tier-ai-models-comparative-analysis.html ---- */
+  {
+    file: 'flash-tier-ai-models-comparative-analysis-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'flash-tier-ai-models-comparative-analysis.html',
+    kicker: 'Comparative analysis &middot; Flash tier',
+    title: 'The flash tier, compared',
+    sub: 'Comparing 2026&rsquo;s top flash-tier open-weight models: DeepSeek V4 Flash, GLM-5.3 Flash, and Qwen3.8 Flash-Next. Architecture, benchmarks, pricing, and strategic implications.',
+    stats: [
+      { v: '52 min', k: 'Read time at 200 words per minute' },
+      { v: '10,346', k: 'Words in this post' },
+      { v: '19', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- glm-5-3-flash-deep-dive.html ---- */
+  {
+    file: 'glm-5-3-flash-deep-dive-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'glm-5-3-flash-deep-dive.html',
+    kicker: 'Deep dive &middot; Z.ai',
+    title: 'GLM-5.3-Flash, in depth',
+    sub: 'Technical deep-dive: Z.ai&rsquo;s GLM-5.3-Flash (320B/18B active), 1M context, MIT license, native FP8. Hybrid KDA+MLA attention. $0.15/$0.50 per M tokens. The mystery model behind Ox Alpha.',
+    stats: [
+      { v: '35 min', k: 'Read time at 200 words per minute' },
+      { v: '6,989', k: 'Words in this post' },
+      { v: '15', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- mistral-large-4-deep-dive.html ---- */
+  {
+    file: 'mistral-large-4-deep-dive-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'mistral-large-4-deep-dive.html',
+    kicker: 'Deep dive &middot; Mistral AI',
+    title: 'Mistral Large 4, in depth',
+    sub: 'Inside Le Chonk &mdash; a 1T-parameter multimodal MoE with 49B active, previewed Oct 6, 2026, with open weights promised by the end of the month.',
+    stats: [
+      { v: '29 min', k: 'Read time at 200 words per minute' },
+      { v: '5,642', k: 'Words in this post' },
+      { v: '11', k: 'Sections' },
+      { v: 'Oct 7', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Oct 7, 2026.',
+  },
+
+  /* ---- gpt-6-astra-deep-dive.html ---- */
+  {
+    file: 'gpt-6-astra-deep-dive-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'gpt-6-astra-deep-dive.html',
+    kicker: 'Deep dive &middot; OpenAI',
+    title: 'GPT-6 Astra, in depth',
+    sub: 'Full architectural breakdown: looped transformers, MoVA vision agents, 100K GPU training, benchmark saturation. ARC-AGI-3 99.9%, ExploitBench 100%, computer use 72.6%. Every technical detail explained.',
+    stats: [
+      { v: '25 min', k: 'Read time at 200 words per minute' },
+      { v: '5,054', k: 'Words in this post' },
+      { v: '11', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- gpu-cpu-inference-troubleshooting.html ---- */
+  {
+    file: 'gpu-cpu-inference-troubleshooting-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'gpu-cpu-inference-troubleshooting.html',
+    kicker: 'Engineering &middot; Troubleshooting',
+    title: 'When inference stalls',
+    sub: 'Complete GPU and CPU inference troubleshooting guide for 2026 &mdash; diagnose slow inference, OOM errors, low token speed, KV cache pressure, CPU offload bottlenecks, and optimize your local AI stack.',
+    stats: [
+      { v: '19 min', k: 'Read time at 200 words per minute' },
+      { v: '3,810', k: 'Words in this post' },
+      { v: '18', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- how-much-local-ai-costs-2026.html ---- */
+  {
+    file: 'how-much-local-ai-costs-2026-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'how-much-local-ai-costs-2026.html',
+    kicker: 'Cost analysis &middot; Local AI',
+    title: 'What local AI really costs',
+    sub: 'A multi-source verified cost survey of building a custom local AI system in 2026: hardware, electricity, software, models, and ongoing maintenance. Real-world numbers, not theoretical.',
+    stats: [
+      { v: '35 min', k: 'Read time at 200 words per minute' },
+      { v: '7,077', k: 'Words in this post' },
+      { v: '18', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- how-to-build-local-ai-legal-assistant.html ---- */
+  {
+    file: 'how-to-build-local-ai-legal-assistant-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'how-to-build-local-ai-legal-assistant.html',
+    kicker: 'Guide &middot; Legal tech',
+    title: 'Build a local legal assistant',
+    sub: 'Step-by-step guide to building a privacy-first AI assistant for legal documents. Learn from Lawyer Assistant by Hussain Nazary - a complete open-source implementation.',
+    stats: [
+      { v: '20 min', k: 'Read time at 200 words per minute' },
+      { v: '3,937', k: 'Words in this post' },
+      { v: '20', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- july-2026-ai-model-roundup.html ---- */
+  {
+    file: 'july-2026-ai-model-roundup-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'july-2026-ai-model-roundup.html',
+    kicker: 'Monthly roundup &middot; July 2026',
+    title: 'July 2026 AI roundup',
+    sub: 'Kimi K3, Qwen3.8-Max (2.4T), GLM-5.2, DeepSeek V4-Flash-0731, MiniMax M3, GPT-5.6 updates, Meta Muse Code, FLUX 3 Video, Claude Opus 5 and Gemini 3.6 Flash &mdash; two months that reshaped the frontier.&hellip;',
+    stats: [
+      { v: '16 min', k: 'Read time at 200 words per minute' },
+      { v: '3,293', k: 'Words in this post' },
+      { v: '7', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- lawyer-assistant-privacy-first-legal-ai.html ---- */
+  {
+    file: 'lawyer-assistant-privacy-first-legal-ai-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'lawyer-assistant-privacy-first-legal-ai.html',
+    kicker: 'Guide &middot; Legal tech',
+    title: 'A private legal assistant',
+    sub: 'Complete guide to building a local AI assistant for legal documents using Lawyer Assistant. Free, open-source, 100% private RAG system for contract analysis and clause detection by Hussain Nazary.',
+    stats: [
+      { v: '13 min', k: 'Read time at 200 words per minute' },
+      { v: '2,548', k: 'Words in this post' },
+      { v: '14', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- low-resource-ai-agents-experiment-archive.html ---- */
+  {
+    file: 'low-resource-ai-agents-experiment-archive-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'low-resource-ai-agents-experiment-archive.html',
+    kicker: 'Experiment archive &middot; 8 GB GPUs',
+    title: 'Agents on 8 GB, in practice',
+    sub: 'A research paper and experiment archive: how people actually ran AI agents on 8 GB VRAM + 32 GB RAM machines, the architectures that worked, and the numbers they measured.',
+    stats: [
+      { v: '78 min', k: 'Read time at 200 words per minute' },
+      { v: '15,561', k: 'Words in this post' },
+      { v: '18', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- low-resource-ai-agents-research-paper.html ---- */
+  {
+    file: 'low-resource-ai-agents-research-paper-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'low-resource-ai-agents-research-paper.html',
+    kicker: 'Research paper &middot; Low-VRAM agents',
+    title: 'Agents on 8 GB GPUs',
+    sub: 'A book-length engineering research paper on maximizing a low-memory GPU (8 GB VRAM, 32 GB RAM) workstation for complex AI agent workloads. Quantization science, KV-cache management, offloading, engine&hellip;',
+    stats: [
+      { v: '101 min', k: 'Read time at 200 words per minute' },
+      { v: '20,279', k: 'Words in this post' },
+      { v: '25', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- migrate-claude-to-local-ai.html ---- */
+  {
+    file: 'migrate-claude-to-local-ai-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'migrate-claude-to-local-ai.html',
+    kicker: 'Migration guide &middot; Local AI',
+    title: 'Leaving Claude for local AI',
+    sub: 'Step-by-step guide to replace Claude API with local models: Kimi K3, DeepSeek V4.1 Flash, GLM-5.3 Flash. Hardware tiers, model equivalents, prompt migration, coding agent alternatives, honest quality gap&hellip;',
+    stats: [
+      { v: '34 min', k: 'Read time at 200 words per minute' },
+      { v: '6,728', k: 'Words in this post' },
+      { v: '16', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- muse-glimmer-30b-comprehensive-analysis.html ---- */
+  {
+    file: 'muse-glimmer-30b-comprehensive-analysis-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'muse-glimmer-30b-comprehensive-analysis.html',
+    kicker: 'Model analysis &middot; Muse Glimmer 30B',
+    title: 'Muse Glimmer 30B, examined',
+    sub: 'In-depth research analysis of Meta&rsquo;s Muse Glimmer 30B (Aug 10, 2026): 29.6B parameters, optimized for local agentic workflows, runs on 24GB VRAM. Complete architecture review and deployment guide.',
+    stats: [
+      { v: '29 min', k: 'Read time at 200 words per minute' },
+      { v: '5,723', k: 'Words in this post' },
+      { v: '12', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- ox-alpha-stealth-model-comprehensive-analysis.html ---- */
+  {
+    file: 'ox-alpha-stealth-model-comprehensive-analysis-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'ox-alpha-stealth-model-comprehensive-analysis.html',
+    kicker: 'Model analysis &middot; OX Alpha',
+    title: 'OX Alpha, examined',
+    sub: 'Technical deep-dive: OX Alpha(glm 5.3 flash) achieves 80% DeepSWE Pass@1, surpassing Claude (65%) and GPT-5.6 (52%). 1M context window, multimodal support, likely Zhipu GLM-5.x. Free preview ends Aug 27.',
+    stats: [
+      { v: '20 min', k: 'Read time at 200 words per minute' },
+      { v: '3,985', k: 'Words in this post' },
+      { v: '18', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- quantization-formats-guide.html ---- */
+  {
+    file: 'quantization-formats-guide-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'quantization-formats-guide.html',
+    kicker: 'Guide &middot; Quantisation',
+    title: 'Quantisation formats, explained',
+    sub: 'Master GGUF, EXL2, AWQ, and GPTQ quantization formats for local AI. Comparison of precision, speed, VRAM, and best use cases for 2026.',
+    stats: [
+      { v: '9 min', k: 'Read time at 200 words per minute' },
+      { v: '1,891', k: 'Words in this post' },
+      { v: '16', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- qwen3-8-27b-comprehensive-analysis.html ---- */
+  {
+    file: 'qwen3-8-27b-comprehensive-analysis-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'qwen3-8-27b-comprehensive-analysis.html',
+    kicker: 'Model analysis &middot; Qwen3.8 27B',
+    title: 'Qwen3.8 27B, examined',
+    sub: 'In-depth research analysis of Alibaba&rsquo;s Qwen3.8-27B (Aug 14, 2026): 27.8B parameters, beats Claude Opus 4.6 on 15 benchmarks, runs on 24GB VRAM. Complete architecture review and deployment guide.',
+    stats: [
+      { v: '19 min', k: 'Read time at 200 words per minute' },
+      { v: '3,846', k: 'Words in this post' },
+      { v: '13', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- qwen3-8-flash-next-deep-dive.html ---- */
+  {
+    file: 'qwen3-8-flash-next-deep-dive-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'qwen3-8-flash-next-deep-dive.html',
+    kicker: 'Deep dive &middot; Qwen3.8 Flash-Next',
+    title: 'Qwen3.8 Flash-Next, in depth',
+    sub: 'Technical deep-dive: Qwen3.8-Flash-Next with 125B+51B N-gram params, 6B active, GDN + QSA + N-gram + Muon architecture. $0.16/$0.47 per M tokens, 12x cheaper than Qwen3.8-Max. Previewing Qwen4.',
+    stats: [
+      { v: '63 min', k: 'Read time at 200 words per minute' },
+      { v: '12,639', k: 'Words in this post' },
+      { v: '55', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- system-architect-without-coding.html ---- */
+  {
+    file: 'system-architect-without-coding-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'system-architect-without-coding.html',
+    kicker: 'Career &amp; skills &middot; Architecture',
+    title: 'Architect without coding',
+    sub: 'AI can write code on demand, but someone still needs to design the system. Master decomposition, data flow thinking, control flow logic, and failure analysis &mdash; the five core skills every architect needs.',
+    stats: [
+      { v: '13 min', k: 'Read time at 200 words per minute' },
+      { v: '2,650', k: 'Words in this post' },
+      { v: '13', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- top-20-inference-providers-2026.html ---- */
+  {
+    file: 'top-20-inference-providers-2026-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'top-20-inference-providers-2026.html',
+    kicker: 'Survey &middot; Inference providers',
+    title: '20 inference providers, ranked',
+    sub: 'Ranked comparison of the top 20 GPU rental providers for AI inference in 2026. Pricing, GPU availability, regions, billing models, and best use cases.',
+    stats: [
+      { v: '17 min', k: 'Read time at 200 words per minute' },
+      { v: '3,477', k: 'Words in this post' },
+      { v: '15', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
+  /* ---- top-embedding-reranker-ocr-models-2026.html ---- */
+  {
+    file: 'top-embedding-reranker-ocr-models-2026-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'top-embedding-reranker-ocr-models-2026.html',
+    kicker: 'Survey &middot; Embeddings, rerankers, OCR',
+    title: 'Embeddings, rerankers, OCR',
+    sub: 'The complete 2026 guide to local AI infrastructure: top embedding models, rerankers, and OCR models for RAG pipelines &mdash; all with benchmarks and GGUF links.',
+    stats: [
+      { v: '9 min', k: 'Read time at 200 words per minute' },
+      { v: '1,743', k: 'Words in this post' },
+      { v: '7', k: 'Sections' },
+      { v: 'Jan 1', k: 'Published, 2026' },
+    ],
+    footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
+  },
+
 ];
 
 /* ------------------------------------------------------------------ *
