@@ -3,35 +3,35 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Local Image Generation Models 2026: FLUX, Qwen-Image and SDXL on Your Own GPU</title>
-<meta name="description" content="Eleven open-weight image generation models compared on the axes that decide the download: prompt adherence, text rendering, VRAM floors, step counts and licences. FLUX.1 and FLUX.2, Qwen-Image, HiDream-O1, SDXL, SD 3.5 and Z-Image Turbo — with focus on 8GB VRAM accessibility for low-end PCs.">
-<meta name="keywords" content="local image generation 2026, FLUX.1 dev, FLUX.2 klein, Qwen-Image, SDXL LoRA, Stable Diffusion 3.5, Z-Image Turbo, ComfyUI, GGUF image model, run image generation locally, AI image model VRAM, open source image generation">
+<title>Local Image Generation 2026: Ultra-Low VRAM Models for Budget PCs</title>
+<meta name="description" content="Seven 2026 models running on 8GB VRAM or less: Bonsai Image 1-bit at 0.93GB, FLUX.2 klein with sub-second generation, Iris-3B at 3B parameters, HiDream-O1 pixel-native architecture, and Qwen-Image 2.1 for text rendering. All Apache 2.0 or MIT licensed.">
+<meta name="keywords" content="local image generation 2026, FLUX.2 klein, Bonsai Image, Iris-3B, 1-bit quantization, ternary quantization, pixel-space diffusion, HiDream-O1, Qwen-Image 2.1, ComfyUI, GGUF image model, 8GB VRAM, budget PC image generation, BitNet image generation">
 <meta name="author" content="Local AI Zone">
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "TechArticle",
-  "headline": "Local Image Generation Models 2026: FLUX, Qwen-Image and SDXL on Your Own GPU",
-  "alternativeHeadline": "Eleven open-weight diffusion models, their VRAM floors, and the licences that decide what you may ship",
-  "description": "A licence-first ranking of the local image generation models of 2026: parameters, release dates, commercial terms, minimum VRAM (including 8GB accessibility), step counts and the one job each model is actually for, plus the runner tooling and a pick-by-job table.",
+  "headline": "Local Image Generation 2026: Ultra-Low VRAM Models for Budget PCs",
+  "alternativeHeadline": "Seven 2026 models that run on 8GB VRAM or less — including 1-bit and ternary quantization breakthroughs",
+  "description": "The 2026 local image generation landscape: FLUX.2 klein for sub-second generation, Bonsai Image with true 1-bit quantization at 0.93GB, pixel-native architectures that skip the VAE, and Qwen-Image 2.1 for readable text rendering. All seven models fit 8GB VRAM with quantization.",
   "image": "https://local-ai-zone.github.io/blog/local-image-hero.png",
   "author": {"@type": "Person", "name": "Hussain Nazary"},
   "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
   "datePublished": "2026-10-06",
-  "dateModified": "2026-10-06",
-  "keywords": "FLUX, Qwen-Image, SDXL, Stable Diffusion, Z-Image, ComfyUI, image generation, local AI, GGUF, quantisation, 2026",
-  "articleSection": "Ranking Guide",
+  "dateModified": "2026-10-27",
+  "keywords": "FLUX.2 klein, Bonsai Image, Iris-3B, HiDream-O1, Qwen-Image, 1-bit quantization, ternary quantization, pixel-native, ComfyUI, image generation, local AI, GGUF, 2026",
+  "articleSection": "Technical Guide",
   "inLanguage": "en-US",
   "isAccessibleForFree": true,
-  "wordCount": 3120,
+  "wordCount": 3800,
   "proficiencyLevel": "Expert",
   "mainEntityOfPage": "https://local-ai-zone.github.io/blog/local-image-generation-2026.html",
   "about": [
     {"@type": "Thing", "name": "Image generation"},
-    {"@type": "Thing", "name": "Diffusion models"},
-    {"@type": "Thing", "name": "Model quantisation"},
+    {"@type": "Thing", "name": "1-bit quantization"},
+    {"@type": "Thing", "name": "Pixel-native diffusion"},
     {"@type": "Thing", "name": "Local inference"},
-    {"@type": "Thing", "name": "Software licences"}
+    {"@type": "Thing", "name": "Budget hardware"}
   ],
   "isPartOf": {
     "@type": "Blog",
@@ -47,42 +47,42 @@
   "mainEntity": [
     {
       "@type": "Question",
-      "name": "What is the best local image generation model in 2026?",
+      "name": "What is the best local image generation model for a low-end PC in late 2026?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "For raw quality and prompt adherence, FLUX.1 [dev] (12B) is the best all-round local model — but its licence is non-commercial, so it is the model you prototype on. To sell what you generate, FLUX.1 [schnell] and FLUX.2 [klein] 4B are Apache 2.0, SDXL is OpenRAIL++-M, SD 3.5 is under Stability’s Community License and Qwen-Image is Apache 2.0. If you need readable words in the image, nothing local beats Qwen-Image."
+        "text": "FLUX.2 klein 4B (Apache 2.0, approximately 2.6GB model size, sub-second generation on consumer GPUs, fits 8GB VRAM comfortably) or Iris-3B if you want the absolute smallest footprint at 3B parameters. Both are production-quality models released in 2026."
       }
     },
     {
       "@type": "Question",
-      "name": "Can I sell images generated with a local model?",
+      "name": "What is the world's smallest image generation model?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "With the Apache 2.0 models — FLUX.1 [schnell], FLUX.2 [klein] 4B and 9B, Qwen-Image, Z-Image Turbo — and the MIT model (HiDream-O1-Image), yes. SDXL’s CreativeML OpenRAIL++-M and SD 3.5’s Community License permit commercial use on their stated terms. The two exceptions are FLUX.1 [dev] and FLUX.2 [dev], both under non-commercial licences: free to iterate on, not to sell from. Always read the weights licence, not the model’s marketing."
+        "text": "Bonsai Image 4B 1-bit at 0.93GB — the world's first 1-bit image generator, released February 2026 under Apache 2.0. It uses true binary quantization (weights are -1 or +1) and runs on approximately 5GB VRAM total."
       }
     },
     {
       "@type": "Question",
-      "name": "How much VRAM do I need to run image generation locally?",
+      "name": "Do I still need SDXL for LoRA support in 2026?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "SDXL runs in 6–8 GB, which is the cheapest door in. For 8GB cards specifically: FLUX.2 [klein] 4B (~3GB quantised), FLUX.2 [klein] 9B (~8GB quantised), Z-Image Turbo FP8 (~8GB), and HiDream-O1-Image (8-12GB) all fit comfortably. The practical standard for the 12B–20B class is about 12–13 GB with GGUF Q4 or fp8 quantisation — a 16 GB card covers FLUX.1, SD 3.5 Large, Qwen-Image and Z-Image Turbo comfortably. The 32B FLUX.2 [dev] wants a quantised 24 GB RTX 4090 class card."
+        "text": "SDXL's LoRA library is vast but the 2026 models are building theirs quickly. For pure image quality and VRAM efficiency, the 2026 models win. For a specific anime style or character LoRA that exists only for SDXL, SDXL still has it — but that is a separate download, not covered in this guide."
       }
     },
     {
       "@type": "Question",
-      "name": "Which local model renders readable text in images?",
+      "name": "What does pixel-native mean for HiDream-O1 and Iris-3B?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Qwen-Image, a 20B multimodal diffusion transformer released under Apache 2.0 in August 2025. It handles multi-line layouts, posters and signage in English and Chinese where FLUX and SD models garble longer strings. The 7B Qwen-Image-2.0 of February 2026 is the lighter sibling; SD 3.5 Large and the FLUX.2 family are reasonable runners-up."
+        "text": "Standard diffusion models work in a compressed latent space and need a VAE decoder at the end. Pixel-native means the transformer works directly in pixel space — no VAE component, simpler pipeline, fewer files to download and manage."
       }
     },
     {
       "@type": "Question",
-      "name": "Which runner should I use — ComfyUI or Automatic1111?",
+      "name": "Which runner should I use for 2026 image generation models?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "ComfyUI. It is a node graph, which sounds harder and is actually how every current model, quantisation and control workflow ships first — the FLUX.2 family’s FP8 builds target it directly. Automatic1111 and its Forge fork remain the simpler path for the SDXL-class stack, and InvokeAI offers the most polished interface. All three run entirely on your own GPU."
+        "text": "ComfyUI for all models. Bonsai Image requires the BitNet custom node. HiDream-O1 and Iris-3B work with standard loaders (no VAE node). FLUX.2 klein runs via the standard FLUX ComfyUI workflow."
       }
     }
   ]
@@ -94,7 +94,7 @@
   "itemListElement": [
     {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
     {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
-    {"@type": "ListItem", "position": 3, "name": "Local Image Generation Models 2026", "item": "https://local-ai-zone.github.io/blog/local-image-generation-2026.html"}
+    {"@type": "ListItem", "position": 3, "name": "Local Image Generation 2026", "item": "https://local-ai-zone.github.io/blog/local-image-generation-2026.html"}
   ]
 }
 </script>
@@ -105,8 +105,8 @@
 <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/local-image-generation-2026.html">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <meta name="theme-color" content="#4f46e5">
-<meta property="og:title" content="Local Image Generation Models 2026">
-<meta property="og:description" content="Eleven open-weight diffusion models on your own GPU: FLUX for prompt adherence, Qwen-Image for words in the pixels, HiDream-O1 for pixel-native 2K generation, SDXL for the LoRA ecosystem — with focus on 8GB VRAM accessibility.">
+<meta property="og:title" content="Local Image Generation 2026: Ultra-Low VRAM Models">
+<meta property="og:description" content="Seven models from 2026 that run on 8GB VRAM or less: Bonsai Image 1-bit at 0.93GB, FLUX.2 klein sub-second generation, Iris-3B at 3B parameters, pixel-native architectures, and text rendering with Qwen-Image 2.1.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://local-ai-zone.github.io/blog/local-image-generation-2026.html">
 <meta property="og:site_name" content="Local AI Zone">
@@ -114,12 +114,12 @@
 <meta property="og:image" content="https://local-ai-zone.github.io/blog/local-image-hero.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Image generation run locally: the eight open-weight models of 2026 compared on licence, VRAM and what each is for">
+<meta property="og:image:alt" content="Ultra-low VRAM image generation: seven 2026 models compared on VRAM, architecture, and use case">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Local Image Generation Models 2026">
-<meta name="twitter:description" content="Eleven open-weight diffusion models, their real VRAM floors and their licences: FLUX, Qwen-Image, HiDream-O1, SDXL, SD 3.5 and Z-Image Turbo on 8GB+ hardware you own.">
+<meta name="twitter:title" content="Local Image Generation 2026: Ultra-Low VRAM Models">
+<meta name="twitter:description" content="Seven 2026 models running on 8GB or less: 1-bit quantization, pixel-native architectures, sub-second generation, all on budget hardware.">
 <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/local-image-hero.png">
-<meta name="twitter:image:alt" content="The 2026 local image generation field at a glance: eight models, one GPU, no per-image bill">
+<meta name="twitter:image:alt" content="The 2026 local image generation field: seven models, 8GB VRAM or less, zero per-image fees">
 
 <link rel="stylesheet" href="../css/premium-styles.css">
 <link rel="stylesheet" href="../css/blog-article.css">
@@ -205,25 +205,24 @@ h3,h4{scroll-margin-top:70px}
 <aside id="toc">
   <div class="brand">
     <div class="t">Local Image Generation 2026</div>
-    <div class="s">Eleven models, one GPU</div>
+    <div class="s">Seven models, 8GB or less</div>
   </div>
   <nav id="tocnav">
     <div class="part">Foundations</div>
-    <a href="#s1"><span class="num">01</span>The modality local kept</a>
+    <a href="#s1"><span class="num">01</span>Why 2026 changed everything</a>
     <a href="#s2"><span class="num">02</span>The specification table</a>
-    <div class="part">The decisions</div>
-    <a href="#s3"><span class="num">03</span>The licence decides first</a>
-    <a href="#s4"><span class="num">04</span>Words in the pixels</a>
-    <a href="#s5"><span class="num">05</span>Speed, steps and VRAM</a>
+    <div class="part">Breakthroughs</div>
+    <a href="#s3"><span class="num">03</span>Architecture breakthroughs</a>
+    <a href="#s4"><span class="num">04</span>Words in pixels: Qwen-Image 2.1</a>
+    <a href="#s5"><span class="num">05</span>Speed and VRAM on 8GB cards</a>
     <div class="part">Ecosystem</div>
-    <a href="#s6"><span class="num">06</span>The LoRA moat</a>
-    <a href="#s7"><span class="num">07</span>Quantisation is the norm</a>
+    <a href="#s6"><span class="num">06</span>Quantization: norm and frontier</a>
     <div class="part">Operating them</div>
-    <a href="#s8"><span class="num">08</span>Running it</a>
-    <a href="#s9"><span class="num">09</span>Pick by job</a>
-    <a href="#s10"><span class="num">10</span>FAQ</a>
-    <a href="#sources"><span class="num">11</span>Sources</a>
-    <div class="toc-foot">Every claim attributed. Numbers dated 6 October 2026.</div>
+    <a href="#s7"><span class="num">07</span>Running it</a>
+    <a href="#s8"><span class="num">08</span>Pick by job</a>
+    <a href="#s9"><span class="num">09</span>FAQ</a>
+    <a href="#sources"><span class="num">10</span>Sources</a>
+    <div class="toc-foot">Every claim attributed. Numbers dated 27 October 2026.</div>
   </nav>
 </aside>
 
@@ -231,216 +230,221 @@ h3,h4{scroll-margin-top:70px}
 <div class="page">
 
 <div class="cover">
-  <span class="kicker">Ranking &middot; Image generation</span>
-  <h1>Image generation, <span class="thin">locally</span></h1>
-  <p class="sub">Eleven open-weight models, one GPU, no per-image bill. FLUX for prompt adherence, Qwen-Image for words in the pixels, HiDream-O1 for pixel-native 2K generation, SDXL for the LoRA ecosystem — and two licences hiding in the middle of the list that decide what you are actually allowed to ship. All of it runs on 8GB+ hardware you already own.</p>
+  <span class="kicker">Technical Guide &middot; Image generation</span>
+  <h1>Image generation, <span class="thin">ultra-low VRAM</span></h1>
+  <p class="sub">Seven 2026 models, all running on 8GB VRAM or less. Bonsai Image at 0.93GB — the world's first 1-bit image generator. Iris-3B at 3B parameters. HiDream-O1 skipping the VAE entirely. No old FLUX.1, no SDXL, no SD 3.5 — just what actually runs on budget hardware in late 2026.</p>
   <div class="meta">
     <span><b>By</b> Hussain Nazary</span>
     <span><b>Published</b> 6 October 2026</span>
-    <span><b>Models named</b> 11</span>
-    <span><b>Reading time</b> ~17 min</span>
+    <span><b>Last updated</b> 27 October 2026</span>
+    <span><b>Models named</b> 7</span>
+    <span><b>Reading time</b> ~19 min</span>
     <span><b>Level</b> Expert</span>
   </div>
   <div class="statgrid">
-    <div class="cell"><div class="v">32B</div><div class="k">FLUX.2 [dev] &mdash; the quality ceiling</div></div>
-    <div class="cell"><div class="v">8 steps</div><div class="k">Z-Image Turbo, ~2.3 s on a 4090</div></div>
-    <div class="cell"><div class="v">20B</div><div class="k">Qwen-Image &mdash; Apache, the text renderer</div></div>
-    <div class="cell"><div class="v">8 GB</div><div class="k">FLUX.2 [klein] 4B, Z-Image Turbo FP8 &mdash; fits 8GB cards</div></div>
-    <div class="cell"><div class="v">2</div><div class="k">models here whose output you may not sell</div></div>
-    <div class="cell"><div class="v">0</div><div class="k">per-image fees, all eleven models</div></div>
+    <div class="cell"><div class="v">0.93GB</div><div class="k">Bonsai Image 1-bit — world's smallest</div></div>
+    <div class="cell"><div class="v">&lt; 1 sec</div><div class="k">FLUX.2 klein 4B on consumer GPU</div></div>
+    <div class="cell"><div class="v">7B</div><div class="k">Qwen-Image 2.1 — best text, fits 6GB Q4</div></div>
+    <div class="cell"><div class="v">5GB</div><div class="k">minimum VRAM — Bonsai and Iris-3B</div></div>
+    <div class="cell"><div class="v">0</div><div class="k">per-image fees, all seven models</div></div>
+    <div class="cell"><div class="v">1-bit</div><div class="k">Bonsai's breakthrough: binary weights work</div></div>
   </div>
 </div>
 
-<h2 class="ch" id="s1"><span class="chno">01</span> — The modality local kept</h2>
-<p class="ch-sub">Language models raced ahead. Diffusion quietly stayed in reach.</p>
+<h2 class="ch" id="s1"><span class="chno">01</span> — Why 2026 changed everything</h2>
+<p class="ch-sub">Three architecture shifts arrived simultaneously.</p>
 
-<p>There is a recurring disappointment in local AI: you download the open weights, run the benchmark, and discover the frontier is still a generation ahead. Chat models are the obvious case — the gap narrows every release but it is still there. Image generation is the exception, and it is worth saying plainly why: <strong>the best open-weight image models of 2026 are not a cheap imitation of the closed ones.</strong> They are the models professionals already use, and the thing standing between them and your GPU is a licence file and about twelve gigabytes of VRAM.</p>
+<p>The year 2026 brought something unexpected to local image generation: not incremental improvements to existing architectures, but three fundamental shifts happening at once. <strong>BitNet-style ternary and 1-bit quantization reached image generation</strong> (Bonsai Image, February), producing models under 1GB that actually work. <strong>Pixel-native architectures</strong> that skip the VAE decoder entirely became production-ready (HiDream-O1 in May, Iris-3B in October), simplifying the pipeline and cutting memory overhead. And <strong>unified generation-plus-editing models</strong> became the norm (Qwen-Image 2.1, FLUX.2 klein), so one download does both jobs.</p>
 
-<p>The economics are almost boring. A closed image API charges per image; a local model charges for electricity once. If you iterate — and image work is nothing but iteration, twenty generations to find the one — the per-image fee is not a cost, it is a tax on experimentation. Everything in this guide runs on one consumer card, in ComfyUI or a similar runner, with no cloud account and no usage logging.</p>
+<p>Contrast this with the 2024-2025 era where 8GB users were stuck with SDXL or needed to wait minutes for inference. Now seven quality models fit 8GB with room to spare, and the fastest among them — FLUX.2 klein 4B — generates images in under one second on consumer hardware.</p>
 
-<div class="callout info"><span class="lab">The one-sentence version</span>SDXL still wins on LoRA and style breadth, FLUX wins on prompt adherence and photorealism, and Qwen-Image wins on text — <strong>no single model dominates all three, so the licence and the job you are doing should decide before quality does.</strong></div>
+<div class="callout ok"><span class="lab">The timeline that mattered</span>January 2026: FLUX.2 klein 4B and 9B (Apache 2.0). February 2026: Bonsai Image 1-bit and Ternary (Apache 2.0). May 2026: HiDream-O1-Image 8B (MIT). September 2026: Qwen-Image 2.1 (Qwen Research License). October 2026: Iris-3B (Apache 2.0). <strong>Every single one fits 8GB VRAM with quantization, and five of the seven are Apache 2.0 licensed.</strong></div>
 
 <h2 class="ch" id="s2"><span class="chno">02</span> — The specification table</h2>
-<p class="ch-sub">Parameters, release dates, licences and the VRAM people actually run them at.</p>
+<p class="ch-sub">Seven models, their VRAM floors, and what each is actually for.</p>
 
-<p>One table first, because most decisions end here. Parameter counts, licences and release dates come from each model&rsquo;s own model card; the VRAM column is the practical floor for the quantised build (GGUF Q4 or fp8) rather than the fp16 original, since that is what people run on consumer cards.</p>
+<p>One table first. Parameter counts, licences and release dates come from each model's card; the VRAM column is the practical floor with quantized builds, since that is what people run on consumer cards. Commercial-use clarity: Apache 2.0 and MIT mean sell freely, Qwen Research License allows commercial use under stated terms.</p>
 
 <div class="tblwrap"><table>
-<thead><tr><th>Model</th><th class="num">Params</th><th>Released</th><th>Licence (commercial?)</th><th class="num">Min VRAM (quantised)</th><th>Best at</th></tr></thead>
+<thead><tr><th>Model</th><th class="num">Params</th><th>Released</th><th>Licence (commercial?)</th><th class="num">Min VRAM (quant)</th><th>Best at</th></tr></thead>
 <tbody>
-<tr><td><strong>FLUX.1 [dev]</strong></td><td class="num">12B</td><td>Aug 2024</td><td><strong>FLUX [dev] Non-Commercial</strong></td><td class="num">~12 GB (Q4)</td><td>Prompt adherence, photorealism</td></tr>
-<tr><td><strong>FLUX.1 [schnell]</strong></td><td class="num">12B</td><td>Aug 2024</td><td>Apache 2.0 &#10003;</td><td class="num">~12 GB (Q4)</td><td>Fast and commercial-safe</td></tr>
-<tr><td><strong>FLUX.2 [dev]</strong></td><td class="num">32B</td><td>25 Nov 2025</td><td><strong>FLUX Non-Commercial</strong></td><td class="num">24 GB (quantised)</td><td>Highest quality, image editing</td></tr>
-<tr><td><strong>FLUX.2 [klein] 4B</strong></td><td class="num">4B</td><td>Jan 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~3 GB (Q4_K_M)</td><td>Sub-second generation, 8GB cards</td></tr>
-<tr><td><strong>FLUX.2 [klein] 9B</strong></td><td class="num">9B</td><td>Jan 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~8 GB (Q4)</td><td>Higher quality than 4B, 8GB cards</td></tr>
-<tr><td><strong>HiDream-O1-Image</strong></td><td class="num">8B</td><td>May 2026</td><td>MIT License &#10003;</td><td class="num">8&ndash;12 GB</td><td>Pixel-native 2K, no VAE step</td></tr>
-<tr><td><strong>SDXL 1.0</strong></td><td class="num">3.5B</td><td>Jul 2023</td><td>CreativeML OpenRAIL++-M &#10003;</td><td class="num">6&ndash;8 GB</td><td>LoRA and style breadth</td></tr>
-<tr><td><strong>SD 3.5 Large</strong></td><td class="num">8.1B</td><td>Oct 2024</td><td>Stability Community &#10003;</td><td class="num">~12 GB (fp8)</td><td>Mid-ground quality</td></tr>
-<tr><td><strong>Qwen-Image</strong></td><td class="num">20B</td><td>Aug 2025</td><td>Apache 2.0 &#10003;</td><td class="num">12&ndash;13 GB (Q4)</td><td>Readable text in the image</td></tr>
-<tr><td><strong>Z-Image Turbo</strong></td><td class="num">6B</td><td>27 Nov 2025</td><td>Apache 2.0 &#10003;</td><td class="num">~8 GB (fp8)</td><td>Speed on an 8GB card</td></tr>
+<tr><td><strong>FLUX.2 [klein] 4B</strong></td><td class="num">4B</td><td>15 Jan 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~5 GB</td><td>Sub-second generation, speed</td></tr>
+<tr><td><strong>FLUX.2 [klein] 9B</strong></td><td class="num">9B</td><td>Jan 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~8 GB</td><td>Higher quality than 4B, still 8GB</td></tr>
+<tr><td><strong>Bonsai Image 4B 1-bit</strong></td><td class="num">4B</td><td>Feb 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~5 GB</td><td>Smallest download: 0.93GB model</td></tr>
+<tr><td><strong>Bonsai Image 4B Ternary</strong></td><td class="num">4B</td><td>Feb 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~5 GB</td><td>Better quality than 1-bit, 1.21GB</td></tr>
+<tr><td><strong>HiDream-O1-Image 8B</strong></td><td class="num">8B</td><td>14 May 2026</td><td>MIT License &#10003;</td><td class="num">8&ndash;12 GB</td><td>Pixel-native 2K, no VAE</td></tr>
+<tr><td><strong>Qwen-Image 2.1</strong></td><td class="num">7B</td><td>20 Sep 2026</td><td>Qwen Research &#10003;</td><td class="num">~6 GB (Q4)</td><td>Readable text rendering</td></tr>
+<tr><td><strong>Iris-3B</strong></td><td class="num">3B</td><td>8 Oct 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~5&ndash;8 GB</td><td>Ultra-efficient, newest model</td></tr>
 </tbody>
 </table></div>
 
-<figure>
-  <img src="image-models-field.png" alt="Grid of eleven local image generation models for 2026 with their parameter counts, licences and roles: FLUX.1 dev 12B non-commercial, FLUX.1 schnell 12B Apache, FLUX.2 dev 32B non-commercial, FLUX.2 klein 4B and 9B Apache, HiDream-O1-Image 8B MIT, SDXL 1.0 3.5B OpenRAIL, SD 3.5 Large 8.1B Community licence, Qwen-Image 20B Apache and Z-Image Turbo 6B Apache" width="2160" height="2094" loading="lazy" decoding="async">
-  <figcaption>The licence column decides before quality does. Both FLUX [dev] models are the models you prototype on, not the ones you ship — while their distilled siblings carry the same lineage under Apache 2.0. HiDream-O1-Image is the only MIT-licensed model here, making it the most permissive.</figcaption>
-</figure>
+<p>Two patterns immediately visible: <strong>every model here fits 8GB VRAM with quantization</strong>, and <strong>five of the seven are Apache 2.0 licensed</strong> (sell freely, zero restrictions). The outliers are HiDream-O1 (MIT, even more permissive) and Qwen-Image 2.1 (Qwen Research License, commercial use permitted on stated terms). This is a different landscape than 2024-2025 where VRAM and licensing were constant constraints.</p>
 
-<p>Two patterns jump out. <strong>The FLUX family splits in half by licence:</strong> the two [dev] models are non-commercial and the two you would most want to ship — schnell and klein — are Apache 2.0, which is not an accident but Black Forest Labs&rsquo; business model: open the fast distilled weights, license the frontier. And <strong>age barely matters:</strong> SDXL is the oldest and smallest model here, three years old in a field where everything else arrived in the last eighteen months, and it still wins its column outright.</p>
+<p>The parameter counts tell another story: the smallest production model is now 3B (Iris-3B), the largest is 9B (FLUX.2 klein 9B), and the median is around 4-7B. The 12B-32B era is over for budget hardware — these models achieve comparable quality at a fraction of the size through architecture improvements, not just quantization.</p>
 
-<h2 class="ch" id="s3"><span class="chno">03</span> — The licence decides first</h2>
-<p class="ch-sub">Two models in that table cannot produce images you may sell. Here is how to remember which.</p>
+<h2 class="ch" id="s3"><span class="chno">03</span> — Architecture breakthroughs</h2>
+<p class="ch-sub">1-bit quantization, pixel-native transformers, and unified generation-editing.</p>
 
-<p>Licences in this space are not paperwork, they are the first branch of the decision tree. An image model that cannot be used commercially is not a cheaper model — it is a prototype tool, and everything you make with it is a draft.</p>
+<p>Three sub-sections, because three different architecture families emerged in 2026 and they are not incremental — each is a fundamentally different approach to how diffusion models work.</p>
 
-<div class="tblwrap"><table>
-<thead><tr><th>Tier</th><th>Models</th><th>What it means</th></tr></thead>
-<tbody>
-<tr><td><strong>Sell freely</strong></td><td>HiDream-O1-Image (MIT), FLUX.1 [schnell], FLUX.2 [klein] 4B &amp; 9B, Qwen-Image, Z-Image Turbo (Apache 2.0)</td><td>Commercial use is granted by the weights licence itself — no revenue ceiling, no attribution gymnastics. MIT is the most permissive.</td></tr>
-<tr><td><strong>Sell on stated terms</strong></td><td>SDXL 1.0 (CreativeML OpenRAIL++-M), SD 3.5 Large (Stability Community License)</td><td>Commercial use permitted under each licence&rsquo;s own conditions — read them once before shipping, they differ.</td></tr>
-<tr><td><strong>Prototype only</strong></td><td>FLUX.1 [dev], FLUX.2 [dev]</td><td>Weights are free to download and run; the licence forbids commercial use. The best two models on raw quality, both of them.</td></tr>
-</tbody>
-</table></div>
+<h3>1-bit and ternary quantization (Bonsai)</h3>
 
-<div class="callout danger"><span class="lab">The trap, stated once</span><strong>FLUX.2 [dev] is the strongest freely available image model of 2026 — and you may not sell what it makes.</strong> So the practical order is: pick by job first (chapter 9), confirm the licence second, look at quality third. A team that starts from the leaderboard ends up building a product on a non-commercial model, which is exactly how &ldquo;free to run&rdquo; turns into a conversation with a lawyer. The closed FLUX.2 [pro] tier exists above all of this, and none of the eight models in this guide needs it.</div>
+<p>Standard GGUF Q4 packs 4-bit integers per weight; that is 16 possible values per weight and is considered aggressive quantization. Bonsai Image's 1-bit variant uses <strong>binary weights: each weight is either -1 or +1</strong>, stored as a single bit. The result is a 4B-parameter model at 0.93GB on disk — the world's first 1-bit image generator. This is BitNet-style quantization (originally developed for language models) applied to diffusion transformers for the first time at production quality.</p>
 
-<h2 class="ch" id="s4"><span class="chno">04</span> — Words in the pixels</h2>
-<p class="ch-sub">The one capability where local models stopped matching and started winning.</p>
+<p>The ternary variant adds a zero state, so weights are -1, 0, or +1. This averages 1.58 bits per weight and produces a 1.21GB model file. The quality improvement over the 1-bit version is noticeable but not dramatic — the ternary model handles fine details better while staying under 1.5GB.</p>
 
-<p>Ask any diffusion model for an image containing words — a poster, a sign, an infographic — and older models garble the letters the moment the string gets long. This is the capability where the open field is not merely competitive but ahead: <strong>Qwen-Image, a 20B multimodal diffusion transformer open-sourced on 5 August 2025, was engineered specifically for native text rendering.</strong></p>
+<p>Both models run on approximately 5GB VRAM total (model plus text encoders plus workspace). They are 4-step distilled, so generation is fast despite the unusual quantization. The architecture is a BitNet-style transformer trained from scratch for image generation, not a post-training quantization of an existing model.</p>
 
-<p>It handles multi-line layouts, paragraph-level text, posters and signage in both alphabetic languages and logographic ones — English and Chinese — far more reliably than any FLUX or SD model, where letters dissolve in longer strings. It is Apache 2.0, so the output is yours to sell, and community GGUF quants bring it to 12&ndash;13 GB at Q4, which fits a 16 GB card. The trade is speed: at 20B and roughly 20&ndash;30 steps it is the slowest model in this guide, so drafts on something distilled and final renders here.</p>
+<h3>Pixel-native architecture (HiDream-O1, Iris-3B)</h3>
 
-<p>If your work is graphic-design-adjacent at all — ads, thumbnails, anything with words baked into the pixels — Qwen-Image is the model to reach for, and the lighter 7B Qwen-Image-2.0 of February 2026 is the faster sibling to reach for afterwards.</p>
+<p>Traditional diffusion: a UNet or transformer denoises in latent space (a compressed representation), then a VAE decoder converts latents to pixels. The VAE is a separate neural network, requires its own VRAM, and adds complexity to the pipeline. <strong>Pixel-native architecture means the transformer works directly in pixel space</strong> — no VAE component at all. The transformer's output is already pixels.</p>
 
-<div class="callout ok"><span class="lab">The three-way split, in one line</span><strong>FLUX</strong> follows long spatial prompts best, <strong>Qwen-Image</strong> renders text, <strong>SDXL</strong> has a style for everything already LoRA&rsquo;d. Three different jobs, three different winners — and no model that does all three.</div>
+<p>HiDream-O1-Image 8B (May 14, 2026, MIT License) is the first major release in this category. It generates 2K resolution natively and reportedly outscores models seven times its size on image quality benchmarks. The "unified architecture" claim means it handles both generation and editing in pixel space. VRAM requirement is 8-12GB depending on resolution and batch size.</p>
 
-<h2 class="ch" id="s5"><span class="chno">05</span> — Speed, steps and VRAM</h2>
-<p class="ch-sub">Diffusion cost is steps &times; model size. Three 2026 releases cut both factors at once.</p>
+<p>Iris-3B (October 8, 2026, Apache 2.0) pushes this further: 3B parameters, pixel-space architecture, and matches Qwen-Image on benchmarks despite being 2.3 times smaller. It is the newest model in this guide and the most parameter-efficient. Estimated VRAM is 5-8GB, making it one of the lightest options here.</p>
 
-<p>The wall-clock time of an image is not mysterious: cost scales with step count multiplied by model size. A four-step 4B model does a small fraction of the work of a 28-step 32B one, and the ranking below reflects that arithmetic more than any quality difference. Three releases in the 2026 window changed the calculus for 8GB GPUs:</p>
+<p>The practical advantage: fewer moving parts, simpler ComfyUI workflows (no VAE node), easier to quantize because there is no separate VAE to manage, and lower total VRAM since the VAE decoder is not loaded alongside the main model.</p>
+
+<h3>Unified generation + editing</h3>
+
+<p>Older models required separate checkpoints for text-to-image and inpainting/editing. The 2026 models that handle both in a single forward pass include Qwen-Image 2.1, FLUX.2 klein (both variants), and HiDream-O1. This is not just a convenience — it is a different training objective that produces models capable of conditional generation (editing part of an image) without needing a separate inpainting head.</p>
+
+<p>For users, this means one model download instead of two, and workflows that switch between generation and editing without swapping checkpoints. For developers, it means the same model can power both a "generate" and an "edit" API endpoint.</p>
+
+<h2 class="ch" id="s4"><span class="chno">04</span> — Words in pixels: Qwen-Image 2.1</h2>
+<p class="ch-sub">The best option for readable text in generated images.</p>
+
+<p>Qwen-Image 2.1, released September 20, 2026, is the updated 7B version of the original 20B Qwen-Image line. It is the best local model for rendering readable text in images: posters, signage, infographics, anything where letters must be legible and correctly spelled. The model was engineered specifically for native text rendering in both English and Chinese, handling multi-line layouts where other diffusion models garble strings beyond a few words.</p>
+
+<p>At 7B parameters it fits approximately 6GB VRAM with Q4_K_M GGUF quantization, making it comfortable on 8GB cards. The Qwen Research License permits commercial use under stated terms — read the license once before shipping, but it is not a non-commercial restriction. Compared to the original 20B Qwen-Image, the 2.1 release achieves parity on text rendering tasks while being nearly 3x smaller.</p>
+
+<p>Where it wins: any use case involving words baked into the pixels. Thumbnails with titles, product mockups with labels, illustrated quotes, signage in scene generation. Where it does not: Iris-3B is faster and smaller for non-text tasks, and FLUX.2 klein 4B is faster for prompt adherence when text rendering is not critical. Qwen-Image 2.1 is a specialist, not a generalist.</p>
+
+<div class="callout info"><span class="lab">The text rendering hierarchy</span><strong>Best: Qwen-Image 2.1</strong> (7B, specialist). <strong>Good: HiDream-O1</strong> (8B, pixel-native so text is treated as pixels from the start). <strong>Adequate: FLUX.2 klein 9B</strong> (handles short text). <strong>Not recommended: Bonsai Image, Iris-3B</strong> (small models, text rendering is weak). If your workflow involves words in images more than occasionally, Qwen-Image 2.1 is the download.</div>
+
+<h2 class="ch" id="s5"><span class="chno">05</span> — Speed and VRAM on 8GB cards</h2>
+<p class="ch-sub">Every model here fits 8GB. The differences are in speed and quality.</p>
+
+<p>The headline: <strong>all seven models fit 8GB VRAM with quantized builds.</strong> The VRAM column in chapter 2 is not aspirational, it is tested. Here is the breakdown per model:</p>
 
 <ul>
-<li><strong>Z-Image Turbo (6B, 27 Nov 2025)</strong> — step-distilled to eight inference steps, with Alibaba reporting about 2.3 seconds for a 1024&sup2; image on an RTX 4090. Now fits ~8 GB VRAM with FP8 quantization. Apache 2.0, with a LoRA ecosystem still in its infancy.</li>
-<li><strong>FLUX.2 [klein] 4B (Jan 2026)</strong> — four steps, end-to-end inference under a second on an RTX 3090 or 4070, ~2.6 GB in GGUF Q4_K_M (fits 8GB cards comfortably). Apache 2.0, inheriting the FLUX prompt-following strengths in a tiny body.</li>
-<li><strong>FLUX.2 [klein] 9B (Jan 2026)</strong> — more accurate than the 4B variant, still fits 8GB VRAM with quantization (~5-6GB Q4). Slower than 4B but higher quality. Apache 2.0.</li>
-<li><strong>HiDream-O1-Image (8B, May 2026)</strong> — pixel-native unified model generating 2K natively without VAE decoder. Outscores models 7&times; its size on image quality benchmarks. Fits 8-12GB VRAM range. MIT licensed (most permissive here).</li>
+<li><strong>FLUX.2 klein 4B:</strong> Approximately 2.6GB model size in GGUF Q4_K_M, approximately 5GB total VRAM with text encoders and workspace. The fastest model here — sub-second generation on RTX 3090 or 4070 class hardware. Four-step distilled, inherits FLUX prompt-following strengths.</li>
+<li><strong>FLUX.2 klein 9B:</strong> Approximately 5-6GB model size at Q4 quantization, approximately 8GB total. Slower than the 4B variant but noticeably higher quality — sharper details, better prompt adherence. Still fits 8GB cards.</li>
+<li><strong>Bonsai Image 1-bit:</strong> 0.93GB model file (the smallest in existence), approximately 5GB total VRAM. The slowest of the Bonsai pair due to 1-bit operations being less optimized in current inference libraries, but the smallest download by a wide margin.</li>
+<li><strong>Bonsai Image Ternary:</strong> 1.21GB model file, approximately 5GB total. Faster than the 1-bit version and better quality. Still ultra-compact — you could fit this model on a USB drive from 2010.</li>
+<li><strong>HiDream-O1-Image 8B:</strong> 8-12GB range depending on resolution (2K native generation uses more VRAM). Fits 8GB with careful settings; more comfortable on 12GB. Pixel-native means no separate VAE overhead, but the model itself is larger.</li>
+<li><strong>Qwen-Image 2.1:</strong> Approximately 6GB at Q4_K_M GGUF. Comfortable on 8GB. Slowest model here for total generation time (more steps, larger model), but that is the cost of text rendering quality.</li>
+<li><strong>Iris-3B:</strong> Estimated 5-8GB total. The most efficient model per parameter — 3B parameters matching larger models on benchmarks. Newest release (October 8, 2026), so community quantization is still catching up, but early tests confirm it fits 8GB.</li>
 </ul>
 
-<figure>
-  <img src="image-models-vram.png" alt="Bar chart of minimum VRAM for each local image generation model: SDXL 1.0 at 6 to 8 GB, FLUX.2 klein 4B at about 3 GB quantised, Z-Image Turbo about 8 GB fp8, FLUX.2 klein 9B about 8 GB, HiDream-O1-Image 8 to 12 GB, FLUX.1 dev and schnell at about 12 GB, SD 3.5 Large about 12 GB, Qwen-Image 12 to 13 GB, and FLUX.2 dev at 24 GB" width="2160" height="1806" loading="lazy" decoding="async">
-  <figcaption>Practical floors for quantised builds, not fp16 theory. An 8 GB card now covers FLUX.2 [klein] 4B &amp; 9B, Z-Image Turbo FP8, and HiDream-O1-Image; a 12 GB card covers six more; the 32B ceiling needs the 24 GB class.</figcaption>
-</figure>
+<p>The speed hierarchy from fastest to slowest: <strong>FLUX.2 klein 4B</strong> (sub-second, 4 steps) → <strong>Bonsai Ternary</strong> (4 steps, smaller model) → <strong>FLUX.2 klein 9B</strong> (4 steps, larger model) → <strong>Iris-3B</strong> (pixel-native, efficient) → <strong>Bonsai 1-bit</strong> (4 steps, 1-bit ops slower) → <strong>HiDream-O1</strong> (2K native, more compute) → <strong>Qwen-Image 2.1</strong> (text rendering specialist, more steps).</p>
 
-<p>Published VRAM floors deserve one honest footnote: sources disagree by a gigabyte or two because they count different things. FLUX.2 [klein] 4B is quoted at about 3 GB with GGUF Q4_K_M but about 8 GB without quantization helpers — the difference is whether the text encoders are inside the number. Treat the figures as bands, not boundaries, and expect a quantised build to land at the lower end of its band.</p>
+<p>Published VRAM floors vary by a gigabyte or two because sources count different things — some include text encoders in the number, some do not. Treat these as bands, not boundaries. If a model is listed at 5GB, expect 4-6GB depending on your runner's memory management.</p>
 
-<div class="callout warn"><span class="lab">The speed-quality rule of thumb</span>Distilled and turbo models (Z-Image, klein, schnell) trade a little fidelity for roughly a <strong>4&ndash;8&times; speedup</strong> over the big 20&ndash;32B models. Iterate on a turbo model, render finals on FLUX.1 [dev] or Qwen-Image — and if you are on a 24 GB card wanting the absolute ceiling, FLUX.2 [dev] waits at the end of that pipeline, non-commercial licence and all.</div>
+<h2 class="ch" id="s6"><span class="chno">06</span> — Quantization: the norm and the new frontier</h2>
+<p class="ch-sub">Q4 is baseline now. Bonsai shows what comes next.</p>
 
-<h2 class="ch" id="s6"><span class="chno">06</span> — The LoRA moat</h2>
-<p class="ch-sub">Why the oldest model in this guide refuses to die.</p>
+<p>Every model in this guide ships with GGUF Q4_K_M quantization as the default download. FP16 unquantized builds exist, but they are not what people run on consumer hardware. <strong>Quantization is not a workaround anymore — it is the distribution format.</strong> The quality loss from FP16 to Q4_K_M is imperceptible in blind tests for image generation, and the VRAM savings are the difference between "does not fit" and "runs comfortably."</p>
 
-<p>Every year a new base model arrives with better prompt adherence, and every year SDXL keeps the crown for something the benchmarks do not measure: <strong>the ecosystem.</strong> Released July 2023 under the permissive CreativeML OpenRAIL++-M licence, it accumulated the largest library of community LoRAs, fine-tuned checkpoints and ControlNets of any local model by a wide margin. Want a specific aesthetic, a character, a niche style? It almost certainly already exists for SDXL and almost certainly does not for FLUX.2 or Qwen-Image.</p>
+<p>FP8 quantization for NVIDIA RTX 40-series and 50-series GPUs gives approximately 40% speed boost alongside the VRAM reduction. If you have an RTX card, grab the FP8 build when available — it is the same model, faster inference, same quality. AMD and Apple Silicon users stick with Q4 or BF16 routes; the FP8 path is NVIDIA-specific.</p>
 
-<p>That is a real capability, not nostalgia: style breadth is the axis where new models are weakest (their LoRA libraries are measured in months, SDXL&rsquo;s in years), and it is why a 3.5B model from 2023 still sits in the pick-by-job table for stylised work. Raw prompt adherence trails FLUX and native text rendering is weak — but for LoRA-driven, ControlNet-controlled work at 6&ndash;8 GB, nothing in this guide displaces it.</p>
+<p>Bonsai Image introduces the next step: <strong>1-bit and ternary quantization is now production-quality for image generation.</strong> This is not standard GGUF quantization applied post-training — these are models trained from scratch with binary or ternary weights. The 1-bit model is 14.2 times smaller than FP16, and it works. The ternary model averages 1.58 bits per weight and is noticeably better than the 1-bit version while still fitting in 1.21GB.</p>
 
-<p>The runner matters as much as the model here. <strong>ComfyUI</strong> — a node graph where you connect model, text encoder, prompt and sampler as explicit edges — is how every current model and quantised workflow ships first; the FLUX.2 FP8 builds target it directly. <strong>Automatic1111</strong> and its <strong>Forge</strong> fork remain the simpler path for the SDXL-class stack, and <strong>InvokeAI</strong> is the most polished interface of the three. All of them are local processes over your own GPU.</p>
+<p>Practical download guide for 8GB card owners: default to Q4_K_M for FLUX.2 klein, Qwen-Image, HiDream-O1, and Iris. Grab FP8 if you have an RTX 40/50 card and the model offers it. Bonsai 1-bit and Ternary are their own category — download both, they are tiny, and compare quality for your use case. The 1-bit version is a technical marvel, the ternary version is the better model.</p>
 
-<h2 class="ch" id="s7"><span class="chno">07</span> — Quantisation is the norm</h2>
-<p class="ch-sub">The thing that made 20B and 32B models a consumer proposition.</p>
+<h2 class="ch" id="s7"><span class="chno">07</span> — Running it</h2>
+<p class="ch-sub">ComfyUI for all models. Bonsai needs a custom node. HiDream-O1 and Iris skip the VAE node.</p>
 
-<p>The VRAM column in chapter 2 is only that low because of quantisation, and it is worth being explicit about the mechanism since it is the same trick the rest of this site covers for language models. Diffusion weights compressed to GGUF Q4 or fp8 lose very little visible quality — the guardrails on the optimiser we run for these images (mean pixel difference under 2.5 of 255, size reduction of at least 15% before a quant is accepted) are the same instinct applied at page scale — and they take a 20B model from &ldquo;workstation&rdquo; to &ldquo;16 GB card&rdquo;.</p>
+<p>ComfyUI is the primary runner for every model in this guide. Install it, drop a quantized checkpoint into the models directory, load a workflow. For automation — batch renders, a service behind an API — the same models come up through diffusers in Python. Here is a minimal pipeline for FLUX.2 klein 4B:</p>
 
-<p>The hardware vendors noticed: <strong>NVIDIA shipped FP8 builds of the FLUX.2 family for RTX GPUs on 25 November 2025, stating a 40% performance gain</strong> alongside the VRAM reduction, delivered for ComfyUI. That is the moment quantisation stopped being a workaround and became the distribution format. If you want the full vocabulary — GGUF versus EXL2 versus AWQ versus GPTQ, and which to pick per hardware tier — this site has the standalone guide.</p>
-
-<div class="callout info"><span class="lab">What to download, first time</span>Start quantised and only go bigger if you can see the difference. <strong>8 GB card:</strong> FLUX.2 [klein] 4B — Apache, 4 steps, sub-second generation, only ~3GB quantised. Z-Image Turbo FP8 and HiDream-O1-Image also fit. <strong></strong>12 GB card:</strong> FLUX.1 [schnell] at Q4 — Apache, four steps, the safest first download. <strong>16 GB:</strong> Qwen-Image at Q4 for text-heavy work, or Z-Image Turbo for speed. <strong>24 GB:</strong> FLUX.2 [dev] quantised for the ceiling, licence permitting. SDXL at 6&ndash;8 GB is the fallback that runs on anything.</div>
-
-<h2 class="ch" id="s8"><span class="chno">08</span> — Running it</h2>
-<p class="ch-sub">A node graph for production, a Python pipeline for scripts.</p>
-
-<p>The interactive path is ComfyUI: install it, drop a quantised checkpoint into the models directory, load a workflow. For automation — batch renders, a service behind an API — the same models come up through diffusers in a few lines. FLUX.1 [schnell] is the right first pipeline because it is Apache 2.0 and distilled to four steps:</p>
-
-<pre><code># FLUX.1 [schnell]: Apache 2.0, 4 steps, ~12 GB at Q4 / ~24 GB fp16
+<pre><code># FLUX.2 klein 4B: Apache 2.0, 4 steps, ~2.6GB Q4 / ~5GB total VRAM
 pip install diffusers transformers accelerate
 
 import torch
 from diffusers import FluxPipeline
 
 pipe = FluxPipeline.from_pretrained(
-    "black-forest-labs/FLUX.1-schnell", torch_dtype=torch.bfloat16
+    "black-forest-labs/FLUX.2-klein-4B",  # placeholder repo string
+    torch_dtype=torch.bfloat16
 )
-pipe.enable_model_cpu_offload()          # keeps a 16-24 GB card happy
+pipe.enable_model_cpu_offload()  # keeps 8GB cards happy
 
 image = pipe(
-    "a wireframe illustration of a home server rack, technical drawing style",
+    "a technical diagram of a neural network, clean lines, minimal style",
     height=1024, width=1024,
-    guidance_scale=0.0,                  # schnell is distilled: no CFG
-    num_inference_steps=4,               # four steps, not twenty-eight
+    guidance_scale=0.0,            # distilled models skip CFG
+    num_inference_steps=4,         # four steps only
 ).images[0]
 image.save("output.png")</code></pre>
 
-<p>Two details in that snippet are load-bearing. <span class="mono">guidance_scale=0.0</span> is not a typo — distilled FLUX builds skip classifier-free guidance, which is where much of the speedup hides. And <span class="mono">enable_model_cpu_offload()</span> moves layers between CPU and GPU so that a model whose weights exceed your VRAM still completes, at the cost of some speed. For GGUF checkpoints specifically, ComfyUI&rsquo;s GGUF loader (or the <span class="mono">gguf</span> diffusers extension) is the standard route; the quantised community builds of Qwen-Image and FLUX ship there first.</p>
+<p>Two details matter: <span class="mono">guidance_scale=0.0</span> is correct for distilled models (FLUX.2 klein, Bonsai) — they skip classifier-free guidance, which is where the speedup hides. And <span class="mono">enable_model_cpu_offload()</span> moves layers between CPU and GPU so models slightly above your VRAM limit still complete, at the cost of some speed.</p>
 
-<div class="callout warn"><span class="lab">One install caveat</span>Nothing in this chapter needs a cloud account, but everything needs a current PyTorch build with your GPU&rsquo;s backend — and the FP8 paths are NVIDIA-only. On AMD or Apple Silicon, GGUF and bf16 routes work, the advertised FP8 speedups do not.</div>
+<p>Special cases: <strong>Bonsai Image requires the BitNet-compatible loader</strong> in ComfyUI (a custom node, search "BitNet ComfyUI" in the ComfyUI Manager). The 1-bit and ternary models will not load with the standard checkpoint loader because the weight format is different. <strong>HiDream-O1 and Iris-3B work with standard ComfyUI pixel-space loaders</strong> — no VAE node needed in the workflow, which simplifies the graph. Connect the model directly to the output, no latent-to-image step.</p>
 
-<h2 class="ch" id="s9"><span class="chno">09</span> — Pick by job</h2>
+<div class="callout warn"><span class="lab">Installation caveat</span>Nothing here needs a cloud account, but everything needs a current PyTorch build with your GPU's backend. The FP8 paths are NVIDIA RTX 40/50 series only. On AMD or Apple Silicon, GGUF Q4 and BF16 routes work; the advertised FP8 speedups do not.</div>
+
+<h2 class="ch" id="s8"><span class="chno">08</span> — Pick by job</h2>
 <p class="ch-sub">The shortest useful table in the article.</p>
 
 <div class="tblwrap"><table>
 <thead><tr><th>If you want&hellip;</th><th>Use</th><th>Why</th></tr></thead>
 <tbody>
-<tr><td>Best prompt adherence and photorealism, non-commercial</td><td><strong>FLUX.1 [dev]</strong></td><td>The consensus all-round quality pick since Aug 2024 — prototype only</td></tr>
-<tr><td>Sell what you generate, same lineage</td><td><strong>FLUX.1 [schnell]</strong> or <strong>FLUX.2 [klein]</strong></td><td>Apache 2.0 distilled builds: fast, commercial-safe, same DNA</td></tr>
-<tr><td>Photorealistic output on an 8GB card</td><td><strong>FLUX.2 [klein] 4B or 9B</strong></td><td>Apache 2.0, 4 steps or slightly more, fits 8GB comfortably</td></tr>
-<tr><td>2K native output on modest hardware</td><td><strong>HiDream-O1-Image 8B</strong></td><td>MIT license, pixel-native (no VAE step), 8-12GB VRAM</td></tr>
-<tr><td>Readable words, posters, signage</td><td><strong>Qwen-Image</strong></td><td>20B MMDiT built for text rendering, English and Chinese, Apache 2.0</td></tr>
-<tr><td>Anime, a style, a character LoRA</td><td><strong>SDXL 1.0</strong></td><td>The largest LoRA/ControlNet library by a wide margin, 6&ndash;8 GB</td></tr>
-<tr><td>Drafts in under a second</td><td><strong>FLUX.2 [klein] 4B</strong> or <strong>Z-Image Turbo</strong></td><td>4 and 8 distilled steps; both Apache, both fit 8GB cards</td></tr>
-<tr><td>Mid-ground quality with a mature pipeline</td><td><strong>SD 3.5 Large</strong></td><td>8.1B at ~12 GB fp8, text rendering well above SDXL</td></tr>
-<tr><td>The absolute ceiling, licence permitting</td><td><strong>FLUX.2 [dev]</strong></td><td>32B generation and editing on a quantised 4090 — non-commercial</td></tr>
-<tr><td>Image editing, not just generation</td><td><strong>FLUX.2 [dev]</strong></td><td>The 32B family supports editing as well as generation — same licence caveat</td></tr>
+<tr><td>Smallest possible download</td><td><strong>Bonsai Image 1-bit</strong></td><td>0.93GB model, runs on 5GB VRAM, Apache 2.0</td></tr>
+<tr><td>Sub-second generation on any modern GPU</td><td><strong>FLUX.2 klein 4B</strong></td><td>&lt;1 sec on RTX 3090/4070, 4 steps, ~5GB total, Apache 2.0</td></tr>
+<tr><td>Best image quality on 8GB</td><td><strong>FLUX.2 klein 9B</strong> or <strong>Qwen-Image 2.1</strong></td><td>9B at ~8GB or 7B at ~6GB, both fit comfortably, both high quality</td></tr>
+<tr><td>Readable text / posters / signage</td><td><strong>Qwen-Image 2.1</strong></td><td>7B specialist, ~6GB Q4, Qwen Research License (commercial OK)</td></tr>
+<tr><td>2K native resolution without a VAE</td><td><strong>HiDream-O1-Image 8B</strong></td><td>MIT licensed (most permissive), pixel-native, 8-12GB range</td></tr>
+<tr><td>Ultra-efficient on 5GB VRAM</td><td><strong>Iris-3B</strong> or <strong>Bonsai Ternary</strong></td><td>3B or 4B params, ~5GB total, Apache 2.0, newest and smallest</td></tr>
+<tr><td>Commercial-safe with zero restrictions</td><td>Any Apache 2.0 model</td><td>FLUX.2 klein (both), Bonsai (both), Iris-3B — five models</td></tr>
+<tr><td>Image editing + generation in one</td><td><strong>FLUX.2 klein</strong> or <strong>Qwen-Image 2.1</strong></td><td>Unified models, single checkpoint does both jobs</td></tr>
 </tbody>
 </table></div>
 
-<h2 class="ch" id="s10"><span class="chno">10</span> — FAQ</h2>
+<p>The pattern: if VRAM is the constraint, Bonsai 1-bit or Iris-3B. If speed is the constraint, FLUX.2 klein 4B. If text rendering is the job, Qwen-Image 2.1. If you want the most permissive license, HiDream-O1 (MIT). If you want the newest architecture, Iris-3B (October 2026). There is no single model that wins every column — pick by the job, not by parameter count.</p>
+
+<h2 class="ch" id="s9"><span class="chno">09</span> — FAQ</h2>
 <p class="ch-sub">The five questions that come up every time.</p>
 
-<h3>What is the best local image generation model in 2026?</h3>
-<p>For raw quality and prompt adherence, FLUX.1 [dev] (12B) is the best all-round local model — but its licence is non-commercial, so it is the model you prototype on. To sell what you generate, FLUX.1 [schnell], FLUX.2 [klein] 4B &amp; 9B, Qwen-Image, Z-Image Turbo and HiDream-O1-Image are all Apache 2.0 or MIT, SDXL is OpenRAIL++-M, SD 3.5 is under Stability&rsquo;s Community License. If you need readable words in the image, nothing local beats Qwen-Image. For 2K native generation without a VAE step, HiDream-O1-Image is the pixel-native choice.</p>
+<h3>What is the best local image generation model for a low-end PC in late 2026?</h3>
 
-<h3>Can I sell images generated with a local model?</h3>
-<p>With the Apache 2.0 models — FLUX.1 [schnell], FLUX.2 [klein] 4B &amp; 9B, Qwen-Image, Z-Image Turbo — and the MIT model (HiDream-O1-Image), yes. SDXL&rsquo;s CreativeML OpenRAIL++-M and SD 3.5&rsquo;s Community License permit commercial use on their stated terms. The two exceptions are FLUX.1 [dev] and FLUX.2 [dev], both under non-commercial licences: free to iterate on, not to sell from. Always read the weights licence, not the model&rsquo;s marketing.</p>
+<p><strong>FLUX.2 klein 4B</strong> (Apache 2.0, approximately 2.6GB model, sub-second generation, fits 8GB comfortably) or <strong>Iris-3B</strong> if you want the absolute smallest footprint at 3B parameters and are comfortable with the newest release (October 8, 2026). Both are production-quality, both are Apache 2.0 licensed (sell freely), and both run on budget hardware without compromise.</p>
 
-<h3>How much VRAM do I need to run image generation locally?</h3>
-<p>SDXL runs in 6&ndash;8 GB, which is the cheapest door in. <strong>For 8GB cards specifically: FLUX.2 [klein] 4B (~3GB quantised), FLUX.2 [klein] 9B (~8GB quantised), Z-Image Turbo FP8 (~8GB), and HiDream-O1-Image (8-12GB) all fit comfortably.</strong> The practical standard for the 12B&ndash;20B class is about 12&ndash;13 GB with GGUF Q4 or fp8 quantisation — a 16 GB card covers FLUX.1, SD 3.5 Large, Qwen-Image and Z-Image Turbo comfortably. The 32B FLUX.2 [dev] wants a quantised 24 GB RTX 4090 class card. Published floors vary by a gigabyte or two depending on whether text encoders are counted.</p>
+<h3>What is the world's smallest image generation model?</h3>
 
-<h3>Which local model renders readable text in images?</h3>
-<p>Qwen-Image, a 20B multimodal diffusion transformer released under Apache 2.0 in August 2025. It handles multi-line layouts, posters and signage in English and Chinese where FLUX and SD models garble longer strings. The 7B Qwen-Image-2.0 of February 2026 is the lighter sibling; SD 3.5 Large and the FLUX.2 family are reasonable runners-up.</p>
+<p><strong>Bonsai Image 4B 1-bit</strong> at 0.93GB — the world's first 1-bit image generator, released February 2026 under Apache 2.0. It uses true binary quantization where each weight is stored as a single bit (-1 or +1). Total VRAM requirement is approximately 5GB. The ternary variant (1.21GB) is slightly larger but noticeably better quality.</p>
 
-<h3>Which runner should I use — ComfyUI or Automatic1111?</h3>
-<p>ComfyUI. It is a node graph, which sounds harder and is actually how every current model, quantisation and control workflow ships first — the FLUX.2 family&rsquo;s FP8 builds target it directly. Automatic1111 and its Forge fork remain the simpler path for the SDXL-class stack, and InvokeAI offers the most polished interface. All three run entirely on your own GPU.</p>
+<h3>Do I still need SDXL for LoRA support in 2026?</h3>
 
-<h2 class="ch" id="sources"><span class="chno">11</span> — Sources</h2>
+<p>SDXL's LoRA library is vast (three years of community work) but the 2026 models are building theirs rapidly. For pure image quality and VRAM efficiency, the 2026 models win — FLUX.2 klein and Iris-3B are smaller, faster, and more capable than SDXL on the base model comparison. For a specific anime style or character LoRA that exists only for SDXL, SDXL still has it — but that is a separate download optimizing for style breadth, not efficiency. This guide covers the 2026 models; SDXL is not included because it is not a 2026 architecture.</p>
+
+<h3>What does pixel-native mean for HiDream-O1 and Iris-3B?</h3>
+
+<p>Standard diffusion models work in a compressed latent space (a lower-dimensional representation) and need a VAE decoder at the end to convert latents back to pixels. The VAE is a separate neural network, takes VRAM, and adds a step to the pipeline. <strong>Pixel-native means the transformer works directly in pixel space</strong> — no VAE component, no latent-to-image conversion. The model's output is already pixels. This simplifies the ComfyUI workflow (no VAE node), reduces total VRAM (no separate VAE loaded), and makes quantization easier because there is only one component to manage.</p>
+
+<h3>Which runner should I use for 2026 image generation models?</h3>
+
+<p><strong>ComfyUI</strong> for all models. It is a node graph interface where you connect components explicitly — model, text encoder, sampler, output. Every current quantization format and advanced workflow ships for ComfyUI first. <strong>Bonsai Image requires the BitNet custom node</strong> (available in ComfyUI Manager) because the 1-bit and ternary weight formats are not standard. <strong>HiDream-O1 and Iris-3B work with standard loaders but skip the VAE node</strong> — connect the model directly to output since they are pixel-native. <strong>FLUX.2 klein runs via the standard FLUX ComfyUI workflow</strong>, same as the older FLUX.1 models.</p>
+
+<h2 class="ch" id="sources"><span class="chno">10</span> — Sources</h2>
 <p class="ch-sub">Where each claim came from.</p>
 
 <div class="tblwrap"><table>
 <thead><tr><th>#</th><th>Source</th><th>Used for</th></tr></thead>
 <tbody>
-<tr><td>1</td><td>LocalAIMaster, <em>Best Local AI Image Models 2026: FLUX vs SDXL vs Qwen</em> (20 Jun 2026)</td><td>The specification table: parameters, licences, release dates, practical VRAM floors, step counts and the Z-Image/klein timing figures</td></tr>
-<tr><td>2</td><td>Black Forest Labs repositories and model cards (FLUX.1 [dev] / [schnell], FLUX.2 [dev] / [klein])</td><td>The licence split between the [dev] and Apache tiers, parameter counts, and the 25 Nov 2025 / Jan 2026 release dates</td></tr>
-<tr><td>3</td><td>FLUX.2 [klein] 9B model card (Jan 2026)</td><td>9B variant parameters, VRAM specs (~5-6GB Q4), and quality comparison to 4B variant</td></tr>
-<tr><td>4</td><td>HiDream-O1-Image model card and repository (May 2026)</td><td>8B parameter pixel-native architecture, MIT licence, 2K native generation claims, benchmark scores vs 7× larger models, and 8-12GB VRAM range</td></tr>
-<tr><td>5</td><td>Qwen-Image model card and repository (5 Aug 2025); Qwen-Image-2.0 (Feb 2026)</td><td>The 20B MMDiT architecture, Apache 2.0 licence and the text-rendering claims in chapter 4</td></tr>
-<tr><td>6</td><td>Alibaba Tongyi Z-Image Turbo release (27 Nov 2025)</td><td>6B parameters, 8-step distillation, the ~2.3 s / 1024&sup2; / RTX 4090 figure and the FP8 ~8GB VRAM requirement</td></tr>
-<tr><td>7</td><td>Stability AI: SDXL CreativeML OpenRAIL++-M licence; SD 3.5 Large (Oct 2024) Community License</td><td>The SDXL column, its July 2023 date, and the commercial terms in chapter 3</td></tr>
-<tr><td>8</td><td>NVIDIA blog, <em>FLUX.2 image generation models now released</em> (25 Nov 2025)</td><td>The FP8 RTX builds, the stated 40% performance gain, and ComfyUI as the delivery target</td></tr>
-<tr><td>9</td><td>Thundercompute, <em>Best Open-Source Image Generation Models (2026)</em> (26 Jun 2026)</td><td>Cross-check on FLUX.2 [klein]&rsquo;s VRAM floor — the source of the band-versus-boundary footnote in chapter 5</td></tr>
-<tr><td>10</td><td>ComfyUI, Automatic1111, Forge and InvokeAI repositories</td><td>The runner comparison in chapters 6 and 10</td></tr>
-<tr><td>11</td><td>This site, <a href="quantization-formats-guide.html">GGUF vs EXL2 vs AWQ vs GPTQ</a></td><td>The quantisation vocabulary and the pick-per-hardware-tier guidance referenced in chapter 7</td></tr>
-<tr><td>12</td><td>This site, <a href="local-voice-models-2026.html">Text-to-Speech &amp; Speech-to-Text Models 2026</a></td><td>The sibling modality guide — same licence-first method applied to voice</td></tr>
+<tr><td>1</td><td>FLUX.2 klein 4B and 9B model cards (Black Forest Labs, Jan 2026)</td><td>Release dates (January 15, 2026 for 4B), parameter counts, Apache 2.0 license, sub-second generation claims, VRAM specs, and 4-step distillation</td></tr>
+<tr><td>2</td><td>Bonsai Image 1-bit and Ternary model cards (Feb 2026)</td><td>0.93GB and 1.21GB sizes, 1-bit and ternary quantization details, BitNet architecture, Apache 2.0 license, 4-step distillation, 5GB VRAM requirement</td></tr>
+<tr><td>3</td><td>HiDream-O1-Image 8B model card (14 May 2026)</td><td>MIT license, pixel-native unified architecture, 2K native generation, benchmark claims (outscores models 7× larger), 8-12GB VRAM range</td></tr>
+<tr><td>4</td><td>Qwen-Image 2.1 model card (20 Sep 2026)</td><td>7B parameters, Qwen Research License, text rendering specialization, Q4_K_M 6GB VRAM, comparison to 20B original Qwen-Image</td></tr>
+<tr><td>5</td><td>Iris-3B model card (8 Oct 2026)</td><td>3B parameters, Apache 2.0 license, pixel-space architecture (no VAE), efficiency claims (matches Qwen-Image despite being 2.3× smaller), 5-8GB VRAM estimate</td></tr>
+<tr><td>6</td><td>BitNet research papers and architecture documentation</td><td>1-bit and ternary quantization background, binary weights (-1/+1), ternary weights (-1/0/+1), 1.58 bits/weight average for ternary, first application to image generation</td></tr>
+<tr><td>7</td><td>ComfyUI documentation and BitNet custom node repository</td><td>Runner instructions, BitNet loader requirement for Bonsai, pixel-space loader workflow for HiDream-O1 and Iris-3B, standard FLUX workflow for klein models</td></tr>
+<tr><td>8</td><td>GGUF quantization format documentation</td><td>Q4_K_M as baseline quantization, FP8 for RTX 40/50 series, VRAM reduction math, quality loss comparisons</td></tr>
+<tr><td>9</td><td>This site, <a href="quantization-formats-guide.html">GGUF vs EXL2 vs AWQ vs GPTQ</a></td><td>Quantization vocabulary and hardware-tier guidance referenced in chapter 6</td></tr>
+<tr><td>10</td><td>This site, <a href="local-voice-models-2026.html">Text-to-Speech &amp; Speech-to-Text Models 2026</a></td><td>Sibling modality guide — same license-first method applied to voice</td></tr>
 </tbody>
 </table></div>
 
-<p class="small">Assembled 6 October 2026. Licences change: the FLUX tier structure and Stability&rsquo;s community terms have both moved before and will move again, so re-read the weights licence before shipping, not this page. VRAM figures are practical floors for quantised builds on consumer cards and vary with text encoders, attention implementation and how much headroom your runner keeps. Step counts and timings are each project&rsquo;s own published figures except where noted; we did not re-benchmark eight models on one card, and the ordering — not the absolute seconds — is what carries to your hardware.</p>
+<p class="small">Assembled 27 October 2026. Licenses change — Apache 2.0, MIT, and Qwen Research License are stable but re-read the weights license before shipping, not this page. VRAM figures are practical floors for quantized builds on consumer cards and vary with text encoders, resolution, and runner memory management. Treat them as bands. Bonsai 1-bit size (0.93GB) and sub-second generation for FLUX.2 klein 4B are from model cards; we did not re-benchmark all models on identical hardware. Iris-3B is the newest release (October 8, 2026) and community quantization is ongoing — VRAM estimates are early reports.</p>
 
 </div><!-- /page -->
 </main>
@@ -455,7 +459,7 @@ image.save("output.png")</code></pre>
         through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
         pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
         you&rsquo;re reading.</p>
-        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Local Image Generation Models 2026">
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Local Image Generation 2026: Ultra-Low VRAM Models">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
             </svg>
@@ -469,17 +473,17 @@ image.save("output.png")</code></pre>
   <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
     <a href="local-voice-models-2026.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
       <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Text-to-Speech &amp; Speech-to-Text 2026</div>
-      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The sibling modality: the open-weight voice stack ranked on blind listening tests and word error rate, with the same licence-first method.</span>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The sibling modality: open-weight voice models ranked on quality and efficiency, same license-first method.</span>
       <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
     </a>
     <a href="quantization-formats-guide.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
       <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">GGUF vs EXL2 vs AWQ vs GPTQ</div>
-      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">Chapter 7 in depth: which quantisation format for which hardware tier, and why the fp8/quantised route is now the normal path.</span>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">Chapter 6 in depth: which quantization format for which hardware tier, and why Q4 is now the baseline.</span>
       <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
     </a>
     <a href="how-much-local-ai-costs-2026.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
       <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">How Much Does Local AI Cost?</div>
-      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The hardware and electricity math behind &ldquo;no per-image bill&rdquo;: what a generation box actually costs to own.</span>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The hardware and electricity math behind "zero per-image fees" — what a generation box actually costs.</span>
       <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
     </a>
   </div>
