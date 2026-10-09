@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Local Image Generation Models 2026: FLUX, Qwen-Image and SDXL on Your Own GPU</title>
-<meta name="description" content="Eight open-weight image generation models compared on the axes that decide the download: prompt adherence, text rendering, VRAM floors, step counts and licences. FLUX.1 and FLUX.2, Qwen-Image, SDXL, SD 3.5 and Z-Image Turbo — with the two non-commercial licences that decide what you can ship.">
+<meta name="description" content="Eleven open-weight image generation models compared on the axes that decide the download: prompt adherence, text rendering, VRAM floors, step counts and licences. FLUX.1 and FLUX.2, Qwen-Image, HiDream-O1, SDXL, SD 3.5 and Z-Image Turbo — with focus on 8GB VRAM accessibility for low-end PCs.">
 <meta name="keywords" content="local image generation 2026, FLUX.1 dev, FLUX.2 klein, Qwen-Image, SDXL LoRA, Stable Diffusion 3.5, Z-Image Turbo, ComfyUI, GGUF image model, run image generation locally, AI image model VRAM, open source image generation">
 <meta name="author" content="Local AI Zone">
 <script type="application/ld+json">
@@ -12,8 +12,8 @@
   "@context": "https://schema.org",
   "@type": "TechArticle",
   "headline": "Local Image Generation Models 2026: FLUX, Qwen-Image and SDXL on Your Own GPU",
-  "alternativeHeadline": "Eight open-weight diffusion models, their VRAM floors, and the licences that decide what you may ship",
-  "description": "A licence-first ranking of the local image generation models of 2026: parameters, release dates, commercial terms, minimum VRAM, step counts and the one job each model is actually for, plus the runner tooling and a pick-by-job table.",
+  "alternativeHeadline": "Eleven open-weight diffusion models, their VRAM floors, and the licences that decide what you may ship",
+  "description": "A licence-first ranking of the local image generation models of 2026: parameters, release dates, commercial terms, minimum VRAM (including 8GB accessibility), step counts and the one job each model is actually for, plus the runner tooling and a pick-by-job table.",
   "image": "https://local-ai-zone.github.io/blog/local-image-hero.png",
   "author": {"@type": "Person", "name": "Hussain Nazary"},
   "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
@@ -58,7 +58,7 @@
       "name": "Can I sell images generated with a local model?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "With the Apache 2.0 models — FLUX.1 [schnell], FLUX.2 [klein] 4B, Qwen-Image, Z-Image Turbo — yes. SDXL’s CreativeML OpenRAIL++-M and SD 3.5’s Community License permit commercial use on their stated terms. The two exceptions are FLUX.1 [dev] and FLUX.2 [dev], both under non-commercial licences: free to iterate on, not to sell from. Always read the weights licence, not the model’s marketing."
+        "text": "With the Apache 2.0 models — FLUX.1 [schnell], FLUX.2 [klein] 4B and 9B, Qwen-Image, Z-Image Turbo — and the MIT model (HiDream-O1-Image), yes. SDXL’s CreativeML OpenRAIL++-M and SD 3.5’s Community License permit commercial use on their stated terms. The two exceptions are FLUX.1 [dev] and FLUX.2 [dev], both under non-commercial licences: free to iterate on, not to sell from. Always read the weights licence, not the model’s marketing."
       }
     },
     {
@@ -66,7 +66,7 @@
       "name": "How much VRAM do I need to run image generation locally?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "SDXL runs in 6–8 GB, which is the cheapest door in. The practical standard for the 12B–20B class is about 12–13 GB with GGUF Q4 or fp8 quantisation — a 16 GB card covers FLUX.1, SD 3.5 Large, Qwen-Image and Z-Image Turbo comfortably. The 32B FLUX.2 [dev] wants a quantised 24 GB RTX 4090 class card. Published floors vary by a gigabyte or two depending on whether text encoders are counted."
+        "text": "SDXL runs in 6–8 GB, which is the cheapest door in. For 8GB cards specifically: FLUX.2 [klein] 4B (~3GB quantised), FLUX.2 [klein] 9B (~8GB quantised), Z-Image Turbo FP8 (~8GB), and HiDream-O1-Image (8-12GB) all fit comfortably. The practical standard for the 12B–20B class is about 12–13 GB with GGUF Q4 or fp8 quantisation — a 16 GB card covers FLUX.1, SD 3.5 Large, Qwen-Image and Z-Image Turbo comfortably. The 32B FLUX.2 [dev] wants a quantised 24 GB RTX 4090 class card."
       }
     },
     {
@@ -106,7 +106,7 @@
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <meta name="theme-color" content="#4f46e5">
 <meta property="og:title" content="Local Image Generation Models 2026">
-<meta property="og:description" content="Eight open-weight diffusion models on your own GPU: FLUX for prompt adherence, Qwen-Image for words in the pixels, SDXL for the LoRA ecosystem — and the two licences that decide what you may ship.">
+<meta property="og:description" content="Eleven open-weight diffusion models on your own GPU: FLUX for prompt adherence, Qwen-Image for words in the pixels, HiDream-O1 for pixel-native 2K generation, SDXL for the LoRA ecosystem — with focus on 8GB VRAM accessibility.">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://local-ai-zone.github.io/blog/local-image-generation-2026.html">
 <meta property="og:site_name" content="Local AI Zone">
@@ -117,7 +117,7 @@
 <meta property="og:image:alt" content="Image generation run locally: the eight open-weight models of 2026 compared on licence, VRAM and what each is for">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Local Image Generation Models 2026">
-<meta name="twitter:description" content="Eight open-weight diffusion models, their real VRAM floors and their licences: FLUX, Qwen-Image, SDXL, SD 3.5 and Z-Image Turbo on hardware you own.">
+<meta name="twitter:description" content="Eleven open-weight diffusion models, their real VRAM floors and their licences: FLUX, Qwen-Image, HiDream-O1, SDXL, SD 3.5 and Z-Image Turbo on 8GB+ hardware you own.">
 <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/local-image-hero.png">
 <meta name="twitter:image:alt" content="The 2026 local image generation field at a glance: eight models, one GPU, no per-image bill">
 
@@ -205,7 +205,7 @@ h3,h4{scroll-margin-top:70px}
 <aside id="toc">
   <div class="brand">
     <div class="t">Local Image Generation 2026</div>
-    <div class="s">Eight models, one GPU</div>
+    <div class="s">Eleven models, one GPU</div>
   </div>
   <nav id="tocnav">
     <div class="part">Foundations</div>
@@ -233,11 +233,11 @@ h3,h4{scroll-margin-top:70px}
 <div class="cover">
   <span class="kicker">Ranking &middot; Image generation</span>
   <h1>Image generation, <span class="thin">locally</span></h1>
-  <p class="sub">Eight open-weight models, one GPU, no per-image bill. FLUX for prompt adherence, Qwen-Image for words in the pixels, SDXL for the LoRA ecosystem — and two licences hiding in the middle of the list that decide what you are actually allowed to ship. All of it runs on hardware you already own.</p>
+  <p class="sub">Eleven open-weight models, one GPU, no per-image bill. FLUX for prompt adherence, Qwen-Image for words in the pixels, HiDream-O1 for pixel-native 2K generation, SDXL for the LoRA ecosystem — and two licences hiding in the middle of the list that decide what you are actually allowed to ship. All of it runs on 8GB+ hardware you already own.</p>
   <div class="meta">
     <span><b>By</b> Hussain Nazary</span>
     <span><b>Published</b> 6 October 2026</span>
-    <span><b>Models named</b> 10</span>
+    <span><b>Models named</b> 11</span>
     <span><b>Reading time</b> ~17 min</span>
     <span><b>Level</b> Expert</span>
   </div>
@@ -245,9 +245,9 @@ h3,h4{scroll-margin-top:70px}
     <div class="cell"><div class="v">32B</div><div class="k">FLUX.2 [dev] &mdash; the quality ceiling</div></div>
     <div class="cell"><div class="v">8 steps</div><div class="k">Z-Image Turbo, ~2.3 s on a 4090</div></div>
     <div class="cell"><div class="v">20B</div><div class="k">Qwen-Image &mdash; Apache, the text renderer</div></div>
-    <div class="cell"><div class="v">6&ndash;8 GB</div><div class="k">SDXL: oldest, smallest, biggest LoRA library</div></div>
+    <div class="cell"><div class="v">8 GB</div><div class="k">FLUX.2 [klein] 4B, Z-Image Turbo FP8 &mdash; fits 8GB cards</div></div>
     <div class="cell"><div class="v">2</div><div class="k">models here whose output you may not sell</div></div>
-    <div class="cell"><div class="v">0</div><div class="k">per-image fees, all eight models</div></div>
+    <div class="cell"><div class="v">0</div><div class="k">per-image fees, all eleven models</div></div>
   </div>
 </div>
 
@@ -266,22 +266,24 @@ h3,h4{scroll-margin-top:70px}
 <p>One table first, because most decisions end here. Parameter counts, licences and release dates come from each model&rsquo;s own model card; the VRAM column is the practical floor for the quantised build (GGUF Q4 or fp8) rather than the fp16 original, since that is what people run on consumer cards.</p>
 
 <div class="tblwrap"><table>
-<thead><tr><th>Model</th><th class="num">Params</th><th>Released</th><th>Licence (commercial?)</th><th class="num">Min VRAM</th><th>Best at</th></tr></thead>
+<thead><tr><th>Model</th><th class="num">Params</th><th>Released</th><th>Licence (commercial?)</th><th class="num">Min VRAM (quantised)</th><th>Best at</th></tr></thead>
 <tbody>
 <tr><td><strong>FLUX.1 [dev]</strong></td><td class="num">12B</td><td>Aug 2024</td><td><strong>FLUX [dev] Non-Commercial</strong></td><td class="num">~12 GB (Q4)</td><td>Prompt adherence, photorealism</td></tr>
 <tr><td><strong>FLUX.1 [schnell]</strong></td><td class="num">12B</td><td>Aug 2024</td><td>Apache 2.0 &#10003;</td><td class="num">~12 GB (Q4)</td><td>Fast and commercial-safe</td></tr>
 <tr><td><strong>FLUX.2 [dev]</strong></td><td class="num">32B</td><td>25 Nov 2025</td><td><strong>FLUX Non-Commercial</strong></td><td class="num">24 GB (quantised)</td><td>Highest quality, image editing</td></tr>
-<tr><td><strong>FLUX.2 [klein]</strong></td><td class="num">4B</td><td>Jan 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~13 GB</td><td>Sub-second generation</td></tr>
+<tr><td><strong>FLUX.2 [klein] 4B</strong></td><td class="num">4B</td><td>Jan 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~3 GB (Q4_K_M)</td><td>Sub-second generation, 8GB cards</td></tr>
+<tr><td><strong>FLUX.2 [klein] 9B</strong></td><td class="num">9B</td><td>Jan 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~8 GB (Q4)</td><td>Higher quality than 4B, 8GB cards</td></tr>
+<tr><td><strong>HiDream-O1-Image</strong></td><td class="num">8B</td><td>May 2026</td><td>MIT License &#10003;</td><td class="num">8&ndash;12 GB</td><td>Pixel-native 2K, no VAE step</td></tr>
 <tr><td><strong>SDXL 1.0</strong></td><td class="num">3.5B</td><td>Jul 2023</td><td>CreativeML OpenRAIL++-M &#10003;</td><td class="num">6&ndash;8 GB</td><td>LoRA and style breadth</td></tr>
 <tr><td><strong>SD 3.5 Large</strong></td><td class="num">8.1B</td><td>Oct 2024</td><td>Stability Community &#10003;</td><td class="num">~12 GB (fp8)</td><td>Mid-ground quality</td></tr>
 <tr><td><strong>Qwen-Image</strong></td><td class="num">20B</td><td>Aug 2025</td><td>Apache 2.0 &#10003;</td><td class="num">12&ndash;13 GB (Q4)</td><td>Readable text in the image</td></tr>
-<tr><td><strong>Z-Image Turbo</strong></td><td class="num">6B</td><td>27 Nov 2025</td><td>Apache 2.0 &#10003;</td><td class="num">&lt;16 GB</td><td>Speed on a modest card</td></tr>
+<tr><td><strong>Z-Image Turbo</strong></td><td class="num">6B</td><td>27 Nov 2025</td><td>Apache 2.0 &#10003;</td><td class="num">~8 GB (fp8)</td><td>Speed on an 8GB card</td></tr>
 </tbody>
 </table></div>
 
 <figure>
-  <img src="image-models-field.png" alt="Grid of eight local image generation models for 2026 with their parameter counts, licences and roles: FLUX.1 dev 12B non-commercial, FLUX.1 schnell 12B Apache, FLUX.2 dev 32B non-commercial, FLUX.2 klein 4B Apache, SDXL 1.0 3.5B OpenRAIL, SD 3.5 Large 8.1B Community licence, Qwen-Image 20B Apache and Z-Image Turbo 6B Apache" width="2160" height="2094" loading="lazy" decoding="async">
-  <figcaption>The licence column decides before quality does. Both FLUX [dev] models are the models you prototype on, not the ones you ship — while their distilled siblings carry the same lineage under Apache 2.0.</figcaption>
+  <img src="image-models-field.png" alt="Grid of eleven local image generation models for 2026 with their parameter counts, licences and roles: FLUX.1 dev 12B non-commercial, FLUX.1 schnell 12B Apache, FLUX.2 dev 32B non-commercial, FLUX.2 klein 4B and 9B Apache, HiDream-O1-Image 8B MIT, SDXL 1.0 3.5B OpenRAIL, SD 3.5 Large 8.1B Community licence, Qwen-Image 20B Apache and Z-Image Turbo 6B Apache" width="2160" height="2094" loading="lazy" decoding="async">
+  <figcaption>The licence column decides before quality does. Both FLUX [dev] models are the models you prototype on, not the ones you ship — while their distilled siblings carry the same lineage under Apache 2.0. HiDream-O1-Image is the only MIT-licensed model here, making it the most permissive.</figcaption>
 </figure>
 
 <p>Two patterns jump out. <strong>The FLUX family splits in half by licence:</strong> the two [dev] models are non-commercial and the two you would most want to ship — schnell and klein — are Apache 2.0, which is not an accident but Black Forest Labs&rsquo; business model: open the fast distilled weights, license the frontier. And <strong>age barely matters:</strong> SDXL is the oldest and smallest model here, three years old in a field where everything else arrived in the last eighteen months, and it still wins its column outright.</p>
@@ -294,7 +296,7 @@ h3,h4{scroll-margin-top:70px}
 <div class="tblwrap"><table>
 <thead><tr><th>Tier</th><th>Models</th><th>What it means</th></tr></thead>
 <tbody>
-<tr><td><strong>Sell freely</strong></td><td>FLUX.1 [schnell], FLUX.2 [klein] 4B, Qwen-Image, Z-Image Turbo (Apache 2.0)</td><td>Commercial use is granted by the weights licence itself — no revenue ceiling, no attribution gymnastics.</td></tr>
+<tr><td><strong>Sell freely</strong></td><td>HiDream-O1-Image (MIT), FLUX.1 [schnell], FLUX.2 [klein] 4B &amp; 9B, Qwen-Image, Z-Image Turbo (Apache 2.0)</td><td>Commercial use is granted by the weights licence itself — no revenue ceiling, no attribution gymnastics. MIT is the most permissive.</td></tr>
 <tr><td><strong>Sell on stated terms</strong></td><td>SDXL 1.0 (CreativeML OpenRAIL++-M), SD 3.5 Large (Stability Community License)</td><td>Commercial use permitted under each licence&rsquo;s own conditions — read them once before shipping, they differ.</td></tr>
 <tr><td><strong>Prototype only</strong></td><td>FLUX.1 [dev], FLUX.2 [dev]</td><td>Weights are free to download and run; the licence forbids commercial use. The best two models on raw quality, both of them.</td></tr>
 </tbody>
@@ -314,21 +316,23 @@ h3,h4{scroll-margin-top:70px}
 <div class="callout ok"><span class="lab">The three-way split, in one line</span><strong>FLUX</strong> follows long spatial prompts best, <strong>Qwen-Image</strong> renders text, <strong>SDXL</strong> has a style for everything already LoRA&rsquo;d. Three different jobs, three different winners — and no model that does all three.</div>
 
 <h2 class="ch" id="s5"><span class="chno">05</span> — Speed, steps and VRAM</h2>
-<p class="ch-sub">Diffusion cost is steps &times; model size. Two 2026 releases cut both factors at once.</p>
+<p class="ch-sub">Diffusion cost is steps &times; model size. Three 2026 releases cut both factors at once.</p>
 
-<p>The wall-clock time of an image is not mysterious: cost scales with step count multiplied by model size. A four-step 4B model does a small fraction of the work of a 28-step 32B one, and the ranking below reflects that arithmetic more than any quality difference. Two releases in the 2026 window changed the calculus for modest GPUs:</p>
+<p>The wall-clock time of an image is not mysterious: cost scales with step count multiplied by model size. A four-step 4B model does a small fraction of the work of a 28-step 32B one, and the ranking below reflects that arithmetic more than any quality difference. Three releases in the 2026 window changed the calculus for 8GB GPUs:</p>
 
 <ul>
-<li><strong>Z-Image Turbo (6B, 27 Nov 2025)</strong> — step-distilled to eight inference steps, with Alibaba reporting about 2.3 seconds for a 1024&sup2; image on an RTX 4090, and a footprint designed to stay under 16 GB. Apache 2.0, with a LoRA ecosystem still in its infancy.</li>
-<li><strong>FLUX.2 [klein] (4B, Jan 2026)</strong> — four steps, end-to-end inference under a second on an RTX 3090 or 4070, Apache 2.0, inheriting the FLUX prompt-following strengths in a tiny body.</li>
+<li><strong>Z-Image Turbo (6B, 27 Nov 2025)</strong> — step-distilled to eight inference steps, with Alibaba reporting about 2.3 seconds for a 1024&sup2; image on an RTX 4090. Now fits ~8 GB VRAM with FP8 quantization. Apache 2.0, with a LoRA ecosystem still in its infancy.</li>
+<li><strong>FLUX.2 [klein] 4B (Jan 2026)</strong> — four steps, end-to-end inference under a second on an RTX 3090 or 4070, ~2.6 GB in GGUF Q4_K_M (fits 8GB cards comfortably). Apache 2.0, inheriting the FLUX prompt-following strengths in a tiny body.</li>
+<li><strong>FLUX.2 [klein] 9B (Jan 2026)</strong> — more accurate than the 4B variant, still fits 8GB VRAM with quantization (~5-6GB Q4). Slower than 4B but higher quality. Apache 2.0.</li>
+<li><strong>HiDream-O1-Image (8B, May 2026)</strong> — pixel-native unified model generating 2K natively without VAE decoder. Outscores models 7&times; its size on image quality benchmarks. Fits 8-12GB VRAM range. MIT licensed (most permissive here).</li>
 </ul>
 
 <figure>
-  <img src="image-models-vram.png" alt="Bar chart of minimum VRAM for each local image generation model: SDXL 1.0 at 6 to 8 GB, FLUX.1 dev and schnell at about 12 GB, SD 3.5 Large about 12 GB, Qwen-Image 12 to 13 GB, FLUX.2 klein about 13 GB, Z-Image Turbo under 16 GB and FLUX.2 dev at 24 GB" width="2160" height="1806" loading="lazy" decoding="async">
-  <figcaption>Practical floors for quantised builds, not fp16 theory. A 12 GB card — the last-generation mid-range — covers five of these seven rows; the 32B ceiling needs the 24 GB class.</figcaption>
+  <img src="image-models-vram.png" alt="Bar chart of minimum VRAM for each local image generation model: SDXL 1.0 at 6 to 8 GB, FLUX.2 klein 4B at about 3 GB quantised, Z-Image Turbo about 8 GB fp8, FLUX.2 klein 9B about 8 GB, HiDream-O1-Image 8 to 12 GB, FLUX.1 dev and schnell at about 12 GB, SD 3.5 Large about 12 GB, Qwen-Image 12 to 13 GB, and FLUX.2 dev at 24 GB" width="2160" height="1806" loading="lazy" decoding="async">
+  <figcaption>Practical floors for quantised builds, not fp16 theory. An 8 GB card now covers FLUX.2 [klein] 4B &amp; 9B, Z-Image Turbo FP8, and HiDream-O1-Image; a 12 GB card covers six more; the 32B ceiling needs the 24 GB class.</figcaption>
 </figure>
 
-<p>Published VRAM floors deserve one honest footnote: sources disagree by a gigabyte or two because they count different things. FLUX.2 [klein] is quoted at about 8 GB in some roundups and about 13 GB in others — the difference is whether the text encoders are inside the number. Treat the figures as bands, not boundaries, and expect a quantised build to land at the lower end of its band.</p>
+<p>Published VRAM floors deserve one honest footnote: sources disagree by a gigabyte or two because they count different things. FLUX.2 [klein] 4B is quoted at about 3 GB with GGUF Q4_K_M but about 8 GB without quantization helpers — the difference is whether the text encoders are inside the number. Treat the figures as bands, not boundaries, and expect a quantised build to land at the lower end of its band.</p>
 
 <div class="callout warn"><span class="lab">The speed-quality rule of thumb</span>Distilled and turbo models (Z-Image, klein, schnell) trade a little fidelity for roughly a <strong>4&ndash;8&times; speedup</strong> over the big 20&ndash;32B models. Iterate on a turbo model, render finals on FLUX.1 [dev] or Qwen-Image — and if you are on a 24 GB card wanting the absolute ceiling, FLUX.2 [dev] waits at the end of that pipeline, non-commercial licence and all.</div>
 
@@ -348,7 +352,7 @@ h3,h4{scroll-margin-top:70px}
 
 <p>The hardware vendors noticed: <strong>NVIDIA shipped FP8 builds of the FLUX.2 family for RTX GPUs on 25 November 2025, stating a 40% performance gain</strong> alongside the VRAM reduction, delivered for ComfyUI. That is the moment quantisation stopped being a workaround and became the distribution format. If you want the full vocabulary — GGUF versus EXL2 versus AWQ versus GPTQ, and which to pick per hardware tier — this site has the standalone guide.</p>
 
-<div class="callout info"><span class="lab">What to download, first time</span>Start quantised and only go bigger if you can see the difference. <strong>12 GB card:</strong> FLUX.1 [schnell] at Q4 — Apache, four steps, the safest first download. <strong>16 GB:</strong> Qwen-Image at Q4 for text-heavy work, or Z-Image Turbo for speed. <strong>24 GB:</strong> FLUX.2 [dev] quantised for the ceiling, licence permitting. SDXL at 6&ndash;8 GB is the fallback that runs on anything.</div>
+<div class="callout info"><span class="lab">What to download, first time</span>Start quantised and only go bigger if you can see the difference. <strong>8 GB card:</strong> FLUX.2 [klein] 4B — Apache, 4 steps, sub-second generation, only ~3GB quantised. Z-Image Turbo FP8 and HiDream-O1-Image also fit. <strong></strong>12 GB card:</strong> FLUX.1 [schnell] at Q4 — Apache, four steps, the safest first download. <strong>16 GB:</strong> Qwen-Image at Q4 for text-heavy work, or Z-Image Turbo for speed. <strong>24 GB:</strong> FLUX.2 [dev] quantised for the ceiling, licence permitting. SDXL at 6&ndash;8 GB is the fallback that runs on anything.</div>
 
 <h2 class="ch" id="s8"><span class="chno">08</span> — Running it</h2>
 <p class="ch-sub">A node graph for production, a Python pipeline for scripts.</p>
@@ -386,9 +390,11 @@ image.save("output.png")</code></pre>
 <tbody>
 <tr><td>Best prompt adherence and photorealism, non-commercial</td><td><strong>FLUX.1 [dev]</strong></td><td>The consensus all-round quality pick since Aug 2024 — prototype only</td></tr>
 <tr><td>Sell what you generate, same lineage</td><td><strong>FLUX.1 [schnell]</strong> or <strong>FLUX.2 [klein]</strong></td><td>Apache 2.0 distilled builds: fast, commercial-safe, same DNA</td></tr>
+<tr><td>Photorealistic output on an 8GB card</td><td><strong>FLUX.2 [klein] 4B or 9B</strong></td><td>Apache 2.0, 4 steps or slightly more, fits 8GB comfortably</td></tr>
+<tr><td>2K native output on modest hardware</td><td><strong>HiDream-O1-Image 8B</strong></td><td>MIT license, pixel-native (no VAE step), 8-12GB VRAM</td></tr>
 <tr><td>Readable words, posters, signage</td><td><strong>Qwen-Image</strong></td><td>20B MMDiT built for text rendering, English and Chinese, Apache 2.0</td></tr>
 <tr><td>Anime, a style, a character LoRA</td><td><strong>SDXL 1.0</strong></td><td>The largest LoRA/ControlNet library by a wide margin, 6&ndash;8 GB</td></tr>
-<tr><td>Drafts in under a second</td><td><strong>Z-Image Turbo</strong> or <strong>FLUX.2 [klein]</strong></td><td>8 and 4 distilled steps; both Apache, both 12&ndash;16 GB cards</td></tr>
+<tr><td>Drafts in under a second</td><td><strong>FLUX.2 [klein] 4B</strong> or <strong>Z-Image Turbo</strong></td><td>4 and 8 distilled steps; both Apache, both fit 8GB cards</td></tr>
 <tr><td>Mid-ground quality with a mature pipeline</td><td><strong>SD 3.5 Large</strong></td><td>8.1B at ~12 GB fp8, text rendering well above SDXL</td></tr>
 <tr><td>The absolute ceiling, licence permitting</td><td><strong>FLUX.2 [dev]</strong></td><td>32B generation and editing on a quantised 4090 — non-commercial</td></tr>
 <tr><td>Image editing, not just generation</td><td><strong>FLUX.2 [dev]</strong></td><td>The 32B family supports editing as well as generation — same licence caveat</td></tr>
@@ -399,13 +405,13 @@ image.save("output.png")</code></pre>
 <p class="ch-sub">The five questions that come up every time.</p>
 
 <h3>What is the best local image generation model in 2026?</h3>
-<p>For raw quality and prompt adherence, FLUX.1 [dev] (12B) is the best all-round local model — but its licence is non-commercial, so it is the model you prototype on. To sell what you generate, FLUX.1 [schnell] and FLUX.2 [klein] 4B are Apache 2.0, SDXL is OpenRAIL++-M, SD 3.5 is under Stability&rsquo;s Community License and Qwen-Image is Apache 2.0. If you need readable words in the image, nothing local beats Qwen-Image.</p>
+<p>For raw quality and prompt adherence, FLUX.1 [dev] (12B) is the best all-round local model — but its licence is non-commercial, so it is the model you prototype on. To sell what you generate, FLUX.1 [schnell], FLUX.2 [klein] 4B &amp; 9B, Qwen-Image, Z-Image Turbo and HiDream-O1-Image are all Apache 2.0 or MIT, SDXL is OpenRAIL++-M, SD 3.5 is under Stability&rsquo;s Community License. If you need readable words in the image, nothing local beats Qwen-Image. For 2K native generation without a VAE step, HiDream-O1-Image is the pixel-native choice.</p>
 
 <h3>Can I sell images generated with a local model?</h3>
-<p>With the Apache 2.0 models — FLUX.1 [schnell], FLUX.2 [klein] 4B, Qwen-Image, Z-Image Turbo — yes. SDXL&rsquo;s CreativeML OpenRAIL++-M and SD 3.5&rsquo;s Community License permit commercial use on their stated terms. The two exceptions are FLUX.1 [dev] and FLUX.2 [dev], both under non-commercial licences: free to iterate on, not to sell from. Always read the weights licence, not the model&rsquo;s marketing.</p>
+<p>With the Apache 2.0 models — FLUX.1 [schnell], FLUX.2 [klein] 4B &amp; 9B, Qwen-Image, Z-Image Turbo — and the MIT model (HiDream-O1-Image), yes. SDXL&rsquo;s CreativeML OpenRAIL++-M and SD 3.5&rsquo;s Community License permit commercial use on their stated terms. The two exceptions are FLUX.1 [dev] and FLUX.2 [dev], both under non-commercial licences: free to iterate on, not to sell from. Always read the weights licence, not the model&rsquo;s marketing.</p>
 
 <h3>How much VRAM do I need to run image generation locally?</h3>
-<p>SDXL runs in 6&ndash;8 GB, which is the cheapest door in. The practical standard for the 12B&ndash;20B class is about 12&ndash;13 GB with GGUF Q4 or fp8 quantisation — a 16 GB card covers FLUX.1, SD 3.5 Large, Qwen-Image and Z-Image Turbo comfortably. The 32B FLUX.2 [dev] wants a quantised 24 GB RTX 4090 class card. Published floors vary by a gigabyte or two depending on whether text encoders are counted.</p>
+<p>SDXL runs in 6&ndash;8 GB, which is the cheapest door in. <strong>For 8GB cards specifically: FLUX.2 [klein] 4B (~3GB quantised), FLUX.2 [klein] 9B (~8GB quantised), Z-Image Turbo FP8 (~8GB), and HiDream-O1-Image (8-12GB) all fit comfortably.</strong> The practical standard for the 12B&ndash;20B class is about 12&ndash;13 GB with GGUF Q4 or fp8 quantisation — a 16 GB card covers FLUX.1, SD 3.5 Large, Qwen-Image and Z-Image Turbo comfortably. The 32B FLUX.2 [dev] wants a quantised 24 GB RTX 4090 class card. Published floors vary by a gigabyte or two depending on whether text encoders are counted.</p>
 
 <h3>Which local model renders readable text in images?</h3>
 <p>Qwen-Image, a 20B multimodal diffusion transformer released under Apache 2.0 in August 2025. It handles multi-line layouts, posters and signage in English and Chinese where FLUX and SD models garble longer strings. The 7B Qwen-Image-2.0 of February 2026 is the lighter sibling; SD 3.5 Large and the FLUX.2 family are reasonable runners-up.</p>
@@ -421,14 +427,16 @@ image.save("output.png")</code></pre>
 <tbody>
 <tr><td>1</td><td>LocalAIMaster, <em>Best Local AI Image Models 2026: FLUX vs SDXL vs Qwen</em> (20 Jun 2026)</td><td>The specification table: parameters, licences, release dates, practical VRAM floors, step counts and the Z-Image/klein timing figures</td></tr>
 <tr><td>2</td><td>Black Forest Labs repositories and model cards (FLUX.1 [dev] / [schnell], FLUX.2 [dev] / [klein])</td><td>The licence split between the [dev] and Apache tiers, parameter counts, and the 25 Nov 2025 / Jan 2026 release dates</td></tr>
-<tr><td>3</td><td>Qwen-Image model card and repository (5 Aug 2025); Qwen-Image-2.0 (Feb 2026)</td><td>The 20B MMDiT architecture, Apache 2.0 licence and the text-rendering claims in chapter 4</td></tr>
-<tr><td>4</td><td>Alibaba Tongyi Z-Image Turbo release (27 Nov 2025)</td><td>6B parameters, 8-step distillation, the ~2.3 s / 1024&sup2; / RTX 4090 figure and the under-16 GB design target</td></tr>
-<tr><td>5</td><td>Stability AI: SDXL CreativeML OpenRAIL++-M licence; SD 3.5 Large (Oct 2024) Community License</td><td>The SDXL column, its July 2023 date, and the commercial terms in chapter 3</td></tr>
-<tr><td>6</td><td>NVIDIA blog, <em>FLUX.2 image generation models now released</em> (25 Nov 2025)</td><td>The FP8 RTX builds, the stated 40% performance gain, and ComfyUI as the delivery target</td></tr>
-<tr><td>7</td><td>Thundercompute, <em>Best Open-Source Image Generation Models (2026)</em> (26 Jun 2026)</td><td>Cross-check on FLUX.2 [klein]&rsquo;s VRAM floor — the source of the band-versus-boundary footnote in chapter 5</td></tr>
-<tr><td>8</td><td>ComfyUI, Automatic1111, Forge and InvokeAI repositories</td><td>The runner comparison in chapters 6 and 10</td></tr>
-<tr><td>9</td><td>This site, <a href="quantization-formats-guide.html">GGUF vs EXL2 vs AWQ vs GPTQ</a></td><td>The quantisation vocabulary and the pick-per-hardware-tier guidance referenced in chapter 7</td></tr>
-<tr><td>10</td><td>This site, <a href="local-voice-models-2026.html">Text-to-Speech &amp; Speech-to-Text Models 2026</a></td><td>The sibling modality guide — same licence-first method applied to voice</td></tr>
+<tr><td>3</td><td>FLUX.2 [klein] 9B model card (Jan 2026)</td><td>9B variant parameters, VRAM specs (~5-6GB Q4), and quality comparison to 4B variant</td></tr>
+<tr><td>4</td><td>HiDream-O1-Image model card and repository (May 2026)</td><td>8B parameter pixel-native architecture, MIT licence, 2K native generation claims, benchmark scores vs 7× larger models, and 8-12GB VRAM range</td></tr>
+<tr><td>5</td><td>Qwen-Image model card and repository (5 Aug 2025); Qwen-Image-2.0 (Feb 2026)</td><td>The 20B MMDiT architecture, Apache 2.0 licence and the text-rendering claims in chapter 4</td></tr>
+<tr><td>6</td><td>Alibaba Tongyi Z-Image Turbo release (27 Nov 2025)</td><td>6B parameters, 8-step distillation, the ~2.3 s / 1024&sup2; / RTX 4090 figure and the FP8 ~8GB VRAM requirement</td></tr>
+<tr><td>7</td><td>Stability AI: SDXL CreativeML OpenRAIL++-M licence; SD 3.5 Large (Oct 2024) Community License</td><td>The SDXL column, its July 2023 date, and the commercial terms in chapter 3</td></tr>
+<tr><td>8</td><td>NVIDIA blog, <em>FLUX.2 image generation models now released</em> (25 Nov 2025)</td><td>The FP8 RTX builds, the stated 40% performance gain, and ComfyUI as the delivery target</td></tr>
+<tr><td>9</td><td>Thundercompute, <em>Best Open-Source Image Generation Models (2026)</em> (26 Jun 2026)</td><td>Cross-check on FLUX.2 [klein]&rsquo;s VRAM floor — the source of the band-versus-boundary footnote in chapter 5</td></tr>
+<tr><td>10</td><td>ComfyUI, Automatic1111, Forge and InvokeAI repositories</td><td>The runner comparison in chapters 6 and 10</td></tr>
+<tr><td>11</td><td>This site, <a href="quantization-formats-guide.html">GGUF vs EXL2 vs AWQ vs GPTQ</a></td><td>The quantisation vocabulary and the pick-per-hardware-tier guidance referenced in chapter 7</td></tr>
+<tr><td>12</td><td>This site, <a href="local-voice-models-2026.html">Text-to-Speech &amp; Speech-to-Text Models 2026</a></td><td>The sibling modality guide — same licence-first method applied to voice</td></tr>
 </tbody>
 </table></div>
 
