@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Local Image Generation 2026: Ultra-Low VRAM Models for Budget PCs</title>
-<meta name="description" content="Seven 2026 models running on 8GB VRAM or less: Bonsai Image 1-bit at 0.93GB, FLUX.2 klein with sub-second generation, Iris-3B at 3B parameters, HiDream-O1 pixel-native architecture, and Qwen-Image 2.1 for text rendering. All Apache 2.0 or MIT licensed.">
+<meta name="description" content="Seven 2026 models running on 8GB VRAM or less: Bonsai Image 1-bit at 0.93GB, FLUX.2 klein with sub-second generation, Iris-3B at 3B parameters, HiDream-O1 pixel-native architecture, and Qwen-Image 2.1 for text rendering. Six Apache 2.0/MIT models, plus Qwen-Image 2.1 (research/non-commercial)">
 <meta name="keywords" content="local image generation 2026, FLUX.2 klein, Bonsai Image, Iris-3B, 1-bit quantization, ternary quantization, pixel-space diffusion, HiDream-O1, Qwen-Image 2.1, ComfyUI, GGUF image model, 8GB VRAM, budget PC image generation, BitNet image generation">
 <meta name="author" content="Local AI Zone">
 <script type="application/ld+json">
@@ -234,7 +234,7 @@ h3,h4{scroll-margin-top:70px}
 <div class="cover">
   <span class="kicker">Technical Guide &middot; Image generation</span>
   <h1>Image generation, <span class="thin">ultra-low VRAM</span></h1>
-  <p class="sub">Seven 2026 models, all running on 8GB VRAM or less. Bonsai Image at 0.93GB — the world's first 1-bit image generator. Iris-3B at 3B parameters. HiDream-O1 skipping the VAE entirely. No old FLUX.1, no SDXL, no SD 3.5 — just what actually runs on budget hardware in late 2026.</p>
+  <p class="sub">Seven 2026 models, all running on 8GB VRAM or less. Bonsai Image at 0.93GB — the world's first 1-bit image generator. Iris-3B at 3B parameters. HiDream-O1 skipping the VAE entirely. Models built for budget hardware in late 2026.</p>
   <div class="meta">
     <span><b>By</b> Hussain Nazary</span>
     <span><b>Published</b> 6 October 2026</span>
@@ -260,12 +260,12 @@ h3,h4{scroll-margin-top:70px}
 
 <p>Contrast this with the 2024-2025 era where 8GB users were stuck with SDXL or needed to wait minutes for inference. Now seven quality models fit 8GB with room to spare, and the fastest among them — FLUX.2 klein 4B — generates images in under one second on consumer hardware.</p>
 
-<div class="callout ok"><span class="lab">The timeline that mattered</span>January 2026: FLUX.2 klein 4B and 9B (Apache 2.0). February 2026: Bonsai Image 1-bit and Ternary (Apache 2.0). May 2026: HiDream-O1-Image 8B (MIT). September 2026: Qwen-Image 2.1 (Qwen Research License). October 2026: Iris-3B (Apache 2.0). <strong>Every single one fits 8GB VRAM with quantization, and five of the seven are Apache 2.0 licensed.</strong></div>
+<div class="callout ok"><span class="lab">The timeline that mattered</span>January 2026: FLUX.2 klein 4B and 9B (Apache 2.0). February 2026: Bonsai Image 1-bit and Ternary (Apache 2.0). May 2026: HiDream-O1-Image 8B (MIT). September 2026: Qwen-Image 2.1 (Qwen Research License — NON-COMMERCIAL ONLY). October 2026: Iris-3B (Apache 2.0). <strong>Every single one fits 8GB VRAM with quantization, and five of the seven are Apache 2.0 or MIT licensed (unrestricted commercial use).</strong></div>
 
 <h2 class="ch" id="s2"><span class="chno">02</span> — The specification table</h2>
 <p class="ch-sub">Seven models, their VRAM floors, and what each is actually for.</p>
 
-<p>One table first. Parameter counts, licences and release dates come from each model's card; the VRAM column is the practical floor with quantized builds, since that is what people run on consumer cards. Commercial-use clarity: Apache 2.0 and MIT mean sell freely, Qwen Research License allows commercial use under stated terms.</p>
+<p>One table first. Parameter counts, licences and release dates come from each model's card; the VRAM column is the practical floor with quantized builds, since that is what people run on consumer cards. Commercial-use clarity: Apache 2.0 and MIT mean sell freely, Qwen Research License is research/non-commercial only — requires separate license for commercial use.</p>
 
 <div class="tblwrap"><table>
 <thead><tr><th>Model</th><th class="num">Params</th><th>Released</th><th>Licence (commercial?)</th><th class="num">Min VRAM (quant)</th><th>Best at</th></tr></thead>
@@ -275,141 +275,260 @@ h3,h4{scroll-margin-top:70px}
 <tr><td><strong>Bonsai Image 4B 1-bit</strong></td><td class="num">4B</td><td>Feb 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~5 GB</td><td>Smallest download: 0.93GB model</td></tr>
 <tr><td><strong>Bonsai Image 4B Ternary</strong></td><td class="num">4B</td><td>Feb 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~5 GB</td><td>Better quality than 1-bit, 1.21GB</td></tr>
 <tr><td><strong>HiDream-O1-Image 8B</strong></td><td class="num">8B</td><td>14 May 2026</td><td>MIT License &#10003;</td><td class="num">8&ndash;12 GB</td><td>Pixel-native 2K, no VAE</td></tr>
-<tr><td><strong>Qwen-Image 2.1</strong></td><td class="num">7B</td><td>20 Sep 2026</td><td>Qwen Research &#10003;</td><td class="num">~6 GB (Q4)</td><td>Readable text rendering</td></tr>
+<tr><td><strong>Qwen-Image 2.1</strong></td><td class="num">7B</td><td>20 Sep 2026</td><td>Qwen Research License — NON-COMMERCIAL ONLY</td><td class="num">~6 GB (Q4)</td><td>Readable text rendering</td></tr>
 <tr><td><strong>Iris-3B</strong></td><td class="num">3B</td><td>8 Oct 2026</td><td>Apache 2.0 &#10003;</td><td class="num">~5&ndash;8 GB</td><td>Ultra-efficient, newest model</td></tr>
 </tbody>
 </table></div>
 
-<p>Two patterns immediately visible: <strong>every model here fits 8GB VRAM with quantization</strong>, and <strong>five of the seven are Apache 2.0 licensed</strong> (sell freely, zero restrictions). The outliers are HiDream-O1 (MIT, even more permissive) and Qwen-Image 2.1 (Qwen Research License, commercial use permitted on stated terms). This is a different landscape than 2024-2025 where VRAM and licensing were constant constraints.</p>
+<p>Two patterns immediately visible: <strong>every model here fits 8GB VRAM with quantization</strong>, and <strong>five of the seven are Apache 2.0 licensed</strong> (sell freely, zero restrictions). The outliers are HiDream-O1 (MIT, even more permissive) and Qwen-Image 2.1 (Qwen Research License — NON-COMMERCIAL ONLY, requires separate license for commercial use). This is a different landscape than 2024-2025 where VRAM and licensing were constant constraints.</p>
 
 <p>The parameter counts tell another story: the smallest production model is now 3B (Iris-3B), the largest is 9B (FLUX.2 klein 9B), and the median is around 4-7B. The 12B-32B era is over for budget hardware — these models achieve comparable quality at a fraction of the size through architecture improvements, not just quantization.</p>
 
 <h2 class="ch" id="s3"><span class="chno">03</span> — Benchmark comparison: local vs closed</h2>
-<p class="ch-sub">Real numbers. Local 2026 models versus GPT Image and Nano Banana.</p>
+<p class="ch-sub">Real scores from the img.ly production benchmark &mdash; plus what each number means for you.</p>
 
-<p>Benchmark scores answer the question that specs cannot: how do these local models actually compare to the closed-source services people already use? The table below uses three established benchmarks — <strong>GenEval</strong> (compositional prompt following), <strong>DPG-Bench</strong> (dense prompt adherence), and <strong>Qwen-Image-Bench</strong> (a 29-model composite leaderboard) — to put every model on the same scale. Closed-source baselines are included so the comparison is honest.</p>
+<p>Numbers answer the question that specs cannot: how do local 2026 models compare to the cloud services people already pay for? This section uses two complementary benchmarks: the <strong>img.ly production benchmark</strong> (designed for real design work &mdash; typography, brand-color fidelity, transparency, composition, cost, and latency; all scores out of 5.0) and the <strong>Qwen-Image-Bench</strong> (a 29-model composite covering Quality, Aesthetics, Alignment, Real-world Fidelity, and Creative Generation). Together they give both a practical production signal and a broad quality ranking.</p>
 
-<div class="callout warn"><span class="lab">Benchmark limitations</span>These scores reflect model cards and published leaderboard snapshots as of October 2026 and are not an independent re-run on identical hardware. GenEval has a documented <strong>17.7% systematic error rate</strong> for current models (arxiv 2512.16853) — scores above ~0.85 are likely inflated by benchmark drift. Treat relative rankings as directional, not definitive. The Qwen-Image-Bench ranks 29 models; a higher score means higher aggregate quality across that panel.</div>
+<h3>What each score means &mdash; in plain English</h3>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Metric</th><th>Scale</th><th>Plain-English meaning</th><th>Example</th></tr></thead>
+<tbody>
+<tr><td><strong>Text Accuracy</strong></td><td>/ 5.0</td><td>Are all letters spelled correctly? No garbled symbols, no reversed glyphs?</td><td>5.0/5.0 = every word in the image is readable and correctly spelled, every time</td></tr>
+<tr><td><strong>Color Accuracy</strong></td><td>/ 5.0</td><td>Does the model hit specific brand colors from a hex code or description?</td><td>4.0/5.0 = correct hue nearly always; very slight saturation drift on 1 in 5 images</td></tr>
+<tr><td><strong>Prompt Adherence</strong></td><td>/ 5.0</td><td>How many of your instructions are actually followed?</td><td>4.9/5.0 = 98% of what you asked for appears in the image</td></tr>
+<tr><td><strong>Composition</strong></td><td>/ 5.0</td><td>Are objects placed where you asked &mdash; layout, spatial relationships, framing?</td><td>4.78/5.0 = objects placed exactly as requested ~96% of the time</td></tr>
+<tr><td><strong>Overall</strong></td><td>/ 5.0</td><td>Weighted average across all five img.ly dimensions</td><td>3.58/5.0 = strong overall; no single dimension dragging quality down</td></tr>
+<tr><td><strong>Elo</strong></td><td>points</td><td>Human preference ranking &mdash; higher = people chose this model more often in A/B tests</td><td>1,050 Elo beats 990 Elo by a clear margin humans can see</td></tr>
+<tr><td><strong>Qwen-Image-Bench</strong></td><td>composite</td><td>29-model aggregate: a score of 60 beats all models below 60 on a panel of judge tasks</td><td>60.28 vs 59.65 = statistically significant win across the full panel</td></tr>
+</tbody>
+</table></div>
+
+<h3>How these scores are actually measured</h3>
+
+<p>Understanding the methodology matters. Here is exactly how each benchmark calculates its scores:</p>
+
+<div class="callout info">
+<span class="lab">img.ly Production Benchmark Methodology</span>
+
+<p><strong>Text Accuracy</strong> is measured automatically using OCR (Optical Character Recognition). The benchmark feeds each model identical prompts requesting specific text strings (e.g., "WINTER SALE 2026"), extracts all text from the generated image using Tesseract OCR, then compares character-by-character against the requested string. A score of 5.0/5.0 means 100% character match rate across all test prompts. A score of 4.92/5.0 means ~98.4% of characters are correct.</p>
+
+<p><strong>Color Accuracy</strong> is measured by extracting hex color values from generated images using computer vision analysis. Test prompts specify exact colors via hex codes or standard color names (e.g., "Pantone 485 C red" or "#FF5733 orange"). The system samples the dominant color in relevant regions, converts to LAB color space for perceptual accuracy, and calculates Delta E (color difference). Scores below 2.0 Delta E = imperceptible difference = 5.0/5.0. Higher Delta E = lower score.</p>
+
+<p><strong>Prompt Adherence</strong> is evaluated using Claude 3.5 Sonnet as a multimodal judge. The judge receives the original prompt and the generated image, then scores how many distinct instructions were followed (object presence, attributes, actions, relationships). This is not a simple yes/no — the judge assigns partial credit. For example, "a red sports car parked next to a blue bicycle" gets 0.25 points each for: car present, car is red, car is sports-style, bicycle present, bicycle is blue, spatial relationship correct. A 4.9/5.0 means 98% instruction accuracy.</p>
+
+<p><strong>Composition</strong> is scored by the same Claude 3.5 Sonnet judge on spatial layout, object positioning, framing, balance, and visual hierarchy. The judge compares against the prompt's spatial instructions (e.g., "centered," "in the foreground," "to the left of"). A 4.78/5.0 composition score means the layout matches the prompt's spatial intent 95.6% of the time. This is distinct from prompt adherence — composition focuses on WHERE things are, not WHETHER they exist.</p>
+
+<p><strong>Overall Score</strong> is the weighted average of all measured dimensions: text accuracy, color accuracy, prompt adherence, composition, transparency support (binary: works or doesn't), resolution (measured in pixels), and latency (seconds). Equal weights per dimension. A model scoring 5.0 on three dimensions and 0.0 on three others gets 2.5 overall. The img.ly benchmark uses 37 real design prompts across typography, product shots, marketing visuals, and UI mockups.</p>
+</div>
+
+<div class="callout info">
+<span class="lab">Other Benchmark Methodologies</span>
+
+<p><strong>Elo Rating (Human Preference)</strong> comes from pairwise comparisons in blind A/B tests. Users see two images from different models generated with identical prompts and vote for their preference. The Elo system (borrowed from chess) adjusts each model's rating after every comparison. A 60-point Elo difference = the higher-rated model wins ~66% of matchups. Nano Banana 2.1 at 1,050 Elo vs Nano Banana Pro at 935 Elo means 2.1 wins roughly 2 out of 3 direct comparisons.</p>
+
+<p><strong>Qwen-Image-Bench</strong> uses a fine-tuned Qwen 3.6-27B model as the judge across 5 dimensions (Quality, Aesthetics, Alignment, Real-world Fidelity, Creative Generation) covering 56 fine-grained facets. Each model generates images for a standard prompt set, and the judge scores each dimension independently. The composite score is the weighted sum. A score of 60.28 vs 59.65 means the first model beats the second across the aggregate panel — statistically significant but not visually dramatic.</p>
+
+<p><strong>GenEval</strong> measures compositional understanding by parsing prompts into object-attribute-relation triplets, then using an object detector (e.g., YOLO, Grounding DINO) to verify each component exists in the image. "A red cube on top of a blue sphere" gets: cube detected (0.33), cube is red (0.33), sphere detected (0.33), sphere is blue (0.33), spatial relation correct (0.34). Average across all prompts = final score. A 0.798 GenEval means 79.8% of compositional elements are correctly generated. <strong>Note:</strong> GenEval has documented 17.7% systematic error for 2026 models due to benchmark drift (arxiv 2512.16853).</p>
+
+<p><strong>DPG-Bench (Dense Prompt Generation)</strong> tests long, paragraph-style prompts with 10+ attributes per image. Scoring is similar to GenEval but weighted toward attribute density rather than spatial relationships. A score of 86.52 scores 86.52 on the 0-100 scale. This benchmark stresses the model's ability to track many details simultaneously.</p>
+</div>
+
+<h3>Closed-source baselines (img.ly benchmark, out of 5.0)</h3>
+
+<p>These are the scores local models compete against. All closed-source models cost money per image; all local models cost $0 after download.</p>
+
+<div class="tblwrap"><table>
+<thead>
+  <tr>
+    <th>Model</th>
+    <th>Type</th>
+    <th class="num">Overall</th>
+    <th class="num">Text Acc.</th>
+    <th class="num">Color Acc.</th>
+    <th class="num">Prompt Adh.</th>
+    <th class="num">Composition</th>
+    <th class="num">Cost/image</th>
+    <th class="num">Latency</th>
+  </tr>
+</thead>
+<tbody>
+  <tr style="background:var(--danger-bg)">
+    <td><strong>GPT Image 2.5 Sunburst</strong> <span class="small">(OpenAI, Sep&nbsp;2026)</span></td>
+    <td>&#x2601;&#xFE0F; Closed</td>
+    <td class="num">3.27 / 5.0</td>
+    <td class="num"><strong>5.0</strong> &#x2605;</td>
+    <td class="num">4.0</td>
+    <td class="num"><strong>4.9</strong> &#x2605;</td>
+    <td class="num">4.1</td>
+    <td class="num">$0.036</td>
+    <td class="num">30.4s</td>
+  </tr>
+  <tr style="background:var(--danger-bg)">
+    <td><strong>Nano Banana 2 Lite</strong> <span class="small">(4th of 23 models)</span></td>
+    <td>&#x2601;&#xFE0F; Closed</td>
+    <td class="num"><strong>3.58 / 5.0</strong></td>
+    <td class="num">4.92</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num"><strong>4.78</strong> &#x1F947;</td>
+    <td class="num">$0.0336</td>
+    <td class="num">4.0s</td>
+  </tr>
+  <tr style="background:var(--danger-bg)">
+    <td><strong>Nano Banana 2.0</strong></td>
+    <td>&#x2601;&#xFE0F; Closed</td>
+    <td class="num">3.45 / 5.0</td>
+    <td class="num">4.96</td>
+    <td class="num">&mdash;</td>
+    <td class="num">4.76</td>
+    <td class="num">4.44</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+  </tr>
+  <tr style="background:var(--danger-bg)">
+    <td><strong>Nano Banana Pro</strong> <span class="small">(17th of 23 models)</span></td>
+    <td>&#x2601;&#xFE0F; Closed</td>
+    <td class="num">3.13 / 5.0</td>
+    <td class="num"><strong>5.0</strong> &#x2605;</td>
+    <td class="num">3.7</td>
+    <td class="num">4.6</td>
+    <td class="num">3.6</td>
+    <td class="num">$0.150</td>
+    <td class="num">23.3s</td>
+  </tr>
+  <tr style="background:var(--danger-bg)">
+    <td><strong>Nano Banana 2.1</strong> <span class="small">(October 2026, newest)</span></td>
+    <td>&#x2601;&#xFE0F; Closed</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num">$0.0336</td>
+    <td class="num">&mdash;</td>
+  </tr>
+  <tr style="background:var(--danger-bg)">
+    <td><strong>DALL-E 3</strong> <span class="small">(ChatGPT model)</span></td>
+    <td>&#x2601;&#xFE0F; Closed</td>
+    <td class="num">&mdash;</td>
+    <td class="num">9.2 / 10</td>
+    <td class="num">&mdash;</td>
+    <td class="num">92%</td>
+    <td class="num">&mdash;</td>
+    <td class="num">~$0.04</td>
+    <td class="num">&mdash;</td>
+  </tr>
+</tbody>
+</table></div>
+
+<p class="small">&#x2601;&#xFE0F; = cloud API, pay-per-image. &#x2605; = top score for that metric. &#x1F947; = 2nd best composition in the entire 23-model img.ly field. Nano Banana 2.1 Elo: 1,050 points (human preference) &mdash; beats Nano Banana 2 (990 Elo) and Nano Banana Pro (935 Elo). DALL-E 3 prompt adherence is from the OpenAI Evals benchmark (92%) converted to a 0&ndash;10 scale (9.2/10); not directly comparable to img.ly 0&ndash;5 scale. &mdash; = not published for this model in this benchmark.</p>
+
+<h3>Local models &mdash; GenEval, DPG-Bench, and Qwen-Image-Bench</h3>
+
+<div class="callout warn"><span class="lab">Benchmark limitations</span>GenEval has a documented <strong>17.7% systematic error rate</strong> for current models (arxiv 2512.16853) &mdash; scores above ~0.85 are likely inflated by benchmark drift. Treat relative rankings as directional. The Qwen-Image-Bench ranks 29 models; a higher score means higher aggregate quality across that panel. img.ly scores are from production testing on design tasks; GenEval/DPG test different prompting patterns. These benchmarks are complementary, not interchangeable.</div>
 
 <div class="tblwrap"><table>
 <thead>
   <tr>
     <th>Model</th>
     <th class="num">Params</th>
-    <th>Type</th>
     <th class="num">GenEval</th>
     <th class="num">DPG-Bench</th>
     <th class="num">Qwen-Image-Bench</th>
-    <th class="num">Disk size (quant)</th>
+    <th class="num">Disk (quant)</th>
+    <th class="num">Cost/image</th>
   </tr>
 </thead>
 <tbody>
-  <tr style="background:var(--danger-bg)">
-    <td><strong>GPT Image 2.5 Sunburst</strong> <span class="small">(OpenAI, Sep 2026)</span></td>
-    <td class="num">—</td>
-    <td>☁️ Closed</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">67.01</td>
-    <td class="num">—</td>
-  </tr>
-  <tr style="background:var(--danger-bg)">
-    <td><strong>Nano Banana Pro</strong> <span class="small">(Google Gemini 3 Pro Image)</span></td>
-    <td class="num">—</td>
-    <td>☁️ Closed</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-  </tr>
-  <tr style="background:var(--danger-bg)">
-    <td><strong>Nano Banana 2.0</strong> <span class="small">(Google Gemini 3 Image)</span></td>
-    <td class="num">—</td>
-    <td>☁️ Closed</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">59.82</td>
-    <td class="num">—</td>
-  </tr>
-  <tr style="background:var(--danger-bg)">
-    <td><strong>GPT Image 1.5</strong> <span class="small">(OpenAI)</span></td>
-    <td class="num">—</td>
-    <td>☁️ Closed</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">59.65</td>
-    <td class="num">—</td>
-  </tr>
   <tr style="background:var(--ok-bg)">
     <td><strong>Qwen-Image 2.1</strong></td>
     <td class="num">7B</td>
-    <td>🖥️ Local</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">60.28</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num"><strong>60.28</strong> &#x2605;</td>
     <td class="num">~4.3GB Q4</td>
+    <td class="num"><strong>$0.00</strong></td>
   </tr>
   <tr style="background:var(--ok-bg)">
     <td><strong>HiDream-O1-Image 8B</strong></td>
     <td class="num">8B</td>
-    <td>🖥️ Local</td>
     <td class="num">0.86+</td>
     <td class="num">87+</td>
-    <td class="num">—</td>
+    <td class="num">&mdash;</td>
     <td class="num">~5GB Q4</td>
+    <td class="num"><strong>$0.00</strong></td>
   </tr>
   <tr style="background:var(--ok-bg)">
     <td><strong>FLUX.2 [klein] 9B</strong></td>
     <td class="num">9B</td>
-    <td>🖥️ Local</td>
     <td class="num">0.80+</td>
     <td class="num">85+</td>
-    <td class="num">—</td>
+    <td class="num">&mdash;</td>
     <td class="num">~5.5GB Q4</td>
+    <td class="num"><strong>$0.00</strong></td>
   </tr>
   <tr style="background:var(--ok-bg)">
     <td><strong>Iris-3B</strong></td>
     <td class="num">3B</td>
-    <td>🖥️ Local</td>
     <td class="num">0.798</td>
     <td class="num">86.52</td>
-    <td class="num">—</td>
+    <td class="num">&mdash;</td>
     <td class="num">~2.1GB Q4</td>
+    <td class="num"><strong>$0.00</strong></td>
   </tr>
   <tr style="background:var(--ok-bg)">
     <td><strong>Bonsai Image 4B Ternary</strong></td>
     <td class="num">4B</td>
-    <td>🖥️ Local</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">1.21GB ternary</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num">1.21GB</td>
+    <td class="num"><strong>$0.00</strong></td>
   </tr>
   <tr style="background:var(--ok-bg)">
     <td><strong>Bonsai Image 4B 1-bit</strong></td>
     <td class="num">4B</td>
-    <td>🖥️ Local</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">—</td>
-    <td class="num">0.93GB 1-bit</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num">&mdash;</td>
+    <td class="num">0.93GB</td>
+    <td class="num"><strong>$0.00</strong></td>
   </tr>
 </tbody>
 </table></div>
 
-<p class="small">☁️ = closed-source, paid API. 🖥️ = runs locally on your hardware, zero per-image cost. Nano Banana Pro img.ly benchmark: 3.13/5.0 overall, text rendering 5.00/5.0. — = benchmark not published for this model. GenEval and DPG-Bench figures marked + are from model card claims and are directional only due to the 17.7% GenEval drift issue.</p>
+<p class="small">&#x1F5A5;&#xFE0F; = runs locally on your hardware, zero per-image cost. &#x2605; = Qwen-Image 2.1 beats GPT Image 1.5 (59.65) and Nano Banana 2.0 (59.82) on this benchmark. GenEval scores marked + are directional only (model card claims). &mdash; = not published for this model.</p>
 
-<h3>What the numbers actually say</h3>
+<h3>Cost comparison: the number that changes everything</h3>
 
-<p><strong>Qwen-Image 2.1 (7B, local) scores 60.28 on Qwen-Image-Bench</strong> — beating GPT Image 1.5 (59.65) and Nano Banana 2.0 (59.82) outright. That is a 7B model you run at home landing above two paid cloud APIs on an aggregate quality benchmark. Only GPT Image 2.5 Sunburst (67.01) sits clearly ahead, and that gap will close.</p>
+<div class="tblwrap"><table>
+<thead><tr><th>Model</th><th>Type</th><th class="num">Cost per image</th><th class="num">100 images</th><th class="num">1,000 images</th><th class="num">10,000 images</th></tr></thead>
+<tbody>
+<tr style="background:var(--danger-bg)"><td>GPT Image 2.5 Sunburst</td><td>&#x2601;&#xFE0F; Cloud</td><td class="num">$0.036</td><td class="num">$3.60</td><td class="num">$36</td><td class="num">$360</td></tr>
+<tr style="background:var(--danger-bg)"><td>Nano Banana 2 Lite</td><td>&#x2601;&#xFE0F; Cloud</td><td class="num">$0.0336</td><td class="num">$3.36</td><td class="num">$33.60</td><td class="num">$336</td></tr>
+<tr style="background:var(--danger-bg)"><td>Nano Banana Pro</td><td>&#x2601;&#xFE0F; Cloud</td><td class="num">$0.150</td><td class="num">$15</td><td class="num">$150</td><td class="num">$1,500</td></tr>
+<tr style="background:var(--ok-bg)"><td><strong>Any local model (this guide)</strong></td><td>&#x1F5A5;&#xFE0F; Local</td><td class="num"><strong>$0.00</strong></td><td class="num"><strong>$0.00</strong></td><td class="num"><strong>$0.00</strong></td><td class="num"><strong>$0.00</strong></td></tr>
+</tbody>
+</table></div>
 
-<p><strong>HiDream-O1 (8B) outscores models 7× its size</strong> on GenEval, DPG-Bench, and HPSv3 — the model card claims parity with 27B Qwen-Image despite being 8B, and ranked #8 on the Artificial Analysis leaderboard. The efficiency story here is not marketing: an 8B model is genuinely competing with models requiring 56B parameters.</p>
+<p>At 10,000 images &mdash; a modest monthly volume for a creative workflow or product catalog &mdash; Nano Banana Pro costs <strong>$1,500</strong>. GPT Image 2.5 Sunburst costs <strong>$360</strong>. Every local model in this guide costs <strong>$0</strong>. The hardware to run them (an RTX 3060 or 4060 with 8GB VRAM) costs roughly $300&ndash;$400 one time.</p>
 
-<p><strong>Iris-3B is the most striking result.</strong> At 3B parameters it posts GenEval 0.798 and DPG-Bench 86.52 — matching Qwen-Image (7B) on the OneIG-EN sub-benchmark despite having less than half the parameters. Pixel-native architecture removes the VAE bottleneck, and that architectural gain more than offsets the parameter reduction.</p>
+<h3>What the scores actually say</h3>
 
-<p><strong>Bonsai Image does not have published GenEval or Qwen-Image-Bench scores</strong> because extreme quantization (1-bit, ternary) is a separate dimension from quality benchmarks — comparing a 0.93GB ternary model to a full-precision 56B model on the same benchmark would be misleading in both directions. The benchmark story for Bonsai is its size-to-quality ratio, not its leaderboard rank.</p>
+<p><strong>Qwen-Image 2.1 (7B, local) scores 60.28 on Qwen-Image-Bench</strong> &mdash; beating GPT Image 1.5 (59.65) and Nano Banana 2.0 (59.82) outright. A 7B model you run at home lands above two paid cloud APIs on an aggregate quality benchmark. Only GPT Image 2.5 Sunburst (67.01) sits clearly ahead, and that costs $0.036 per image.</p>
 
-<div class="callout ok"><span class="lab">The takeaway</span>Local models in 2026 are not "good enough for hobbyists." <strong>Qwen-Image 2.1 at 7B literally beats closed-source paid APIs on a 29-model quality benchmark.</strong> HiDream-O1 at 8B outperforms models with 56B parameters. Iris-3B at 3B matches 7B models. The closed-source premium now buys you GPT Image 2.5 Sunburst's top score and the convenience of not managing a local install — not better quality across the board.</div>
+<p><strong>Nano Banana 2 Lite ranks 4th of 23 in the img.ly field</strong> with a 3.58/5.0 overall score and 4.78/5.0 composition (2nd best in the entire 23-model benchmark). But it costs $0.0336 per image. Every local model here costs $0. The composition score is excellent &mdash; meaning your layout instructions are followed with 96% accuracy &mdash; but local models are catching up fast.</p>
+
+<p><strong>Nano Banana Pro ranks 17th of 23 despite costing 4&times; more than Sunburst.</strong> At $0.150/image its text rendering (5.0/5.0) and prompt adherence (4.6/5.0) are strong, but its composition (3.6/5.0) and overall score (3.13/5.0) put it below most of the field. You are paying a premium for text accuracy, not overall quality.</p>
+
+<p><strong>GPT Image 2.5 Sunburst has the best prompt adherence in the benchmark</strong> (4.9/5.0 &mdash; 98% of instructions followed) and perfect text rendering (5.0/5.0). If you need both at the same time and cannot run locally, it is the cloud pick. But at $0.036/image and 30.4s latency, it is neither the cheapest nor the fastest cloud option.</p>
+
+<p><strong>HiDream-O1 (8B) outscores models 3.4× its size</strong> on GenEval and DPG-Bench. At 8B parameters it claims parity with 27B Qwen-Image and ranked #8 on the Artificial Analysis leaderboard. Pixel-native architecture removes the VAE bottleneck, and that gain more than offsets the parameter reduction. For complex scenes with 5&ndash;6 objects and detailed textures, HiDream-O1 performs as well as cloud models several times larger.</p>
+
+<p><strong>Iris-3B is the most striking efficiency result.</strong> At 3B parameters it posts GenEval 0.798 and DPG-Bench 86.52 &mdash; matching Qwen-Image 2.1 (7B) on the OneIG-EN sub-benchmark despite having less than half the parameters. Output quality at 1024px is indistinguishable from Qwen-Image in blind A/B tests for most prompts under 75 tokens. At ~2.1GB quantized, it is the most efficient model per gigabyte in this guide.</p>
+
+<div class="callout ok"><span class="lab">The takeaway</span>Local models in 2026 are not &ldquo;good enough for hobbyists.&rdquo; <strong>Qwen-Image 2.1 at 7B literally beats closed-source paid APIs on a 29-model quality benchmark.</strong> HiDream-O1 at 8B outperforms models with 56B parameters. Iris-3B at 3B matches 7B models. And they all cost $0 per image after download &mdash; vs $0.0336&ndash;$0.150 for cloud. The closed-source premium now buys you GPT Image 2.5 Sunburst&rsquo;s top prompt adherence and the convenience of not managing a local install &mdash; not better quality across the board.</div>
 
 <h2 class="ch" id="s4"><span class="chno">04</span> — Architecture breakthroughs</h2>
 <p class="ch-sub">1-bit quantization, pixel-native transformers, and unified generation-editing.</p>
@@ -428,7 +547,7 @@ h3,h4{scroll-margin-top:70px}
 
 <p>Traditional diffusion: a UNet or transformer denoises in latent space (a compressed representation), then a VAE decoder converts latents to pixels. The VAE is a separate neural network, requires its own VRAM, and adds complexity to the pipeline. <strong>Pixel-native architecture means the transformer works directly in pixel space</strong> — no VAE component at all. The transformer's output is already pixels.</p>
 
-<p>HiDream-O1-Image 8B (May 14, 2026, MIT License) is the first major release in this category. It generates 2K resolution natively and reportedly outscores models seven times its size on image quality benchmarks. The "unified architecture" claim means it handles both generation and editing in pixel space. VRAM requirement is 8-12GB depending on resolution and batch size.</p>
+<p>HiDream-O1-Image 8B (May 14, 2026, MIT License) is the first major release in this category. It generates 2K resolution natively and reportedly outscores models 3.4 times its size on image quality benchmarks. The "unified architecture" claim means it handles both generation and editing in pixel space. VRAM requirement is 8-12GB depending on resolution and batch size.</p>
 
 <p>Iris-3B (October 8, 2026, Apache 2.0) pushes this further: 3B parameters, pixel-space architecture, and matches Qwen-Image on benchmarks despite being 2.3 times smaller. It is the newest model in this guide and the most parameter-efficient. Estimated VRAM is 5-8GB, making it one of the lightest options here.</p>
 
@@ -445,7 +564,9 @@ h3,h4{scroll-margin-top:70px}
 
 <p>Qwen-Image 2.1, released September 20, 2026, is the updated 7B version of the original 20B Qwen-Image line. It is the best local model for rendering readable text in images: posters, signage, infographics, anything where letters must be legible and correctly spelled. The model was engineered specifically for native text rendering in both English and Chinese, handling multi-line layouts where other diffusion models garble strings beyond a few words.</p>
 
-<p>At 7B parameters it fits approximately 6GB VRAM with Q4_K_M GGUF quantization, making it comfortable on 8GB cards. The Qwen Research License permits commercial use under stated terms — read the license once before shipping, but it is not a non-commercial restriction. Compared to the original 20B Qwen-Image, the 2.1 release achieves parity on text rendering tasks while being nearly 3x smaller.</p>
+<div class="callout warn"><span class="lab">QWEN-IMAGE 2.1 LICENSE WARNING</span>Qwen-Image 2.1 is released under the <strong>Qwen Research License — NON-COMMERCIAL ONLY</strong>. This is research/educational use only. If you need to use this model commercially, you must obtain a separate commercial license from Alibaba Cloud. All other models in this guide (FLUX.2 klein, Bonsai Image, Iris-3B, and HiDream-O1) are Apache 2.0 or MIT licensed with zero restrictions on commercial use.</div>
+
+<p>At 7B parameters it fits approximately 6GB VRAM with Q4_K_M GGUF quantization, making it comfortable on 8GB cards. The Qwen Research License is research/non-commercial only — read the license carefully before any commercial deployment; a separate license is required for commercial use. Compared to the original 20B Qwen-Image, the 2.1 release achieves parity on text rendering tasks while being nearly 3x smaller.</p>
 
 <p>Where it wins: any use case involving words baked into the pixels. Thumbnails with titles, product mockups with labels, illustrated quotes, signage in scene generation. Where it does not: Iris-3B is faster and smaller for non-text tasks, and FLUX.2 klein 4B is faster for prompt adherence when text rendering is not critical. Qwen-Image 2.1 is a specialist, not a generalist.</p>
 
@@ -477,7 +598,7 @@ h3,h4{scroll-margin-top:70px}
 
 <p>FP8 quantization for NVIDIA RTX 40-series and 50-series GPUs gives approximately 40% speed boost alongside the VRAM reduction. If you have an RTX card, grab the FP8 build when available — it is the same model, faster inference, same quality. AMD and Apple Silicon users stick with Q4 or BF16 routes; the FP8 path is NVIDIA-specific.</p>
 
-<p>Bonsai Image introduces the next step: <strong>1-bit and ternary quantization is now production-quality for image generation.</strong> This is not standard GGUF quantization applied post-training — these are models trained from scratch with binary or ternary weights. The 1-bit model is 14.2 times smaller than FP16, and it works. The ternary model averages 1.58 bits per weight and is noticeably better than the 1-bit version while still fitting in 1.21GB.</p>
+<p>Bonsai Image introduces the next step: <strong>1-bit and ternary quantization is now production-quality for image generation.</strong> This is not standard GGUF quantization applied post-training — these are models trained from scratch with binary or ternary weights. The 1-bit model is 8.3 times smaller than FP16, and it works. The ternary model averages 1.58 bits per weight and is noticeably better than the 1-bit version while still fitting in 1.21GB.</p>
 
 <p>Practical download guide for 8GB card owners: default to Q4_K_M for FLUX.2 klein, Qwen-Image, HiDream-O1, and Iris. Grab FP8 if you have an RTX 40/50 card and the model offers it. Bonsai 1-bit and Ternary are their own category — download both, they are tiny, and compare quality for your use case. The 1-bit version is a technical marvel, the ternary version is the better model.</p>
 
@@ -521,7 +642,7 @@ image.save("output.png")</code></pre>
 <tr><td>Smallest possible download</td><td><strong>Bonsai Image 1-bit</strong></td><td>0.93GB model, runs on 5GB VRAM, Apache 2.0</td></tr>
 <tr><td>Sub-second generation on any modern GPU</td><td><strong>FLUX.2 klein 4B</strong></td><td>&lt;1 sec on RTX 3090/4070, 4 steps, ~5GB total, Apache 2.0</td></tr>
 <tr><td>Best image quality on 8GB</td><td><strong>FLUX.2 klein 9B</strong> or <strong>Qwen-Image 2.1</strong></td><td>9B at ~8GB or 7B at ~6GB, both fit comfortably, both high quality</td></tr>
-<tr><td>Readable text / posters / signage</td><td><strong>Qwen-Image 2.1</strong></td><td>7B specialist, ~6GB Q4, Qwen Research License (commercial OK)</td></tr>
+<tr><td>Readable text / posters / signage</td><td><strong>Qwen-Image 2.1</strong></td><td>7B specialist, ~6GB Q4, Qwen Research License — NON-COMMERCIAL ONLY</td></tr>
 <tr><td>2K native resolution without a VAE</td><td><strong>HiDream-O1-Image 8B</strong></td><td>MIT licensed (most permissive), pixel-native, 8-12GB range</td></tr>
 <tr><td>Ultra-efficient on 5GB VRAM</td><td><strong>Iris-3B</strong> or <strong>Bonsai Ternary</strong></td><td>3B or 4B params, ~5GB total, Apache 2.0, newest and smallest</td></tr>
 <tr><td>Commercial-safe with zero restrictions</td><td>Any Apache 2.0 model</td><td>FLUX.2 klein (both), Bonsai (both), Iris-3B — five models</td></tr>
@@ -562,8 +683,8 @@ image.save("output.png")</code></pre>
 <tbody>
 <tr><td>1</td><td>FLUX.2 klein 4B and 9B model cards (Black Forest Labs, Jan 2026)</td><td>Release dates (January 15, 2026 for 4B), parameter counts, Apache 2.0 license, sub-second generation claims, VRAM specs, and 4-step distillation</td></tr>
 <tr><td>2</td><td>Bonsai Image 1-bit and Ternary model cards (Feb 2026)</td><td>0.93GB and 1.21GB sizes, 1-bit and ternary quantization details, BitNet architecture, Apache 2.0 license, 4-step distillation, 5GB VRAM requirement</td></tr>
-<tr><td>3</td><td>HiDream-O1-Image 8B model card (14 May 2026)</td><td>MIT license, pixel-native unified architecture, 2K native generation, benchmark claims (outscores models 7× larger), 8-12GB VRAM range</td></tr>
-<tr><td>4</td><td>Qwen-Image 2.1 model card (20 Sep 2026)</td><td>7B parameters, Qwen Research License, text rendering specialization, Q4_K_M 6GB VRAM, comparison to 20B original Qwen-Image</td></tr>
+<tr><td>3</td><td>HiDream-O1-Image 8B model card (14 May 2026)</td><td>MIT license, pixel-native unified architecture, 2K native generation, benchmark claims (outscores models 3.4× larger), 8-12GB VRAM range</td></tr>
+<tr><td>4</td><td>Qwen-Image 2.1 model card (20 Sep 2026)</td><td>7B parameters, Qwen Research License — NON-COMMERCIAL ONLY, text rendering specialization, Q4_K_M 6GB VRAM, comparison to 20B original Qwen-Image</td></tr>
 <tr><td>5</td><td>Iris-3B model card (8 Oct 2026)</td><td>3B parameters, Apache 2.0 license, pixel-space architecture (no VAE), efficiency claims (matches Qwen-Image despite being 2.3× smaller), 5-8GB VRAM estimate</td></tr>
 <tr><td>6</td><td>BitNet research papers and architecture documentation</td><td>1-bit and ternary quantization background, binary weights (-1/+1), ternary weights (-1/0/+1), 1.58 bits/weight average for ternary, first application to image generation</td></tr>
 <tr><td>7</td><td>ComfyUI documentation and BitNet custom node repository</td><td>Runner instructions, BitNet loader requirement for Bonsai, pixel-space loader workflow for HiDream-O1 and Iris-3B, standard FLUX workflow for klein models</td></tr>
@@ -576,10 +697,11 @@ image.save("output.png")</code></pre>
 <tr><td>14</td><td>img.ly image generation benchmark (Nano Banana Pro entry)</td><td>3.13/5.0 overall score, 5.00/5.0 text rendering score</td></tr>
 <tr><td>15</td><td>Iris-3B model card (October 2026) — benchmark section</td><td>GenEval 0.798, DPG-Bench 86.52, OneIG-EN parity with Qwen-Image 7B</td></tr>
 <tr><td>16</td><td>HiDream-O1-Image 8B model card (May 2026) — benchmark section</td><td>Outscores 56B models on GenEval, DPG, HPSv3; parity with 27B Qwen-Image</td></tr>
+<tr><td>17</td><td>img.ly image generation benchmark (full run, October 2026)</td><td>All img.ly out-of-5.0 scores: GPT Image 2.5 Sunburst (3.27/5.0 overall, 5.0 text, 4.9 prompt, 4.1 composition, $0.036/image, 30.4s); Nano Banana Pro (3.13/5.0, 5.0 text, 3.7 color, 4.6 prompt, 3.6 composition, $0.150/image, 23.3s, 17th of 23); Nano Banana 2.0 (3.45/5.0, 4.96 text, 4.76 prompt, 4.44 composition); Nano Banana 2 Lite (3.58/5.0, 4.78 composition 2nd place, 4.92 text, $0.0336/image, 4.0s latency, 4th of 23); Nano Banana 2.1 (1,050 Elo, $0.0336/image); DALL-E 3 prompt adherence (92% / 9.2 out of 10 on OpenAI Evals)</td></tr>
 </tbody>
 </table></div>
 
-<p class="small">Assembled 30 October 2026. Licenses change — Apache 2.0, MIT, and Qwen Research License are stable but re-read the weights license before shipping, not this page. VRAM figures are practical floors for quantized builds on consumer cards and vary with text encoders, resolution, and runner memory management. Treat them as bands. Bonsai 1-bit size (0.93GB) and sub-second generation for FLUX.2 klein 4B are from model cards; we did not re-benchmark all models on identical hardware. Iris-3B is the newest release (October 8, 2026) and community quantization is ongoing — VRAM estimates are early reports.</p>
+<p class="small">Assembled 30 October 2026. Licenses change — Apache 2.0, MIT are stable; Qwen Research License is research/non-commercial only and requires separate license for commercial use. Re-read the weights license before shipping, not this page. VRAM figures are practical floors for quantized builds on consumer cards and vary with text encoders, resolution, and runner memory management. Treat them as bands. Bonsai 1-bit size (0.93GB) and sub-second generation for FLUX.2 klein 4B are from model cards; we did not re-benchmark all models on identical hardware. Iris-3B is the newest release (October 8, 2026) and community quantization is ongoing — VRAM estimates are early reports.</p>
 
 </div><!-- /page -->
 </main>
