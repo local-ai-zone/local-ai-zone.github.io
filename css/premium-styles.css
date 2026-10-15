@@ -3006,6 +3006,168 @@ Hardware Filter Styles */
     font-size: 1rem;
 }
 
+/* Floating Instagram Button - Always Visible on All Screens */
+.floating-instagram-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 8px 24px rgba(225, 48, 108, 0.4);
+    z-index: 1000;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.floating-instagram-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 32px rgba(225, 48, 108, 0.5);
+    color: white;
+}
+
+.floating-instagram-btn .btn-icon {
+    flex-shrink: 0;
+}
+
+.floating-instagram-btn svg {
+    stroke: white;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.floating-instagram-btn .btn-text {
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Mobile optimized - Icon only on very small screens */
+@media (max-width: 480px) {
+    .floating-instagram-btn {
+        width: 60px;
+        height: 60px;
+        padding: 0;
+        justify-content: center;
+        bottom: 20px;
+        right: 20px;
+        border-radius: 50%;
+    }
+    
+    .floating-instagram-btn .btn-text {
+        display: none;
+    }
+    
+    .floating-instagram-btn svg {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+/* Tablet and larger - Show full button */
+@media (min-width: 481px) and (max-width: 768px) {
+    .floating-instagram-btn {
+        padding: 12px 20px;
+        font-size: 0.85rem;
+    }
+}
+
+/* Instagram Connect Button - Replaces GGUF Loader Button */
+.instagram-connect-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-4);
+    background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-lg);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.instagram-connect-btn:hover {
+    background: linear-gradient(135deg, #e6843d 0%, #dd5f36 25%, #d12d40 50%, #c2215e 75%, #af1680 100%);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+    color: white;
+}
+
+.instagram-connect-btn .btn-text {
+    font-weight: 600;
+    color: white;
+}
+
+.instagram-connect-btn .btn-icon {
+    flex-shrink: 0;
+}
+
+.instagram-connect-btn svg {
+    stroke: white;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Social Icon Button - Clean & Minimal */
+.social-icon-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-lg);
+    background: var(--neutral-100);
+    border: 1px solid var(--neutral-200);
+    color: var(--neutral-700);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.social-icon-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.social-icon-btn svg {
+    position: relative;
+    z-index: 1;
+    transition: all var(--transition-fast);
+}
+
+/* Instagram specific styling */
+.instagram-btn {
+    background: linear-gradient(135deg, rgba(240, 148, 51, 0.1) 0%, rgba(230, 104, 60, 0.1) 25%, rgba(220, 39, 67, 0.1) 50%, rgba(204, 35, 102, 0.1) 75%, rgba(188, 24, 136, 0.1) 100%);
+    border-color: rgba(225, 48, 108, 0.2);
+}
+
+.instagram-btn:hover {
+    background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    border-color: #e1306c;
+}
+
+.instagram-btn:hover svg {
+    stroke: white;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}
+
+.instagram-btn svg {
+    stroke: #e1306c;
+}
+
 /* Mobile Header Bar Improvements */
 @media (max-width: 768px) {
     .mobile-header-bar {
@@ -3121,5 +3283,16 @@ Hardware Filter Styles */
     .gguf-header-btn {
         width: 100%;
         justify-content: center;
+    }
+    
+    .instagram-connect-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .social-icon-btn {
+        width: 100%;
+        height: 48px;
+        border-radius: var(--radius-md);
     }
 }
