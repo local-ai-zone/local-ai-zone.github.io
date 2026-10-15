@@ -426,3 +426,179 @@
 
             <p>Argon's multimodal capabilities extend across <strong>text, images, audio, video, and documents</strong>. This means developers can submit multi-page PDFs, hour-long video files, audio recordings, and image sets as part of a unified prompt — and Argon will process them holistically, maintaining cross-modal context throughout its reasoning process. Currently, Argon outputs <strong>text only</strong>, though its ability to reason over multimodal inputs makes it highly effective for applications like video archive analysis (processing hours of archival footage and generating comprehensive summaries, speaker transcripts, and event timelines), complex chart interpretation (analyzing financial charts, scientific diagrams, and technical schematics embedded in multimodal documents), and multimodal document QA (answering questions that require synthesizing information from text, tables, images, and embedded media within a single document set).</p>
 
+            <h2>Benchmark Performance</h2>
+
+            <p>Gemini 4 Argon's performance across industry-standard benchmarks demonstrates its position as a true frontier model with particular strengths in enterprise workflows, software engineering, long-horizon reasoning, and cybersecurity. Google's published evaluation spans 19 benchmarks, where Argon achieves first-place rankings on 13 — the most dominant showing among currently available models. The benchmark results also reveal where Argon trails competing systems, providing a realistic assessment of its capabilities relative to Claude Opus 5.5, GPT-6 Astra, and Claude Fable 5.1.</p>
+
+            <table>
+                <caption><strong>Gemini 4 Argon Benchmark Results</strong></caption>
+                <thead>
+                    <tr>
+                        <th>Benchmark</th>
+                        <th>Score</th>
+                        <th>Ranking</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>DeepSWE v1.1</td>
+                        <td>77.9%</td>
+                        <td>#1 (State of the Art)</td>
+                        <td>Long-horizon software engineering</td>
+                    </tr>
+                    <tr>
+                        <td>AutomationBench</td>
+                        <td>51.3%</td>
+                        <td>#1</td>
+                        <td>Multi-step automation tasks</td>
+                    </tr>
+                    <tr>
+                        <td>Vals Index</td>
+                        <td>68.9%</td>
+                        <td>#1</td>
+                        <td>Finance, coding, legal, tax impact</td>
+                    </tr>
+                    <tr>
+                        <td>LVBench</td>
+                        <td>91.7%</td>
+                        <td>#1 (State of the Art)</td>
+                        <td>Long video understanding</td>
+                    </tr>
+                    <tr>
+                        <td>CWE-bench v1</td>
+                        <td>68%</td>
+                        <td>Tied #1</td>
+                        <td>Vulnerability discovery and patching</td>
+                    </tr>
+                    <tr>
+                        <td>AI Intelligence Index</td>
+                        <td>53</td>
+                        <td>Tied (with GPT-6 Astra, Claude Fable 5.1)</td>
+                        <td>Overall frontier capability</td>
+                    </tr>
+                    <tr>
+                        <td>Terminal Bench</td>
+                        <td>57%</td>
+                        <td>Below leaders</td>
+                        <td>Trails Claude Opus 5.5 (66.4%)</td>
+                    </tr>
+                    <tr>
+                        <td>FrontierSWE v2</td>
+                        <td>55.0%</td>
+                        <td>Below leaders</td>
+                        <td>Trails GPT-6 Astra and Claude Opus 5.5</td>
+                    </tr>
+                    <tr>
+                        <td>Vals Finance Agent v2</td>
+                        <td>Leading</td>
+                        <td>#1</td>
+                        <td>Financial agent tasks</td>
+                    </tr>
+                    <tr>
+                        <td>Harvey Legal Agent</td>
+                        <td>Leading</td>
+                        <td>#1</td>
+                        <td>Legal agent tasks</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table>
+                <caption><strong>Head-to-Head: Gemini 4 Argon vs. Top Frontier Models</strong></caption>
+                <thead>
+                    <tr>
+                        <th>Benchmark</th>
+                        <th>Gemini 4 Argon</th>
+                        <th>GPT-6 Astra</th>
+                        <th>Claude Opus 5.5</th>
+                        <th>Claude Fable 5.1</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>AI Intelligence Index</td>
+                        <td>53</td>
+                        <td>53</td>
+                        <td>55</td>
+                        <td>53</td>
+                    </tr>
+                    <tr>
+                        <td>DeepSWE v1.1</td>
+                        <td>77.9%</td>
+                        <td>~72%</td>
+                        <td>~74%</td>
+                        <td>~70%</td>
+                    </tr>
+                    <tr>
+                        <td>AutomationBench</td>
+                        <td>51.3%</td>
+                        <td>~48%</td>
+                        <td>~49%</td>
+                        <td>~46%</td>
+                    </tr>
+                    <tr>
+                        <td>LVBench</td>
+                        <td>91.7%</td>
+                        <td>~85%</td>
+                        <td>~82%</td>
+                        <td>~80%</td>
+                    </tr>
+                    <tr>
+                        <td>Terminal Bench</td>
+                        <td>57%</td>
+                        <td>~56%</td>
+                        <td>66.4%</td>
+                        <td>~55%</td>
+                    </tr>
+                    <tr>
+                        <td>FrontierSWE v2</td>
+                        <td>55.0%</td>
+                        <td>~58%</td>
+                        <td>~60%</td>
+                        <td>~56%</td>
+                    </tr>
+                    <tr>
+                        <td>Vals Index</td>
+                        <td>68.9%</td>
+                        <td>~60%</td>
+                        <td>~62%</td>
+                        <td>~58%</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <blockquote>
+                <p><strong>Note:</strong> Benchmark scores for competitor models in Table 2 are approximations based on publicly available leaderboard data at time of publication. Exact scores may vary.</p>
+            </blockquote>
+
+            <p>Across the 19 benchmarks in Google's evaluation suite, Gemini 4 Argon wins 13 first-place rankings — the strongest showing among any currently available frontier model. Argon's dominant performance categories include <strong>enterprise workflows</strong> (Vals Index, AutomationBench, Finance Agent, Legal Agent), <strong>long video understanding</strong> (LVBench), and <strong>cybersecurity</strong> (CWE-bench). The model achieves state-of-the-art results on DeepSWE v1.1 and LVBench, setting new performance records on benchmarks where previous frontier models had plateaued.</p>
+
+            <p>However, Argon's performance is not universally dominant. On <strong>Terminal Bench</strong>, which measures command-line tool usage and system administration tasks, Argon scores 57% — trailing Claude Opus 5.5 by 9.4 percentage points. On <strong>FrontierSWE v2</strong>, a challenging benchmark for real-world GitHub issue resolution, Argon scores 55.0%, slightly behind GPT-6 Astra (~58%) and Claude Opus 5.5 (~60%). On the <strong>AI Intelligence Index</strong>, Argon scores 53, tied with GPT-6 Astra and Claude Fable 5.1 but 2 points below Claude Opus 5.5's leading score of 55.</p>
+
+            <p>These gaps reveal Argon's relative weaknesses in certain specialized domains — particularly terminal/command-line interaction and certain categories of software engineering that require less sustained reasoning and more rapid tool invocation. For developers evaluating Argon, these benchmark results provide a realistic performance envelope: Argon excels at long-horizon reasoning, comprehensive generation, and enterprise knowledge work, but is not uniformly superior across all frontier capabilities.</p>
+
+            <h2>Real-World Impact at Google</h2>
+
+            <p>Before general availability on October 13, 2026, Gemini 4 Argon was deployed extensively within Google's internal operations across quantum computing, infrastructure optimization, operating system development, and cybersecurity. These internal deployments provide concrete validation of Argon's capabilities beyond synthetic benchmarks, demonstrating measurable business impact in production environments where accuracy, reliability, and scale are non-negotiable.</p>
+
+            <h3>Quantum Algorithmic Optimization</h3>
+
+            <p>Google's quantum computing teams used Argon to optimize quantum circuit designs for specific algorithmic workloads, achieving a <strong>40% improvement over baseline implementations</strong>. Quantum algorithm design requires reasoning across massive search spaces of gate sequences, error correction strategies, and qubit topology constraints — a task that benefits directly from Argon's 1M context window and sustained multi-step reasoning capabilities. This deployment demonstrates Argon's ability to operate in highly specialized scientific domains where even small efficiency gains translate to significant competitive advantages.</p>
+
+            <h3>Memory Efficiency at Data Center Scale</h3>
+
+            <p>Argon identified and implemented memory optimizations across Google's distributed systems infrastructure, freeing <strong>300 TiB of memory</strong> across production data centers. This required reasoning simultaneously across thousands of service configurations, allocation policies, and usage patterns — a level of cross-system analysis that would be infeasible without Argon's 1M token context/output window. The optimization involved analyzing memory allocation patterns across microservices, identifying redundant caches and over-provisioned buffers, and generating configuration patches that reduced waste without impacting service reliability. This deployment showcases Argon's capability for large-scale infrastructure reasoning where context windows matter as much as reasoning depth.</p>
+
+            <h3>The Fuchsia Zircon Rust Migration</h3>
+
+            <p>One of Argon's most impressive internal deployments was the migration of C/C++ code to Rust for Google's Fuchsia operating system Zircon kernel. The scale of this migration was unprecedented: <strong>up to 800,000+ lines of code</strong> — a codebase size that had been previously impossible for any AI model to process without manual chunking, context truncation, or multi-phase workflows. Argon's 1M output window enabled the migration to be completed in single reasoning trajectories, maintaining full semantic context across the entire codebase while generating memory-safe, idiomatic Rust implementations.</p>
+
+            <p>A particularly notable result came from the <strong>libgav1 video decoder rewrite</strong>, where Argon's generated Rust code achieved <strong>2.7x faster execution</strong> than the prior Rust port. This performance gain was not merely the result of correct translation — it reflected genuine optimization insight, with Argon identifying opportunities for vectorization, cache-friendly data layouts, and algorithmic refinements that human developers had not implemented in earlier manual rewrites. This deployment demonstrates that Argon is capable of not just code translation but architectural reasoning that produces measurably superior implementations.</p>
+
+            <h3>Scan for Good: Finding Critical Vulnerabilities</h3>
+
+            <p>Through a partnership with <strong>Wiz</strong>, a leading cloud security company, Google deployed Argon as part of the <strong>Scan for Good initiative</strong> — a program that uses AI-powered security analysis to identify vulnerabilities in critical infrastructure systems. Argon was used to scan the production systems of a major healthcare provider and successfully discovered a <strong>critical security vulnerability</strong> that had not been detected by traditional static analysis tools, runtime monitoring, or manual code review.</p>
+
+            <p>The vulnerability discovery required Argon to reason across multiple layers of the system — analyzing authentication flows, authorization policies, data access patterns, and inter-service communication — to identify a subtle chain of misconfigurations that could be exploited to gain unauthorized access to protected health information. The vulnerability was responsibly disclosed and patched before any exploitation occurred. This deployment demonstrates the responsible, high-stakes application of Argon's CWE-bench leading cybersecurity capabilities in real-world defensive security operations where accuracy and reliability are paramount.</p>
+
