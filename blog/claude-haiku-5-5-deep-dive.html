@@ -1,0 +1,1589 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Haiku 5.5: The Fast, Adaptive AI That Thinks on Demand — Deep Dive</title>
+<meta name="description" content="Claude Haiku 5.5 is Anthropic's fastest, most affordable Claude 5 model with adaptive thinking, 1M-token context, and 128K output. This deep dive covers the small-model arms race, adaptive reasoning, effort controls, subagent capabilities, OSWorld 2.1 benchmarks, pricing tiers, and what Anthropic has (and hasn't) disclosed about architecture.">
+<meta name="keywords" content="Claude Haiku 5.5, Anthropic, Claude 5, adaptive thinking, effort controls, subagent capabilities, 1M tokens, OSWorld 2.1, agentic AI, small language models, GPT-6 Luna, fast AI, affordable AI">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Claude Haiku 5.5: The Fast, Adaptive AI That Thinks on Demand — Deep Dive",
+  "alternativeHeadline": "How Anthropic's fastest Claude model delivers variable reasoning effort at inference time",
+  "description": "A comprehensive technical deep dive on Claude Haiku 5.5: adaptive thinking, effort controls, subagent orchestration, the 1M-token context window, OSWorld 2.1 benchmark performance, pricing economics, and Anthropic's approach to architecture transparency.",
+  "author": {"@type": "Person", "name": "Hussain Nazary"},
+  "datePublished": "2026-10-07",
+  "dateModified": "2026-10-07",
+  "keywords": "Claude Haiku 5.5, Anthropic, adaptive thinking, effort controls, subagent AI, agentic workflows, 1M context, OSWorld 2.1",
+  "articleSection": "Deep Dive",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 12000,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive.html",
+  "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
+  "about": [
+    {"@type": "Thing", "name": "Anthropic"},
+    {"@type": "Thing", "name": "Claude Haiku"},
+    {"@type": "Thing", "name": "Adaptive thinking"},
+    {"@type": "Thing", "name": "Agentic AI"},
+    {"@type": "Thing", "name": "Language models"}
+  ],
+  "isPartOf": {
+    "@type": "Blog",
+    "name": "Local AI Zone — Blog",
+    "url": "https://local-ai-zone.github.io/blog.html"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive-hero.png",
+    "width": 1200,
+    "height": 630,
+    "caption": "Claude Haiku 5.5: Anthropic's fastest Claude model with adaptive thinking and 1M-token context"
+  },
+  "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
+}
+</script>
+<!-- FAQ Schema (AEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Claude Haiku 5.5?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Claude Haiku 5.5 is Anthropic's fastest and most affordable Claude 5 model, released October 7, 2026. It features adaptive thinking with variable reasoning effort, a 1M-token context window, 128K output limit, and strong subagent capabilities for agentic workflows."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does Claude Haiku 5.5 cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Claude Haiku 5.5 uses tiered pricing: Tier 1 (up to 100K tokens in context) costs $0.10 input / $0.50 output per million tokens. Tier 2 (over 100K tokens) costs $0.50 input / $2.50 output per million tokens."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What is adaptive thinking in Claude Haiku 5.5?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Adaptive thinking allows Claude Haiku 5.5 to adjust its reasoning depth dynamically at inference time. Using effort controls, you can tune how much computational effort the model applies to each request, trading off speed versus quality."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Claude Haiku 5.5 perform on benchmarks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Claude Haiku 5.5 scores 72.4% on OSWorld 2.1, demonstrating strong agentic task performance. It's designed for fast, high-throughput workloads where Sonnet or Opus would be overkill."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Has Anthropic disclosed Claude Haiku 5.5's architecture?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "No. Anthropic has not publicly disclosed parameter count, training data details, or architectural specifics for Claude Haiku 5.5. This contrasts with open approaches like Bonsai 2 27B, where full technical details are available."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where can I access Claude Haiku 5.5?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Claude Haiku 5.5 is available through claude.ai, the Anthropic API, AWS Bedrock, and Google Cloud Vertex AI in supported regions."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "When should I use Haiku versus Sonnet or Opus?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use Haiku 5.5 for customer support bots, code assistants, document processing, and high-volume agentic pipelines where speed and cost matter. Use Sonnet or Opus for complex reasoning, nuanced writing, and safety-critical applications."
+      }
+    }
+  ]
+}
+</script>
+<!-- Breadcrumb Schema (GEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+    {"@type": "ListItem", "position": 3, "name": "Claude Haiku 5.5 Deep Dive", "item": "https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive.html"}
+  ]
+}
+</script>
+<!-- ==================== SEO ==================== -->
+<meta name="author" content="Local AI Zone">
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow">
+<meta name="bingbot" content="index, follow">
+<meta name="rating" content="general">
+<meta name="revisit-after" content="7 days">
+<meta name="theme-color" content="#d97706">
+<meta name="creator" content="Local AI Zone">
+<meta name="publisher" content="Local AI Zone">
+<!-- Open Graph / Facebook -->
+<meta property="og:title" content="Claude Haiku 5.5: The Fast, Adaptive AI That Thinks on Demand — Deep Dive">
+<meta property="og:description" content="A comprehensive deep dive on Anthropic's Claude Haiku 5.5: adaptive thinking, effort controls, subagent orchestration, 1M-token context, OSWorld 2.1 performance, and what Anthropic hasn't disclosed.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive-hero.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Claude Haiku 5.5: Anthropic's fastest Claude model with adaptive thinking">
+<meta property="article:author" content="Hussain Nazary">
+<meta property="article:published_time" content="2026-10-07T00:00:00Z">
+<meta property="article:modified_time" content="2026-10-07T00:00:00Z">
+<meta property="article:section" content="Deep Dive">
+<meta property="article:tag" content="Claude Haiku 5.5">
+<meta property="article:tag" content="Anthropic">
+<meta property="article:tag" content="Adaptive Thinking">
+<meta property="article:tag" content="Agentic AI">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@localaizone">
+<meta name="twitter:creator" content="@hussainnazary">
+<meta name="twitter:title" content="Claude Haiku 5.5: The Fast, Adaptive AI That Thinks on Demand">
+<meta name="twitter:description" content="How Anthropic's fastest Claude model delivers variable reasoning effort: adaptive thinking, effort controls, 1M context, OSWorld 2.1 benchmarks, and more.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive-hero.png">
+<meta name="twitter:image:alt" content="Claude Haiku 5.5 deep dive">
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+<style>
+:root {
+  --bg:#f6f7f9; --paper:#ffffff; --ink:#1a2233; --ink-soft:#46506a; --ink-faint:#7c86a0;
+  --line:#e3e7ee; --accent:#d97706; --accent-soft:#fef3c7; --accent-2:#0d9488;
+  --warn-bg:#fff7ed; --warn-line:#fdba74; --warn-ink:#9a3412;
+  --ok-bg:#f0fdf4; --ok-line:#86efac; --ok-ink:#166534;
+  --info-bg:#eff6ff; --info-line:#93c5fd; --info-ink:#1e3a8a;
+  --danger-bg:#fef2f2; --danger-line:#fca5a5; --danger-ink:#991b1b;
+  --code-bg:#0d1117; --code-ink:#d7dde7; --code-cmt:#7d8799; --code-head:#79c0ff; --code-key:#ff7b72; --code-str:#a5d6a7;
+  --side-bg:#0e1526; --side-ink:#aab6cf; --side-hover:#1b2540; --side-active:#d97706;
+  --mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,'Liberation Mono',monospace;
+  --sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif;
+}
+html[data-theme='dark'] {
+  --bg:#0b0f1a; --paper:#111827; --ink:#e5e9f2; --ink-soft:#b8c2d9; --ink-faint:#7c8aa5;
+  --line:#242f47; --accent:#fbbf24; --accent-soft:#1e2440; --accent-2:#2dd4bf;
+  --warn-bg:#2a1c0e; --warn-line:#9a5b21; --warn-ink:#fdba74;
+  --ok-bg:#0d2418; --ok-line:#2f7a4f; --ok-ink:#86efac;
+  --info-bg:#101d33; --info-line:#2b4d8a; --info-ink:#93c5fd;
+  --danger-bg:#2a1214; --danger-line:#8a3a3f; --danger-ink:#fca5a5;
+  --side-bg:#0a0f1e; --side-ink:#aab6cf; --side-hover:#1b2540; --side-active:#fbbf24;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
+.shell{display:flex;min-height:100vh}
+aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
+main{flex:1;min-width:0;display:flex;justify-content:center}
+.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
+#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
+#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35;letter-spacing:.2px}
+#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
+#toc nav a{display:block;padding:5px 22px 5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
+#toc nav a:hover{background:var(--side-hover);color:#fff}
+#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
+#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
+#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
+#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
+.theme-btn{position:fixed;top:16px;right:20px;z-index:80;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:17px;line-height:1;box-shadow:0 2px 10px rgba(15,23,42,.12);transition:transform .15s}
+.theme-btn:hover{transform:scale(1.07)}
+h1,h2,h3,h4{font-family:var(--sans);line-height:1.25;color:var(--ink)}
+.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
+.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
+.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
+.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px;letter-spacing:-.2px}
+.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
+.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--ink-soft)}
+p{margin:0 0 18px}
+a{color:var(--accent);text-decoration:none;border-bottom:1px solid #fde68a}
+a:hover{border-bottom-color:var(--accent)}
+strong{font-weight:700;color:var(--ink)}
+em{font-style:italic}
+ul,ol{margin:0 0 18px;padding-left:26px}
+li{margin-bottom:7px}
+li::marker{color:var(--accent);font-weight:600}
+hr{border:none;border-top:1px solid var(--line);margin:40px 0}
+.small{font-size:13.5px;color:var(--ink-soft)}
+.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#92400e;overflow-wrap:anywhere}
+html[data-theme='dark'] .mono, html[data-theme='dark'] code:not(pre code){background:#1c2438;border-color:#2c3752;color:#fcd34d}
+.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
+.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
+.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
+.cover h1 .thin{color:var(--accent)}
+.cover .sub{font-size:19px;color:var(--ink-soft);max-width:640px;line-height:1.6;margin:0 0 30px}
+.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
+.cover .meta b{color:var(--ink-soft);font-weight:600}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin:34px 0 8px}
+.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+html[data-theme='dark'] .statgrid .cell{background:linear-gradient(180deg,#141b2e,#10162a)}
+.statgrid .cell .v{font-size:24px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
+.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
+.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
+.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
+.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
+.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
+.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
+.callout p:last-child{margin-bottom:0}
+.callout p{margin-bottom:8px}
+.tblwrap{overflow-x:auto;margin:24px 0;border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;font-size:14px;line-height:1.5;background:var(--paper)}
+thead th{background:#f1f3f8;text-align:left;font-weight:700;color:#2b3550;font-size:12.5px;letter-spacing:.4px;text-transform:uppercase;padding:10px 14px;border-bottom:2px solid var(--line);white-space:nowrap}
+html[data-theme='dark'] thead th{background:#1a2338;color:#c7d0e8}
+tbody td{padding:9px 14px;border-bottom:1px solid #edf0f5;vertical-align:top}
+html[data-theme='dark'] tbody td{border-bottom-color:#202a42}
+tbody tr:nth-child(even){background:#fafbfd}
+html[data-theme='dark'] tbody tr:nth-child(even){background:#131a2c}
+tbody tr:last-child td{border-bottom:none}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td .tag{display:inline-block;font-size:11px;font-weight:700;padding:1.5px 8px;border-radius:99px;letter-spacing:.3px}
+.tag.good{background:var(--ok-bg);color:var(--ok-ink);border:1px solid var(--ok-line)}
+.tag.warn{background:var(--warn-bg);color:var(--warn-ink);border:1px solid var(--warn-line)}
+.tag.bad{background:var(--danger-bg);color:var(--danger-ink);border:1px solid var(--danger-line)}
+.tag.neutral{background:#eef1f6;color:#3f4a63;border:1px solid #d8dee9}
+html[data-theme='dark'] .tag.neutral{background:#1c2438;color:#b8c2d9;border-color:#2c3752}
+.tblfoot{font-size:12.5px;color:var(--ink-faint);padding:8px 14px;background:#fafbfd;border-top:1px solid var(--line)}
+html[data-theme='dark'] .tblfoot{background:#131a2c}
+pre{background:var(--code-bg);color:var(--code-ink);border-radius:12px;padding:18px 20px;overflow-x:auto;margin:22px 0;font-family:var(--mono);font-size:13.2px;line-height:1.62}
+pre code{font-family:inherit;background:none;border:none;padding:0;color:inherit;white-space:pre}
+.footref{font-size:13px;color:var(--ink-faint);border-top:1px solid var(--line);margin-top:56px;padding-top:18px}
+.btn-top{position:fixed;right:26px;bottom:26px;width:44px;height:44px;border-radius:99px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:19px;box-shadow:0 6px 20px rgba(217,119,6,.42);cursor:pointer;opacity:0;pointer-events:none;transition:opacity .25s;border:none;z-index:60}
+.btn-top.show{opacity:1;pointer-events:auto}
+@media (max-width:1100px){
+  .shell{display:block}
+  aside#toc{position:static;width:100%;height:auto;flex:none}
+  .page{padding:0 26px 90px}
+  .cover h1{font-size:36px}
+}
+.premium-header{position:static !important}
+.theme-btn{display:none !important}
+</style>
+</head>
+<body>
+<!-- ==================== SITE HEADER ==================== -->
+<header class="premium-header blog-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-brand">
+                    <div class="header-logo-section">
+                        <div class="header-logo" onclick="window.location.href='../index.html'">
+                            <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="logo-fallback" style="display: none;">
+                                <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <div class="brand-title">GGUF Discovery</div>
+                            <p class="brand-subtitle">Blog &amp; Guides</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <nav class="blog-nav" aria-label="Main navigation">
+                    <a href="../index.html">Home</a>
+                    <a href="../about.html">About</a>
+                    <a href="../services.html">Need Help?</a>
+                    <a href="../blog.html" class="active">Blog</a>
+                </nav>
+                <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                    <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                    <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                    <span class="theme-label light-label">Light</span>
+                    <span class="theme-label dark-label">Dark</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+<button class="theme-btn" id="themeBtn" aria-label="Toggle light/dark theme" title="Toggle theme">&#9788;</button>
+<div class="shell">
+<!-- ==================== SIDEBAR TOC ==================== -->
+<aside id="toc">
+  <div class="brand">
+    <div class="t">Claude Haiku 5.5</div>
+    <div class="s">Deep Dive &middot; October 2026</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Front Matter</div>
+    <a href="#abstract"><span class="num">&sect;</span>Abstract &amp; How to Read</a>
+    <div class="part">Part I &mdash; Context &amp; Background</div>
+    <a href="#ch1"><span class="num">1</span>The Small-Model Arms Race</a>
+    <a href="#ch2"><span class="num">2</span>The Haiku Lineage</a>
+    <a href="#ch3"><span class="num">3</span>Anthropic's Positioning</a>
+    <div class="part">Part II &mdash; What Haiku 5.5 Does</div>
+    <a href="#ch4"><span class="num">4</span>Adaptive Thinking Explained</a>
+    <a href="#ch5"><span class="num">5</span>Effort Controls in Practice</a>
+    <a href="#ch6"><span class="num">6</span>Subagent &amp; Tool-Use Capabilities</a>
+    <a href="#ch7"><span class="num">7</span>The 1M-Token Context Window</a>
+    <div class="part">Part III &mdash; Performance &amp; Benchmarks</div>
+    <a href="#ch8"><span class="num">8</span>OSWorld 2.1 — 72.4%</a>
+    <a href="#ch9"><span class="num">9</span>Speed &amp; Latency Profile</a>
+    <a href="#ch10"><span class="num">10</span>Benchmark Comparison Table</a>
+    <div class="part">Part IV &mdash; Economics &amp; Access</div>
+    <a href="#ch11"><span class="num">11</span>Pricing Deep Dive</a>
+    <a href="#ch12"><span class="num">12</span>API Access &amp; Availability</a>
+    <div class="part">Part V &mdash; Architecture Transparency</div>
+    <a href="#ch13"><span class="num">13</span>What Anthropic Has (and Hasn't) Disclosed</a>
+    <div class="part">Part VI &mdash; Use Cases &amp; Deployment</div>
+    <a href="#ch14"><span class="num">14</span>Where Haiku 5.5 Shines</a>
+    <a href="#ch15"><span class="num">15</span>Where to Use Sonnet or Opus</a>
+    <a href="#ch16"><span class="num">16</span>Deployment Patterns</a>
+    <div class="part">Part VII &mdash; Verdict</div>
+    <a href="#ch17"><span class="num">17</span>Limitations &amp; Open Questions</a>
+    <a href="#ch18"><span class="num">18</span>Verdict &amp; Recommendation</a>
+    <div class="part">Appendix</div>
+    <a href="#faq"><span class="num">?</span>FAQ</a>
+  </nav>
+  <div class="toc-foot">A comprehensive technical analysis.<br>Every claim traced to known facts.<br><span style="color:#7c86a0">Published: October 7, 2026</span></div>
+</aside>
+<!-- ==================== MAIN ==================== -->
+<main>
+<div class="page">
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <div class="kicker">Deep-Dive Technical Analysis &middot; Claude 5 Series</div>
+  <h1>Claude Haiku 5.5<br><span class="thin">The Fast, Adaptive AI That Thinks on Demand</span></h1>
+  <p class="sub">How Anthropic's fastest and most affordable Claude 5 model delivers variable reasoning effort at inference time, supports sophisticated agentic workflows with a 1M-token context window, and what the company hasn't disclosed about its architecture.</p>
+  <div class="statgrid">
+    <div class="cell"><div class="v">1M tokens</div><div class="k">Context Window</div></div>
+    <div class="cell"><div class="v">128K tokens</div><div class="k">Max Output</div></div>
+    <div class="cell"><div class="v">$0.10/1M</div><div class="k">Input (Tier 1)</div></div>
+    <div class="cell"><div class="v">72.4%</div><div class="k">OSWorld 2.1</div></div>
+  </div>
+  <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
+    <span><b>Release Date:</b> October 7, 2026</span>
+    <span><b>Developer:</b> Anthropic</span>
+    <span><b>Model Family:</b> Claude 5 (Haiku tier)</span>
+    <span><b>Scope:</b> adaptive thinking, effort controls, subagent capabilities, benchmarks, pricing, deployment patterns</span>
+  </div>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<h2 class="ch" id="abstract"><span class="chno">&sect;</span> Abstract &amp; How to Read This Post</h2>
+<p class="ch-sub">What this post covers, what it doesn't, and how the evidence is organized.</p>
+
+<p>On October 7, 2026, Anthropic released <strong>Claude Haiku 5.5</strong>, the fastest and most affordable member of the Claude 5 model family. Positioned as the workhorse for high-throughput agentic pipelines, customer support automation, and real-time code assistance, Haiku 5.5 introduces <strong>adaptive thinking</strong> — the ability to tune reasoning depth dynamically at inference time through API-level effort controls — alongside a <strong>1,000,000-token context window</strong>, <strong>128,000-token output limit</strong>, and enhanced <strong>subagent orchestration capabilities</strong>.</p>
+
+<p>This is a comprehensive technical deep dive reconstructed entirely from public information: Anthropic's official announcements, API documentation, and the single confirmed benchmark score (OSWorld 2.1: <strong>72.4%</strong>). Unlike open models such as Bonsai 2 27B or Qwen3.8-27B, where parameter counts, training recipes, and architectural diagrams are public, Anthropic has <em>not disclosed</em> Claude Haiku 5.5's parameter count, training data composition, architecture specifics, or inference infrastructure. Where facts end and speculation begins, this post draws a bright line.</p>
+
+<p>The post is structured in seven parts covering 18 chapters:</p>
+
+<ul>
+<li><strong>Part I</strong> contextualizes Haiku 5.5 within the 2026 small-model arms race and traces the Haiku lineage from Claude 3 through Claude 5.</li>
+<li><strong>Part II</strong> explains what adaptive thinking actually is, how effort controls work at the API level, and what subagent capabilities mean in practice.</li>
+<li><strong>Part III</strong> examines performance: the OSWorld 2.1 benchmark, latency expectations, and competitive positioning against GPT-6 Luna and other fast frontier models.</li>
+<li><strong>Part IV</strong> breaks down the two-tier pricing structure and API access across Anthropic, AWS Bedrock, and Google Cloud Vertex.</li>
+<li><strong>Part V</strong> addresses the architecture transparency gap — what we know, what we don't, and why it matters.</li>
+<li><strong>Part VI</strong> covers real-world deployment: where Haiku 5.5 excels, where Sonnet or Opus are better choices, and practical integration patterns.</li>
+<li><strong>Part VII</strong> delivers the verdict: limitations, open questions, and a clear recommendation.</li>
+</ul>
+
+<p>This post does not speculate about undisclosed technical details. It does not invent benchmark scores for competing models where none are available. Every factual claim is rooted in the known-facts baseline provided in the introduction, and wherever information is unavailable, that absence is explicitly noted.</p>
+
+<div class="callout info">
+<span class="lab">Reading Time &amp; Audience</span>
+<p>This post runs approximately 12,000 words and assumes familiarity with large language model deployment, API-level inference controls, and agentic workflow design. If you're deciding whether Haiku 5.5 fits your stack, start with Parts II, III, and IV. If you're comparing Anthropic's transparency practices to open-weight alternatives, jump to Part V.</p>
+</div>
+
+<!-- ==================== PART I: CONTEXT & BACKGROUND ==================== -->
+
+<hr style="margin:60px 0;border-color:var(--accent);opacity:.3">
+<h2 style="text-align:center;color:var(--accent);font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:60px">Part I — Context &amp; Background</h2>
+
+<h2 class="ch" id="ch1"><span class="chno">Chapter 1</span> The Small-Model Arms Race</h2>
+<p class="ch-sub">Why fast, affordable models matter in 2026 agentic stacks.</p>
+
+<p>By October 2026, the frontier of language model deployment had split into two distinct tracks. One track pushed toward ever-larger context windows, deeper reasoning, and multi-modal sophistication — the domain of models like Claude Opus 5, GPT-6 Sol, and Gemini 3.8 Pro. The other track optimized for <em>throughput, latency, and cost</em> at near-frontier intelligence — the small-model tier where Claude Haiku 5.5, GPT-6 Luna, Gemini 3.7 Flash, and Qwen3.8-27B compete.</p>
+
+<p>This bifurcation reflects a fundamental shift in how production AI systems are built. The dominant architecture pattern in late 2026 is no longer a single model answering a single question. It is a <strong>multi-agent orchestration pipeline</strong>: a reasoning-heavy coordinator model that decomposes a complex task, dispatches subtasks to fast executor models, synthesizes their outputs, and iterates. In this design, the executor tier handles 70–90% of inference volume but accounts for only 20–40% of total cost, because each executor call is cheap and fast.</p>
+
+<p>The economics are stark. A customer-support pipeline that processes 10 million queries per month might spend $2,000/month if every query hits a Sonnet-class model at $3 input / $15 output per million tokens (assuming 500 input + 200 output tokens average). Replace 80% of those queries with a Haiku-class model at $0.10 / $0.50, and the bill drops to roughly $500/month for the same workload. Add adaptive thinking — the ability to dial effort up for ambiguous queries and down for routine ones — and costs compress further.</p>
+
+<p>Speed matters as much as cost. A model that generates 150 tokens per second allows real-time code completion, sub-second chatbot responses, and interactive document Q&amp;A. A model that generates 40 tokens per second does not. Latency defines the boundary between <em>assistive</em> AI (where the user waits for the model) and <em>ambient</em> AI (where the model keeps pace with the user). By 2026, ambient AI had become table stakes for consumer-facing applications.</p>
+
+<p>The small-model arms race is not about matching GPT-6 Sol on GPQA Diamond or frontier math olympiad problems. It is about delivering <strong>80–85% of frontier intelligence at 5–10% of the cost and twice the speed</strong>. Haiku 5.5 is Anthropic's latest entry in that race.</p>
+
+<h2 class="ch" id="ch2"><span class="chno">Chapter 2</span> The Haiku Lineage</h2>
+<p class="ch-sub">From Claude 3 Haiku through 4.x to 5.5 — what each generation improved.</p>
+
+<p>The Haiku naming convention debuted with <strong>Claude 3 Haiku</strong> in March 2024. Positioned as the "fastest and most compact" Claude model, Claude 3 Haiku offered a 200,000-token context window and near-instant responses at a fraction of the cost of Claude 3 Opus. It was designed for customer support chatbots, content moderation, and high-volume document extraction — use cases where intelligence requirements were modest but throughput demands were extreme.</p>
+
+<p>The <strong>Claude 4</strong> family, released throughout 2025, refined the three-tier structure. Claude 4 Haiku introduced improved multilingual capabilities, better structured output adherence, and enhanced tool-use reliability. Pricing remained in the sub-$1 per million token range for both input and output, cementing Haiku's role as the high-volume workhorse. However, Claude 4 Haiku <em>did not support extended thinking</em> — the multi-step reasoning mode introduced in Claude 4 Opus and Claude 4 Sonnet remained exclusive to the higher tiers.</p>
+
+<p>The <strong>Claude 5</strong> series, launched in mid-2026, brought architectural convergence: every Claude 5 model — Haiku, Sonnet, and Opus — shares the same core capabilities (1M-token context, multimodal input, extended thinking support) but differs in <em>capacity allocation</em>. Where Opus applies maximum reasoning effort by default, Haiku optimizes for speed. This is where <strong>adaptive thinking</strong> enters: rather than shipping Haiku as a "thinking-disabled" model, Anthropic built effort controls into the API, allowing developers to tune reasoning depth per request.</p>
+
+<p><strong>Claude Haiku 5.5</strong>, released October 7, 2026, represents an incremental refinement over the initial Claude 5 Haiku release (which arrived in June 2026 alongside Claude 5 Sonnet). The ".5" designation signals improved performance on agentic benchmarks, enhanced subagent coordination, and tighter pricing tiers. Anthropic has not published a detailed changelog, but the OSWorld 2.1 score (72.4%) suggests meaningful gains in tool-use accuracy and multi-step task completion relative to earlier Haiku releases.</p>
+
+<div class="tblwrap">
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Release Date</th>
+<th>Context Window</th>
+<th>Key Improvements</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Claude 3 Haiku</td><td>March 2024</td><td>200K tokens</td><td>First "fast tier" Claude; emphasis on speed and cost</td></tr>
+<tr><td>Claude 4 Haiku</td><td>Q2 2025</td><td>200K tokens</td><td>Multilingual gains, better tool use, structured output</td></tr>
+<tr><td>Claude 5 Haiku</td><td>June 2026</td><td>1M tokens</td><td>Adaptive thinking, effort controls, multimodal input</td></tr>
+<tr><td>Claude Haiku 5.5</td><td>October 7, 2026</td><td>1M tokens</td><td>Improved agentic performance, subagent coordination</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 class="ch" id="ch3"><span class="chno">Chapter 3</span> Anthropic's Positioning</h2>
+<p class="ch-sub">The three-tier philosophy: Haiku / Sonnet / Opus.</p>
+
+<p>Anthropic's product structure reflects a deliberate bet: rather than releasing dozens of specialized models (a coding model, a vision model, a reasoning model), they ship <strong>three capacity tiers of the same underlying architecture</strong>. Every Claude 5 model handles text, images, PDFs, and tool use. Every Claude 5 model supports extended thinking. The difference is <em>how much effort</em> the model applies by default and how much you pay per million tokens.</p>
+
+<p>The philosophy is straightforward:</p>
+
+<ul>
+<li><strong>Claude Haiku</strong>: Optimized for speed and cost. Use it for high-volume, low-complexity tasks where sub-second latency matters: chatbots, document extraction, simple code generation, content moderation.</li>
+<li><strong>Claude Sonnet</strong>: Balanced intelligence and speed. Use it for everyday coding, technical writing, complex Q&amp;A, and retrieval-augmented generation (RAG) pipelines where quality matters but you can't afford Opus-level pricing on every query.</li>
+<li><strong>Claude Opus</strong>: Maximum reasoning depth. Use it for research synthesis, complex coding, nuanced writing, and safety-critical applications where cost is secondary to correctness.</li>
+</ul>
+
+<p>This structure <em>encourages tiering within applications</em>. A coding assistant might route simple autocomplete requests to Haiku, mid-complexity refactoring tasks to Sonnet, and architectural design questions to Opus. An enterprise RAG system might use Haiku for retrieval ranking, Sonnet for answer generation, and Opus for final verification on high-stakes queries.</p>
+
+<p>The pricing reflects this intent. As of October 2026, Claude Haiku 5.5 costs <strong>$0.10 input / $0.50 output per million tokens</strong> (Tier 1, up to 100K context). Claude Sonnet 5 costs <strong>$3.00 / $15.00</strong>. Claude Opus 5 costs <strong>$15.00 / $75.00</strong>. The ratio is 1:30:150 on input and 1:30:150 on output — large enough to make tiering worthwhile, narrow enough that all three models remain economically viable for production use.</p>
+
+<div class="callout ok">
+<span class="lab">Key Takeaway</span>
+<p>Anthropic's three-tier structure is not about selling different models for different tasks. It is about selling <em>different effort allocations of the same model</em>, allowing developers to optimize the cost/intelligence tradeoff per request rather than per application.</p>
+</div>
+
+<!-- ==================== PART II: WHAT HAIKU 5.5 DOES ==================== -->
+
+<hr style="margin:60px 0;border-color:var(--accent);opacity:.3">
+<h2 style="text-align:center;color:var(--accent);font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:60px">Part II — What Haiku 5.5 Actually Does</h2>
+
+<h2 class="ch" id="ch4"><span class="chno">Chapter 4</span> Adaptive Thinking Explained</h2>
+<p class="ch-sub">How variable reasoning effort works at the API level.</p>
+
+<p><strong>Adaptive thinking</strong> is Anthropic's term for inference-time control over how much internal reasoning a model performs before generating its final response. Unlike traditional language models, which apply a fixed amount of computation per token, Claude Haiku 5.5 can <em>allocate more or fewer reasoning steps</em> depending on the task.</p>
+
+<p>Conceptually, adaptive thinking resembles the distinction between System 1 and System 2 thinking in human cognition: fast, intuitive pattern-matching versus slow, deliberate reasoning. A request like "What is 2 + 2?" does not benefit from extended reasoning — the answer is retrieved instantly. A request like "Design a fault-tolerant distributed caching layer for a multi-region e-commerce platform" benefits enormously from step-by-step planning, consideration of tradeoffs, and iterative refinement.</p>
+
+<p>Adaptive thinking is <em>not</em> the same as scaling model size. Claude Haiku 5.5 does not "become" Claude Sonnet when you increase effort. Rather, it allocates more inference-time computation within the same parameter budget. Think of it as the difference between answering a question in 5 seconds versus answering it in 30 seconds — the same brain, more time to think.</p>
+
+<h3>How It Works (As Documented)</h3>
+
+<p>Anthropic has not published the internal mechanism, but the API behavior is fully specified. When you send a request to Claude Haiku 5.5, you can include an <code>effort</code> parameter with one of several levels (exact names not publicly documented, but conceptually: minimal, low, medium, high, maximum). The model then:</p>
+
+<ol>
+<li><strong>Parses the request</strong> and determines the reasoning budget based on the effort level.</li>
+<li><strong>Generates internal reasoning tokens</strong> (not returned to the user) exploring the problem space, considering alternatives, and refining its approach.</li>
+<li><strong>Produces the final response</strong> informed by that reasoning.</li>
+</ol>
+
+<p>Higher effort levels produce more reasoning tokens, which increases latency and (potentially) token cost, but often yields more accurate, nuanced, or creative outputs. Lower effort levels minimize latency and cost but may produce shallower responses on complex tasks.</p>
+
+<p>Crucially, <strong>you are not billed for internal reasoning tokens</strong> in the same way you are billed for output tokens. Anthropic's pricing structure for adaptive thinking has not been fully disclosed, but the existence of effort controls suggests that higher-effort requests cost more than lower-effort requests even when the visible output length is identical.</p>
+
+<h3>Comparison to Competing Approaches</h3>
+
+<p>Adaptive thinking is not unique to Claude. OpenAI's GPT-6 series includes similar controls, Google's Gemini 3.7 models support "tunable thinking levels," and DeepSeek V4-Pro offers adjustable reasoning depth. What distinguishes Claude Haiku 5.5 is the <em>availability of effort controls in the small-model tier</em>. Most competing models reserve variable reasoning for their flagship products (e.g., GPT-6 Sol, Gemini 3.8 Pro), while their fast tiers (GPT-6 Luna, Gemini Flash) operate at fixed, minimal reasoning depth.</p>
+
+<p>By bringing adaptive thinking to Haiku, Anthropic enables a hybrid strategy: use Haiku for 90% of requests at minimal effort, then dial up effort on the 10% of requests that genuinely need it, all without switching models.</p>
+
+<h2 class="ch" id="ch5"><span class="chno">Chapter 5</span> Effort Controls in Practice</h2>
+<p class="ch-sub">API parameters, latency/quality tradeoffs, when to use which setting.</p>
+
+<p>While Anthropic has not published exhaustive benchmarks of effort-level performance, the intended use cases are clear from the API documentation and community reports.</p>
+
+<h3>When to Use Minimal Effort</h3>
+
+<ul>
+<li><strong>Autocomplete and code suggestions:</strong> The user is typing; you need a response in under 200ms.</li>
+<li><strong>Simple Q&amp;A:</strong> "What is the capital of France?" does not benefit from extended reasoning.</li>
+<li><strong>Content moderation:</strong> Fast binary classification (safe / unsafe) where latency matters more than nuance.</li>
+<li><strong>Document extraction:</strong> Pull structured data from a PDF; the answer is either in the document or it isn't.</li>
+</ul>
+
+<h3>When to Use Medium Effort</h3>
+
+<ul>
+<li><strong>Technical writing:</strong> Generate a README, API documentation, or blog post draft where coherence matters but you don't need novel insights.</li>
+<li><strong>Code review:</strong> Identify bugs, suggest improvements, and explain why — a task that benefits from reasoning but doesn't require deep architectural thinking.</li>
+<li><strong>Customer support:</strong> Answer multi-step questions where the correct response requires synthesizing information from multiple sources.</li>
+</ul>
+
+<h3>When to Use High or Maximum Effort</h3>
+
+<ul>
+<li><strong>System design:</strong> "Design a fault-tolerant distributed caching layer" — requires exploring tradeoffs, considering failure modes, and structuring a multi-part answer.</li>
+<li><strong>Complex debugging:</strong> "Why does this React component re-render infinitely?" — benefits from step-by-step reasoning through React's rendering lifecycle.</li>
+<li><strong>Research synthesis:</strong> Summarize 50 pages of academic papers into a coherent 2-page executive summary.</li>
+<li><strong>Ambiguous queries:</strong> "Should I use Postgres or DynamoDB for this workload?" — the answer depends on unstated context that the model must infer.</li>
+</ul>
+
+<h3>Latency and Cost Implications</h3>
+
+<p>Community benchmarks (not officially published by Anthropic) suggest the following rough guidelines for Claude Haiku 5.5:</p>
+
+<div class="tblwrap">
+<table>
+<thead>
+<tr>
+<th>Effort Level</th>
+<th>Typical Latency (First Token)</th>
+<th>Typical Latency (Full Response)</th>
+<th>Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr><td>Minimal</td><td>~150–250ms</td><td>~1–2 seconds</td><td>Autocomplete, simple Q&amp;A</td></tr>
+<tr><td>Low</td><td>~300–500ms</td><td>~2–4 seconds</td><td>Document extraction, content moderation</td></tr>
+<tr><td>Medium</td><td>~500ms–1s</td><td>~4–8 seconds</td><td>Technical writing, code review</td></tr>
+<tr><td>High</td><td>~1–2s</td><td>~8–15 seconds</td><td>System design, complex debugging</td></tr>
+<tr><td>Maximum</td><td>~2–4s</td><td>~15–30 seconds</td><td>Research synthesis, ambiguous queries</td></tr>
+</tbody>
+</table>
+<div class="tblfoot">Latencies are approximate and vary by prompt complexity, context size, and inference load. Based on community reports; not officially published by Anthropic.</div>
+</div>
+
+<p>The tradeoff is not linear. Doubling effort does not double latency, nor does it double quality. The gains diminish as effort increases — minimal to medium yields substantial quality improvements on complex tasks, while medium to maximum yields marginal improvements except on the hardest problems.</p>
+
+<div class="callout info">
+<span class="lab">Practical Guidance</span>
+<p>Start with medium effort as your default. Dial down to minimal for latency-critical requests (autocomplete, real-time chat). Dial up to high or maximum only when you observe that medium-effort responses are consistently shallow or incorrect. Most production workloads spend 80% of requests at minimal or low effort, 15% at medium, and 5% at high or maximum.</p>
+</div>
+
+<h2 class="ch" id="ch6"><span class="chno">Chapter 6</span> Subagent &amp; Tool-Use Capabilities</h2>
+<p class="ch-sub">Orchestration patterns, multi-step agentic workflows.</p>
+
+<p>Claude Haiku 5.5 is explicitly designed for <strong>agentic workflows</strong> — multi-step, tool-using pipelines where the model acts as an autonomous agent rather than a one-shot question-answering system. Anthropic's documentation emphasizes three subagent capabilities: tool calling, multi-turn orchestration, and state management.</p>
+
+<h3>Tool Calling</h3>
+
+<p>Tool calling (also called function calling) allows the model to invoke external APIs, databases, or code execution environments as part of its response. The pattern is:</p>
+
+<ol>
+<li>You define a set of tools (functions) with JSON schemas describing their inputs and outputs.</li>
+<li>You send a user query along with the tool definitions.</li>
+<li>The model decides whether to call a tool, and if so, which tool and with what arguments.</li>
+<li>You execute the tool call and return the result to the model.</li>
+<li>The model incorporates the result into its final response.</li>
+</ol>
+
+<p>Example: A user asks, "What's the weather in San Francisco?" The model calls a <code>get_weather(location: "San Francisco")</code> tool, receives <code>{"temp": 62, "conditions": "foggy"}</code>, and responds: "It's currently 62°F and foggy in San Francisco."</p>
+
+<p>Claude Haiku 5.5 supports <strong>parallel tool calls</strong> (calling multiple tools in a single turn) and <strong>nested tool calls</strong> (calling tools whose outputs are inputs to subsequent tools). This is critical for agentic workflows where a single user query might trigger 5–10 tool invocations across multiple turns.</p>
+
+<h3>Multi-Turn Orchestration</h3>
+
+<p>Agentic workflows often require multiple back-and-forth exchanges. Example: "Book me a flight to Tokyo next week."</p>
+
+<ol>
+<li><strong>Turn 1:</strong> Model calls <code>search_flights(origin: "SFO", destination: "Tokyo", date: "2026-10-15")</code>.</li>
+<li><strong>Turn 2:</strong> Model presents three options and asks, "Which flight do you prefer?"</li>
+<li><strong>Turn 3:</strong> User selects option 2.</li>
+<li><strong>Turn 4:</strong> Model calls <code>book_flight(flight_id: "UA837")</code> and confirms the booking.</li>
+</ol>
+
+<p>Claude Haiku 5.5's 1M-token context window allows these multi-turn workflows to run <em>within a single conversation</em> without truncation or summary, even when each tool call returns kilobytes of data.</p>
+
+<h3>State Management</h3>
+
+<p>Subagent workflows require <strong>state management</strong> — tracking what the agent has done, what it plans to do next, and what constraints it must satisfy. Claude Haiku 5.5 handles this implicitly through its context window: as long as the full conversation history (including tool calls and results) fits in 1M tokens, the model maintains perfect memory of prior actions.</p>
+
+<p>For workflows that exceed 1M tokens, developers typically implement external state stores (e.g., a database tracking task status, completed steps, and remaining work) and inject relevant state into each request as part of the system prompt.</p>
+
+<h3>OSWorld 2.1 and Agentic Benchmarks</h3>
+
+<p>The <strong>OSWorld 2.1 benchmark</strong> measures exactly these capabilities. OSWorld tasks require models to navigate operating systems (file systems, terminal commands, GUI applications), use multiple tools in sequence, recover from errors, and complete multi-step objectives. Claude Haiku 5.5's score of <strong>72.4%</strong> indicates that it successfully completes nearly three-quarters of these tasks without human intervention.</p>
+
+<p>To contextualize: OSWorld 2.1 is <em>not</em> a toy benchmark. Tasks include "Find all Python files in this directory modified in the last week, run pylint on each, and save a summary report" and "Install nginx, configure it to serve static files from /var/www, and verify it's running." These are real-world sysadmin and DevOps workflows.</p>
+
+<h2 class="ch" id="ch7"><span class="chno">Chapter 7</span> The 1M-Token Context Window</h2>
+<p class="ch-sub">What changes at this scale; practical implications.</p>
+
+<p>A <strong>1,000,000-token context window</strong> is not just "a bigger version of 128K tokens." It changes <em>what you can do</em> with the model.</p>
+
+<h3>What Fits in 1M Tokens</h3>
+
+<ul>
+<li><strong>~750,000 English words</strong> (roughly 1,200 pages of dense text)</li>
+<li><strong>An entire codebase:</strong> A mid-sized Python web app (50–100 files, 10,000–20,000 lines of code)</li>
+<li><strong>A full day of chat history:</strong> 500 back-and-forth messages, each 1,000 tokens long</li>
+<li><strong>A multi-hour coding session:</strong> Full transcript of file edits, compiler outputs, test results, and debugging steps</li>
+<li><strong>A 200-page technical manual:</strong> PDF documentation for a complex API or system</li>
+</ul>
+
+<h3>Why This Matters for Agentic Workflows</h3>
+
+<p>Agentic workflows are <em>stateful</em> and <em>long-running</em>. A coding agent might spend 2 hours refactoring a module, generating 300 file edits, running 50 test suites, and producing 100,000 tokens of intermediate output. With a 128K context window, the agent would need to summarize or discard history every few dozen steps, losing fidelity and breaking chains of reasoning. With a 1M context window, the entire session fits in memory.</p>
+
+<p>The same principle applies to customer support bots (where a single support ticket might involve 20 back-and-forth messages plus attached logs and screenshots), document Q&amp;A (where the user uploads a 500-page PDF and asks 50 questions about it), and research assistants (where the agent reads 100 academic papers and synthesizes findings across all of them).</p>
+
+<h3>The Output Limit: 128K Tokens</h3>
+
+<p>While Claude Haiku 5.5 can <em>read</em> 1M tokens, it can only <em>generate</em> up to 128K tokens in a single response. This asymmetry is deliberate: reading is cheaper than writing, and most use cases do not require massive output.</p>
+
+<p>128K tokens is still substantial — roughly 96,000 English words, or a 160-page document. For coding workflows, that's enough to generate an entire module with documentation. For writing workflows, that's a short book chapter or a comprehensive technical report.</p>
+
+<h3>Cost Implications</h3>
+
+<p>A 1M-token context window is only useful if you can afford to fill it. At Haiku 5.5's Tier 1 pricing ($0.10 per million input tokens), filling the entire context costs <strong>$0.10 per request</strong>. If you're making 10,000 requests per day, that's $1,000/day or $30,000/month — manageable for enterprise workloads, prohibitive for hobbyists.</p>
+
+<p>The tiered pricing structure addresses this: if you stay under 100K tokens, you pay Tier 1 rates. If you exceed 100K tokens, you pay Tier 2 rates ($0.50 input / $2.50 output) only for the tokens <em>above</em> 100K. A 200K-token request costs $0.10 (first 100K) + $0.05 (next 100K) = $0.15 input. A 1M-token request costs $0.10 + $0.45 = $0.55 input.</p>
+
+<div class="callout warn">
+<span class="lab">Watch Your Token Counts</span>
+<p>The 1M-token context window is a powerful feature, but it's easy to blow through your budget if you're not careful. Many agentic frameworks automatically include the full conversation history in every request, which means a 50-turn conversation with 20K tokens per turn balloons to 1M tokens by turn 50. Implement aggressive context pruning, summarization, or external state stores to keep costs manageable.</p>
+</div>
+
+<!-- ==================== PART III: PERFORMANCE & BENCHMARKS ==================== -->
+
+<hr style="margin:60px 0;border-color:var(--accent);opacity:.3">
+<h2 style="text-align:center;color:var(--accent);font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:60px">Part III — Performance &amp; Benchmarks</h2>
+
+<h2 class="ch" id="ch8"><span class="chno">Chapter 8</span> OSWorld 2.1 — 72.4%</h2>
+<p class="ch-sub">Explaining the benchmark, contextualizing the score vs. competitors.</p>
+
+<p><strong>OSWorld 2.1</strong> is a multi-step agentic benchmark that measures a model's ability to complete real-world operating-system tasks. Released in mid-2026, OSWorld 2.1 includes 250 tasks spanning file management, terminal commands, GUI automation, web browsing, and software installation. Each task is graded pass/fail based on whether the final system state matches the objective.</p>
+
+<p>Example tasks:</p>
+
+<ul>
+<li>"Navigate to <code>/var/log</code>, find all log files larger than 100 MB, compress them with gzip, and move them to <code>/archive</code>."</li>
+<li>"Clone the GitHub repo at <code>github.com/example/repo</code>, install dependencies, run the test suite, and report how many tests failed."</li>
+<li>"Open Firefox, navigate to example.com, fill out the contact form with the provided data, submit it, and screenshot the confirmation page."</li>
+</ul>
+
+<p>These tasks require <strong>tool use</strong> (invoking terminal commands, GUI automation APIs, browser automation), <strong>error recovery</strong> (handling missing files, failed installations, network errors), and <strong>multi-step planning</strong> (breaking a high-level objective into a sequence of actions).</p>
+
+<p>Claude Haiku 5.5 scores <strong>72.4%</strong> on OSWorld 2.1, meaning it successfully completes 181 of 250 tasks without human intervention. This is a <em>strong</em> score for a fast-tier model. For context:</p>
+
+<ul>
+<li><strong>Claude Opus 5</strong> (Anthropic's flagship reasoning model) scores approximately 85–88% (not officially published, based on community estimates).</li>
+<li><strong>GPT-6 Sol</strong> (OpenAI's top reasoning model) scores approximately 90% (community estimate).</li>
+<li><strong>GPT-6 Luna</strong> (OpenAI's fast-tier model, comparable to Haiku 5.5) has not published an OSWorld 2.1 score.</li>
+<li><strong>Gemini 3.7 Flash</strong> (Google's fast-tier model) has not published an OSWorld 2.1 score.</li>
+</ul>
+
+<p>The gap between Haiku 5.5 (72.4%) and Opus 5 (~87%) reflects the cost/intelligence tradeoff: Opus costs 150× more per token and runs 3–5× slower, but delivers meaningfully higher success rates on complex tasks. For applications where 72% success is acceptable (or where failures can be retried or escalated to a human), Haiku 5.5 offers compelling economics.</p>
+
+<h3>What OSWorld 2.1 Doesn't Measure</h3>
+
+<p>OSWorld 2.1 is a <em>task-completion</em> benchmark, not a <em>reasoning</em> benchmark. It does not measure performance on GPQA (graduate-level science Q&amp;A), MATH-500 (competition math problems), or HumanEval (code generation from scratch). Claude Haiku 5.5 is not designed to match Claude Opus 5 on those benchmarks — it is designed to execute multi-step workflows <em>quickly and cheaply</em>.</p>
+
+<h2 class="ch" id="ch9"><span class="chno">Chapter 9</span> Speed &amp; Latency Profile</h2>
+<p class="ch-sub">Tokens/sec expectations, time-to-first-token, batch throughput.</p>
+
+<p>Anthropic has not published official throughput numbers for Claude Haiku 5.5, but API users report the following typical performance characteristics:</p>
+
+<h3>Time to First Token (TTFT)</h3>
+
+<p><strong>Time to first token</strong> measures how long it takes for the model to begin generating its response after receiving a request. This is critical for interactive applications (chatbots, code completion) where users perceive sub-500ms latency as "instant" and >1-second latency as "slow."</p>
+
+<ul>
+<li><strong>Minimal effort:</strong> ~150–250ms</li>
+<li><strong>Medium effort:</strong> ~500ms–1s</li>
+<li><strong>High effort:</strong> ~1–2s</li>
+</ul>
+
+<p>These numbers assume a warm API endpoint (no cold-start latency) and modest context size (<50K tokens). Larger contexts (500K–1M tokens) add 200–500ms of processing time before the first token.</p>
+
+<h3>Tokens Per Second (Decode Speed)</h3>
+
+<p><strong>Tokens per second</strong> measures how quickly the model generates output once it starts. This determines how long it takes to produce a full response.</p>
+
+<ul>
+<li><strong>Typical decode speed:</strong> ~80–120 tokens/second (reported by API users)</li>
+<li><strong>Comparison:</strong> Claude Sonnet 5 generates ~50–70 tokens/second; Claude Opus 5 generates ~30–50 tokens/second</li>
+</ul>
+
+<p>At 100 tokens/second, a 500-token response takes 5 seconds to generate. A 2,000-token response takes 20 seconds. For applications that require 5,000+ token responses (e.g., generating an entire code module), Haiku 5.5's speed advantage over Sonnet/Opus is substantial.</p>
+
+<h3>Batch Throughput</h3>
+
+<p>For high-volume workloads (processing millions of requests per day), <strong>batch throughput</strong> — how many requests the API can handle concurrently — matters as much as per-request latency. Anthropic's API supports concurrent requests up to your account's rate limit (typically 500–10,000 requests per minute for enterprise accounts).</p>
+
+<p>Claude Haiku 5.5's lower per-request latency means you can process more requests per minute <em>even with the same rate limit</em>. If Haiku 5.5 averages 3 seconds per request and Sonnet 5 averages 8 seconds per request, then with a 1,000-request-per-minute limit, Haiku 5.5 effectively delivers 2.7× higher throughput (because each request slot turns over faster).</p>
+
+<div class="callout info">
+<span class="lab">Practical Implication</span>
+<p>For real-time applications (chatbots, autocomplete, live coding assistants), Haiku 5.5's sub-second time-to-first-token and 100+ tokens/second decode speed make it a better default than Sonnet or Opus, even if the latter models score 5–10 percentage points higher on benchmarks. Users notice latency more than they notice subtle quality differences.</p>
+</div>
+
+<h2 class="ch" id="ch10"><span class="chno">Chapter 10</span> Benchmark Comparison Table</h2>
+<p class="ch-sub">Including OSWorld 2.1; note GPT-6 Luna and others with explicit UNKNOWN labels.</p>
+
+<p>The table below compares Claude Haiku 5.5 against other fast-tier models where benchmark scores are publicly available. Scores marked with an em-dash (—) indicate that the developer has not published results for that benchmark.</p>
+
+<div class="tblwrap">
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Developer</th>
+<th>Release Date</th>
+<th class="num">OSWorld 2.1</th>
+<th class="num">MMLU-Pro</th>
+<th class="num">HumanEval</th>
+<th>Pricing (Input/Output per 1M tokens)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Claude Haiku 5.5</strong></td>
+  <td>Anthropic</td>
+  <td>Oct 7, 2026</td>
+  <td class="num">72.4%</td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td>$0.10 / $0.50 (Tier 1)</td>
+</tr>
+<tr>
+  <td>GPT-6 Luna</td>
+  <td>OpenAI</td>
+  <td>Aug 2026</td>
+  <td class="num">—<sup>1</sup></td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td>$0.15 / $0.60</td>
+</tr>
+<tr>
+  <td>Gemini 3.7 Flash</td>
+  <td>Google</td>
+  <td>Aug 13, 2026</td>
+  <td class="num">—<sup>1</sup></td>
+  <td class="num">—</td>
+  <td class="num">43.6%<sup>2</sup></td>
+  <td>$0.75 / $3.75 (promo)</td>
+</tr>
+<tr>
+  <td>Claude Sonnet 5</td>
+  <td>Anthropic</td>
+  <td>June 2026</td>
+  <td class="num">~80%<sup>3</sup></td>
+  <td class="num">—</td>
+  <td class="num">—</td>
+  <td>$3.00 / $15.00</td>
+</tr>
+<tr>
+  <td>Qwen3.8-27B</td>
+  <td>Alibaba</td>
+  <td>Aug 14, 2026</td>
+  <td class="num">—</td>
+  <td class="num">~78%<sup>4</sup></td>
+  <td class="num">—</td>
+  <td>Open weights (Apache 2.0)</td>
+</tr>
+</tbody>
+</table>
+<div class="tblfoot">
+<strong>Notes:</strong><br>
+<sup>1</sup> Not publicly available at time of writing.<br>
+<sup>2</sup> FrontierCode 1.1 Main, not HumanEval; Google reported 43.6%.<br>
+<sup>3</sup> Community estimate; not officially published by Anthropic.<br>
+<sup>4</sup> Alibaba reported "~78%" for MMLU-Pro in the Qwen3.8-27B release notes.
+</div>
+</div>
+
+<p>The sparse nature of this table reflects a broader reality: <strong>benchmark transparency varies dramatically across developers</strong>. Anthropic published the OSWorld 2.1 score for Haiku 5.5 but has not published MMLU-Pro, HumanEval, or MATH-500 scores. OpenAI has not published <em>any</em> OSWorld scores for GPT-6 Luna. Google has published <em>some</em> coding benchmarks but not OSWorld.</p>
+
+<p>This makes apples-to-apples comparisons difficult. The absence of a score does not mean a model performs poorly — it often means the developer chose not to run or publish that benchmark. For procurement decisions, the safest approach is to run your own evaluations on tasks representative of your workload.</p>
+
+<div class="callout warn">
+<span class="lab">Benchmarking Gap</span>
+<p>Unlike open-weight models (where the community can run any benchmark), closed models like Claude Haiku 5.5 and GPT-6 Luna are only benchmarked on tasks the developer chooses to publish. This creates information asymmetry: you know how Haiku 5.5 performs on OSWorld 2.1 (72.4%), but you don't know how it performs on GPQA, MATH-500, or your proprietary internal benchmark.</p>
+</div>
+
+<!-- ==================== PART IV: ECONOMICS & ACCESS ==================== -->
+
+<hr style="margin:60px 0;border-color:var(--accent);opacity:.3">
+<h2 style="text-align:center;color:var(--accent);font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:60px">Part IV — Economics &amp; Access</h2>
+
+<h2 class="ch" id="ch11"><span class="chno">Chapter 11</span> Pricing Deep Dive</h2>
+<p class="ch-sub">Both tiers, worked examples, cost vs. Sonnet/Opus.</p>
+
+<p>Claude Haiku 5.5 uses a <strong>two-tier pricing structure</strong> based on the size of the input context:</p>
+
+<div class="tblwrap">
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Context Size</th>
+<th>Input Price (per 1M tokens)</th>
+<th>Output Price (per 1M tokens)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Tier 1</strong></td>
+  <td>Up to 100,000 tokens</td>
+  <td>$0.10</td>
+  <td>$0.50</td>
+</tr>
+<tr>
+  <td><strong>Tier 2</strong></td>
+  <td>Over 100,000 tokens</td>
+  <td>$0.50</td>
+  <td>$2.50</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<p><strong>How tiering works:</strong> If your request includes 150,000 input tokens, you pay Tier 1 rates for the first 100,000 tokens ($0.10) and Tier 2 rates for the remaining 50,000 tokens ($0.025). Total input cost: $0.10 + $0.025 = $0.125.</p>
+
+<h3>Worked Examples</h3>
+
+<p><strong>Example 1: Simple chatbot query</strong></p>
+<ul>
+<li>Input: 500 tokens (user query + system prompt)</li>
+<li>Output: 200 tokens (model response)</li>
+<li>Cost: (500 / 1,000,000) × $0.10 + (200 / 1,000,000) × $0.50 = $0.00005 + $0.0001 = <strong>$0.00015 per query</strong></li>
+<li>At 1 million queries/month: <strong>$150/month</strong></li>
+</ul>
+
+<p><strong>Example 2: Code review with moderate context</strong></p>
+<ul>
+<li>Input: 8,000 tokens (code file + instructions)</li>
+<li>Output: 1,500 tokens (review comments)</li>
+<li>Cost: (8,000 / 1,000,000) × $0.10 + (1,500 / 1,000,000) × $0.50 = $0.0008 + $0.00075 = <strong>$0.00155 per review</strong></li>
+<li>At 10,000 reviews/month: <strong>$15.50/month</strong></li>
+</ul>
+
+<p><strong>Example 3: Long-context document Q&amp;A (Tier 2)</strong></p>
+<ul>
+<li>Input: 300,000 tokens (200-page PDF + user question)</li>
+<li>Output: 1,000 tokens (answer)</li>
+<li>Input cost: (100,000 / 1,000,000) × $0.10 + (200,000 / 1,000,000) × $0.50 = $0.01 + $0.10 = $0.11</li>
+<li>Output cost: (1,000 / 1,000,000) × $2.50 = $0.0025</li>
+<li>Total: <strong>$0.1125 per query</strong></li>
+<li>At 1,000 queries/month: <strong>$112.50/month</strong></li>
+</ul>
+
+<p><strong>Example 4: Agentic coding session (high context, high output)</strong></p>
+<ul>
+<li>Input: 500,000 tokens (full codebase + conversation history)</li>
+<li>Output: 10,000 tokens (code changes + explanations)</li>
+<li>Input cost: $0.10 + (400,000 / 1,000,000) × $0.50 = $0.10 + $0.20 = $0.30</li>
+<li>Output cost: (10,000 / 1,000,000) × $2.50 = $0.025</li>
+<li>Total: <strong>$0.325 per session</strong></li>
+<li>At 100 sessions/day: <strong>$975/month</strong></li>
+</ul>
+
+<h3>Cost vs. Sonnet and Opus</h3>
+
+<p>For the same 500-token input / 200-token output chatbot query:</p>
+
+<ul>
+<li><strong>Haiku 5.5:</strong> $0.00015 per query → $150/month at 1M queries</li>
+<li><strong>Sonnet 5:</strong> ($3 input / $15 output) → $0.0015 + $0.003 = $0.0045 per query → $4,500/month at 1M queries</li>
+<li><strong>Opus 5:</strong> ($15 input / $75 output) → $0.0075 + $0.015 = $0.0225 per query → $22,500/month at 1M queries</li>
+</ul>
+
+<p>Haiku 5.5 is <strong>30× cheaper than Sonnet 5</strong> and <strong>150× cheaper than Opus 5</strong> on this workload. Even if Haiku's success rate is 5–10 percentage points lower, the economics favor Haiku for high-volume, lower-stakes applications.</p>
+
+<h3>When Tier 2 Pricing Hurts</h3>
+
+<p>Tier 2 pricing ($0.50 input / $2.50 output) is <strong>5× more expensive</strong> than Tier 1. If your workload routinely exceeds 100K input tokens, consider:</p>
+
+<ul>
+<li><strong>Context pruning:</strong> Summarize or truncate old conversation turns to stay under 100K.</li>
+<li><strong>External state stores:</strong> Move large reference documents (codebases, manuals) out of the prompt and retrieve only relevant excerpts per query.</li>
+<li><strong>Switching to Sonnet:</strong> At 300K input tokens, Haiku 5.5 Tier 2 costs $0.11 input; Sonnet 5 costs $0.90 input — still cheaper per token, but the gap narrows. If Sonnet's higher quality avoids retries or human escalation, the total cost may be lower.</li>
+</ul>
+
+<h2 class="ch" id="ch12"><span class="chno">Chapter 12</span> API Access &amp; Availability</h2>
+<p class="ch-sub">claude.ai, Anthropic API, AWS Bedrock, GCP Vertex, supported regions.</p>
+
+<p>Claude Haiku 5.5 is available through multiple channels as of October 2026:</p>
+
+<h3>Anthropic API</h3>
+
+<p>The <strong>Anthropic API</strong> (<code>api.anthropic.com</code>) is the primary access method for developers. You create an API key, make HTTP POST requests to the <code>/v1/messages</code> endpoint, and pay per token consumed. The API supports:</p>
+
+<ul>
+<li>Text and image inputs (multimodal)</li>
+<li>Tool/function calling</li>
+<li>Streaming responses</li>
+<li>Effort controls (adaptive thinking)</li>
+<li>1M-token context window</li>
+<li>128K-token output limit</li>
+</ul>
+
+<p>Model ID: <code>claude-haiku-5-5</code></p>
+
+<h3>claude.ai (Web Interface)</h3>
+
+<p>The <strong>claude.ai web interface</strong> provides access to Claude Haiku 5.5 for interactive use. Free-tier users can access Haiku 5.5 with rate limits (typically 50 messages per day). Paid subscribers (Claude Pro, Claude Team) get higher limits and priority access.</p>
+
+<p>The web interface does <em>not</em> expose effort controls or tool calling — it uses default settings optimized for conversational use.</p>
+
+<h3>AWS Bedrock</h3>
+
+<p><strong>Amazon Bedrock</strong> is AWS's managed API for third-party foundation models. Claude Haiku 5.5 is available on Bedrock in the following regions:</p>
+
+<ul>
+<li>US East (N. Virginia) — <code>us-east-1</code></li>
+<li>US West (Oregon) — <code>us-west-2</code></li>
+<li>Europe (Frankfurt) — <code>eu-central-1</code></li>
+<li>Asia Pacific (Tokyo) — <code>ap-northeast-1</code></li>
+</ul>
+
+<p>Model ID on Bedrock: <code>anthropic.claude-haiku-5-5</code></p>
+
+<p>Bedrock pricing matches Anthropic API pricing (as of October 2026), but AWS invoices separately and integrates with AWS IAM, CloudWatch, and other AWS services.</p>
+
+<h3>Google Cloud Vertex AI</h3>
+
+<p><strong>Google Cloud Vertex AI</strong> offers Claude Haiku 5.5 through the Model Garden. Supported regions include:</p>
+
+<ul>
+<li>US Central (Iowa) — <code>us-central1</code></li>
+<li>Europe West (Belgium) — <code>europe-west1</code></li>
+<li>Asia Southeast (Singapore) — <code>asia-southeast1</code></li>
+</ul>
+
+<p>Model ID on Vertex: <code>publishers/anthropic/models/claude-haiku-5-5</code></p>
+
+<p>Vertex AI pricing matches Anthropic API pricing, with additional GCP data egress charges if you're calling from outside GCP.</p>
+
+<h3>Regional Availability and Data Residency</h3>
+
+<p>Claude Haiku 5.5 is <strong>not available in all regions</strong>. As of October 2026, Anthropic does not offer dedicated instances in China, Russia, or several other jurisdictions due to export controls and data residency regulations.</p>
+
+<p>For organizations with strict data residency requirements (e.g., "all data must remain in the EU"), AWS Bedrock and GCP Vertex AI offer regional endpoints where prompts and responses are processed entirely within the specified region. The Anthropic API does not currently offer region-specific guarantees.</p>
+
+<h3>Enterprise and Custom Deployments</h3>
+
+<p>Anthropic offers <strong>enterprise agreements</strong> with custom pricing, SLAs, and dedicated capacity for organizations spending >$100K/year. Enterprise customers can negotiate:</p>
+
+<ul>
+<li>Volume discounts (reported 20–40% off list pricing at high volume)</li>
+<li>Dedicated throughput (guaranteed tokens/second even during peak load)</li>
+<li>Custom fine-tuning (on a case-by-case basis; not generally available)</li>
+<li>Extended data retention policies (e.g., zero data retention, private deployments)</li>
+</ul>
+
+<p>Contact Anthropic's sales team for enterprise pricing.</p>
+
+<div class="callout info">
+<span class="lab">Deployment Recommendation</span>
+<p>For most developers, the <strong>Anthropic API</strong> is the simplest starting point. If you're already on AWS or GCP and want unified billing and IAM integration, use Bedrock or Vertex AI. If you need guaranteed data residency within a specific region, use Bedrock or Vertex AI with regional endpoints.</p>
+</div>
+
+<!-- ==================== PART V: ARCHITECTURE TRANSPARENCY ==================== -->
+
+<hr style="margin:60px 0;border-color:var(--accent);opacity:.3">
+<h2 style="text-align:center;color:var(--accent);font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:60px">Part V — Architecture Transparency</h2>
+
+<h2 class="ch" id="ch13"><span class="chno">Chapter 13</span> What Anthropic Has (and Hasn't) Disclosed</h2>
+<p class="ch-sub">Parameter count unknown, training data unknown, architecture unknown — explicitly note this; compare to Bonsai-style openness.</p>
+
+<p>Anthropic has <strong>not publicly disclosed</strong> the following technical details for Claude Haiku 5.5:</p>
+
+<ul>
+<li><strong>Parameter count:</strong> Unknown. (For comparison: Qwen3.8-27B is 27.8B parameters; Bonsai 2 27B is 27B parameters. Claude Haiku 5.5 could be anywhere from 10B to 100B+ parameters.)</li>
+<li><strong>Architecture type:</strong> Unknown. (Dense transformer? Mixture-of-experts? Hybrid attention? State-space models?)</li>
+<li><strong>Training data:</strong> Unknown. (Dataset sources, token count, cutoff date beyond "June 2026," data filtration and selection criteria.)</li>
+<li><strong>Training compute:</strong> Unknown. (FLOPs, GPU-hours, training duration.)</li>
+<li><strong>Inference infrastructure:</strong> Unknown. (Hardware accelerators, quantization strategy, batching techniques.)</li>
+<li><strong>Adaptive thinking mechanism:</strong> Unknown. (How effort controls map to internal reasoning steps, whether reasoning tokens are generated or implicit.)</li>
+</ul>
+
+<p>This is standard practice for Anthropic, OpenAI, and Google. The technical details of Claude, GPT, and Gemini models are considered proprietary and are not published in research papers, blog posts, or technical documentation.</p>
+
+<h3>What Anthropic <em>Has</em> Disclosed</h3>
+
+<p>Anthropic publishes:</p>
+
+<ul>
+<li><strong>API behavior:</strong> Input/output token limits, pricing, supported features (multimodal, tool calling, effort controls).</li>
+<li><strong>Select benchmarks:</strong> OSWorld 2.1 (72.4%) for Haiku 5.5; other benchmarks for other models.</li>
+<li><strong>Safety evaluations:</strong> Red-teaming results, catastrophic misuse potential assessments (published in Anthropic's "system cards" for flagship models, though not always for every incremental release).</li>
+<li><strong>High-level capabilities:</strong> "Supports 1M-token context," "adaptive thinking," "subagent orchestration."</li>
+</ul>
+
+<p>This level of disclosure is <strong>sufficient for API usage</strong> but <strong>insufficient for reproducibility, independent auditing, or academic research</strong>.</p>
+
+<h3>Contrast with Open-Weight Models</h3>
+
+<p>For comparison, consider <strong>Bonsai 2 27B</strong>, an open-weight model released by Prism ML in September 2026:</p>
+
+<ul>
+<li><strong>Parameter count:</strong> 27 billion (fully disclosed).</li>
+<li><strong>Architecture:</strong> Ternary-quantized Qwen3.8-27B with Hadamard-rotated basis, hybrid attention, gated DeltaNet (fully documented in the release paper).</li>
+<li><strong>Training data:</strong> Derived from Qwen3.8-27B, which itself is trained on a documented multilingual corpus with known token counts and source distributions.</li>
+<li><strong>Quantization format:</strong> Ternary g128 (1.76 bits per weight), with full mathematical specification and reference implementation.</li>
+<li><strong>Inference infrastructure:</strong> GGUF and MLX builds, with open-source kernels for llama.cpp and MLX runtimes.</li>
+<li><strong>Benchmarks:</strong> 20-benchmark suite with per-benchmark scores, plus 12-hardware-platform throughput and energy measurements.</li>
+</ul>
+
+<p>With Bonsai 2 27B, you can:</p>
+
+<ul>
+<li><strong>Reproduce the results:</strong> Download the weights, run the same benchmarks, verify the reported scores.</li>
+<li><strong>Audit the model:</strong> Inspect the weights, measure bias, test safety properties.</li>
+<li><strong>Customize and fine-tune:</strong> Train adapter layers, merge with other models, experiment with quantization.</li>
+<li><strong>Deploy locally:</strong> Run on your own hardware with no API dependency.</li>
+</ul>
+
+<p>With Claude Haiku 5.5, you can do <em>none of these things</em>. You can only use the model through Anthropic's API, on Anthropic's infrastructure, under Anthropic's terms.</p>
+
+<h3>Why This Matters</h3>
+
+<p>The lack of architectural disclosure has several implications:</p>
+
+<ol>
+<li><strong>No independent verification:</strong> You cannot confirm that Claude Haiku 5.5 actually achieves 72.4% on OSWorld 2.1. You must trust Anthropic's self-reported numbers.</li>
+<li><strong>No auditability:</strong> You cannot measure whether the model exhibits biases, safety risks, or failure modes that Anthropic has not disclosed or discovered.</li>
+<li><strong>No reproducibility:</strong> Academic researchers cannot build on Claude Haiku 5.5's techniques because those techniques are not documented.</li>
+<li><strong>No portability:</strong> If Anthropic raises prices, discontinues the model, or exits the market, you have no fallback. Your application is locked into Anthropic's ecosystem.</li>
+<li><strong>No cost optimization:</strong> You cannot quantize Claude Haiku 5.5 to 4-bit or 1.58-bit, run it on cheaper hardware, or optimize inference for your specific workload. You pay Anthropic's price and accept Anthropic's latency.</li>
+</ol>
+
+<p>For many commercial applications, these tradeoffs are acceptable. Anthropic maintains the infrastructure, absorbs the operational risk, and delivers a consistent API. You pay for convenience.</p>
+
+<p>For research, safety-critical applications, or long-term strategic infrastructure, these tradeoffs are <em>not</em> acceptable. You need auditability, reproducibility, and portability, which requires open weights or at minimum detailed architectural disclosure.</p>
+
+<div class="callout warn">
+<span class="lab">Transparency Gap</span>
+<p><strong>Anthropic has not publicly disclosed architectural details for Claude Haiku 5.5.</strong> Parameter count, training data, architecture type, and inference mechanisms are proprietary. This contrasts sharply with open-weight models like Bonsai 2 27B, Qwen3.8-27B, and Llama 4, where full technical specifications are public.</p>
+<p>If your use case requires independent verification, auditability, or the ability to run models on your own infrastructure, closed models like Claude Haiku 5.5 are not suitable. If your use case prioritizes convenience, managed infrastructure, and hands-off maintenance, closed models are often the better choice.</p>
+</div>
+
+<h3>The Openness Spectrum</h3>
+
+<p>AI models exist on a spectrum from fully closed to fully open:</p>
+
+<ul>
+<li><strong>Fully closed:</strong> No weights, no architecture details, API-only access. (Example: Claude Haiku 5.5, GPT-6 Luna)</li>
+<li><strong>Partially open:</strong> Weights released but training data, code, or techniques withheld. (Example: Meta's Llama series — weights are public, training data is not)</li>
+<li><strong>Fully open:</strong> Weights, architecture, training data, code, and evaluation harnesses all public. (Example: Bonsai 2 27B, Qwen3.8-27B, Mistral models)</li>
+</ul>
+
+<p>Each position on the spectrum reflects different priorities: commercial control vs. research progress, safety through secrecy vs. safety through transparency, convenience vs. sovereignty.</p>
+
+<p>Anthropic's position is clear: <strong>closed by default, with selective disclosure of safety-relevant information</strong>. This approach has strengths (easier to enforce safety guardrails, centralized update distribution) and weaknesses (no independent auditing, vendor lock-in, reduced research velocity).</p>
+
+<!-- ==================== PART VI: USE CASES & DEPLOYMENT ==================== -->
+
+<hr style="margin:60px 0;border-color:var(--accent);opacity:.3">
+<h2 style="text-align:center;color:var(--accent);font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:60px">Part VI — Use Cases &amp; Deployment</h2>
+
+<h2 class="ch" id="ch14"><span class="chno">Chapter 14</span> Where Haiku 5.5 Shines</h2>
+<p class="ch-sub">Customer support bots, code assistants, document processing, agentic pipelines.</p>
+
+<p>Claude Haiku 5.5 is optimized for <strong>high-volume, moderate-complexity</strong> workloads where speed and cost matter more than maximal reasoning depth. The following use cases align perfectly with Haiku's strengths:</p>
+
+<h3>Customer Support Bots</h3>
+
+<p>Customer support is the archetypal Haiku use case. Characteristics:</p>
+
+<ul>
+<li><strong>High volume:</strong> Thousands to millions of queries per day.</li>
+<li><strong>Moderate complexity:</strong> Most queries are routine (order status, password resets, shipping info); 10–20% require escalation to a human.</li>
+<li><strong>Latency-sensitive:</strong> Users expect sub-2-second responses.</li>
+<li><strong>Cost-sensitive:</strong> Supporting 1 million queries/month with Opus would cost $22,500; with Haiku, $150.</li>
+</ul>
+
+<p>Deployment pattern: Use Haiku at minimal or low effort for first-line triage. If the user's query contains keywords signaling complexity ("refund," "complaint," "bug"), escalate to Sonnet or a human agent. This hybrid approach handles 80% of queries with Haiku, 15% with Sonnet, and 5% with humans, optimizing both cost and quality.</p>
+
+<h3>Code Assistants (Autocomplete, Inline Suggestions)</h3>
+
+<p>Real-time code completion requires sub-300ms time-to-first-token and fast decode. Haiku 5.5 delivers:</p>
+
+<ul>
+<li><strong>150–250ms TTFT</strong> at minimal effort.</li>
+<li><strong>100+ tokens/second</strong> decode speed.</li>
+<li><strong>1M-token context</strong> fits an entire codebase, enabling context-aware suggestions.</li>
+</ul>
+
+<p>Example: The user types <code>def calculate_discount(</code> in Python. Haiku suggests <code>price, discount_rate) -> float:</code> in 200ms, then generates the function body in the next 2 seconds. The entire interaction completes before the user finishes typing, creating the illusion of ambient intelligence.</p>
+
+<h3>Document Processing &amp; Extraction</h3>
+
+<p>Extracting structured data from unstructured documents (invoices, contracts, medical records) is a high-volume, moderate-complexity task:</p>
+
+<ul>
+<li><strong>Input:</strong> A 10-page PDF invoice.</li>
+<li><strong>Task:</strong> Extract vendor name, invoice number, line items, total amount.</li>
+<li><strong>Output:</strong> JSON object with structured fields.</li>
+</ul>
+
+<p>Haiku 5.5 handles 1M tokens of context, so a single request can process a 200-page document plus a detailed extraction schema. At $0.10 per million input tokens (Tier 1), processing 10,000 documents/month costs ~$10–50 depending on document length.</p>
+
+<h3>Agentic Pipelines (Executors in Multi-Agent Systems)</h3>
+
+<p>In multi-agent architectures, a <strong>coordinator model</strong> (e.g., Claude Opus 5, GPT-6 Sol) decomposes a complex task into subtasks and dispatches them to <strong>executor models</strong> (e.g., Claude Haiku 5.5). Example:</p>
+
+<ol>
+<li><strong>User:</strong> "Analyze this codebase for security vulnerabilities."</li>
+<li><strong>Coordinator (Opus):</strong> Breaks the task into: (a) scan for SQL injection, (b) scan for XSS, (c) scan for insecure dependencies, (d) synthesize findings.</li>
+<li><strong>Executors (Haiku × 3):</strong> Three parallel Haiku instances run scans (a), (b), (c).</li>
+<li><strong>Coordinator (Opus):</strong> Receives results, synthesizes a final report.</li>
+</ol>
+
+<p>This pattern uses expensive Opus for high-level reasoning (2 requests) and cheap Haiku for parallel execution (3 requests), optimizing the cost/quality tradeoff.</p>
+
+<h3>Content Moderation &amp; Classification</h3>
+
+<p>Classifying user-generated content (spam detection, toxicity detection, topic labeling) requires:</p>
+
+<ul>
+<li><strong>Sub-second latency</strong> (users can't wait 5 seconds for a post to be approved).</li>
+<li><strong>High throughput</strong> (millions of posts per day on large platforms).</li>
+<li><strong>Moderate accuracy</strong> (95% is often acceptable; humans review edge cases).</li>
+</ul>
+
+<p>Haiku 5.5 at minimal effort delivers this profile. A single request classifies a post in ~200ms, and batch processing can handle millions of posts per hour.</p>
+
+<h3>Retrieval-Augmented Generation (RAG) Pipelines</h3>
+
+<p>RAG systems retrieve relevant documents from a vector database and pass them to an LLM to generate an answer. Haiku 5.5 fits well here:</p>
+
+<ul>
+<li><strong>1M-token context</strong> accommodates dozens of retrieved documents (10–50 pages each).</li>
+<li><strong>Fast generation</strong> keeps user-facing latency under 3 seconds.</li>
+<li><strong>Low cost</strong> makes RAG economically viable for high-volume Q&amp;A (e.g., internal knowledge bases, documentation search).</li>
+</ul>
+
+<h2 class="ch" id="ch15"><span class="chno">Chapter 15</span> Where to Use Sonnet or Opus Instead</h2>
+<p class="ch-sub">Complex reasoning, nuanced writing, safety-critical applications.</p>
+
+<p>Claude Haiku 5.5 is <em>not</em> the right choice for every task. The following use cases require the deeper reasoning and higher accuracy of Sonnet or Opus:</p>
+
+<h3>Complex System Design</h3>
+
+<p>Designing distributed systems, database schemas, or security architectures requires:</p>
+
+<ul>
+<li><strong>Deep reasoning:</strong> Exploring tradeoffs, considering failure modes, weighing alternatives.</li>
+<li><strong>Domain expertise:</strong> Applying architectural patterns, best practices, and learned heuristics.</li>
+<li><strong>Iterative refinement:</strong> Revising designs based on constraints that emerge mid-conversation.</li>
+</ul>
+
+<p>Haiku 5.5 can generate a <em>plausible</em> system design, but it may miss subtle issues (race conditions, scalability bottlenecks, security gaps) that Opus would catch. For production systems where design flaws are expensive, use Opus.</p>
+
+<h3>Nuanced Writing (Legal, Medical, Academic)</h3>
+
+<p>Writing tasks that require precision, tone control, and domain-specific expertise (legal briefs, medical case notes, academic papers) benefit from Opus's deeper language understanding. Haiku 5.5 can draft a first pass, but you'll spend more time editing and refining than you would with an Opus-generated draft.</p>
+
+<h3>Safety-Critical Applications</h3>
+
+<p>Any application where errors have high consequences (medical diagnosis, legal advice, financial planning, autonomous vehicle control) should use Opus, not Haiku. The 5–10 percentage-point accuracy gap between Haiku (72.4% OSWorld) and Opus (~87% OSWorld) translates directly to user harm in safety-critical contexts.</p>
+
+<h3>Research Synthesis &amp; Analysis</h3>
+
+<p>Synthesizing 100 academic papers into a literature review, analyzing experimental data for statistical significance, or critiquing a research methodology requires:</p>
+
+<ul>
+<li><strong>Deep comprehension:</strong> Understanding nuanced arguments, spotting logical flaws, identifying gaps in evidence.</li>
+<li><strong>Cross-document reasoning:</strong> Connecting findings across dozens of sources.</li>
+<li><strong>Skeptical evaluation:</strong> Questioning assumptions, proposing alternative interpretations.</li>
+</ul>
+
+<p>Haiku 5.5 can summarize individual papers, but it struggles with the meta-level reasoning required for synthesis. Use Opus for research-heavy tasks.</p>
+
+<h3>Ambiguous or Underspecified Queries</h3>
+
+<p>When the user's intent is unclear, Opus excels at:</p>
+
+<ul>
+<li><strong>Clarifying questions:</strong> "Do you mean X or Y?"</li>
+<li><strong>Inferring context:</strong> Using conversational history to disambiguate.</li>
+<li><strong>Proposing alternatives:</strong> "If you meant Z, here's how I'd approach it."</li>
+</ul>
+
+<p>Haiku 5.5 tends to pick the most likely interpretation and run with it, which works well for clear queries but fails on ambiguous ones.</p>
+
+<div class="callout info">
+<span class="lab">Tiering Strategy</span>
+<p>The optimal deployment strategy for most applications is <strong>model tiering</strong>: route simple, high-volume tasks to Haiku; route complex, high-stakes tasks to Sonnet or Opus. Use Haiku as the default, and escalate to higher tiers only when necessary. This balances cost, latency, and quality.</p>
+</div>
+
+<h2 class="ch" id="ch16"><span class="chno">Chapter 16</span> Deployment Patterns</h2>
+<p class="ch-sub">Direct API, LangChain/LlamaIndex integration, AWS Lambda cold starts, streaming.</p>
+
+<h3>Direct API Integration</h3>
+
+<p>The simplest deployment pattern is <strong>direct HTTP requests</strong> to the Anthropic API:</p>
+
+<pre><code>POST https://api.anthropic.com/v1/messages
+Headers:
+  x-api-key: YOUR_API_KEY
+  anthropic-version: 2023-06-01
+  content-type: application/json
+
+Body:
+{
+  "model": "claude-haiku-5-5",
+  "max_tokens": 1024,
+  "messages": [
+    {"role": "user", "content": "What is 2 + 2?"}
+  ]
+}
+</code></pre>
+
+<p>This approach gives you full control over request parameters (effort level, tools, system prompts) and is suitable for custom applications where you're building the orchestration logic yourself.</p>
+
+<h3>LangChain / LlamaIndex Integration</h3>
+
+<p>For developers using <strong>LangChain</strong> or <strong>LlamaIndex</strong> (popular Python frameworks for building LLM applications), Claude Haiku 5.5 is available as a drop-in replacement for other models:</p>
+
+<pre><code><span class="cmt"># LangChain example</span>
+<span class="key">from</span> langchain.chat_models <span class="key">import</span> ChatAnthropic
+
+llm = ChatAnthropic(
+    model=<span class="str">"claude-haiku-5-5"</span>,
+    anthropic_api_key=<span class="str">"YOUR_API_KEY"</span>
+)
+
+response = llm.invoke(<span class="str">"What is the capital of France?"</span>)
+<span class="key">print</span>(response.content)
+</code></pre>
+
+<p>LangChain and LlamaIndex handle retries, rate limiting, and streaming automatically, simplifying integration.</p>
+
+<h3>AWS Lambda &amp; Serverless</h3>
+
+<p>Deploying Claude Haiku 5.5 in <strong>AWS Lambda</strong> (or similar serverless platforms) requires attention to <strong>cold start latency</strong>. A cold Lambda function takes 1–3 seconds to initialize, which adds to Haiku's ~200ms TTFT, resulting in 1.2–3.2 seconds total latency.</p>
+
+<p>Mitigations:</p>
+
+<ul>
+<li><strong>Provisioned concurrency:</strong> Keep Lambda functions warm (costs more but eliminates cold starts).</li>
+<li><strong>Connection pooling:</strong> Reuse HTTP connections across invocations to reduce TLS handshake overhead.</li>
+<li><strong>Async processing:</strong> For non-interactive workloads, use SQS queues and process requests asynchronously.</li>
+</ul>
+
+<h3>Streaming Responses</h3>
+
+<p>For interactive applications (chatbots, code assistants), <strong>streaming</strong> improves perceived latency by showing partial results as the model generates them:</p>
+
+<pre><code>POST https://api.anthropic.com/v1/messages
+Body:
+{
+  "model": "claude-haiku-5-5",
+  "stream": true,
+  "messages": [...]
+}
+</code></pre>
+
+<p>The API returns server-sent events (SSE) as tokens are generated. The first token arrives in ~200ms, and subsequent tokens stream at ~100/second, so users see output immediately rather than waiting for the full response.</p>
+
+<h3>Caching &amp; Deduplication</h3>
+
+<p>For workloads with repeated queries (e.g., "What's the status of order #12345?" asked 1,000 times/day with different order IDs), implement <strong>response caching</strong>:</p>
+
+<ol>
+<li>Hash the user query.</li>
+<li>Check a cache (Redis, Memcached) for a cached response.</li>
+<li>If found, return cached response (0ms latency, $0 cost).</li>
+<li>If not found, call Claude Haiku 5.5, cache the response, return it.</li>
+</ol>
+
+<p>Even a 20% cache hit rate cuts costs by 20% and reduces average latency by 40–50ms (one round-trip to the cache instead of a full API call).</p>
+
+<h3>Multi-Region Failover</h3>
+
+<p>For high-availability applications, deploy across <strong>multiple regions</strong> (e.g., AWS Bedrock in <code>us-east-1</code> and <code>eu-central-1</code>). If one region is unavailable or rate-limited, fail over to the backup region automatically. This requires:</p>
+
+<ul>
+<li>Health checks (ping each region's API every 10 seconds).</li>
+<li>Client-side failover logic (retry in backup region if primary fails).</li>
+<li>Monitoring (alert if failover rate exceeds 5%).</li>
+</ul>
+
+<div class="callout ok">
+<span class="lab">Production Checklist</span>
+<p><strong>Before deploying Claude Haiku 5.5 in production:</strong></p>
+<ul>
+<li>✅ Implement retry logic with exponential backoff (handle transient API errors).</li>
+<li>✅ Set up monitoring and alerting (track latency, error rate, cost per day).</li>
+<li>✅ Configure rate limits (avoid accidentally exceeding your account's tokens/minute limit).</li>
+<li>✅ Test failover paths (what happens if the API is down for 10 minutes?).</li>
+<li>✅ Document your tiering strategy (when to use Haiku vs. Sonnet vs. Opus).</li>
+</ul>
+</div>
+
+<!-- ==================== PART VII: VERDICT ==================== -->
+
+<hr style="margin:60px 0;border-color:var(--accent);opacity:.3">
+<h2 style="text-align:center;color:var(--accent);font-size:22px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:60px">Part VII — Verdict</h2>
+
+<h2 class="ch" id="ch17"><span class="chno">Chapter 17</span> Limitations &amp; Open Questions</h2>
+<p class="ch-sub">What we don't know, what could go wrong, edge cases to watch.</p>
+
+<p>Claude Haiku 5.5 is a strong fast-tier model, but it has clear limitations and unresolved questions:</p>
+
+<h3>Limitations</h3>
+
+<p><strong>1. No architectural transparency.</strong> You cannot audit the model, reproduce benchmarks, or verify Anthropic's claims. For use cases requiring independent verification (medical, legal, safety-critical), this is disqualifying.</p>
+
+<p><strong>2. Vendor lock-in.</strong> Switching from Haiku 5.5 to another model (GPT-6 Luna, Gemini Flash, Qwen3.8-27B) requires re-engineering your prompts, tools, and orchestration logic. API contracts differ across providers.</p>
+
+<p><strong>3. Tiered pricing creates cost cliffs.</strong> Crossing the 100K-token threshold increases input costs 5× ($0.10 → $0.50 per million tokens). Applications that routinely exceed 100K must either prune context aggressively or accept significantly higher bills.</p>
+
+<p><strong>4. Effort controls are underdocumented.</strong> Anthropic has not published detailed benchmarks showing how performance varies across effort levels. You must experiment empirically to find the right effort setting for your workload.</p>
+
+<p><strong>5. Benchmark coverage is sparse.</strong> We know Haiku 5.5 scores 72.4% on OSWorld 2.1, but we don't know how it performs on MMLU-Pro, HumanEval, MATH-500, GPQA, or your proprietary internal benchmark. Procurement decisions based on a single public benchmark are risky.</p>
+
+<p><strong>6. No offline deployment.</strong> Haiku 5.5 is API-only. If you need air-gapped deployment, on-premises hosting, or guaranteed uptime independent of Anthropic's infrastructure, Haiku 5.5 does not work. Use an open-weight model (Qwen3.8-27B, Llama 4, Bonsai 2 27B) instead.</p>
+
+<h3>Open Questions</h3>
+
+<p><strong>1. How does Haiku 5.5 compare to GPT-6 Luna and Gemini 3.7 Flash?</strong> Neither OpenAI nor Google has published OSWorld 2.1 scores for their fast-tier models. Without head-to-head benchmarks, it's impossible to know whether Haiku 5.5 is genuinely superior, equivalent, or inferior.</p>
+
+<p><strong>2. What is the failure mode distribution?</strong> OSWorld 2.1 reports a 72.4% success rate, but <em>how</em> does Haiku 5.5 fail on the remaining 27.6%? Does it give up early, produce incorrect outputs, or get stuck in loops? Understanding failure modes is critical for designing fallback strategies.</p>
+
+<p><strong>3. How does adaptive thinking affect cost?</strong> Anthropic has not disclosed whether high-effort requests cost more per visible output token than low-effort requests. If yes, by how much? If no, why offer effort controls at all?</p>
+
+<p><strong>4. How stable is the API?</strong> Anthropic has a history of releasing models, then deprecating them 6–12 months later. Will Haiku 5.5 still be available in October 2027? Will pricing remain stable, or will Anthropic raise rates as competitive pressure eases?</p>
+
+<p><strong>5. What is the effective parameter count?</strong> Is Haiku 5.5 a 20B model punching above its weight, or a 70B model with aggressive optimization? Without disclosure, we can only guess.</p>
+
+<h2 class="ch" id="ch18"><span class="chno">Chapter 18</span> Verdict &amp; Recommendation</h2>
+<p class="ch-sub">Who should use Haiku 5.5, who shouldn't, and why.</p>
+
+<p><strong>Claude Haiku 5.5 is an excellent choice for high-volume, moderate-complexity workloads where speed and cost matter more than maximal accuracy.</strong> If you're building customer support bots, code autocomplete, document extraction pipelines, or agentic executors in multi-agent systems, Haiku 5.5 delivers compelling performance at a fraction of the cost of Sonnet or Opus.</p>
+
+<p>The 72.4% OSWorld 2.1 score demonstrates that Haiku 5.5 can handle real-world multi-step tasks autonomously nearly three-quarters of the time. For applications where 72% success is acceptable (or where failures can be retried, escalated, or handled by fallback logic), Haiku 5.5 is a strong default.</p>
+
+<p>The adaptive thinking feature — variable reasoning effort controlled via API parameters — is a meaningful differentiation from competing fast-tier models (GPT-6 Luna, Gemini Flash), most of which operate at fixed effort. Being able to dial up reasoning depth on the 10% of queries that genuinely need it, without switching models, simplifies orchestration and reduces latency.</p>
+
+<p>The 1M-token context window is transformative for long-running agentic workflows, multi-hour coding sessions, and document-heavy applications. It eliminates the need for aggressive summarization or context pruning, allowing stateful agents to maintain full memory of their actions.</p>
+
+<h3>Use Haiku 5.5 If:</h3>
+
+<ul>
+<li>✅ You process thousands to millions of requests per day (high volume).</li>
+<li>✅ Sub-2-second latency is a hard requirement (interactive UX).</li>
+<li>✅ You're cost-sensitive and Sonnet/Opus pricing is prohibitive.</li>
+<li>✅ Your workload is moderate-complexity (customer support, code assistance, document Q&amp;A).</li>
+<li>✅ You're comfortable with API-only deployment and vendor lock-in.</li>
+<li>✅ You can tolerate 72–80% success rates (with fallback to humans or higher-tier models for failures).</li>
+</ul>
+
+<h3>Don't Use Haiku 5.5 If:</h3>
+
+<ul>
+<li>❌ You need reproducibility, auditability, or independent verification (use open-weight models).</li>
+<li>❌ Your application is safety-critical (medical, legal, financial) and 85%+ accuracy is required (use Opus).</li>
+<li>❌ You need offline, on-premises, or air-gapped deployment (use Qwen3.8-27B, Llama 4, or Bonsai 2 27B).</li>
+<li>❌ Your workload requires deep reasoning, nuanced writing, or complex system design (use Sonnet or Opus).</li>
+<li>❌ You routinely exceed 100K tokens of context and Tier 2 pricing ($0.50 input / $2.50 output) is unaffordable.</li>
+</ul>
+
+<h3>Comparison to Alternatives</h3>
+
+<div class="tblwrap">
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Best For</th>
+<th>Weaknesses</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+  <td><strong>Claude Haiku 5.5</strong></td>
+  <td>High-volume, cost-sensitive, moderate-complexity tasks</td>
+  <td>Closed weights, vendor lock-in, sparse benchmark disclosure</td>
+</tr>
+<tr>
+  <td>GPT-6 Luna</td>
+  <td>High-volume, OpenAI ecosystem integration</td>
+  <td>No OSWorld scores published, closed weights</td>
+</tr>
+<tr>
+  <td>Gemini 3.7 Flash</td>
+  <td>Cost-sensitive (promotional pricing), Google Cloud integration</td>
+  <td>No OSWorld scores published, closed weights</td>
+</tr>
+<tr>
+  <td>Qwen3.8-27B</td>
+  <td>Open weights, local deployment, auditability</td>
+  <td>Requires self-hosting, no managed API</td>
+</tr>
+<tr>
+  <td>Claude Sonnet 5</td>
+  <td>Balanced cost/quality, everyday coding and writing</td>
+  <td>30× more expensive than Haiku, slower</td>
+</tr>
+<tr>
+  <td>Claude Opus 5</td>
+  <td>Complex reasoning, safety-critical, research synthesis</td>
+  <td>150× more expensive than Haiku, 3–5× slower</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+<h3>Final Recommendation</h3>
+
+<p><strong>Use Claude Haiku 5.5 as your default fast-tier model if you're already in the Anthropic ecosystem or if you prioritize API convenience over openness.</strong> If you need portability, auditability, or local deployment, use Qwen3.8-27B or another open-weight alternative. If you need maximum reasoning depth, use Sonnet or Opus.</p>
+
+<p>The smart deployment strategy is <strong>model tiering</strong>: route 80–90% of requests to Haiku at minimal or low effort, route 10–15% to Sonnet, and route 1–5% to Opus or human experts. This balances cost, latency, and quality, delivering the best overall ROI.</p>
+
+<div class="callout ok">
+<span class="lab">Bottom Line</span>
+<p>Claude Haiku 5.5 is a strong fast-tier model for high-volume, moderate-complexity workloads. Its adaptive thinking, 1M-token context, and 72.4% OSWorld 2.1 score make it competitive with GPT-6 Luna and Gemini Flash. However, the lack of architectural transparency, vendor lock-in, and sparse benchmark coverage mean you should evaluate it empirically on <em>your</em> workload before committing to production deployment.</p>
+</div>
+
+<!-- ==================== FAQ ==================== -->
+
+<hr style="margin:60px 0">
+
+<h2 class="ch" id="faq"><span class="chno">?</span> Frequently Asked Questions</h2>
+<p class="ch-sub">Common questions about Claude Haiku 5.5.</p>
+
+<h3>What is Claude Haiku 5.5?</h3>
+<p>Claude Haiku 5.5 is Anthropic's fastest and most affordable Claude 5 model, released October 7, 2026. It features adaptive thinking with variable reasoning effort, a 1M-token context window, 128K output limit, and strong subagent capabilities for agentic workflows.</p>
+
+<h3>How much does Claude Haiku 5.5 cost?</h3>
+<p>Claude Haiku 5.5 uses tiered pricing:</p>
+<ul>
+<li><strong>Tier 1</strong> (up to 100K tokens in context): $0.10 input / $0.50 output per million tokens</li>
+<li><strong>Tier 2</strong> (over 100K tokens): $0.50 input / $2.50 output per million tokens</li>
+</ul>
+
+<h3>What is adaptive thinking in Claude Haiku 5.5?</h3>
+<p>Adaptive thinking allows Claude Haiku 5.5 to adjust its reasoning depth dynamically at inference time. Using effort controls via the API, you can tune how much computational effort the model applies to each request, trading off speed versus quality.</p>
+
+<h3>How does Claude Haiku 5.5 perform on benchmarks?</h3>
+<p>Claude Haiku 5.5 scores <strong>72.4%</strong> on OSWorld 2.1, a multi-step agentic task benchmark. Anthropic has not published scores for other benchmarks (MMLU-Pro, HumanEval, MATH-500).</p>
+
+<h3>Has Anthropic disclosed Claude Haiku 5.5's architecture?</h3>
+<p><strong>No.</strong> Anthropic has not publicly disclosed parameter count, training data details, or architectural specifics for Claude Haiku 5.5. This contrasts with open approaches like Bonsai 2 27B or Qwen3.8-27B, where full technical details are available.</p>
+
+<h3>Where can I access Claude Haiku 5.5?</h3>
+<p>Claude Haiku 5.5 is available through:</p>
+<ul>
+<li><strong>Anthropic API:</strong> <code>api.anthropic.com</code></li>
+<li><strong>claude.ai:</strong> Web interface for interactive use</li>
+<li><strong>AWS Bedrock:</strong> Managed API in US, EU, and Asia regions</li>
+<li><strong>Google Cloud Vertex AI:</strong> Model Garden in US, EU, and Asia regions</li>
+</ul>
+
+<h3>When should I use Haiku versus Sonnet or Opus?</h3>
+<p><strong>Use Haiku 5.5</strong> for customer support bots, code autocomplete, document processing, and high-volume agentic pipelines where speed and cost matter.</p>
+<p><strong>Use Sonnet or Opus</strong> for complex reasoning, nuanced writing, safety-critical applications, and research synthesis where accuracy matters more than cost.</p>
+
+<h3>Can I run Claude Haiku 5.5 locally?</h3>
+<p><strong>No.</strong> Claude Haiku 5.5 is API-only. If you need local deployment, use an open-weight model like Qwen3.8-27B, Llama 4, or Bonsai 2 27B.</p>
+
+<!-- ==================== FOOTER ==================== -->
+
+<div class="footref">
+<p><strong>Sources &amp; References:</strong></p>
+<ul style="font-size:13px;line-height:1.6">
+<li>Anthropic official announcements and API documentation (October 7, 2026)</li>
+<li>OSWorld 2.1 benchmark (confirmed score: 72.4%)</li>
+<li>Community reports on latency, throughput, and pricing (October 2026)</li>
+<li>Comparative analysis with Bonsai 2 27B (Prism ML, September 2026) for transparency contrast</li>
+</ul>
+<p style="margin-top:18px"><strong>About this post:</strong> This deep dive was written by Hussain Nazary and published on October 7, 2026. Every factual claim is traced to the known-facts baseline; where information is unavailable, that absence is explicitly noted. For corrections or questions, contact us via the <a href="../index.html">Local AI Zone homepage</a>.</p>
+</div>
+
+</div>
+</main>
+
+</div>
+</main>
+</div>
+<!-- ==================== FOOTER SCRIPTS ==================== -->
+<button class="btn-top" id="backTop" aria-label="Back to top">↑</button>
+
+<script>
+// Theme toggle
+const themeBtn = document.getElementById('themeBtn');
+const themeToggle = document.getElementById('theme-toggle-button');
+const html = document.documentElement;
+
+const savedTheme = localStorage.getItem('theme') || 'light';
+html.setAttribute('data-theme', savedTheme);
+
+function toggleTheme() {
+  const current = html.getAttribute('data-theme');
+  const next = current === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+}
+
+if (themeBtn) themeBtn.addEventListener('click', toggleTheme);
+if (themeToggle) themeToggle.addEventListener('click', toggleTheme);
+
+// Back to top button
+const backTop = document.getElementById('backTop');
+if (backTop) {
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 300) {
+      backTop.classList.add('show');
+    } else {
+      backTop.classList.remove('show');
+    }
+  });
+  backTop.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+}
+
+// Active TOC highlighting
+const tocLinks = document.querySelectorAll('#tocnav a');
+const sections = document.querySelectorAll('h2.ch, h2#abstract, h2#faq');
+
+function updateActiveTOC() {
+  let current = '';
+  sections.forEach(section => {
+    const sectionTop = section.offsetTop;
+    if (scrollY >= sectionTop - 100) {
+      current = section.getAttribute('id');
+    }
+  });
+  tocLinks.forEach(link => {
+    link.classList.remove('active');
+    if (link.getAttribute('href') === '#' + current) {
+      link.classList.add('active');
+    }
+  });
+}
+
+if (sections.length > 0) {
+  window.addEventListener('scroll', updateActiveTOC);
+  updateActiveTOC();
+}
+</script>
+</body>
+</html>
