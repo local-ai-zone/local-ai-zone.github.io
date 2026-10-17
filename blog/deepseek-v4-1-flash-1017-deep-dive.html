@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DeepSeek V4.1 Flash 1017: Wish-Driven Programming Deep Dive - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Complete deep dive into DeepSeek V4.1 Flash 1017, the October 17, 2026 snapshot: official benchmark deltas vs V4.1 Flash, the wish-driven programming RL recipe, Search & Fetch API pricing, provider price comparison, and what 552B open MIT weights mean for running it locally.">
+    <meta name="keywords" content="DeepSeek V4.1 Flash 1017, DeepSeek October 2026, deepseek-flash API, DeepSWE v1.1, Terminal-Bench 4.0, wish-driven programming, Search and Fetch API, DeepSeek pricing, GGUF, run DeepSeek locally, open weights MIT, CED architecture">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="theme-color" content="#2563eb">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="DeepSeek V4.1 Flash 1017: Wish-Driven Programming Deep Dive">
+    <meta property="og:description" content="The October 17, 2026 snapshot of DeepSeek V4.1 Flash: every official benchmark delta, the RL-with-self-feedback recipe behind its agent gains, real API pricing with cache economics, and an honest guide to running 552B open weights locally.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/deepseek-v4-1-flash-1017-deep-dive.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/deepseek-v4-1-flash-1017-hero.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="DeepSeek V4.1 Flash 1017: Wish-Driven Programming Deep Dive">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-10-17T00:00:00Z">
+    <meta property="article:modified_time" content="2026-10-17T00:00:00Z">
+    <meta property="article:section" content="AI Models">
+    <meta property="article:tag" content="DeepSeek">
+    <meta property="article:tag" content="Model Releases">
+    <meta property="article:tag" content="Technical Analysis">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:creator" content="@hussainnazary">
+    <meta name="twitter:title" content="DeepSeek V4.1 Flash 1017: Wish-Driven Programming Deep Dive">
+    <meta name="twitter:description" content="October 17 snapshot: Terminal-Bench +11.1, DeepSWE 77.0, shorter outputs, same low prices. Benchmarks, API economics, and local-running reality, all in one place.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/deepseek-v4-1-flash-1017-hero.png">
+    <meta name="twitter:image:alt" content="DeepSeek V4.1 Flash 1017: Wish-Driven Programming Deep Dive">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "headline": "DeepSeek V4.1 Flash 1017: Wish-Driven Programming Deep Dive",
+      "description": "Deep-dive analysis of DeepSeek-V4.1-Flash-1017, released October 17, 2026. Covers the benchmark deltas versus the September V4.1 Flash build, the reinforcement-learning-with-self-feedback training recipe, the Search and Fetch APIs, provider pricing and cache economics, and practical guidance for running the 552B-parameter open MIT weights locally.",
+      "image": "https://local-ai-zone.github.io/blog/deepseek-v4-1-flash-1017-hero.png",
+      "author": {"@type": "Person", "name": "Hussain Nazary"},
+      "publisher": {"@type": "Organization", "name": "Local AI Zone"},
+      "datePublished": "2026-10-17",
+      "dateModified": "2026-10-17",
+      "wordCount": 4300,
+      "proficiencyLevel": "Intermediate",
+      "about": [
+        {"@type": "Thing", "name": "DeepSeek V4.1 Flash 1017"},
+        {"@type": "Thing", "name": "LLM Benchmarks"},
+        {"@type": "Thing", "name": "AI Agents"},
+        {"@type": "Thing", "name": "API Pricing"},
+        {"@type": "Thing", "name": "Local AI"}
+      ],
+      "mainEntityOfPage": "https://local-ai-zone.github.io/blog/deepseek-v4-1-flash-1017-deep-dive.html",
+      "isAccessibleForFree": true
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is DeepSeek V4.1 Flash 1017?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "DeepSeek-V4.1-Flash-1017 is the October 17, 2026 snapshot of DeepSeek V4.1 Flash. It keeps the same CED architecture (552B backbone, 8B active on input, 16B on output, 1M context) but adds five more weeks of reinforcement learning with self-feedback, delivering higher benchmark scores, faster task completion, and shorter outputs at the same API price."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Do I need to change my API code to use the 1017 version?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "No. The 1017 build is served under the same deepseek-flash API model name, and older identifiers like deepseek-v4-flash still work. Requests switch to the new snapshot automatically, so no migration work is needed."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much does DeepSeek V4.1 Flash 1017 cost?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Off-peak pricing is $0.15 per million input tokens, $0.003 per million cache-read tokens, and $0.60 per million output tokens, with peak rates at $0.30 and $1.20. Thanks to a 91.5% cache hit rate, the weighted average input price actually paid on OpenRouter is about $0.017 per million tokens. The new Search and Fetch APIs cost $0.75 per 1,000 calls and are free through October 31, 2026 when used via server-side tools."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I run DeepSeek V4.1 Flash 1017 locally?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The weights are MIT-licensed and downloadable from Hugging Face and ModelScope. Realistically the 552B backbone needs hundreds of GB at higher quantization levels, so most home users will use the API, while well-equipped multi-GPU rigs can serve quantized builds. Community GGUF builds are already indexed on GGUF Discovery, and llama.cpp, Ollama, and LM Studio support is listed through the Hugging Face quantizations page."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://local-ai-zone.github.io/"
+            },
+            {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Blog",
+                "item": "https://local-ai-zone.github.io/blog.html"
+            },
+            {
+                "@type": "ListItem",
+                "position": 3,
+                "name": "DeepSeek V4.1 Flash 1017 Deep Dive",
+                "item": "https://local-ai-zone.github.io/blog/deepseek-v4-1-flash-1017-deep-dive.html"
+            }
+        ]
+    }
+    </script>
+
+    <style>
+        .back-to-blog { display: inline-flex; align-items: center; gap: 10px; color: white; text-decoration: none; font-weight: 600; margin: 0 0 30px 0; padding: 10px 20px; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.35); border-radius: 8px; backdrop-filter: blur(8px); transition: all 0.3s ease; position: relative; z-index: 1; }
+        .back-to-blog:hover { background: rgba(255,255,255,0.28); transform: translateX(-3px); }
+        .article-content { max-width: 900px; margin: 0 auto; padding: 0 20px 60px; }
+        .article-content h1 { font-size: 2.2em; color: #1e40af; margin: 40px 0 15px; padding-bottom: 10px; border-bottom: 3px solid #e5e7eb; }
+        .article-content h2 { font-size: 1.6em; color: #1e40af; margin: 35px 0 12px; padding-bottom: 8px; border-bottom: 2px solid #e5e7eb; }
+        .article-content h3 { font-size: 1.3em; color: #374151; margin: 28px 0 10px; }
+        .article-content h4 { font-size: 1.1em; color: #4b5563; margin: 20px 0 8px; font-weight: 600; }
+        .article-content p { margin-bottom: 1.2em; line-height: 1.8; }
+        .article-content ul, .article-content ol { margin: 12px 0 12px 24px; }
+        .article-content li { margin-bottom: 6px; line-height: 1.7; }
+        .article-content table { margin: 24px 0; width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        .article-content table th { background: #1e40af; color: white; padding: 10px 12px; text-align: left; font-weight: 600; border: 1px solid #1e40af; }
+        .article-content table td { padding: 10px 12px; border: 1px solid #e5e7eb; text-align: left; }
+        .article-content table tr:nth-child(even) td { background: #f9fafb; }
+        .article-content table tr:hover td { background: #eff6ff; }
+        .article-content blockquote { border-left: 4px solid #2563eb; background: #eff6ff; padding: 20px 24px; margin: 24px 0; border-radius: 0 8px 8px 0; font-style: normal; }
+        .article-content blockquote p { margin-bottom: 0.5em; }
+        .article-content blockquote p:last-child { margin-bottom: 0; }
+        .article-content code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-size: 0.9em; font-family: "Courier New", monospace; color: #1e293b; }
+        .article-content pre { background: #1e293b; color: #e2e8f0; padding: 20px; border-radius: 8px; overflow-x: auto; margin: 20px 0; }
+        .article-content pre code { background: none; color: inherit; padding: 0; }
+        .article-content img { max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0; display: block; }
+        .article-content em { color: #6b7280; font-style: italic; font-size: 0.95em; }
+        .article-content strong { color: #111827; font-weight: 600; }
+        .article-content a { color: #2563eb; text-decoration: none; }
+        .article-content a:hover { text-decoration: underline; }
+        .article-content hr { border: none; border-top: 2px solid #e5e7eb; margin: 40px 0; }
+        .article-header::before { display: none !important; }
+        .article-header .article-title { text-shadow: none !important; }
+        .article-header .container { background: transparent !important; }
+        .premium-header { position: static !important; }
+
+        /* Technical article components */
+        .spec-box { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 1px solid #93c5fd; border-radius: 10px; padding: 25px; margin: 25px 0; }
+        .spec-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }
+        .spec-item { background: white; padding: 12px; border-radius: 6px; border: 1px solid #e5e7eb; }
+        .spec-label { font-size: 0.85em; color: #6b7280; margin-bottom: 4px; }
+        .spec-value { font-size: 1.1em; font-weight: 600; color: #1e40af; }
+        .highlight-box { background: #fef3c7; border-left: 4px solid #f59e0b; padding: 20px; margin: 25px 0; border-radius: 0 8px 8px 0; }
+        .highlight-box h4 { color: #92400e; margin-top: 0; }
+        .comparison-card { background: white; border: 2px solid #e5e7eb; border-radius: 10px; padding: 20px; margin: 20px 0; transition: all 0.3s ease; }
+        .comparison-card:hover { border-color: #2563eb; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1); }
+        .badge { display: inline-block; padding: 4px 12px; background: #2563eb; color: white; border-radius: 12px; font-size: 0.85em; font-weight: 600; margin-right: 8px; }
+        .badge-new { background: #10b981; }
+        .badge-retired { background: #ef4444; }
+        .badge-pending { background: #f59e0b; }
+        .stat-highlight { font-size: 2em; font-weight: 700; color: #2563eb; }
+        .table-scroll { overflow-x: auto; margin: 25px 0; }
+        .doc-info-box { background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 2px solid #0ea5e9; border-radius: 12px; padding: 30px; margin: 30px 0; }
+        .doc-info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px; }
+        .doc-info-item { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid #0ea5e9; }
+        .doc-info-label { font-size: 0.8em; text-transform: uppercase; color: #0369a1; font-weight: 700; margin-bottom: 6px; letter-spacing: 0.5px; }
+        .doc-info-value { font-size: 1em; color: #1e293b; font-weight: 500; }
+
+        /* Dark mode overrides */
+        html[data-theme='dark'] .article-content { color: #e2e8f0; }
+        html[data-theme='dark'] .article-content table th { background: #4c1d95; color: #e2e8f0; border-color: #6d28d9; }
+        html[data-theme='dark'] .article-content table td { border-color: #374151; color: #e2e8f0; background: #1e1e2e; }
+        html[data-theme='dark'] .article-content table tr:nth-child(even) td { background: #252535; }
+        html[data-theme='dark'] .article-content table tr:hover td { background: #2d1b69; }
+        html[data-theme='dark'] .article-content blockquote { background: rgba(37, 99, 235, 0.1); border-left-color: #60a5fa; color: #e2e8f0; }
+        html[data-theme='dark'] .article-content code { background: #2d2d3d; color: #c4b5fd; }
+        html[data-theme='dark'] .article-content pre { background: #1a1a2e; }
+        html[data-theme='dark'] .article-content a { color: #60a5fa; }
+        html[data-theme='dark'] .article-content strong { color: #f3f4f6; }
+        html[data-theme='dark'] .article-content em { color: #9ca3af; }
+        html[data-theme='dark'] .article-content hr { border-top-color: #374151; }
+        html[data-theme='dark'] .article-content h1 { color: #93c5fd; border-bottom-color: #374151; }
+        html[data-theme='dark'] .article-content h2 { color: #93c5fd; border-bottom-color: #374151; }
+        html[data-theme='dark'] .article-content h3 { color: #e2e8f0; }
+        html[data-theme='dark'] .article-content h4 { color: #d1d5db; }
+        html[data-theme='dark'] .spec-box { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-color: #475569; }
+        html[data-theme='dark'] .spec-item { background: #1e1e2e; border-color: #374151; color: #e2e8f0; }
+        html[data-theme='dark'] .spec-label { color: #9ca3af; }
+        html[data-theme='dark'] .spec-value { color: #60a5fa; }
+        html[data-theme='dark'] .highlight-box { background: rgba(245, 158, 11, 0.1); border-left-color: #f59e0b; color: #e2e8f0; }
+        html[data-theme='dark'] .highlight-box h4 { color: #fbbf24; }
+        html[data-theme='dark'] .comparison-card { background: #1e1e2e; border-color: #374151; }
+        html[data-theme='dark'] .comparison-card:hover { border-color: #60a5fa; box-shadow: 0 4px 12px rgba(96, 165, 250, 0.2); }
+        html[data-theme='dark'] .doc-info-box { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border-color: #0ea5e9; }
+        html[data-theme='dark'] .doc-info-item { background: #1e1e2e; border-left-color: #0ea5e9; }
+        html[data-theme='dark'] .doc-info-label { color: #38bdf8; }
+        html[data-theme='dark'] .doc-info-value { color: #e2e8f0; }
+
+        @media (max-width: 768px) {
+            .spec-grid { grid-template-columns: 1fr; }
+            .doc-info-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body class="blog-article-page">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">DeepSeek V4.1 Flash 1017: Wish-Driven Programming Made Real — Full Deep Dive</h1>
+                <div class="article-meta">
+                    <span class="article-date">October 17, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Technical Analysis</span>
+                    <span class="article-read-time">📖 19 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+
+            <img src="deepseek-v4-1-flash-1017-hero.png" alt="DeepSeek V4.1 Flash 1017 hero graphic: wish-driven programming made real" style="width: 100%; border-radius: 12px; margin: 10px 0 25px;">
+
+            <div class="doc-info-box">
+                <h2 style="margin-top: 0; color: #0369a1; font-size: 1.8em;">Document Information</h2>
+                <p style="margin-bottom: 15px; font-size: 1.05em; line-height: 1.6;">A Full Analysis of the October 17, 2026 Snapshot of DeepSeek V4.1 Flash</p>
+                <div class="doc-info-grid">
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">Subject</div>
+                        <div class="doc-info-value">DeepSeek-V4.1-Flash-1017 — Release Analysis</div>
+                    </div>
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">Model Version</div>
+                        <div class="doc-info-value">DeepSeek-V4.1-Flash-1017 (deepseek-flash API endpoint)</div>
+                    </div>
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">Release Date</div>
+                        <div class="doc-info-value">October 17, 2026</div>
+                    </div>
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">Analysis Date</div>
+                        <div class="doc-info-value">October 17, 2026</div>
+                    </div>
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">Document Type</div>
+                        <div class="doc-info-value">Technical Deep Dive / Release Analysis</div>
+                    </div>
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">Word Count</div>
+                        <div class="doc-info-value">~4,300 words</div>
+                    </div>
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">Reading Time</div>
+                        <div class="doc-info-value">~19 minutes</div>
+                    </div>
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">Verification Status</div>
+                        <div class="doc-info-value">Benchmarks and pricing verified against official sources on release day</div>
+                    </div>
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">Primary Sources</div>
+                        <div class="doc-info-value">DeepSeek changelog, HuggingFace model card, OpenRouter provider data</div>
+                    </div>
+                    <div class="doc-info-item">
+                        <div class="doc-info-label">License</div>
+                        <div class="doc-info-value">MIT (model weights and documentation)</div>
+                    </div>
+                </div>
+            </div>
+
+            <hr>
+
+            <h2 id="abstract">Abstract</h2>
+
+            <p>On October 17, 2026, DeepSeek shipped DeepSeek-V4.1-Flash-1017, a point update to the V4.1 Flash model it had released just five weeks earlier. The new snapshot keeps the same Causal Encoder-Decoder architecture — 552 billion backbone parameters with only 8 billion active per input token and 16 billion per output token, a 1-million-token context window, and native image understanding — but adds a fresh round of reinforcement learning that pushes every official benchmark number upward while making the model finish tasks faster and write less. DeepSeek calls the combination a Pareto improvement: better results, lower cost, no trade-off.</p>
+
+            <p>This deep dive walks through what actually changed and what it means for different kinds of readers. We compare the official benchmark table row by row against the September build and against K3, GLM-5.3, GPT-5.6 Sol, and Claude Opus 5. We unpack the "wish-driven programming" training recipe and the showcase projects that demonstrate it, from a Forbidden City 3D reconstruction to a Portal 2 recreation built in the Godot engine. We break down the API economics, including the cache hit rates that bring the real-world input price down to roughly $0.017 per million tokens and the new Search and Fetch APIs priced at $0.75 per 1,000 calls. Finally, we look honestly at what it would take to run the MIT-licensed weights on your own hardware, from community GGUF builds already indexed on this site to the realities of serving a 552-billion-parameter mixture-of-experts model at home.</p>
+
+            <h2 id="tl-dr">Executive Summary (TL;DR — 90 Seconds)</h2>
+
+            <ul>
+                <li><strong>What shipped:</strong> DeepSeek-V4.1-Flash-1017 is the October 17, 2026 snapshot of V4.1 Flash — same architecture, five more weeks of training. It is live now on the DeepSeek website, app, and API, and the open weights are on Hugging Face and ModelScope under MIT.</li>
+                <li><strong>Benchmark gains:</strong> Every official benchmark improved over the September build. The biggest jumps are agentic: Terminal-Bench 4.0 rose from 31.2 to 42.3 (+11.1), ProgramBench from 20.3 to 29.1 (+8.8), and Apex Bench from 64.6 to 72.1 (+7.5). DeepSWE v1.1 hits 77.0, which beats every model in the comparison table except Claude Opus 5's 74.0... and every other rival listed.</li>
+                <li><strong>Faster and cheaper per task:</strong> Outputs are shorter and task completion is quicker than the previous version, which means the cost per completed task drops even though token prices stay the same. With a 91.5% cache hit rate on the official endpoint, the average input token actually costs users about $0.017 per million.</li>
+                <li><strong>New Search &amp; Fetch APIs:</strong> DeepSeek's in-house search engine is now open to everyone at $0.75 per 1,000 calls per endpoint, and free through October 31, 2026 when called through server-side tools in DeepSeek Harness, Claude Code, and Codex.</li>
+                <li><strong>Nothing breaks:</strong> The API model name stays <code>deepseek-flash</code>, so existing applications switch to the better snapshot without any code changes.</li>
+                <li><strong>Local reality check:</strong> The 552B MoE weights are MIT-licensed and downloadable today. Serving the full model at home means hundreds of gigabytes of memory; community GGUF builds (including a 4.13 GB experimental build indexed on this site) and the Hugging Face quantizations page are the practical starting points.</li>
+            </ul>
+
+            <h2 id="table-of-contents">Table of Contents</h2>
+
+            <ol id="toc-list">
+                <li><a href="#introduction">1. What Actually Shipped on October 17</a></li>
+                <li><a href="#architecture">2. The 60-Second Architecture Refresher</a></li>
+                <li><a href="#wish-driven">3. Wish-Driven Programming: The Idea Behind the Update</a></li>
+                <li><a href="#benchmarks">4. Benchmark Results: The Full Official Table</a></li>
+                <li><a href="#pricing">5. Pricing, Cache Economics, and the Search &amp; Fetch APIs</a></li>
+                <li><a href="#local">6. Running It Locally: Weights, Quants, and Hardware</a></li>
+                <li><a href="#who-should-care">7. Who Should Care, and Why</a></li>
+                <li><a href="#limitations">8. Limitations and Open Questions</a></li>
+                <li><a href="#conclusion">9. Conclusion</a></li>
+                <li><a href="#references">10. References</a></li>
+            </ol>
+
+            <hr>
+
+            <h2 id="introduction">1. What Actually Shipped on October 17</h2>
+
+            <p>DeepSeek's release cadence in late 2026 looks less like a series of dramatic launches and more like a steady drumbeat of point releases, and V4.1 Flash 1017 is a textbook example of the pattern. The name itself follows the company's snapshot convention: the base model is DeepSeek-V4.1-Flash, and the four-digit suffix records the release date, October 17. If you used DeepSeek V4.1 Flash last month, you were talking to a model trained as of September 10; as of today, the same API routes your requests to a newer checkpoint with five additional weeks of post-training baked in. Nothing about your integration changes, but the answers get better.</p>
+
+            <p>The headline of DeepSeek's own announcement is a phrase worth pausing on: the update delivers "stronger benchmark performance, faster task completion, and shorter outputs than the previous version — a Pareto improvement in performance and cost." In economics, a Pareto improvement means at least one thing gets better while nothing gets worse, and that framing is the whole story of this release. Usually model updates ask you to trade something: quality goes up but so does latency, or outputs get more accurate but longer and therefore more expensive. DeepSeek claims the opposite here, and the benchmark tables plus the output-length reduction back the claim up.</p>
+
+            <p>The release is also notable for what came with it rather than what is inside it. Alongside the model, DeepSeek opened its Search and Fetch APIs to everyone, powered by an in-house search engine that the company says serves hundreds of millions of requests daily. The update is specifically optimized for agentic harnesses — DeepSeek Harness v0.2.1-rc.1 or later, Tencent's CodeBuddy, and WorkBuddy get named shout-outs — which tells you exactly who DeepSeek thinks this model is for: people who wire models into tools and let them run for many steps. Finally, the weights went straight to open source under the MIT license, with downloads on both Hugging Face and ModelScope from day one, continuing the policy that made the Flash line popular with local-AI users in the first place.</p>
+
+            <div class="spec-box">
+                <h4 style="margin-top: 0;">Release Card: DeepSeek-V4.1-Flash-1017</h4>
+                <div class="spec-grid">
+                    <div class="spec-item"><div class="spec-label">Released</div><div class="spec-value">October 17, 2026</div></div>
+                    <div class="spec-item"><div class="spec-label">API Model Name</div><div class="spec-value"><code>deepseek-flash</code></div></div>
+                    <div class="spec-item"><div class="spec-label">Backbone</div><div class="spec-value">552B params (MoE)</div></div>
+                    <div class="spec-item"><div class="spec-label">Active / Token</div><div class="spec-value">8B input, 16B output</div></div>
+                    <div class="spec-item"><div class="spec-label">Context Window</div><div class="spec-value">1,048,576 tokens</div></div>
+                    <div class="spec-item"><div class="spec-label">Modalities</div><div class="spec-value">Text + image in, text out</div></div>
+                    <div class="spec-item"><div class="spec-label">License</div><div class="spec-value">MIT (open weights)</div></div>
+                    <div class="spec-item"><div class="spec-label">Recommended Sampling</div><div class="spec-value">temp 1.0, top_p 1.0</div></div>
+                </div>
+            </div>
+
+            <h2 id="architecture">2. The 60-Second Architecture Refresher</h2>
+
+            <p>The 1017 snapshot does not change the architecture, but to understand why its agent benchmarks move the way they do, a quick refresher on what makes V4.1 Flash unusual helps. Most large language models you have heard of are decoders: they read your prompt and generate a response token by token, maintaining a memory of everything seen so far called the KV cache. DeepSeek V4.1 Flash instead uses what the company calls a Causal Encoder-Decoder, or CED — a 40-layer Transformer split into a 20-layer causal encoder followed by a 20-layer decoder. Think of it as an assembly line with two stations: the first station reads and digests everything you sent (your instructions, the codebase, the tool results), and the second station writes the response while drawing on that digested summary rather than re-reading the raw text.</p>
+
+            <p>This split matters because reading and writing have very different costs in agent workloads. When an agent runs for hundreds of steps, it spends most of its life re-reading long context — files, logs, web pages — and comparatively little time generating tokens. CED exploits that asymmetry: during prefill (the reading phase) only 8 billion of the 552 billion parameters activate per token, while during decode (the writing phase) 16 billion do. Your prompt is processed cheaply, and the expensive, quality-critical generation gets the larger budget. For a general-tech analogy: the model hires a cheap but thorough reading assistant and an expensive but eloquent writer, instead of paying the writer to re-read every document.</p>
+
+            <p>The second pillar is KV cache compression, and it is the reason DeepSeek's own citation title for this model family is "Pushing the Limits of KV Cache Compression." The decoder's global cache is projected from the encoder's final hidden states instead of being accumulated layer by layer, and a technique called SWA Bounded Replay reconstructs sliding-window attention states on demand rather than storing them. The upshot, per DeepSeek's numbers, is a persistent cache roughly one-eighth the size of the previous V4 Flash generation — and around a quarter of it according to third-party provider summaries. Since cache memory is what you pay for when an agent re-reads a large codebase hundreds of times, compressing it is what makes long-horizon agent work economically sensible at a budget price tier.</p>
+
+            <p>Finally, the model is natively multimodal: text and image embeddings were trained jointly from the start of pre-training rather than bolted on afterward with an adapter. That is why the benchmark table includes vision tests like BabyVision and Chartography alongside coding and terminal benchmarks. The context window stretches to 1,048,576 tokens — about 1,500 pages of A4 text — which matters less for chat and more for the repository-scale, multi-hour agent sessions this release clearly targets.</p>
+
+            <h2 id="wish-driven">3. Wish-Driven Programming: The Idea Behind the Update</h2>
+
+            <p>DeepSeek branded this release "Wish-Driven Programming Made Real," and the phrase describes a training method as much as a marketing angle. The five extra weeks of post-training used reinforcement learning with self-feedback: the model attempts an end-to-end project, grades its own output against the goal, and iterates on the difference. Instead of being rewarded for producing a plausible single-turn answer, it is rewarded for taking a fuzzy human wish — "build me a racing game in the browser" — and doing everything required to make it true: planning, writing the code, running it, observing failures, and fixing them. The wish is the specification; everything in between is the model's problem.</p>
+
+            <p>DeepSeek demonstrated the approach with four showcase projects, and the selection is telling. There is a 3D reconstruction of the Forbidden City, a web-based racing game, a recreation of Portal 2 built with the Godot engine, and something called Valley of Ages, a 3D scene that traces evolution from prehistoric times to the modern era. None of these are one-shot code snippets; each requires the model to sustain a goal over many steps, coordinate multiple files or scenes, and survive contact with an actual runtime. That is exactly the skill profile measured by the agentic benchmarks that jumped the most in this release, which suggests the RL recipe and the benchmark gains share a cause rather than being a coincidence.</p>
+
+            <p>The other half of the story is behavioral: the model got more concise. DeepSeek reports shorter outputs and faster task completion, and third-party measurement of the Flash line has consistently noted that it is a chatty model by default — the Artificial Analysis evaluation of V4.1 Flash generated roughly 250 million tokens across their intelligence index, nearly double their median. Trimming verbosity is not just cosmetic; in agent harnesses, output tokens are the expensive ones, and every unnecessary sentence in a tool call is money and milliseconds spent for nothing. A model that says the same thing in fewer tokens completes more tasks per dollar, which is the Pareto improvement DeepSeek claims in a nutshell.</p>
+
+            <p>One practical note for builders: the update is tuned for specific harnesses, and DeepSeek explicitly recommends DeepSeek Harness v0.2.1-rc.1 or later for the best experience, alongside Tencent CodeBuddy and WorkBuddy. If you run the model through your own agent loop, you may see smaller gains than the headline numbers until your scaffolding uses the tool-calling patterns the post-training optimized for. This is normal for 2026-era releases — the model and the harness it ships with are increasingly one product — but it is worth knowing before you expect a +11-point Terminal-Bench jump in your own stack.</p>
+
+            <h2 id="benchmarks">4. Benchmark Results: The Full Official Table</h2>
+
+            <p>All numbers below come from the official Hugging Face model card published on release day. Evaluations use the Claude Code harness for Terminal-Bench 4.0 and the mini-swe-v2 harness for DeepSWE v1.1; the dagger (†) marks the text-only subset of HLE. The columns matter: DS-V4.1-Flash-1017 is the new snapshot, DS-V4.1-Flash is the September build it replaces, and the remaining columns are the competitive set DeepSeek itself chose — K3, GLM-5.3, GPT-5.6 Sol, and Claude Opus 5.</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Benchmark</th>
+                            <th>V4.1-Flash-1017</th>
+                            <th>V4.1-Flash</th>
+                            <th>K3</th>
+                            <th>GLM-5.3</th>
+                            <th>GPT-5.6 Sol</th>
+                            <th>Opus 5</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>HLE w/o tools</strong></td>
+                            <td><strong>42.6 (44.0†)</strong></td>
+                            <td>36.8 (39.1†)</td>
+                            <td>43.5</td>
+                            <td>42.0†</td>
+                            <td>44.5</td>
+                            <td>56.3</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Terminal-Bench 4.0</strong></td>
+                            <td><strong>42.3</strong></td>
+                            <td>31.2</td>
+                            <td>12.6</td>
+                            <td>37.9</td>
+                            <td>39.9</td>
+                            <td>51.8</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DeepSWE v1.1</strong></td>
+                            <td><strong>77.0</strong></td>
+                            <td>74.2</td>
+                            <td>67.5</td>
+                            <td>66.9</td>
+                            <td>73.0</td>
+                            <td>74.0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ProgramBench</strong></td>
+                            <td><strong>29.1</strong></td>
+                            <td>20.3</td>
+                            <td>17.5</td>
+                            <td>19.0</td>
+                            <td>23.0</td>
+                            <td>37.0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>NL2Repo-Bench</strong></td>
+                            <td><strong>68.2</strong></td>
+                            <td>65.4</td>
+                            <td>58.0</td>
+                            <td>58.0</td>
+                            <td>56.8</td>
+                            <td>75.3</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Automation-Bench v1.0.6</strong></td>
+                            <td><strong>60.5</strong></td>
+                            <td>54.8</td>
+                            <td>46.7</td>
+                            <td>48.8</td>
+                            <td>45.8</td>
+                            <td>50.3</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Agents' Last Exam</strong></td>
+                            <td><strong>35.4</strong></td>
+                            <td>31.8</td>
+                            <td>27.6</td>
+                            <td>28.5</td>
+                            <td>26.7</td>
+                            <td>28.6</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Apex Bench v1.1</strong></td>
+                            <td><strong>72.1</strong></td>
+                            <td>64.6</td>
+                            <td>47.8</td>
+                            <td>56.6</td>
+                            <td>54.3</td>
+                            <td>65.8</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Chartography (w/tools)</strong></td>
+                            <td><strong>83.0</strong></td>
+                            <td>78.9</td>
+                            <td>68.1</td>
+                            <td>—</td>
+                            <td>79.9</td>
+                            <td>84.0</td>
+                        </tr>
+                        <tr>
+                            <td><strong>BabyVision (w/tools)</strong></td>
+                            <td><strong>92.5</strong></td>
+                            <td>89.6</td>
+                            <td>85.7</td>
+                            <td>—</td>
+                            <td>88.9</td>
+                            <td>94.1</td>
+                        </tr>
+                        <tr>
+                            <td><strong>ZeroBench-main (w/tools)</strong></td>
+                            <td><strong>51.0</strong></td>
+                            <td>49.0</td>
+                            <td>41.0</td>
+                            <td>—</td>
+                            <td>53.0</td>
+                            <td>52.0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>4.1 What the deltas actually say</h3>
+
+            <p>Reading the first two columns side by side tells you where the five extra weeks went. The agentic and coding rows moved the most: Terminal-Bench 4.0 gained 11.1 points, ProgramBench 8.8, Apex Bench 7.5, Automation-Bench 5.7, and Agents' Last Exam 3.6. The knowledge-heavy HLE improved by 5.8 points on the full setting, and even the vision rows — BabyVision and Chartography — inched up by around three to four points. In other words, the RL-with-self-feedback recipe concentrated its gains exactly where the wish-driven framing predicts: sustained, multi-step task completion rather than trivia recall.</p>
+
+            <p>The competitive picture is more nuanced than the bolded column suggests. Against GLM-5.3 and K3, the 1017 snapshot now leads on every row where comparisons exist, often by wide margins — Terminal-Bench by 4.4 over GLM-5.3 and nearly 30 points over K3, DeepSWE by 10 points over both. Against GPT-5.6 Sol it wins seven of the eight comparable rows, with HLE the exception. Claude Opus 5 remains ahead on the hardest reasoning rows — HLE by 13.7 points, Terminal-Bench by 9.5, ProgramBench by 7.9 — but the new snapshot actually edges Opus 5 on DeepSWE v1.1 (77.0 versus 74.0), Automation-Bench (60.5 versus 50.3), Apex Bench (72.1 versus 65.8), and Agents' Last Exam (35.4 versus 28.6). A model whose output tokens cost a fifth of Opus-class pricing beating it on four agentic rows is the real news of this table.</p>
+
+            <div class="highlight-box">
+                <h4>The honest summary</h4>
+                <p>If your benchmark is "answer the hardest science question with no tools," Opus 5 is still in a different class. If your benchmark is "complete the most real agent tasks per dollar," the 1017 snapshot is now arguably the strongest value in the comparison — and DeepSWE 77.0 means it beats every listed rival on that software-engineering suite outright.</p>
+            </div>
+
+            <h2 id="pricing">5. Pricing, Cache Economics, and the Search &amp; Fetch APIs</h2>
+
+            <p>The 1017 snapshot ships with no price change, which is itself the point of a Pareto update: you get the higher benchmark numbers at the same rates. On the official DeepSeek endpoint the model is served under the name <code>deepseek-flash</code>, and legacy identifiers such as <code>deepseek-v4-flash</code> are still accepted for compatibility. Off-peak rates are $0.15 per million input tokens, $0.003 per million cache-read tokens, and $0.60 per million output tokens; peak hours (01:00–04:00 and 06:00–10:00 UTC, Monday to Friday) double those to $0.30 and $1.20. The 50% off-peak discount has been in force since September 10, so night-owl batch jobs and scheduled evaluation runs pay half price.</p>
+
+            <p>The number that matters more than any sticker price is the effective cost after caching, and here the model's cheap-input design shows its teeth. OpenRouter's weighted averages for the flash endpoint put the input price actually paid at roughly $0.017 per million tokens, because the official DeepSeek endpoint reports a 91.5% cache hit rate. In plain terms: agents re-read the same context over and over, cache hits cost 2% of the input price, and theFlash line's compressed cache makes those hits cheap to serve — so real workloads spend nearly all their budget on output tokens. DeepSeek's own routing data shows it carrying about 96% of the token traffic for this model across providers, with DeepInfra and inference.net splitting the remainder.</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Provider</th>
+                            <th>Input /M</th>
+                            <th>Output /M</th>
+                            <th>Cache read /M</th>
+                            <th>Latency (P50)</th>
+                            <th>Throughput</th>
+                            <th>Uptime</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>DeepSeek (official)</strong></td>
+                            <td>$0.15</td>
+                            <td>$0.60</td>
+                            <td>$0.003</td>
+                            <td>1.38 s</td>
+                            <td>156 tps</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>inference.net</strong></td>
+                            <td>$0.10</td>
+                            <td>$0.50</td>
+                            <td>$0.002</td>
+                            <td>0.81 s</td>
+                            <td>56 tps</td>
+                            <td>100%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DeepInfra</strong> (30% off)</td>
+                            <td>$0.14</td>
+                            <td>$0.42</td>
+                            <td>$0.0042</td>
+                            <td>1.55 s</td>
+                            <td>39 tps</td>
+                            <td>93.3%</td>
+                        </tr>
+                        <tr>
+                            <td><strong>DeepInfra</strong> (list)</td>
+                            <td>$0.20</td>
+                            <td>$0.60</td>
+                            <td>$0.006</td>
+                            <td>1.55 s</td>
+                            <td>39 tps</td>
+                            <td>93.3%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>Provider prices fluctuate with promotions, so treat the table as a snapshot of release-day conditions rather than a permanent truth; the structural facts are that official DeepSeek throughput (156 tps) is roughly triple most third-party hosts, while DeepInfra's discounted output price is currently the lowest listed. What does not fluctuate this week is the Search &amp; Fetch launch bundled into this release. DeepSeek's in-house search backend — already serving hundreds of millions of requests daily inside its own products — is now exposed as two public APIs at $0.75 per 1,000 calls per endpoint. Better still, calls made through server-side tools in DeepSeek Harness, Claude Code, and Codex are free until October 31, 2026 at 16:00 UTC, which effectively gives every agent builder a two-week free trial of grounded search. For cost-per-task math, this matters: an agent that can fetch live documentation for a fraction of a cent makes fewer wrong turns, and fewer wrong turns is where the real savings live.</p>
+
+            <h2 id="local">6. Running It Locally: Weights, Quants, and Hardware</h2>
+
+            <p>The 1017 weights are on Hugging Face (<code>deepseek-ai/DeepSeek-V4.1-Flash-1017</code>) and ModelScope under the MIT license, so the download is the easy part — the question is what "running it locally" realistically means for a 552-billion-parameter mixture-of-experts model. Even though only 8–16 billion parameters activate per token, all 552 billion must be resident in memory, because you cannot predict which experts a given token will route to. At full precision that is over a terabyte; the practical ceiling for most quantization levels lands in the hundreds of gigabytes. Our estimate table below uses standard GGUF sizing for a 552B backbone as a planning guide — treat it as an order-of-magnitude budget, not gospel.</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Format (est.)</th>
+                            <th>Disk / RAM needed</th>
+                            <th>Realistic hardware</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BF16 (unquantized)</td>
+                            <td>~1,100 GB+</td>
+                            <td>Multi-node server, 8× H200-class or larger</td>
+                        </tr>
+                        <tr>
+                            <td>Q8 GGUF</td>
+                            <td>~590 GB</td>
+                            <td>Dual-socket CPU rig with 768 GB RAM, or 8× 128 GB GPUs</td>
+                        </tr>
+                        <tr>
+                            <td>Q4_K_M GGUF</td>
+                            <td>~320 GB</td>
+                            <td>512 GB RAM workstation or a 4× 128 GB GPU box</td>
+                        </tr>
+                        <tr>
+                            <td>Q2_K GGUF</td>
+                            <td>~210 GB</td>
+                            <td>256 GB RAM server; quality noticeably degraded</td>
+                        </tr>
+                        <tr>
+                            <td>Community experimental builds</td>
+                            <td>varies</td>
+                            <td>See GGUF Discovery index — details below</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>For the community-build row, our own GGUF Discovery index already tracks what hobbyists shipped for the September base model: antirez's <code>deepseek-v4.1-flash-gguf</code> repository, uploaded September 11, lists a Q2 build and a Vision build at 4.13 GB each, requires about 16 GB of RAM per the index metadata, and has accumulated 1.7 million downloads and 67 likes. A 4 GB file obviously cannot contain 552 billion parameters, so treat that repository as an experimental artifact from a well-known tinkerer rather than the full model — it is precisely the kind of thing worth watching as the 1017 quant ecosystem settles. Expect properly sharded GGUFs of the 1017 snapshot to appear on the Hugging Face quantizations page within days to weeks; llama.cpp, Ollama, and LM Studio all surface those community quants through their standard model browsers, and the base architecture was already supported by the time the September model landed.</p>
+
+            <p>Two integration details deserve a warning label. First, this release does not ship a Jinja chat template; DeepSeek instead publishes a self-contained Python reference encoder (<code>encoding.py</code>) with test cases for multi-turn chat, tool calling, thinking mode, numeric reasoning effort, mid-conversation system messages, and interleaved images, plus a maintained Rust toolkit called <code>deepseek-recipe</code> with Python bindings that converts Chat Completions and Responses API requests into the correct token stream. If you are writing your own inference glue, use those rather than hand-rolling a template — getting the prompt format subtly wrong is the fastest way to reproduce a benchmark miss. Second, the recommended sampling parameters are unusual by mainstream standards: temperature 1.0, top_p 1.0, and a max output budget of at least 256K tokens for agent runs. Temperature 1.0 sounds hot if you are used to 0.7-era defaults, but it is what the post-training calibrated for, and the benchmark numbers above were produced under exactly those settings.</p>
+
+            <div class="highlight-box">
+                <h4>The pragmatic recommendation</h4>
+                <p>Unless you own hardware with several hundred gigabytes of pooled memory, the API is the intended way to use this model — and thanks to the CED cache economics, a heavy day of agent work on the official endpoint typically costs less than a coffee. Run the weights locally if you are researching serving stacks, need air-gapped privacy, or enjoy the hobby; run the API if you need the model's actual intelligence at full quality today.</p>
+            </div>
+
+            <h2 id="who-should-care">7. Who Should Care, and Why</h2>
+
+            <p><strong>If you build on APIs:</strong> the 1017 snapshot is a free upgrade that requires zero migration. Your <code>deepseek-flash</code> calls now hit a model that scores 5.8 to 11 points higher on the agentic benchmarks while writing shorter outputs, which directly lowers your per-task cost. If your agents do research, switching them on before October 31 lets you add grounded Search and Fetch calls for free during the launch window, and at $0.75 per 1,000 calls afterward — cheap enough to leave enabled by default.</p>
+
+            <p><strong>If you run agent harnesses:</strong> this release was tuned for you specifically. DeepSeek Harness v0.2.1-rc.1+, Tencent CodeBuddy, and WorkBuddy are the named optimization targets, and the biggest benchmark gains (Terminal-Bench +11.1, ProgramBench +8.8) live exactly in the terminal-and-code-execution territory those harnesses operate in. The shorter outputs are also a hidden throughput win: at 156 tokens per second on the official endpoint, a 30% reduction in output length is a 30% reduction in wall-clock wait, not just in bill.</p>
+
+            <p><strong>If you are a local-AI hobbyist:</strong> the news is bittersweet but still interesting. The MIT license means the exact weights behind the API — including today's improvements — are on Hugging Face right now, which is not true of most frontier-tier models in 2026. Serving them at home remains a multi-hundred-gigabyte project, but the community quantization ecosystem around the September base model appeared within a day of release, and there is no technical reason the 1017 build should be slower to quantize. If you are tracking the frontier of what open weights can do, this snapshot is currently the strongest open-weights agentic performer on several major suites, and that alone makes the download ledger worth watching on this site.</p>
+
+            <h2 id="limitations">8. Limitations and Open Questions</h2>
+
+            <p>The first caveat is scope: this is a point release, and the gains, while real, are measured against the model's own September baseline using DeepSeek's chosen harnesses. Benchmark suites like Terminal-Bench and DeepSWE are sensitive to harness configuration — DeepSeek discloses that it used Claude Code for the former and mini-swe-v2 for the latter — so your own results through a different scaffold may differ from the published deltas. Independent verification of the strongest claims (notably DeepSWE 77.0) was still catching up at publication time, and one third-party analysis has already cautioned readers to separate the well-documented model upgrade from less-confirmed framing around the Search API branding. We lean on the official model card for every number in this post for exactly that reason.</p>
+
+            <p>The second caveat is competitive context. Claude Opus 5 still leads on the hardest single-shot reasoning rows, and DeepSeek's own comparison table is honest about that; meanwhile rival labs are not standing still, with Meta shipping an 816B open-weight model and Mistral previewing a trillion-parameter flagship in the same season. Third, the pricing details in section 5 are release-day snapshots: provider promotions (like DeepInfra's 30% discount) and weighted-average cache economics shift week to week, and the off-peak discount schedule is a DeepSeek billing policy, not a law of nature. Finally, the local-running estimates in section 6 are planning guides for a 552B backbone, not measurements of shipped GGUF files; wait for the community quantization ledger to fill in before budgeting disks. None of these caveats undercut the release — they just mark the difference between a launch-day post and a settled consensus, which will take a few weeks to form.</p>
+
+            <h2 id="conclusion">9. Conclusion</h2>
+
+            <p>DeepSeek-V4.1-Flash-1017 is a small release with a sharp point: five weeks of reinforcement learning with self-feedback made a budget agentic model meaningfully better at the exact things agents do — running terminals, writing programs, completing multi-step tasks — while making it faster and more concise at the same price. The benchmark table shows a clean sweep against GLM-5.3 and K3, a consistent win against GPT-5.6 Sol outside of tool-less HLE, and outright wins over Claude Opus 5 on four agentic rows including a 77.0 on DeepSWE v1.1. The Pareto framing holds up: nobody loses anything they had before, and everyone gains benchmarks, speed, or both.</p>
+
+            <p>The strategic read is just as important as the numbers. DeepSeek is iterating under a stable brand name, serving improvements through an unchanged API identifier, and publishing the weights under MIT the same day — a combination that quietly compounds. For builders, the practical moves this week are simple: keep calling <code>deepseek-flash</code> and enjoy the free upgrade, try the Search and Fetch APIs while they are free until October 31, update your harness if you run one, and watch the GGUF index if you self-host. Sometimes the most consequential releases are the ones that arrive without a launch event, and this is one of them.</p>
+
+            <h2 id="references">10. References &amp; Citations</h2>
+
+            <ol>
+                <li>DeepSeek, "DeepSeek-V4.1-Flash-1017: Wish-Driven Programming Made Real," official changelog, api-docs.deepseek.com/news/news261017, October 17, 2026.</li>
+                <li>DeepSeek-AI, "DeepSeek-V4.1-Flash-1017," Hugging Face model card (benchmarks, prompt encoding, sampling parameters, license), huggingface.co/deepseek-ai/DeepSeek-V4.1-Flash-1017, October 17, 2026.</li>
+                <li>DeepSeek-AI, "DeepSeek-V4.1-Flash: Pushing the Limits of KV Cache Compression," Hugging Face model card (CED architecture, SWA Bounded Replay), September 2026.</li>
+                <li>OpenRouter, "DeepSeek: DeepSeek V4.1 Flash 1017 — API Pricing &amp; Providers" (provider pricing, cache hit rates, latency and uptime data), openrouter.ai/deepseek/deepseek-v4.1-flash-1017, accessed October 17, 2026.</li>
+                <li>Artificial Analysis, "DeepSeek V4.1 Flash (Max) — Intelligence, Performance &amp; Price Analysis" (intelligence index, verbosity, throughput context), artificialanalysis.ai, accessed October 17, 2026.</li>
+                <li>Shattered.io, "DeepSeek V4.1-Flash-1017 Hits 77.0 on DeepSWE [2026]" (off-peak discount history, Search API verification notes), October 2026.</li>
+                <li>GGUF Discovery, "Deepseek V4.1 Flash" index entries (antirez/deepseek-v4.1-flash-gguf: 4.13 GB Q2 and Vision builds, download counts), local-ai-zone.github.io, accessed October 17, 2026.</li>
+            </ol>
+
+            <hr>
+
+            <img src="deepseek-v4-1-flash-1017-hero.png" alt="DeepSeek V4.1 Flash 1017 key specifications recap" style="width: 100%; border-radius: 12px;">
+
+        </div>
+        <!-- Need help with this post? -->
+
+<section id="faq" class="article-section faq">
+<h2>Frequently asked questions</h2>
+<h3>What is DeepSeek V4.1 Flash 1017?</h3>
+<p>DeepSeek-V4.1-Flash-1017 is the October 17, 2026 snapshot of DeepSeek V4.1 Flash. It keeps the same CED architecture — 552B backbone, 8B active on input, 16B on output, 1M context — but adds five more weeks of reinforcement learning with self-feedback, delivering higher benchmark scores, faster task completion, and shorter outputs at the same API price. The open weights are available under MIT on Hugging Face and ModelScope.</p>
+<h3>Do I need to change my API code to use the 1017 version?</h3>
+<p>No. The 1017 build is served under the same <code>deepseek-flash</code> API model name, and older identifiers like <code>deepseek-v4-flash</code> still work. Requests switch to the new snapshot automatically, so there is no migration work. If you run DeepSeek Harness, updating to v0.2.1-rc.1 or later is recommended to get the full benefit of the post-training optimizations.</p>
+<h3>How much cheaper is it than flagship models?</h3>
+<p>Off-peak pricing is $0.15/M input, $0.003/M cache reads, and $0.60/M output, with peak rates at $0.30 and $1.20. Because agents re-read context repeatedly and the official endpoint reports a 91.5% cache hit rate, the weighted average input price actually paid is about $0.017/M. Combined with shorter outputs than the September build, the cost per completed agent task drops again — that is the Pareto improvement DeepSeek claims.</p>
+<h3>Can I run DeepSeek V4.1 Flash 1017 locally?</h3>
+<p>Yes, the MIT weights are downloadable today, but the 552B backbone needs hundreds of gigabytes at practical quantization levels — roughly 320 GB at Q4_K_M by our estimate — so most home users will prefer the API. Community GGUF builds for the September base model are already indexed on GGUF Discovery, and new 1017 quants should appear on the Hugging Face quantizations page for use in llama.cpp, Ollama, and LM Studio. If you write your own inference code, use the official encoding.py or the deepseek-recipe toolkit, since there is no Jinja chat template.</p>
+</section>
+
+<section class="post-help" aria-labelledby="post-help-title">
+        <div class="post-help-inner">
+            <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+            <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+            through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+            pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+            you&rsquo;re reading.</p>
+            <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: DeepSeek V4.1 Flash 1017">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>Ask me about this post</span>
+            </button>
+        </div>
+    </section>
+
+</article>
+
+    <footer style="background: #1e293b; color: #e2e8f0; padding: 40px 20px; margin-top: 60px;">
+        <div class="container" style="max-width: 900px; margin: 0 auto; text-align: center;">
+            <p style="margin: 0 0 15px 0; font-size: 0.95em;">&copy; 2026 Local AI Zone. All rights reserved.</p>
+            <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #94a3b8;">DeepSeek V4.1 Flash 1017 Deep Dive — Release-Day Technical Analysis</p>
+            <p style="margin: 0; font-size: 0.85em; color: #64748b;">
+                <a href="../index.html" style="color: #60a5fa; text-decoration: none;">Home</a> •
+                <a href="../blog.html" style="color: #60a5fa; text-decoration: none;">Blog</a> •
+                <a href="../about.html" style="color: #60a5fa; text-decoration: none;">About</a> •
+                <a href="../services.html" style="color: #60a5fa; text-decoration: none;">Services</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="../js/theme-switcher.js"></script>
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Add copy button to code blocks
+        document.querySelectorAll('pre code').forEach((block) => {
+            const button = document.createElement('button');
+            button.innerHTML = 'Copy';
+            button.style.cssText = 'position: absolute; top: 8px; right: 8px; padding: 4px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em; opacity: 0; transition: opacity 0.3s;';
+
+            const pre = block.parentElement;
+            pre.style.position = 'relative';
+            pre.appendChild(button);
+
+            pre.addEventListener('mouseenter', () => button.style.opacity = '1');
+            pre.addEventListener('mouseleave', () => button.style.opacity = '0');
+
+            button.addEventListener('click', () => {
+                navigator.clipboard.writeText(block.textContent);
+                button.innerHTML = 'Copied!';
+                setTimeout(() => button.innerHTML = 'Copy', 2000);
+            });
+        });
+
+        // Table of contents active link tracking
+        const sections = document.querySelectorAll('h2[id], h3[id]');
+        const tocLinks = document.querySelectorAll('#table-of-contents a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.style.fontWeight = link.getAttribute('href') === '#' + current ? '600' : '400';
+                link.style.color = link.getAttribute('href') === '#' + current ? '#2563eb' : 'inherit';
+            });
+        });
+    </script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button"
+            class="contact-tab-button"
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel"
+         class="contact-form-panel"
+         role="dialog"
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close"
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text"
+                       id="contact-name"
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error"
+                     class="form-error"
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email"
+                       id="contact-email"
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error"
+                     class="form-error"
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text"
+                       id="contact-subject"
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error"
+                     class="form-error"
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message"
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error"
+                     class="form-error"
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+    <!-- Floating Instagram Button - Always Visible -->
+    <a href="https://www.instagram.com/nazary.ai" class="floating-instagram-btn" rel="noopener" target="_blank" aria-label="Connect with me on Instagram" title="Connect with me on Instagram" style="position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 8px 24px rgba(225, 48, 108, 0.4); z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255, 255, 255, 0.2);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span style="color: white; font-weight: 600; white-space: nowrap;">Connect with me on Instagram</span>
+    </a>
+</body>
+</html>
