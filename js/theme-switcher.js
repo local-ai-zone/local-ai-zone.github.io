@@ -60,11 +60,15 @@
          * Updates button icon visibility based on current theme
          */
         updateButtonAppearance() {
-            // This function will update the button icon visibility when theme changes
-            // Icons are handled by CSS, but we can ensure the button is visible
+            // Icons and labels are handled by CSS; keep the accessible name in
+            // sync with the action the button performs.
             const button = this.getThemeToggleButton();
             if (button) {
+                const isDark = this.htmlElement.getAttribute('data-theme') === 'dark';
+                const action = isDark ? 'Switch to light mode' : 'Switch to dark mode';
                 button.style.display = 'flex'; // Ensure button is visible
+                button.setAttribute('aria-label', action);
+                button.title = action;
             }
         },
 

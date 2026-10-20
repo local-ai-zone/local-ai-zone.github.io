@@ -32,190 +32,7 @@
     <meta name="creator" content="Hussain Nazary">
     <meta property="article:author" content="Hussain Nazary">
     
-    <style>
-        .article-header {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            color: white;
-            padding: 60px 0;
-            margin-bottom: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .article-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="white" opacity="0.05"/></svg>');
-        }
-        
-        .article-title {
-            font-size: 3.5em;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        
-        .article-meta {
-            font-size: 1.1em;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .article-date {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .article-author {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-        
-        .article-category {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
-        
-        .article-content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-        
-        .article-section {
-            margin: 50px 0;
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        
-        .section-title {
-            font-size: 2.2em;
-            color: var(--primary-600);
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--border-color);
-            position: relative;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 80px;
-            height: 3px;
-            background: var(--primary-500);
-        }
-        
-        .trend-card {
-            background: var(--primary-50);
-            border-left: 4px solid var(--primary-500);
-            padding: 25px;
-            margin: 20px 0;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
-        }
-        
-        .trend-card:hover {
-            transform: translateX(10px);
-        }
-        
-        .model-release {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-        
-        .model-badge {
-            display: inline-block;
-            padding: 6px 15px;
-            background: var(--primary-600);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .key-takeaway {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border-left: 4px solid #2563eb;
-            padding: 30px;
-            margin: 40px 0;
-            border-radius: 8px;
-        }
-        
-        .stat-number {
-            font-size: 3.5em;
-            font-weight: 700;
-            color: var(--primary-600);
-            line-height: 1;
-            margin-bottom: 10px;
-        }
-        
-        .stat-label {
-            font-size: 1.2em;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-        
-        .article-header .back-to-blog {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 0 0 30px 0;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 8px;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .article-header .back-to-blog:hover {
-            background: rgba(255,255,255,0.28);
-            transform: translateX(-3px);
-        }
-        
-        @media (max-width: 768px) {
-            .article-title {
-                font-size: 2.5em;
-            }
-            
-            .article-section {
-                padding: 25px;
-            }
-            
-            .section-title {
-                font-size: 1.8em;
-            }
-        }
-    </style>
-
-    <!-- Structured Data - Article Schema -->
+<!-- Structured Data - Article Schema -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -238,8 +55,9 @@
         "mainEntityOfPage": "https://local-ai-zone.github.io/blog/ai-updates-august-2026.html"
     }
     </script>
+  <link rel="stylesheet" href="../css/blog-post.css">
 </head>
-<body class="blog-article-page">
+<body class="blog-article-page has-site-header">
 
     <!-- Premium Header (matches homepage) -->
     <header class="premium-header blog-header">
@@ -319,7 +137,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Alibaba</div>
-                    <div class="model-badge" style="background: #7c3aed;">Qwen3.8-Max</div>
+                    <div class="model-badge" style="background: #2563eb;">Qwen3.8-Max</div>
 
                     <h3>Qwen3.8-Max: The Largest Open-Weight Release Ever (August 3, 2026)</h3>
                     <p>Alibaba's flagship arrived August 3 at <strong>2.4 trillion parameters (~95B active)</strong> — and, for the first time, a Qwen-Max-class model will have its weights open-sourced, released the following week.</p>
@@ -333,7 +151,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Alibaba</div>
-                    <div class="model-badge" style="background: #7c3aed;">Qwen3.8-27B</div>
+                    <div class="model-badge" style="background: #2563eb;">Qwen3.8-27B</div>
 
                     <h3>Qwen3.8-27B: The New Efficiency Frontier (August 14, 2026)</h3>
                     <p>Hot on the heels of Max, Tongyi Lab shipped <strong>Qwen3.8-27B</strong> — a 27.8B-parameter <strong>dense</strong> model under Apache 2.0 that rivals frontier proprietary models on agentic benchmarks while running on consumer hardware.</p>
@@ -391,7 +209,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">MiniMax</div>
-                    <div class="model-badge" style="background: #0d9488;">MiniMax H3</div>
+                    <div class="model-badge" style="background: #1d4ed8;">MiniMax H3</div>
 
                     <h3>MiniMax H3: The First Fully Open Omni-Modal Model (Open weights August 3, 2026)</h3>
                     <p>MiniMax published the open weights for <strong>H3</strong> on Hugging Face — a 33B-parameter omni-modal generative system that understands text, image, and video and generates <strong>4-15 second 2K video clips with native stereo audio</strong>.</p>
@@ -411,9 +229,9 @@
                     <p>Microsoft's MAI family expanded with <strong>MAI-Thinking-1</strong>, a medium-sized reasoning model aimed squarely at cost-efficient enterprise workloads across coding, math, and knowledge tasks — the latest sign that mid-size reasoning models are the sweet spot for production.</p>
                 </div>
 
-                <div class="model-release" style="background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border: 2px solid #7c3aed;">
-                    <div class="model-badge" style="background: #7c3aed;">Stealth / Mystery</div>
-                    <div class="model-badge" style="background: #5b21b6;">OX Alpha</div>
+                <div class="model-release" style="background: linear-gradient(135deg, #eff6ff 0%, #eff6ff 100%); border: 2px solid #2563eb;">
+                    <div class="model-badge" style="background: #2563eb;">Stealth / Mystery</div>
+                    <div class="model-badge" style="background: #1e40af;">OX Alpha</div>
 
                     <h3>🔍 OX Alpha: The Anonymous Frontier Model (August 20, 2026)</h3>
                     <p>The AI community was stunned when an anonymous model designated <strong>"stealth/ox-alpha"</strong> appeared on OpenRouter with extraordinary capabilities and zero pricing for a one-week preview period.</p>
@@ -438,7 +256,7 @@
 
                     <p><strong>Historical Context:</strong> OX Alpha follows an established pattern of Chinese AI labs using anonymous "stealth models" for pre-release testing. Previous examples include Pony Alpha (Zhipu's GLM-5), Hunter Alpha (Xiaomi's MiMo-V2-Pro), Elephant Alpha (Ant Group's Lingxi Ling-2.6), and Owl Alpha (Meituan's LongCat-2.0).</p>
 
-                    <p><strong>Status:</strong> Free preview period expected to end ~August 27, 2026. Official attribution not yet confirmed. <a href="ox-alpha-stealth-model-comprehensive-analysis.html" style="color: #7c3aed; font-weight: 600;">Read our comprehensive technical analysis →</a></p>
+                    <p><strong>Status:</strong> Free preview period expected to end ~August 27, 2026. Official attribution not yet confirmed. <a href="ox-alpha-stealth-model-comprehensive-analysis.html" style="color: #2563eb; font-weight: 600;">Read our comprehensive technical analysis →</a></p>
                 </div>
 
                 <div class="model-release">
@@ -556,7 +374,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Moonshot AI</div>
-                    <div class="model-badge" style="background: #7c3aed;">Kimi K3</div>
+                    <div class="model-badge" style="background: #2563eb;">Kimi K3</div>
 
                     <h3>Kimi K3: The Largest Open-Weight Model Ever (July 16, 2026)</h3>
                     <p>Moonshot AI's Kimi K3 is a 2.8T-parameter MoE (896 experts, ~50B active) that ranks <strong>#4 globally across all models</strong> — beating Claude Opus 4.8:</p>
@@ -570,7 +388,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Zhipu AI</div>
-                    <div class="model-badge" style="background: #0891b2;">GLM-5.2</div>
+                    <div class="model-badge" style="background: #1d4ed8;">GLM-5.2</div>
 
                     <h3>GLM-5.2: The Value King (June 13, 2026)</h3>
                     <p>Zhipu's newest open flagship (~753B MoE, ~40B active) posts GPQA Diamond 88.5, MMLU-Pro 84.1, and SWE-bench Verified ~79-81% — while running at roughly <strong>168 tokens/sec</strong>, triple the speed of rival trillion-parameter MoEs via IndexShare routing and KVShare speculative decoding.</p>
@@ -586,7 +404,7 @@
                 
                 <div class="model-release">
                     <div class="model-badge">MiniMax</div>
-                    <div class="model-badge" style="background: #0d9488;">MiniMax M3</div>
+                    <div class="model-badge" style="background: #1d4ed8;">MiniMax M3</div>
 
                     <h3>MiniMax M3: Multimodal Agentic MoE (June 1, 2026)</h3>
                     <p>MiniMax's newest flagship (428B MoE / ~23B active) posts GPQA scores past 92 and features native text + image + video input via MiniMax Sparse Attention — a 1M-token context at 1/20th the compute cost. It excels at autonomous task decomposition and multi-tool workflows.</p>
@@ -965,7 +783,7 @@
                     </ol>
                 </div>
                 
-                <div class="trend-card" style="background: linear-gradient(135deg, #fce7f3 0%, #fbcfe8 100%); border-left-color: #ec4899;">
+                <div class="trend-card" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-left-color: #2563eb;">
                     <h3>⚠️ Watch These Trends</h3>
                     <ul style="line-height: 1.9;">
                         <li><strong>Stealth model pattern normalizing</strong>: If OX Alpha attribution confirms (likely Zhipu GLM-5.x), expect more anonymous pre-releases as standard launch strategy</li>

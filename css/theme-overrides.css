@@ -96,6 +96,16 @@
     background: color-mix(in srgb, var(--background-primary) 95%, transparent) !important;
 }
 
+/* The brand block uses the static neutral palette, which stays dark in dark
+   theme and disappears against the dark header. Follow the theme text colours. */
+html[data-theme='dark'] .brand-title {
+    color: var(--text-primary) !important;
+}
+
+html[data-theme='dark'] .brand-subtitle {
+    color: var(--text-secondary) !important;
+}
+
 .header-stats .stat-card {
     background: var(--background-secondary) !important;
     border-color: var(--border-color) !important;

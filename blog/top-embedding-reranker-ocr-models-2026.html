@@ -32,238 +32,7 @@
     <meta name="creator" content="Hussain Nazary">
     <meta property="article:author" content="Hussain Nazary">
     
-    <style>
-        .article-header {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            color: white;
-            padding: 60px 0;
-            margin-bottom: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .article-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="white" opacity="0.05"/></svg>');
-        }
-        
-        .article-title {
-            font-size: 3.5em;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        
-        .article-meta {
-            font-size: 1.1em;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .article-date {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .article-author {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-        
-        .article-category {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
-        
-        .article-content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-        
-        .article-section {
-            margin: 50px 0;
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        
-        .section-title {
-            font-size: 2.2em;
-            color: var(--primary-600);
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--border-color);
-            position: relative;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 80px;
-            height: 3px;
-            background: var(--primary-500);
-        }
-        
-        .trend-card {
-            background: var(--primary-50);
-            border-left: 4px solid var(--primary-500);
-            padding: 25px;
-            margin: 20px 0;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
-        }
-        
-        .trend-card:hover {
-            transform: translateX(10px);
-        }
-        
-        .model-release {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-        
-        .model-badge {
-            display: inline-block;
-            padding: 6px 15px;
-            background: var(--primary-600);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .key-takeaway {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border-left: 4px solid #2563eb;
-            padding: 30px;
-            margin: 40px 0;
-            border-radius: 8px;
-        }
-        
-        .stat-number {
-            font-size: 3.5em;
-            font-weight: 700;
-            color: var(--primary-600);
-            line-height: 1;
-            margin-bottom: 10px;
-        }
-        
-        .stat-label {
-            font-size: 1.2em;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-        
-        .article-header .back-to-blog {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 0 0 30px 0;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 8px;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .article-header .back-to-blog:hover {
-            background: rgba(255,255,255,0.28);
-            transform: translateX(-3px);
-        }
-        
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 25px 0;
-            font-size: 0.95em;
-        }
-        
-        .comparison-table th {
-            background: var(--primary-600);
-            color: white;
-            padding: 12px 14px;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        .comparison-table td {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: top;
-        }
-        
-        .comparison-table tr:nth-child(even) td {
-            background: var(--primary-50);
-        }
-        
-        .comparison-table tr:hover td {
-            background: var(--primary-100);
-        }
-        
-        .model-link {
-            color: var(--primary-600);
-            font-weight: 600;
-            text-decoration: none;
-        }
-        
-        .model-link:hover {
-            text-decoration: underline;
-        }
-        
-        @media (max-width: 768px) {
-            .article-title {
-                font-size: 2.5em;
-            }
-            
-            .article-section {
-                padding: 25px;
-            }
-            
-            .section-title {
-                font-size: 1.8em;
-            }
-            
-            .comparison-table {
-                font-size: 0.82em;
-            }
-            
-            .comparison-table th,
-            .comparison-table td {
-                padding: 8px 6px;
-            }
-        }
-    </style>
-
-    <!-- Structured Data - Article Schema -->
+<!-- Structured Data - Article Schema -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -286,8 +55,9 @@
         "mainEntityOfPage": "https://local-ai-zone.github.io/blog/top-embedding-reranker-ocr-models-2026.html"
     }
     </script>
+  <link rel="stylesheet" href="../css/blog-post.css">
 </head>
-<body class="blog-article-page">
+<body class="blog-article-page has-site-header">
 
     <!-- Premium Header (matches homepage) -->
     <header class="premium-header blog-header">
@@ -373,7 +143,7 @@
                 
                 <div class="model-release">
                     <div class="model-badge">BAAI</div>
-                    <div class="model-badge" style="background: #0d9488;">BGE-M3</div>
+                    <div class="model-badge" style="background: #1d4ed8;">BGE-M3</div>
                     
                     <h3>1. BGE-M3 — The Hybrid Multilingual Default</h3>
                     <p>The long-standing gold standard for local RAG. BGE-M3 supports <strong>dense + sparse + multi-vector</strong> retrieval in one model across 100+ languages, making it the most flexible embedder for hybrid search pipelines.</p>
@@ -387,7 +157,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Alibaba</div>
-                    <div class="model-badge" style="background: #7c3aed;">Qwen3-Embedding</div>
+                    <div class="model-badge" style="background: #2563eb;">Qwen3-Embedding</div>
                     
                     <h3>2. Qwen3-Embedding-8B / 4B / 0.6B — The New Frontier Family</h3>
                     <p>Alibaba's 2025-2026 embedding generation tops multilingual retrieval leaderboards with a massive 32K context window — the only embedders that comfortably handle long documents out of the box.</p>
@@ -457,7 +227,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Mixedbread</div>
-                    <div class="model-badge" style="background: #6d28d9;">mxbai-embed-large-v1</div>
+                    <div class="model-badge" style="background: #1d4ed8;">mxbai-embed-large-v1</div>
                     
                     <h3>7. mxbai-embed-large-v1 — The Apache 2.0 Workhorse</h3>
                     <p>Mixedbread's 335M embedder was the long-time open benchmark champion and remains a rock-solid production default with universal tooling support.</p>
@@ -489,7 +259,7 @@
                 
                 <div class="model-release">
                     <div class="model-badge">Jina AI</div>
-                    <div class="model-badge" style="background: #7c3aed;">Jina Reranker v3.5</div>
+                    <div class="model-badge" style="background: #2563eb;">Jina Reranker v3.5</div>
                     
                     <h3>1. Jina Reranker v3.5 — The 2026 Speed King</h3>
                     <p>Jina's newest reranker (0.6B) introduces efficient <strong>listwise reranking</strong> — scoring multiple documents concurrently instead of pair-by-pair — drastically cutting inference latency while rivaling 4B+ models.</p>
@@ -503,7 +273,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Alibaba</div>
-                    <div class="model-badge" style="background: #7c3aed;">Qwen3-Reranker</div>
+                    <div class="model-badge" style="background: #2563eb;">Qwen3-Reranker</div>
                     
                     <h3>2. Qwen3-Reranker (0.6B / 4B / 8B) — The Accuracy Apex</h3>
                     <p>Qwen3-based rerankers top standard MTEB and multilingual search benchmarks, with the 4B and 8B variants at the <strong>absolute apex of open-weight retrieval accuracy</strong> across 100+ languages and a 32K context.</p>
@@ -517,7 +287,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">BAAI</div>
-                    <div class="model-badge" style="background: #0d9488;">BGE-Reranker-v2-M3</div>
+                    <div class="model-badge" style="background: #1d4ed8;">BGE-Reranker-v2-M3</div>
                     
                     <h3>3. BGE-Reranker-v2-M3 — The Universal Lightweight</h3>
                     <p>The gold standard lightweight multilingual reranker — 568M parameters on an XLM-RoBERTa backbone, handling 100+ languages with universal tooling support in every RAG framework.</p>
@@ -531,7 +301,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">BAAI</div>
-                    <div class="model-badge" style="background: #0d9488;">BGE-Reranker-v2.5-Gemma2</div>
+                    <div class="model-badge" style="background: #1d4ed8;">BGE-Reranker-v2.5-Gemma2</div>
                     
                     <h3>4. BGE-Reranker-v2.5-Gemma2 — The Reasoning Reranker</h3>
                     <p>A 2B Gemma-2 backbone converted into a cross-encoder — giving it <strong>deep reasoning when scoring logical contradictions</strong> between query and document, far beyond traditional 500M transformer rerankers.</p>
@@ -545,7 +315,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Mixedbread</div>
-                    <div class="model-badge" style="background: #6d28d9;">mxbai-rerank-large-v2</div>
+                    <div class="model-badge" style="background: #1d4ed8;">mxbai-rerank-large-v2</div>
                     
                     <h3>5. mxbai-rerank-large-v2 — The RL-Tuned Precision Pick</h3>
                     <p>Mixedbread's reranker is optimized via reinforcement learning to <strong>minimize false positives</strong> — the right choice when precision matters more than recall.</p>
@@ -591,7 +361,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Zhipu</div>
-                    <div class="model-badge" style="background: #0891b2;">GLM-OCR</div>
+                    <div class="model-badge" style="background: #1d4ed8;">GLM-OCR</div>
                     
                     <h3>2. GLM-OCR — The Tiny Table &amp; Formula Master</h3>
                     <p>Zhipu's 0.9B OCR model is the surprise of 2026 — exceptional at <strong>complex document understanding, tables, and formula recognition</strong> despite its tiny size.</p>
@@ -619,7 +389,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Nanonets</div>
-                    <div class="model-badge" style="background: #0ea5e9;">Nanonets-OCR-s</div>
+                    <div class="model-badge" style="background: #3b82f6;">Nanonets-OCR-s</div>
                     
                     <h3>4. Nanonets-OCR-s — The Rich Markdown Converter</h3>
                     <p>Nanonets' ~3B open model converts documents to <strong>rich markdown with signature and watermark detection</strong>, plus strong form extraction for business documents.</p>
@@ -647,7 +417,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">OlmOCR</div>
-                    <div class="model-badge" style="background: #7c3aed;">olmOCR v2</div>
+                    <div class="model-badge" style="background: #2563eb;">olmOCR v2</div>
                     
                     <h3>6. olmOCR v2 — The PDF Linearization Expert</h3>
                     <p>The Allen Institute's 7B OCR model excels at <strong>PDF linearization and reading-order preservation</strong> — ideal for turning entire PDF corpora into LLM training or RAG datasets.</p>

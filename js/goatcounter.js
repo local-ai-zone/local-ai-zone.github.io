@@ -196,18 +196,43 @@
     // Pick text/background colours that stay readable on any header: some nav bars are
     // dark by default (#1a1a1a) while the badge inherits the page's text colour,
     // which is dark in light theme — so measure the surface behind it instead.
+    function parseColor(value) {
+        var match = /rgba?\(([^)]+)\)/.exec(value);
+        if (match) {
+            var parts = match[1].split(/[,\s/]+/).filter(Boolean).map(Number);
+            if (parts.length >= 3) {
+                return {
+                    r: parts[0], g: parts[1], b: parts[2],
+                    a: parts.length > 3 ? parts[3] : 1
+                };
+            }
+        }
+        // Chrome serialises color-mix() backgrounds as color(srgb r g b / a).
+        match = /color\(srgb\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)(?:\s*\/\s*([\d.]+))?\)/.exec(value);
+        if (match) {
+            return {
+                r: Number(match[1]) * 255,
+                g: Number(match[2]) * 255,
+                b: Number(match[3]) * 255,
+                a: match[4] === undefined ? 1 : Number(match[4])
+            };
+        }
+        return null;
+    }
+
     function effectiveBackground(el) {
         while (el && el !== document.documentElement) {
-            var match = /rgba?\(([^)]+)\)/.exec(getComputedStyle(el).backgroundColor);
-            if (match) {
-                var parts = match[1].split(/[,\s/]+/).filter(Boolean).map(Number);
-                if (parts.length >= 3 && (parts.length < 4 || parts[3] > 0.95)) {
-                    return { r: parts[0], g: parts[1], b: parts[2] };
-                }
-            }
+            var color = parseColor(getComputedStyle(el).backgroundColor);
+            // 0.95 is common for `color-mix(... 95%, transparent)` headers,
+            // which are still effectively opaque for contrast purposes.
+            if (color && color.a >= 0.9) return color;
             el = el.parentElement;
         }
-        return { r: 255, g: 255, b: 255 };
+        var rootColor = parseColor(getComputedStyle(document.documentElement).backgroundColor);
+        if (rootColor && rootColor.a >= 0.9) return rootColor;
+        return document.documentElement.getAttribute('data-theme') === 'dark'
+            ? { r: 18, g: 18, b: 18 }
+            : { r: 255, g: 255, b: 255 };
     }
 
     function isDark(color) {

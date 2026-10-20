@@ -56,440 +56,7 @@
     <meta name="author" content="Hussain Nazary">
     <meta name="creator" content="Hussain Nazary">
     
-    <style>
-        .article-header {
-            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
-            color: white;
-            padding: 60px 0;
-            margin-bottom: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-        .article-header::before {
-            display: none !important;
-        }
-        .article-header .container {
-            background: transparent !important;
-        }
-        .premium-header {
-            position: static !important;
-        }
-        .article-title {
-            font-size: 3.5em;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            text-shadow: none !important;
-        }
-        .article-meta {
-            font-size: 1.1em;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-        .article-date {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        .article-author {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        .article-category {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
-        .article-content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-        .article-section {
-            margin: 50px 0;
-            background: var(--card-background, white);
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        .section-title {
-            font-size: 2.2em; color: var(--primary-600); margin-bottom: 25px; padding-bottom: 15px; border-bottom: 3px solid var(--border-color); position: relative;
-        }
-        .section-title::after {
-            content: ''; position: absolute; bottom: -3px; left: 0; width: 80px; height: 3px; background: var(--primary-500);
-        }
-        .key-takeaway {
-            background: var(--key-takeaway-bg, linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%)); border-left: 4px solid #7c3aed; padding: 30px; margin: 40px 0; border-radius: 8px;
-        }
-        .benchmark-table {
-            width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.95em;
-        }
-        .benchmark-table th {
-            background: var(--primary-600); color: white; padding: 12px 14px; text-align: left; font-weight: 600;
-        }
-        .benchmark-table td {
-            padding: 12px 14px; border-bottom: 1px solid var(--border-color);
-        }
-        .benchmark-table tbody tr:hover {
-            background: var(--bg-secondary);
-        }
-        .highlight-row {
-            background: var(--highlight-row-bg, #faf5ff) !important; font-weight: 600;
-        }
-        .spec-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin: 30px 0;
-        }
-        .spec-card {
-            background: var(--bg-secondary); padding: 25px; border-radius: 8px; border-left: 4px solid var(--primary-500);
-        }
-        .spec-label {
-            font-size: 0.9em; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;
-        }
-        .spec-value {
-            font-size: 1.4em; color: var(--text-primary); font-weight: 700;
-        }
-        .evidence-list {
-            background: var(--evidence-list-bg, #f8fafc); padding: 25px 25px 25px 45px; border-radius: 8px; margin: 20px 0;
-        }
-        .evidence-list li {
-            margin: 12px 0; line-height: 1.7;
-        }
-        .warning-box {
-            background: var(--warning-box-bg, #fef3c7); border-left: 4px solid #f59e0b; padding: 20px; margin: 30px 0; border-radius: 8px;
-        }
-        .comparison-table {
-            width: 100%; margin: 25px 0; border-collapse: collapse;
-        }
-        .comparison-table th {
-            background: var(--primary-600); color: white; padding: 12px 14px; text-align: left;
-        }
-        .comparison-table td {
-            padding: 12px 14px; border-bottom: 1px solid var(--border-color);
-        }
-        .stealth-history-table {
-            width: 100%; margin: 25px 0; border-collapse: collapse; font-size: 0.9em;
-        }
-        .stealth-history-table th {
-            background: #6d28d9; color: white; padding: 10px 12px; text-align: left;
-        }
-        .stealth-history-table td {
-            padding: 10px 12px; border-bottom: 1px solid var(--border-color);
-        }
-        .technical-note {
-            background: var(--technical-note-bg, #eff6ff); border-left: 4px solid #3b82f6; padding: 20px; margin: 20px 0; border-radius: 8px;
-        }
-        .timeline-item {
-            padding: 20px 0; border-left: 3px solid var(--primary-500); padding-left: 25px; margin-left: 10px; position: relative;
-        }
-        .timeline-item::before {
-            content: ''; position: absolute; left: -8px; top: 25px; width: 13px; height: 13px; border-radius: 50%; background: var(--primary-500); border: 3px solid white; box-shadow: 0 0 0 2px var(--primary-500);
-        }
-        .timeline-date {
-            font-weight: 600; color: var(--primary-600); margin-bottom: 8px;
-        }
-        /* Dark Mode Overrides */
-        html[data-theme='dark'] .article-header {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e293b 100%);
-        }
-        html[data-theme='dark'] .section-title {
-            color: var(--primary-400) !important;
-        }
-        html[data-theme='dark'] .section-title::after {
-            background: var(--primary-500) !important;
-        }
-        html[data-theme='dark'] .key-takeaway {
-            background: rgba(124, 58, 237, 0.1) !important;
-            border-left-color: #8b5cf6 !important;
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .key-takeaway h3,
-        html[data-theme='dark'] .key-takeaway h4 {
-            color: var(--primary-400) !important;
-        }
-        html[data-theme='dark'] .benchmark-table th {
-            background: var(--primary-700) !important;
-            color: white !important;
-        }
-        html[data-theme='dark'] .benchmark-table td {
-            border-color: var(--border-color) !important;
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .benchmark-table tbody tr:hover {
-            background: var(--background-secondary) !important;
-        }
-        html[data-theme='dark'] .highlight-row {
-            background: rgba(124, 58, 237, 0.15) !important;
-        }
-        html[data-theme='dark'] .spec-card {
-            background: var(--card-background) !important;
-            border-left-color: var(--primary-500) !important;
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .spec-label {
-            color: var(--text-secondary) !important;
-        }
-        html[data-theme='dark'] .spec-value {
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .evidence-list {
-            background: #1e293b !important;
-            color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] .warning-box {
-            background: rgba(251, 191, 36, 0.15) !important;
-            border-left-color: #fbbf24 !important;
-            color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] .warning-box h4 {
-            color: #fbbf24 !important;
-        }
-        html[data-theme='dark'] .comparison-table th,
-        html[data-theme='dark'] .stealth-history-table th {
-            background: var(--primary-700) !important;
-            color: white !important;
-        }
-        html[data-theme='dark'] .comparison-table td,
-        html[data-theme='dark'] .stealth-history-table td {
-            border-color: var(--border-color) !important;
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .technical-note {
-            background: rgba(59, 130, 246, 0.1) !important;
-            border-left-color: #3b82f6 !important;
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .technical-note h4 {
-            color: #60a5fa !important;
-        }
-        html[data-theme='dark'] .timeline-item {
-            border-left-color: var(--primary-500) !important;
-        }
-        html[data-theme='dark'] .timeline-item::before {
-            background: var(--primary-500) !important;
-            border-color: var(--background-primary) !important;
-            box-shadow: 0 0 0 2px var(--primary-500) !important;
-        }
-        html[data-theme='dark'] .timeline-date {
-            color: var(--primary-400) !important;
-        }
-        html[data-theme='dark'] .article-content p,
-        html[data-theme='dark'] .article-content li {
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .article-content h3,
-        html[data-theme='dark'] .article-content h4 {
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .article-content a {
-            color: var(--primary-400) !important;
-        }
-        html[data-theme='dark'] .article-content a:hover {
-            color: var(--primary-300) !important;
-        }
-        /* Footer Dark Mode */
-        html[data-theme='dark'] footer {
-            background: var(--background-secondary) !important;
-        }
-        html[data-theme='dark'] footer p {
-            color: var(--text-secondary) !important;
-        }
-        html[data-theme='dark'] .key-takeaway {
-            background: rgba(124, 58, 237, 0.15) !important; color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] .key-takeaway h3, html[data-theme='dark'] .key-takeaway h4 {
-            color: #c4b5fd !important;
-        }
-        html[data-theme='dark'] .highlight-row {
-            background: rgba(124, 58, 237, 0.15) !important;
-        }
-        html[data-theme='dark'] .evidence-list {
-            background: #1e293b !important; color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] .warning-box {
-            background: rgba(251, 191, 36, 0.1) !important; color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] div[style*="background: white"] {
-            background: #1e293b !important; color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] .article-content p, html[data-theme='dark'] .article-content li {
-            color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] .article-content strong {
-            color: #f1f5f9 !important;
-        }
-        html[data-theme='dark'] .article-content a {
-            color: #818cf8 !important;
-        }
-        html[data-theme='dark'] .article-content blockquote {
-            background: rgba(30, 41, 59, 0.8) !important; border-left-color: #818cf8 !important; color: #cbd5e1 !important;
-        }
-        html[data-theme='dark'] .article-content code {
-            background: #334155 !important; color: #e2e8f0 !important; border-color: #475569 !important;
-        }
-        html[data-theme='dark'] .article-content pre {
-            background: #0f172a !important;
-        }
-        html[data-theme='dark'] .technical-note {
-            background: rgba(59, 130, 246, 0.15) !important; color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] div[style*='background: var'] {
-            background: #1e293b !important; color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] .article-section {
-            background: var(--card-background) !important;
-            color: var(--text-primary) !important;
-            border: 1px solid var(--border-color) !important;
-        }
-        html[data-theme='dark'] .article-section h2,
-        html[data-theme='dark'] .article-section h3,
-        html[data-theme='dark'] .article-section h4 {
-            color: var(--primary-400) !important;
-        }
-        html[data-theme='dark'] .article-section p,
-        html[data-theme='dark'] .article-section li,
-        html[data-theme='dark'] .article-section span,
-        html[data-theme='dark'] .article-section div {
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .article-section a {
-            color: var(--primary-400) !important;
-        }
-        html[data-theme='dark'] .article-section a:hover {
-            color: var(--primary-300) !important;
-        }
-        html[data-theme='dark'] .article-section code {
-            background: #2d2d3d !important;
-            color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] .article-section blockquote {
-            background: rgba(37, 99, 235, 0.1) !important;
-            border-left-color: #60a5fa !important;
-            color: #e2e8f0 !important;
-        }
-        html[data-theme='dark'] .article-section table td {
-            background: var(--card-background) !important;
-            color: var(--text-primary) !important;
-            border-color: var(--border-color) !important;
-        }
-        html[data-theme='dark'] .article-section table tr:nth-child(even) td {
-            background: var(--background-secondary) !important;
-        }
-        html[data-theme='dark'] .article-section table tr:hover td {
-            background: rgba(124, 58, 237, 0.1) !important;
-        }
-        
-        /* Dark mode for key-takeaway */
-        html[data-theme='dark'] .key-takeaway {
-            background: var(--key-takeaway-bg) !important;
-            border-left-color: var(--primary-400) !important;
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .key-takeaway h2,
-        html[data-theme='dark'] .key-takeaway h3 {
-            color: var(--primary-400) !important;
-        }
-        html[data-theme='dark'] .key-takeaway p,
-        html[data-theme='dark'] .key-takeaway li,
-        html[data-theme='dark'] .key-takeaway span,
-        html[data-theme='dark'] .key-takeaway div {
-            color: var(--text-primary) !important;
-        }
-        
-        /* Dark mode for evidence-list */
-        html[data-theme='dark'] .evidence-list {
-            background: var(--evidence-list-bg) !important;
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .evidence-list li {
-            color: var(--text-primary) !important;
-            border-bottom-color: var(--border-color) !important;
-        }
-        
-        /* Dark mode for warning-box */
-        html[data-theme='dark'] .warning-box {
-            background: var(--warning-box-bg) !important;
-            border-left-color: #fbbf24 !important;
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .warning-box p,
-        html[data-theme='dark'] .warning-box strong {
-            color: var(--text-primary) !important;
-        }
-        
-        /* Dark mode for highlight-row */
-        html[data-theme='dark'] .highlight-row {
-            background: var(--highlight-row-bg) !important;
-            color: var(--text-primary) !important;
-        }
-        
-        /* Dark mode for technical-note */
-        html[data-theme='dark'] .technical-note {
-            background: var(--technical-note-bg) !important;
-            border-left-color: #60a5fa !important;
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .technical-note p {
-            color: var(--text-primary) !important;
-        }
-        
-        /* Dark mode for timeline items */
-        html[data-theme='dark'] .timeline-item {
-            color: var(--text-primary) !important;
-        }
-        html[data-theme='dark'] .timeline-date {
-            color: var(--primary-400) !important;
-        }
-        
-        /* Dark mode for benchmark/comparison tables */
-        html[data-theme='dark'] .benchmark-table td,
-        html[data-theme='dark'] .comparison-table td,
-        html[data-theme='dark'] .stealth-history-table td {
-            background: var(--card-background) !important;
-            color: var(--text-primary) !important;
-            border-color: var(--border-color) !important;
-        }
-        html[data-theme='dark'] .benchmark-table tr:nth-child(even) td,
-        html[data-theme='dark'] .comparison-table tr:nth-child(even) td,
-        html[data-theme='dark'] .stealth-history-table tr:nth-child(even) td {
-            background: var(--background-secondary) !important;
-        }
-        html[data-theme='dark'] .benchmark-table tr:hover td,
-        html[data-theme='dark'] .comparison-table tr:hover td,
-        html[data-theme='dark'] .stealth-history-table tr:hover td {
-            background: rgba(124, 58, 237, 0.1) !important;
-        }
-    
-    
-        /* Dark mode table overrides */
-        html[data-theme='dark'] table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
-        html[data-theme='dark'] table td { background: #1e1e2e !important; color: #e2e8f0 !important; border-color: #374151 !important; }
-        html[data-theme='dark'] table tr:nth-child(even) td { background: #252535 !important; }
-        html[data-theme='dark'] table tr:nth-child(odd) td { background: #1e1e2e !important; }
-        html[data-theme='dark'] table tr:hover td { background: rgba(124, 58, 237, 0.1) !important; }
-        html[data-theme='dark'] table { border-color: #374151 !important; }
-
-        /* === Dark mode: table row overrides (match .article-content specificity) === */
-        html[data-theme='dark'] .article-content table tr:nth-child(even) td { background: #252535 !important; color: #e0e0e0 !important; }
-        html[data-theme='dark'] .article-content table tr:nth-child(odd) td { background: #1e1e2e !important; color: #e0e0e0 !important; }
-        html[data-theme='dark'] .article-content table tr:hover td { background: rgba(124, 58, 237, 0.12) !important; }
-        html[data-theme='dark'] .article-content table th { background: #2d1b69 !important; color: #e2e8f0 !important; border-color: #374151 !important; }
-        html[data-theme='dark'] .article-content table td { border-color: #374151 !important; color: #e0e0e0 !important; }
-        html[data-theme='dark'] .article-content table { border-color: #374151 !important; }
-        /* === Dark mode: blockquote === */
-        html[data-theme='dark'] .article-content blockquote { background: rgba(59, 130, 246, 0.12) !important; border-left-color: #3b82f6 !important; color: #e0e0e0 !important; }
-        /* === Dark mode: code blocks === */
-        html[data-theme='dark'] .article-content pre { background: #1a1a2e !important; color: #e0e0e0 !important; border-color: #374151 !important; }
-        html[data-theme='dark'] .article-content code { background: rgba(124, 58, 237, 0.15) !important; color: #c4b5fd !important; }
-
-</style>
-
-    <!-- JSON-LD Structured Data -->
+<!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -625,8 +192,9 @@
         gtag('js', new Date());
         gtag('config', 'G-T06DPPBJS3');
     </script>
+  <link rel="stylesheet" href="../css/blog-post.css">
 </head>
-<body>
+<body class="blog-article-page">
     <!-- Navigation -->
     <nav class="nav-bar">
         <div class="nav-container">
@@ -660,31 +228,31 @@
     <main class="article-content">
 
         <!-- Quick Facts Box (AEO/GEO Optimization) -->
-        <div class="article-section key-takeaway" style="border-left: 5px solid #7c3aed;">
+        <div class="article-section key-takeaway" style="border-left: 5px solid #2563eb;">
             <h2 class="section-title" style="font-size: 1.8em;">Quick Facts: OX Alpha(glm 5.3 flash) at a Glance</h2>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 25px;">
                 <div>
-                    <h3 style="color: #7c3aed; font-size: 1.1em; margin-bottom: 8px;">📊 Performance</h3>
+                    <h3 style="color: #2563eb; font-size: 1.1em; margin-bottom: 8px;">📊 Performance</h3>
                     <p style="margin: 0; line-height: 1.7; color: inherit;"><strong>80% DeepSWE Pass@1</strong> - beats Claude (65%), GPT-5.6 (52%)</p>
                 </div>
                 <div>
-                    <h3 style="color: #7c3aed; font-size: 1.1em; margin-bottom: 8px;">🔢 Context Window</h3>
+                    <h3 style="color: #2563eb; font-size: 1.1em; margin-bottom: 8px;">🔢 Context Window</h3>
                     <p style="margin: 0; line-height: 1.7; color: inherit;"><strong>1,048,576 tokens</strong> - 5-8x larger than competitors</p>
                 </div>
                 <div>
-                    <h3 style="color: #7c3aed; font-size: 1.1em; margin-bottom: 8px;">🎯 Likely Origin</h3>
+                    <h3 style="color: #2563eb; font-size: 1.1em; margin-bottom: 8px;">🎯 Likely Origin</h3>
                     <p style="margin: 0; line-height: 1.7; color: inherit;"><strong>Zhipu AI GLM-5.x</strong> (99% confidence)</p>
                 </div>
                 <div>
-                    <h3 style="color: #7c3aed; font-size: 1.1em; margin-bottom: 8px;">💰 Pricing</h3>
+                    <h3 style="color: #2563eb; font-size: 1.1em; margin-bottom: 8px;">💰 Pricing</h3>
                     <p style="margin: 0; line-height: 1.7; color: inherit;"><strong>Free until Aug 27, 2026</strong> - then TBD</p>
                 </div>
                 <div>
-                    <h3 style="color: #7c3aed; font-size: 1.1em; margin-bottom: 8px;">🎨 Modalities</h3>
+                    <h3 style="color: #2563eb; font-size: 1.1em; margin-bottom: 8px;">🎨 Modalities</h3>
                     <p style="margin: 0; line-height: 1.7; color: inherit;"><strong>Text, Image, Video</strong> - full multimodal support</p>
                 </div>
                 <div>
-                    <h3 style="color: #7c3aed; font-size: 1.1em; margin-bottom: 8px;">⚙️ Architecture</h3>
+                    <h3 style="color: #2563eb; font-size: 1.1em; margin-bottom: 8px;">⚙️ Architecture</h3>
                     <p style="margin: 0; line-height: 1.7; color: inherit;"><strong>~744B params MoE</strong> (~40B active)</p>
                 </div>
             </div>
@@ -714,7 +282,7 @@
             <p style="font-size: 1.15em; line-height: 1.8; color: #1f2937;">On August 20, 2026, an anonymous AI model designated as <strong>"stealth/ox-alpha"</strong> appeared on OpenRouter, offering a one-week free access window that immediately captured the attention of the AI research community. Within 48 hours, independent testing revealed strong coding performance and an extensive 1M+ token context window, positioning it among August 2026's frontier models.</p>
 
             <div class="key-takeaway">
-                <h3 style="color: #7c3aed; margin-bottom: 15px; font-size: 1.3em;">Key Findings</h3>
+                <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 1.3em;">Key Findings</h3>
                 <ul style="margin: 0; padding-left: 20px;">
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Performance:</strong> Achieved 80% Pass@1 on DeepSWE coding benchmark (note: different benchmark than SWE-bench Verified used by frontier models)</li>
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Architecture:</strong> 1,048,576-token context window with full multimodal support (text, image, video)</li>
@@ -1131,7 +699,7 @@
             <h3 style="color: var(--primary-600); font-size: 1.6em; margin-top: 40px; margin-bottom: 20px;">Competitive Advantages</h3>
 
             <div class="key-takeaway">
-                <h4 style="color: #7c3aed; margin-top: 0;">Where OX Alpha(glm 5.3 flash) Stands Among August 2026 Frontier Models</h4>
+                <h4 style="color: #2563eb; margin-top: 0;">Where OX Alpha(glm 5.3 flash) Stands Among August 2026 Frontier Models</h4>
                 <ul style="margin: 10px 0; padding-left: 20px;">
                     <li style="margin: 12px 0;"><strong>Context Window:</strong> 1,048,576 tokens - comparable to Claude Opus 5 (1M), GPT-5.6 Sol (1.05M), DeepSeek V4 Pro (1M), and Gemini 3.7 Flash (1M); larger than Grok 4.6 (500K)</li>
                     <li style="margin: 12px 0;"><strong>Video Support:</strong> Full native video understanding - shared with Gemini 3.7 Flash; not available in Claude Opus 5, GPT-5.6 Sol, DeepSeek V4 Pro, or Grok 4.6</li>
@@ -1284,7 +852,7 @@
             <p style="font-size: 1.15em; line-height: 1.8; margin-top: 20px;">The technical fingerprinting analysis by Ben Davis provides compelling evidence linking OX Alpha(glm 5.3 flash) to Zhipu AI's unreleased GLM-5.x flagship, though this attribution remains unconfirmed as of publication. The pattern of stealth model releases from Chinese AI labs has become sufficiently established that such testing-through-distribution should now be considered a standard pre-launch strategy rather than an anomaly.</p>
 
             <div class="key-takeaway">
-                <h3 style="color: #7c3aed; margin-bottom: 15px; font-size: 1.3em;">Key Takeaways for Practitioners</h3>
+                <h3 style="color: #2563eb; margin-bottom: 15px; font-size: 1.3em;">Key Takeaways for Practitioners</h3>
                 <ul style="margin: 0; padding-left: 20px;">
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Test During Free Window:</strong> Evaluate OX Alpha(glm 5.3 flash) for your specific use cases before the preview period ends (approx. August 27)</li>
                     <li style="margin: 12px 0; line-height: 1.7;"><strong>Plan for Transition:</strong> Assume pricing will be introduced; assess ROI based on expected commercial rates</li>
@@ -1344,19 +912,19 @@
                 <h2 class="section-title">Related Posts</h2>
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
                                         <a href="deepseek-v4-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
-                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">DeepSeek V4 Flash</h3>
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">DeepSeek V4 Flash</h3>
                         <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Deep-dive into DeepSeek's 284B/13B active MoE with MLA attention, 1M context, and $0.14/$0.28 per M tokens.</p>
-                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more →</span>
                     </a>
                     <a href="qwen3-8-flash-next-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
-                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">Qwen3.8-Flash-Next</h3>
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Qwen3.8-Flash-Next</h3>
                         <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Deep-dive into Alibaba's 125B+51B multimodal MoE with Gated DeltaNet, QSA, and Muon optimizer.</p>
-                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more →</span>
                     </a>
                     <a href="glm-5-3-flash-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
-                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #7c3aed); font-size: 1.1em;">GLM-5.3-Flash Deep Dive</h3>
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">GLM-5.3-Flash Deep Dive</h3>
                         <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Technical deep-dive into Z.ai's 320B/18B active MoE with hybrid KDA+MLA attention and 1M context.</p>
-                        <span style="color: var(--primary-500, #8b5cf6); font-weight: 600; font-size: 0.85em;">Read more →</span>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more →</span>
                     </a>
                 </div>
             </div>

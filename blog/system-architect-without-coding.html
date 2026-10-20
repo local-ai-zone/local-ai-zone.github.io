@@ -57,8 +57,8 @@
     
     <!-- Additional AEO/GEO Meta Tags -->
     <meta name="application-name" content="Local AI Zone">
-    <meta name="msapplication-TileColor" content="#7c3aed">
-    <meta name="theme-color" content="#7c3aed">
+    <meta name="msapplication-TileColor" content="#2563eb">
+    <meta name="theme-color" content="#2563eb">
     <meta name="article-publisher" content="https://local-ai-zone.github.io">
     <meta name="article-content-ttl" content="P1Y">
     
@@ -244,245 +244,9 @@
     }
     </script>
 
-    <style>
-        .article-header {
-            background: linear-gradient(135deg, #7c3aed 0%, #4f46e5 100%);
-            color: white;
-            padding: 80px 0;
-            margin-bottom: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-        .article-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: pulse 15s ease-in-out infinite;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            50% { transform: translate(-10%, -10%) scale(1.1); }
-        }
-        .article-title {
-            font-size: 3.5em;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 25px;
-            text-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            position: relative;
-            z-index: 1;
-        }
-        .article-subtitle {
-            font-size: 1.3em;
-            opacity: 0.95;
-            max-width: 800px;
-            margin: 0 0 30px 0;
-            line-height: 1.6;
-            position: relative;
-            z-index: 1;
-        }
-        .article-meta {
-            font-size: 1.05em;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            position: relative;
-            z-index: 1;
-        }
-        .article-date, .article-category {
-            background: rgba(255,255,255,0.25);
-            padding: 8px 18px;
-            border-radius: 25px;
-            font-weight: 600;
-            backdrop-filter: blur(10px);
-        }
-
-        .article-author {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-
-        .article-content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-        .article-section {
-            margin: 50px 0;
-            background: white;
-            border-radius: 16px;
-            padding: 45px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.06);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .article-section:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 35px rgba(0,0,0,0.1);
-        }
-        .section-title {
-            font-size: 2.3em;
-            color: #6d28d9;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #f5f3ff;
-            position: relative;
-        }
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 100px;
-            height: 3px;
-            background: linear-gradient(90deg, #7c3aed, #8b5cf6);
-        }
-        .skill-card {
-            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-            border-left: 5px solid #7c3aed;
-            padding: 30px;
-            margin: 25px 0;
-            border-radius: 12px;
-            position: relative;
-        }
-
-        .skill-number {
-            position: absolute;
-            left: -15px;
-            top: 20px;
-            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
-            color: white;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 1.3em;
-            box-shadow: 0 4px 12px rgba(124, 58, 237, 0.4);
-        }
-        .skill-card h3 {
-            margin-bottom: 15px;
-            color: #6d28d9;
-            font-size: 1.5em;
-            margin-left: 40px;
-        }
-        .skill-card p, .skill-card ul {
-            margin-left: 40px;
-        }
-        .key-highlight {
-            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-            border-left: 5px solid #7c3aed;
-            padding: 35px;
-            margin: 40px 0;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.15);
-        }
-        .cta-box {
-            background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);
-            padding: 40px;
-            border-radius: 16px;
-            text-align: center;
-            margin: 40px 0;
-            border: 2px solid #8b5cf6;
-        }
-
-        .architecture-diagram {
-            background: #1e1e2e;
-            color: #a5d6ff;
-            padding: 30px;
-            border-radius: 12px;
-            margin: 30px 0;
-            font-family: 'Courier New', monospace;
-            white-space: pre;
-            overflow-x: auto;
-            line-height: 1.5;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        .btn-primary {
-            display: inline-block;
-            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
-            color: white;
-            padding: 16px 40px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
-            font-size: 1.1em;
-        }
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 25px rgba(124, 58, 237, 0.4);
-        }
-        .btn-secondary {
-            display: inline-block;
-            background: transparent;
-            color: #7c3aed;
-            padding: 16px 40px;
-            border-radius: 8px;
-            font-weight: 600;
-            text-decoration: none;
-            border: 2px solid #7c3aed;
-            transition: all 0.3s ease;
-            font-size: 1.1em;
-        }
-
-        .btn-secondary:hover {
-            background: #7c3aed;
-            color: white;
-        }
-        .tech-badge {
-            display: inline-block;
-            padding: 6px 15px;
-            background: #f5f3ff;
-            color: #7c3aed;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: 600;
-            margin: 5px;
-        }
-        .article-header .back-to-blog {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 0 0 30px 0;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 10px;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-        .article-header .back-to-blog:hover {
-            background: rgba(255,255,255,0.28);
-            transform: translateX(-3px);
-        }
-        @media (max-width: 768px) {
-            .article-title { font-size: 2.3em; }
-            .article-section { padding: 30px 25px; }
-            .section-title { font-size: 1.8em; }
-            .skill-card { padding: 25px 20px; }
-            .skill-number { left: -10px; width: 35px; height: 35px; font-size: 1.1em; }
-            .skill-card h3, .skill-card p, .skill-card ul { margin-left: 30px; }
-        }
-    </style>
+  <link rel="stylesheet" href="../css/blog-post.css">
 </head>
-<body class="blog-article-page">
+<body class="blog-article-page has-site-header">
 
     <!-- Premium Header (matches homepage) -->
     <header class="premium-header blog-header">
@@ -571,12 +335,12 @@
                         <h3 style="color: #16a34a; margin-bottom: 12px;">Zero Programming Background</h3>
                         <p>You don't need to know syntax, languages, or frameworks.</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #7c3aed;">
-                        <h3 style="color: #6d28d9; margin-bottom: 12px;">Access to an Implementer</h3>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #2563eb;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 12px;">Access to an Implementer</h3>
                         <p>A human developer, a freelance coder, or an AI coding assistant.</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #7c3aed;">
-                        <h3 style="color: #6d28d9; margin-bottom: 12px;">A Willingness to Think in Structures</h3>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #2563eb;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 12px;">A Willingness to Think in Structures</h3>
                         <p>You think in terms of structure, flow, and responsibility — not syntax.</p>
                     </div>
                 </div>
@@ -592,8 +356,8 @@
                 <p style="font-size: 1.05em; margin-top: 25px;"><strong>Translated to software:</strong></p>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 25px 0;">
-                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #7c3aed;">
-                        <h3 style="color: #6d28d9; margin-bottom: 12px;">🏗️ You Decide</h3>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #2563eb;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 12px;">🏗️ You Decide</h3>
                         <ul style="font-size: 0.95em; line-height: 1.7;">
                             <li>What components exist</li>
                             <li>What each one is responsible for</li>
@@ -709,7 +473,7 @@
                     <p style="margin-top: 15px;">You should be able to trace, in plain language, a path like:</p>
                 </div>
 
-                <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; border-left: 4px solid #7c3aed; margin: 25px 0; font-family: 'Courier New', monospace; font-size: 1.05em; line-height: 1.8;">
+                <div style="background: #f8f9fa; padding: 25px; border-radius: 10px; border-left: 4px solid #2563eb; margin: 25px 0; font-family: 'Courier New', monospace; font-size: 1.05em; line-height: 1.8;">
                     User submits a question<br>
                         → system checks memory for relevant past context<br>
                         → question and context go to the model<br>
@@ -842,20 +606,20 @@
                 <p style="font-size: 1.05em; margin-top: 20px;"><strong>Your problems instead become things like:</strong></p>
 
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin: 25px 0;">
-                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #7c3aed;">
-                        <h4 style="color: #6d28d9; margin-bottom: 10px;">💾 Memory Budget</h4>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2563eb;">
+                        <h4 style="color: #1d4ed8; margin-bottom: 10px;">💾 Memory Budget</h4>
                         <p style="font-size: 0.95em;">How much RAM does the system have to work with, and how is that budget spent?</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #7c3aed;">
-                        <h4 style="color: #6d28d9; margin-bottom: 10px;">🧠 Model Routing</h4>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2563eb;">
+                        <h4 style="color: #1d4ed8; margin-bottom: 10px;">🧠 Model Routing</h4>
                         <p style="font-size: 0.95em;">Which AI model handles which task — a small, fast model for simple classification versus a larger model for deep reasoning?</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #7c3aed;">
-                        <h4 style="color: #6d28d9; margin-bottom: 10px;">⚡ Model Caching</h4>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2563eb;">
+                        <h4 style="color: #1d4ed8; margin-bottom: 10px;">⚡ Model Caching</h4>
                         <p style="font-size: 0.95em;">How does the system avoid reloading the same model repeatedly, wasting time and resources?</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #7c3aed;">
-                        <h4 style="color: #6d28d9; margin-bottom: 10px;">🔄 Timeout Handling</h4>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #2563eb;">
+                        <h4 style="color: #1d4ed8; margin-bottom: 10px;">🔄 Timeout Handling</h4>
                         <p style="font-size: 0.95em;">What happens when a task takes too long, or a component gets stuck in a loop?</p>
                     </div>
                 </div>
@@ -908,16 +672,16 @@
                 <p style="font-size: 1.1em;">Skills like this build through repetition more than reading. A simple, repeatable daily exercise:</p>
 
                 <div style="margin: 30px 0;">
-                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #7c3aed; margin-bottom: 15px;">
-                        <h3 style="color: #6d28d9; margin-bottom: 12px;">Step 1</h3>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #2563eb; margin-bottom: 15px;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 12px;">Step 1</h3>
                         <p style="font-size: 1.05em;">Pick one real-world system (an app you use, a tool you've heard of, or a system you want to build).</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #7c3aed; margin-bottom: 15px;">
-                        <h3 style="color: #6d28d9; margin-bottom: 12px;">Step 2</h3>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #2563eb; margin-bottom: 15px;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 12px;">Step 2</h3>
                         <p style="font-size: 1.05em;">Answer, in writing: What components exist? What does each do? What data moves between them? What state gets saved? What could break, and where?</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #7c3aed;">
-                        <h3 style="color: #6d28d9; margin-bottom: 12px;">Step 3</h3>
+                    <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); padding: 25px; border-radius: 12px; border-left: 4px solid #2563eb;">
+                        <h3 style="color: #1d4ed8; margin-bottom: 12px;">Step 3</h3>
                         <p style="font-size: 1.05em;">If possible, compare your design to how the real system actually works, and note the differences.</p>
                     </div>
                 </div>
@@ -928,14 +692,14 @@
                 </div>
             </div>
 
-            <div class="article-section" style="background: linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%);">
+            <div class="article-section" style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);">
                 <h2 class="section-title">The Core Mindset Shift</h2>
 
                 <p style="font-size: 1.1em; margin-bottom: 25px;">There's one line that separates programmers from architects, and it's worth holding onto:</p>
 
-                <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; border-left: 5px solid #7c3aed; margin: 30px 0;">
-                    <p style="font-size: 1.8em; font-weight: 700; color: #6d28d9; font-style: italic; margin: 0 0 20px 0;">"Programmers ask, 'How do I build this?'"</p>
-                    <p style="font-size: 1.8em; font-weight: 700; color: #7c3aed; font-style: italic; margin: 0;">"Architects ask, 'Should this exist at all?'"</p>
+                <div style="background: white; padding: 30px; border-radius: 12px; text-align: center; border-left: 5px solid #2563eb; margin: 30px 0;">
+                    <p style="font-size: 1.8em; font-weight: 700; color: #1d4ed8; font-style: italic; margin: 0 0 20px 0;">"Programmers ask, 'How do I build this?'"</p>
+                    <p style="font-size: 1.8em; font-weight: 700; color: #2563eb; font-style: italic; margin: 0;">"Architects ask, 'Should this exist at all?'"</p>
                 </div>
 
                 <p style="font-size: 1.05em; margin-top: 25px;">Programmers optimize code. Architects eliminate unnecessary complexity before a single line gets written. That shift — from <em>how</em> to <em>whether and why</em> — is the entire discipline in one sentence.</p>
@@ -986,56 +750,56 @@
                 
                 <div itemscope itemtype="https://schema.org/FAQPage">
                     <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 itemprop="name" style="color: #6d28d9; margin-bottom: 12px; font-size: 1.3em;">Can you become a systems architect without knowing how to code?</h3>
+                        <h3 itemprop="name" style="color: #1d4ed8; margin-bottom: 12px; font-size: 1.3em;">Can you become a systems architect without knowing how to code?</h3>
                         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
                             <p itemprop="text" style="font-size: 1.05em; line-height: 1.7; margin-bottom: 30px;">Yes, absolutely. Systems architecture is a thinking skill, not a coding skill. It involves decomposing problems into components, designing data flows, assigning responsibilities, and planning for failure. You need to know what to build and why — an AI coding agent or human developer can handle the <em>how</em>. The architect designs the system; the implementer builds it.</p>
                         </div>
                     </div>
                     
                     <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 itemprop="name" style="color: #6d28d9; margin-bottom: 12px; font-size: 1.3em;">What are the core skills of a systems architect?</h3>
+                        <h3 itemprop="name" style="color: #1d4ed8; margin-bottom: 12px; font-size: 1.3em;">What are the core skills of a systems architect?</h3>
                         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
                             <p itemprop="text" style="font-size: 1.05em; line-height: 1.7; margin-bottom: 30px;">The five core skills are: <strong>1) Decomposition</strong> — breaking big problems into smaller, well-defined parts. <strong>2) Data Flow Thinking</strong> — tracing how information moves through a system. <strong>3) Responsibility Assignment</strong> — giving each component exactly one job. <strong>4) Control Flow Logic</strong> — defining who calls whom and in what order. <strong>5) Failure Thinking</strong> — planning for what goes wrong before it happens.</p>
                         </div>
                     </div>
                     
                     <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 itemprop="name" style="color: #6d28d9; margin-bottom: 12px; font-size: 1.3em;">What is the difference between a programmer and a systems architect?</h3>
+                        <h3 itemprop="name" style="color: #1d4ed8; margin-bottom: 12px; font-size: 1.3em;">What is the difference between a programmer and a systems architect?</h3>
                         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
                             <p itemprop="text" style="font-size: 1.05em; line-height: 1.7; margin-bottom: 30px;">Programmers ask "How do I build this?" while architects ask "Should this exist at all?" Programmers think bottom-up (starting with code and letting structure emerge), while architects think top-down (designing structure first, then implementing). Architects focus on what components exist, how they communicate, and what happens when things fail — not on syntax or implementation details.</p>
                         </div>
                     </div>
                     
                     <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 itemprop="name" style="color: #6d28d9; margin-bottom: 12px; font-size: 1.3em;">How do you practice systems architecture without coding?</h3>
+                        <h3 itemprop="name" style="color: #1d4ed8; margin-bottom: 12px; font-size: 1.3em;">How do you practice systems architecture without coding?</h3>
                         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
                             <p itemprop="text" style="font-size: 1.05em; line-height: 1.7; margin-bottom: 30px;">Daily practice: Pick one real-world system (an app you use, a tool you've heard of), and answer in writing: What components exist? What does each do? What data moves between them? What state gets saved? What could break, and where? Compare your design to how the real system works. This builds architectural intuition in weeks, no coding required.</p>
                         </div>
                     </div>
                     
                     <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 itemprop="name" style="color: #6d28d9; margin-bottom: 12px; font-size: 1.3em;">What is the advantage of being a non-technical architect?</h3>
+                        <h3 itemprop="name" style="color: #1d4ed8; margin-bottom: 12px; font-size: 1.3em;">What is the advantage of being a non-technical architect?</h3>
                         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
                             <p itemprop="text" style="font-size: 1.05em; line-height: 1.7; margin-bottom: 30px;">Non-technical architects have a natural top-down thinking advantage. Most trained programmers think bottom-up (functions, classes, syntax) and have to unlearn those habits to think architecturally. If you've never learned to code, you're free to think purely in terms of structure, flow, and responsibility from day one — which is exactly where the highest-leverage thinking happens.</p>
                         </div>
                     </div>
                     
                     <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 itemprop="name" style="color: #6d28d9; margin-bottom: 12px; font-size: 1.3em;">What are the eight questions of system design?</h3>
+                        <h3 itemprop="name" style="color: #1d4ed8; margin-bottom: 12px; font-size: 1.3em;">What are the eight questions of system design?</h3>
                         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
                             <p itemprop="text" style="font-size: 1.05em; line-height: 1.7; margin-bottom: 30px;">The eight questions are: <strong>1)</strong> What components exist? <strong>2)</strong> What does each component do? <strong>3)</strong> How do they communicate? <strong>4)</strong> What data flows through the system? <strong>5)</strong> What happens when something fails? <strong>6)</strong> Where are the bottlenecks? <strong>7)</strong> What is the order of execution? <strong>8)</strong> What is stateful vs stateless? If you can answer these clearly, you're doing system design.</p>
                         </div>
                     </div>
                     
                     <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 itemprop="name" style="color: #6d28d9; margin-bottom: 12px; font-size: 1.3em;">How long does it take to learn systems architecture?</h3>
+                        <h3 itemprop="name" style="color: #1d4ed8; margin-bottom: 12px; font-size: 1.3em;">How long does it take to learn systems architecture?</h3>
                         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
                             <p itemprop="text" style="font-size: 1.05em; line-height: 1.7; margin-bottom: 30px;">With consistent daily practice (15-30 minutes), you can develop solid architectural thinking in 4-8 weeks. The 5-phase learning path goes from foundations (box-and-arrow diagrams) to full system design. Most people see significant improvement after just 2-3 weeks of daily practice drawing and documenting system designs.</p>
                         </div>
                     </div>
                     
                     <div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
-                        <h3 itemprop="name" style="color: #6d28d9; margin-bottom: 12px; font-size: 1.3em;">What is failure thinking in system design?</h3>
+                        <h3 itemprop="name" style="color: #1d4ed8; margin-bottom: 12px; font-size: 1.3em;">What is failure thinking in system design?</h3>
                         <div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
                             <p itemprop="text" style="font-size: 1.05em; line-height: 1.7; margin-bottom: 30px;">Failure thinking is the discipline of pre-planning for what goes wrong. For every component, ask: What if this returns no result? What if this takes too long? What if this returns malformed data? What if this gets called twice? The architect defines how the system should respond to each failure mode. Without this step, engineers build systems that break silently.</p>
                         </div>

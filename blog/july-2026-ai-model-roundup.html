@@ -33,249 +33,7 @@
     <meta property="article:author" content="Hussain Nazary">
     <meta name="last-updated" content="2026-08-21">
     
-    <style>
-        .article-header {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            color: white;
-            padding: 60px 0;
-            margin-bottom: 40px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .article-header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="white" opacity="0.05"/></svg>');
-        }
-        
-        .article-title {
-            font-size: 3.5em;
-            font-weight: 700;
-            line-height: 1.2;
-            margin-bottom: 20px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
-        }
-        
-        .article-meta {
-            font-size: 1.1em;
-            opacity: 0.9;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .article-date {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .article-author {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            margin-left: 8px;
-        }
-        
-        .article-category {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-        }
-        
-        .article-content {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 0 20px 60px;
-        }
-        
-        .article-section {
-            margin: 50px 0;
-            background: white;
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-        }
-        
-        .section-title {
-            font-size: 2.2em;
-            color: var(--primary-600);
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 3px solid var(--border-color);
-            position: relative;
-        }
-        
-        .section-title::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 80px;
-            height: 3px;
-            background: var(--primary-500);
-        }
-        
-        .trend-card {
-            background: var(--primary-50);
-            border-left: 4px solid var(--primary-500);
-            padding: 25px;
-            margin: 20px 0;
-            border-radius: 8px;
-            transition: transform 0.3s ease;
-        }
-        
-        .trend-card:hover {
-            transform: translateX(10px);
-        }
-        
-        .model-release {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border: 1px solid var(--border-color);
-            border-radius: 10px;
-            padding: 25px;
-            margin: 20px 0;
-        }
-        
-        .model-badge {
-            display: inline-block;
-            padding: 6px 15px;
-            background: var(--primary-600);
-            color: white;
-            border-radius: 20px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-right: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .key-takeaway {
-            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-            border-left: 4px solid #2563eb;
-            padding: 30px;
-            margin: 40px 0;
-            border-radius: 8px;
-        }
-        
-        .stat-number {
-            font-size: 3.5em;
-            font-weight: 700;
-            color: var(--primary-600);
-            line-height: 1;
-            margin-bottom: 10px;
-        }
-        
-        .stat-label {
-            font-size: 1.2em;
-            color: var(--text-secondary);
-            margin-bottom: 20px;
-        }
-        
-        .article-header .back-to-blog {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            color: white;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 0 0 30px 0;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.15);
-            border: 1px solid rgba(255,255,255,0.35);
-            border-radius: 8px;
-            backdrop-filter: blur(8px);
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .article-header .back-to-blog:hover {
-            background: rgba(255,255,255,0.28);
-            transform: translateX(-3px);
-        }
-        
-        /* Local deployment comparison table */
-        .comparison-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 25px 0;
-            font-size: 0.95em;
-        }
-        
-        .comparison-table th {
-            background: var(--primary-600);
-            color: white;
-            padding: 12px 14px;
-            text-align: left;
-            font-weight: 600;
-        }
-        
-        .comparison-table td {
-            padding: 12px 14px;
-            border-bottom: 1px solid var(--border-color);
-            vertical-align: top;
-        }
-        
-        .comparison-table tr:nth-child(even) td {
-            background: var(--primary-50);
-        }
-        
-        .comparison-table tr:hover td {
-            background: var(--primary-100);
-        }
-        
-        .comparison-table .local-yes {
-            color: #16a34a;
-            font-weight: 700;
-        }
-        
-        .comparison-table .local-no {
-            color: #dc2626;
-            font-weight: 700;
-        }
-        
-        .model-link {
-            color: var(--primary-600);
-            font-weight: 600;
-            text-decoration: none;
-        }
-        
-        .model-link:hover {
-            text-decoration: underline;
-        }
-        
-        @media (max-width: 768px) {
-            .article-title {
-                font-size: 2.5em;
-            }
-            
-            .article-section {
-                padding: 25px;
-            }
-            
-            .section-title {
-                font-size: 1.8em;
-            }
-            
-            .comparison-table {
-                font-size: 0.82em;
-            }
-            
-            .comparison-table th,
-            .comparison-table td {
-                padding: 8px 6px;
-            }
-        }
-    </style>
-
-    <!-- Structured Data - Article Schema -->
+<!-- Structured Data - Article Schema -->
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
@@ -298,8 +56,9 @@
         "mainEntityOfPage": "https://local-ai-zone.github.io/blog/july-2026-ai-model-roundup.html"
     }
     </script>
+  <link rel="stylesheet" href="../css/blog-post.css">
 </head>
-<body class="blog-article-page">
+<body class="blog-article-page has-site-header">
 
     <!-- Premium Header (matches homepage) -->
     <header class="premium-header blog-header">
@@ -534,7 +293,7 @@
                 
                 <div class="model-release">
                     <div class="model-badge">Moonshot AI</div>
-                    <div class="model-badge" style="background: #7c3aed;">Kimi K3</div>
+                    <div class="model-badge" style="background: #2563eb;">Kimi K3</div>
                     
                     <h3>Kimi K3 — The Largest Open-Weight Model Ever (July 16, 2026)</h3>
                     <p>Moonshot AI's Kimi K3 is a 2.8-trillion-parameter MoE with 896 total experts (~50B active) — the biggest open weights ever shipped. It ranks <strong>#4 globally across all models</strong>, ahead of Claude Opus 4.8, and took <strong>#1 on the Arena.ai Frontend Code Arena</strong>.</p>
@@ -549,7 +308,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">Zhipu AI</div>
-                    <div class="model-badge" style="background: #0891b2;">GLM-5.2</div>
+                    <div class="model-badge" style="background: #1d4ed8;">GLM-5.2</div>
                     
                     <h3>GLM-5.2 — The Value King (June 13, 2026)</h3>
                     <p>Zhipu's newest open flagship (~753B total / ~40B active, MIT license) is the <strong>fastest trillion-parameter-class open MoE</strong>, clocking roughly <strong>168 tokens/sec</strong> — triple the speed of rivals — via IndexShare routing and KVShare speculative decoding.</p>
@@ -580,7 +339,7 @@
 
                 <div class="model-release">
                     <div class="model-badge">MiniMax</div>
-                    <div class="model-badge" style="background: #0d9488;">MiniMax M3</div>
+                    <div class="model-badge" style="background: #1d4ed8;">MiniMax M3</div>
                     
                     <h3>MiniMax M3 — The Science Reasoning Specialist (June 1, 2026)</h3>
                     <p>MiniMax's newest flagship (428B MoE / ~23B active) posts <strong>GPQA scores past 92</strong> and is natively multimodal from the ground up — accepting text, image, and video input streams simultaneously.</p>

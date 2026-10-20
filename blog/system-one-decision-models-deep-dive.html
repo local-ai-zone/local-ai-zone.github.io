@@ -71,7 +71,7 @@
 <link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html">
 <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html">
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
-<meta name="theme-color" content="#4f46e5">
+<meta name="theme-color" content="#2563eb">
 <meta property="og:title" content="System One Decision Models: Jev and the 7 Open Alternatives — Deep Dive">
 <meta property="og:description" content="How a model that never writes a token returns calibrated decisions, and how to run the open versions — Laya, Nimble, Kev, SemIf, Rizzo Flow, Von, NanoJev — on your own hardware.">
 <meta property="og:type" content="article">
@@ -94,78 +94,10 @@
 <link rel="stylesheet" href="../css/theme-overrides.css">
 <link rel="stylesheet" href="../css/contact-form.css">
 <link rel="icon" href="../logo.svg" type="image/svg+xml">
-<style>
-:root{--bg:#f6f7f9;--paper:#ffffff;--ink:#1a2233;--ink-soft:#46506a;--ink-faint:#7c86a0;--line:#e3e7ee;--accent:#4f46e5;--accent-soft:#eef2ff;--accent-2:#0d9488;--warn-bg:#fff7ed;--warn-line:#fdba74;--warn-ink:#9a3412;--ok-bg:#f0fdf4;--ok-line:#86efac;--ok-ink:#166534;--info-bg:#eff6ff;--info-line:#93c5fd;--info-ink:#1e3a8a;--danger-bg:#fef2f2;--danger-line:#fca5a5;--danger-ink:#991b1b;--code-bg:#0d1117;--code-ink:#d7dde7;--side-bg:#0e1526;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#4f46e5;--mono:'SFMono-Regular',ui-monospace,'Cascadia Mono','JetBrains Mono',Menlo,Consolas,monospace;--sans:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI','Noto Sans',Roboto,Helvetica,Arial,sans-serif}
-html[data-theme='dark']{--bg:#0b0f1a;--paper:#111827;--ink:#e5e9f2;--ink-soft:#b8c2d9;--ink-faint:#7c8aa5;--line:#242f47;--accent:#818cf8;--accent-soft:#1e2440;--accent-2:#2dd4bf;--warn-bg:#2a1c0e;--warn-line:#9a5b21;--warn-ink:#fdba74;--ok-bg:#0d2418;--ok-line:#2f7a4f;--ok-ink:#86efac;--info-bg:#101d33;--info-line:#2b4d8a;--info-ink:#93c5fd;--danger-bg:#2a1214;--danger-line:#8a3a3f;--danger-ink:#fca5a5;--side-bg:#0a0f1e;--side-ink:#aab6cf;--side-hover:#1b2540;--side-active:#6366f1}
-*{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;font-family:var(--sans);background:var(--bg);color:var(--ink);font-size:16.5px;line-height:1.75;-webkit-font-smoothing:antialiased}
-.shell{display:flex;min-height:100vh}
-aside#toc{width:296px;flex:0 0 296px;background:var(--side-bg);color:var(--side-ink);position:sticky;top:0;height:100vh;overflow-y:auto;padding:26px 0 40px;border-right:1px solid #000}
-main{flex:1;min-width:0;display:flex;justify-content:center}
-.page{width:100%;max-width:880px;padding:0 48px 120px;background:var(--paper);box-shadow:0 0 60px rgba(15,23,42,.06)}
-#toc .brand{padding:0 22px 18px;border-bottom:1px solid #1c2740;margin-bottom:14px}
-#toc .brand .t{font-weight:800;color:#fff;font-size:15px;line-height:1.35}
-#toc .brand .s{font-size:11px;color:#5f6f92;margin-top:6px;text-transform:uppercase;letter-spacing:1.4px}
-#toc nav a{display:block;padding:5px 22px;color:var(--side-ink);text-decoration:none;font-size:13px;line-height:1.45;border-left:3px solid transparent;transition:background .12s,border-color .12s,color .12s}
-#toc nav a:hover{background:var(--side-hover);color:#fff}
-#toc nav a.active{background:var(--side-hover);color:#fff;border-left-color:var(--side-active)}
-#toc nav .part{padding:14px 22px 6px;font-size:10.5px;letter-spacing:1.6px;color:#54628a;text-transform:uppercase;font-weight:700}
-#toc nav a .num{display:inline-block;width:24px;color:#6474a0;font-variant-numeric:tabular-nums}
-#toc .toc-foot{padding:20px 22px 0;font-size:11px;color:#54628a;border-top:1px solid #1c2740;margin-top:20px}
-.theme-btn{position:fixed;top:16px;right:20px;z-index:80;width:40px;height:40px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:17px;line-height:1;box-shadow:0 2px 10px rgba(15,23,42,.12)}
-h1,h2,h3,h4{line-height:1.25;color:var(--ink)}
-.page h2.ch{font-size:30px;font-weight:800;margin:0 0 6px;letter-spacing:-.5px}
-.page h2.ch .chno{color:var(--accent);font-variant-numeric:tabular-nums}
-.ch-sub{color:var(--ink-faint);font-size:15px;margin:0 0 28px;padding-bottom:18px;border-bottom:1px solid var(--line)}
-.page h3{font-size:21.5px;font-weight:750;margin:44px 0 12px}
-.page h3::before{content:"§ ";color:var(--accent);opacity:.55;font-weight:600}
-.page h4{font-size:17px;font-weight:700;margin:30px 0 10px;color:var(--ink-soft)}
-p{margin:0 0 18px}
-a{color:var(--accent);text-decoration:none;border-bottom:1px solid #c7d2fe}
-a:hover{border-bottom-color:var(--accent)}
-ul,ol{margin:0 0 18px;padding-left:26px}
-li{margin-bottom:7px}
-li::marker{color:var(--accent);font-weight:600}
-hr{border:none;border-top:1px solid var(--line);margin:40px 0}
-.small{font-size:13.5px;color:var(--ink-soft)}
-.mono,code:not(pre code){font-family:var(--mono);font-size:.86em;background:#eceef3;border:1px solid #dfe3ec;border-radius:5px;padding:1.5px 6px;color:#3730a3;overflow-wrap:anywhere}
-html[data-theme='dark'] .mono,html[data-theme='dark'] code:not(pre code){background:#1c2438;border-color:#2c3752;color:#a5b4fc}
-.cover{padding:78px 0 54px;border-bottom:1px solid var(--line);margin-bottom:56px}
-.cover .kicker{display:inline-block;font-size:12px;font-weight:700;letter-spacing:2.2px;text-transform:uppercase;color:var(--accent);background:var(--accent-soft);padding:6px 14px;border-radius:99px;margin-bottom:26px}
-.cover h1{font-size:47px;font-weight:850;letter-spacing:-1.6px;line-height:1.08;margin:0 0 18px}
-.cover h1 .thin{color:var(--accent)}
-.cover .sub{font-size:19px;color:var(--ink-soft);max-width:660px;line-height:1.6;margin:0 0 30px}
-.cover .meta{display:flex;flex-wrap:wrap;gap:10px 26px;font-size:13.5px;color:var(--ink-faint);border-top:1px dashed var(--line);padding-top:22px}
-.cover .meta b{color:var(--ink-soft);font-weight:600}
-.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin:34px 0 8px}
-.statgrid .cell{background:linear-gradient(180deg,#fbfcff,#f4f6fb);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-html[data-theme='dark'] .statgrid .cell{background:linear-gradient(180deg,#141b2e,#10162a)}
-.statgrid .cell .v{font-size:23px;font-weight:800;color:var(--accent);letter-spacing:-.5px}
-.statgrid .cell .k{font-size:12px;color:var(--ink-faint);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
-.callout{border-radius:10px;border:1px solid;border-left-width:4px;padding:16px 20px;margin:24px 0;font-size:15px;line-height:1.65}
-.callout .lab{display:block;font-size:11px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;margin-bottom:6px}
-.callout.info{background:var(--info-bg);border-color:var(--info-line);border-left-color:#2563eb;color:var(--info-ink)}
-.callout.warn{background:var(--warn-bg);border-color:var(--warn-line);border-left-color:#ea580c;color:var(--warn-ink)}
-.callout.ok{background:var(--ok-bg);border-color:var(--ok-line);border-left-color:#16a34a;color:var(--ok-ink)}
-.callout.danger{background:var(--danger-bg);border-color:var(--danger-line);border-left-color:#dc2626;color:var(--danger-ink)}
-pre{background:var(--code-bg);color:var(--code-ink);border-radius:10px;padding:16px 18px;overflow-x:auto;font-family:var(--mono);font-size:13.5px;line-height:1.6;margin:0 0 20px}
-pre code{background:none;border:none;padding:0;color:inherit;font-size:inherit}
-.tblwrap{overflow-x:auto;margin:0 0 22px}
-figure{margin:30px 0 34px}
-figure img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:12px;background:var(--paper)}
-figure figcaption{font-size:13.5px;color:var(--ink-faint);line-height:1.6;margin-top:13px;padding-left:14px;border-left:3px solid #c7d2fe}
-html[data-theme='dark'] figure figcaption{border-left-color:#312e81}
-table{border-collapse:collapse;width:100%;font-size:14.5px}
-th,td{border:1px solid var(--line);padding:9px 12px;text-align:left;vertical-align:top}
-th{background:var(--accent-soft);font-weight:700}
-td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
-h2.ch{scroll-margin-top:20px}
-h3,h4{scroll-margin-top:70px}
-@media(max-width:1000px){aside#toc{display:none}.page{padding:0 22px 90px}.cover h1{font-size:34px}}
-</style>
+  <link rel="stylesheet" href="../css/blog-post.css">
+  <link rel="stylesheet" href="../css/blog-paper.css">
 </head>
-<body>
+<body class="paper-page">
 <button id="themeBtn" class="theme-btn" title="Toggle theme" aria-label="Toggle dark mode">&#9788;</button>
 
 <div class="shell">
