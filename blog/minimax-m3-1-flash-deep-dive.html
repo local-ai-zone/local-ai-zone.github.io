@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MiniMax M3.1 Flash: A 428B Agentic Model at Flash-Tier Cost - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="stylesheet" href="../css/contact-form.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Research-grade deep dive into MiniMax M3.1 Flash, released October 19, 2026: the 428B-A23B sparse-MoE architecture behind it, Space Bunny's 200T-token stealth run, official DeepSWE, OSWorld and CyberGym results, the five reasoning tiers, and a full cost-per-task teardown at $0.15/$0.60 per million tokens.">
+    <meta name="keywords" content="MiniMax M3.1 Flash, MiniMax M3, MiniMax Sparse Attention, MSA, Space Bunny, DeepSWE v1.1, OSWorld V2, CyberGym, Agents Last Exam, agentic models, flash tier pricing, MiniMax Code, 428B MoE, reasoning effort, local AI">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="theme-color" content="#2563eb">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="MiniMax M3.1 Flash: A 428B Agentic Model at Flash-Tier Cost">
+    <meta property="og:description" content="M3.1 Flash inherits M3's 428B-A23B sparse-MoE backbone, then spends its gains on agentic coding, computer use and cybersecurity while cutting task cost 70% and pushing output past 200 TPS. Every disclosed benchmark, the pricing math, and what the missing model card does not tell you.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/minimax-m3-1-flash-deep-dive.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/minimax-m3-1-flash-deep-dive-hero.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="MiniMax M3.1 Flash: A 428B Agentic Model at Flash-Tier Cost">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-10-20T00:00:00Z">
+    <meta property="article:modified_time" content="2026-10-20T00:00:00Z">
+    <meta property="article:section" content="AI Models">
+    <meta property="article:tag" content="MiniMax">
+    <meta property="article:tag" content="Model Releases">
+    <meta property="article:tag" content="Technical Analysis">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:creator" content="@hussainnazary">
+    <meta name="twitter:title" content="MiniMax M3.1 Flash: A 428B Agentic Model at Flash-Tier Cost">
+    <meta name="twitter:description" content="Space Bunny was this model in disguise. 428B total, ~23B active, 1M context, 200+ TPS, and $0.15/$0.60 pricing. A research-grade teardown of M3.1 Flash's benchmarks, architecture and unit economics.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/minimax-m3-1-flash-deep-dive-hero.png">
+    <meta name="twitter:image:alt" content="MiniMax M3.1 Flash: A 428B Agentic Model at Flash-Tier Cost">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "headline": "MiniMax M3.1 Flash: A 428B Agentic Model at Flash-Tier Cost",
+      "description": "Research-grade analysis of MiniMax M3.1 Flash, released October 19, 2026. Covers the inherited M3 sparse-MoE architecture, the Space Bunny stealth deployment, official agentic benchmarks, reasoning-effort tiers, inference economics, and the open questions left by the absence of a model card and open weights at launch.",
+      "image": "https://local-ai-zone.github.io/blog/minimax-m3-1-flash-deep-dive-hero.png",
+      "author": {"@type": "Person", "name": "Hussain Nazary"},
+      "publisher": {"@type": "Organization", "name": "Local AI Zone"},
+      "datePublished": "2026-10-20",
+      "dateModified": "2026-10-20",
+      "wordCount": 4357,
+      "proficiencyLevel": "Advanced",
+      "about": [
+        {"@type": "Thing", "name": "MiniMax M3.1 Flash"},
+        {"@type": "Thing", "name": "Mixture-of-Experts"},
+        {"@type": "Thing", "name": "Sparse Attention"},
+        {"@type": "Thing", "name": "AI Agents"},
+        {"@type": "Thing", "name": "API Pricing"}
+      ],
+      "mainEntityOfPage": "https://local-ai-zone.github.io/blog/minimax-m3-1-flash-deep-dive.html",
+      "isAccessibleForFree": true
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is MiniMax M3.1 Flash?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "MiniMax M3.1 Flash is a 428B-parameter mixture-of-experts model with roughly 23B active parameters, a 1M-token context window and native text, image and video input. Released on October 19, 2026, it is the cheap, high-throughput member of the M3 family, tuned for agentic coding, computer use and cybersecurity rather than raw single-shot reasoning."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What was Space Bunny?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Space Bunny was the anonymous codename for an early build of M3.1 Flash that MiniMax tested in the wild. The company says it processed more than 200 trillion tokens while operating without a public model card, making it one of the largest stealth evaluations of a frontier-adjacent model."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How much does MiniMax M3.1 Flash cost?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "MiniMax charges a flat $0.15 per million input tokens, $0.60 per million output tokens and $0.015 per million cached input tokens. There is no peak/off-peak schedule and no long-context surcharge, which makes the effective price predictable for agents that repeatedly reuse the same repository or document context."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Can I run MiniMax M3.1 Flash locally?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Not yet. At launch M3.1 Flash is API-only and MiniMax says the weights will be released later, without a date or license. Even when they ship, the 428B backbone needs roughly 214 GB at NVFP4, 428 GB at FP8, or about 220-240 GB at Q4-class quantization, so local use will be limited to multi-GPU workstations and servers rather than consumer hardware."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "MiniMax M3.1 Flash Deep Dive", "item": "https://local-ai-zone.github.io/blog/minimax-m3-1-flash-deep-dive.html"}
+        ]
+    }
+    </script>
+
+  <link rel="stylesheet" href="../css/blog-post.css">
+</head>
+<body class="blog-article-page has-site-header">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">MiniMax M3.1 Flash: A 428B Agentic Model at Flash-Tier Cost</h1>
+                <div class="article-meta">
+                    <span class="article-date">October 20, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Technical Analysis</span>
+                    <span class="article-read-time">📖 22 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+
+            <header class="paper-header">
+                <div class="eyebrow"><span class="dot"></span>Research Note · Agentic Efficiency</div>
+                <h1 class="title">MiniMax M3.1 Flash</h1>
+                <p class="subtitle">A 428B sparse mixture-of-experts model that spent its release on agentic work — coding, computer use, cybersecurity — and cut the price of a completed task by 70%. Here is what MiniMax disclosed, what it did not, and how the unit economics actually hold up.</p>
+                <div class="byline">
+                    <span><span class="label">Author</span> Hussain Nazary</span>
+                    <span><span class="label">Published</span> October 20, 2026</span>
+                    <span><span class="label">Reading time</span> ~22 minutes</span>
+                    <span><span class="label">Level</span> Advanced</span>
+                </div>
+            </header>
+
+            <h2 id="tl-dr">Executive Summary</h2>
+            <ul>
+                <li><strong>What shipped:</strong> MiniMax M3.1 Flash went GA on October 19, 2026 across the MiniMax API, M Plan and MiniMax Code. It is the cheap, high-throughput member of the M3 family: 428B total parameters, roughly 23B active per token, native text/image/video input, 1M-token context and up to 512K output tokens.</li>
+                <li><strong>The stealth story:</strong> "Space Bunny," an anonymous model that processed more than 200 trillion tokens before anyone knew whose it was, was an early M3.1 Flash build. That is one of the largest unlabelled evaluations of a frontier-adjacent model on record.</li>
+                <li><strong>Benchmarks:</strong> 73.7% on DeepSWE v1.1, 61.7 on OSWorld V2, 29.6 on Agents' Last Exam, 82% on CyberGym and 76.2 on BankerToolBench. Coding and computer-use scores land within a few points of models that cost five to twenty times more per token.</li>
+                <li><strong>Economics:</strong> $0.15 input, $0.60 output and $0.015 cached input per million tokens, with no peak pricing and no long-context surcharge. At a 20:1 input/output ratio the blended rate is about $0.171 per million tokens.</li>
+                <li><strong>Throughput:</strong> 200+ tokens per second in normal use, with a P50 above 170 TPS — roughly triple the previous generation's online inference speed by MiniMax's own measurement.</li>
+                <li><strong>What is missing:</strong> No technical report, no parameter-level model card, no published evaluation harness, and no weights. M3.1 Flash is proprietary at launch, and several headline claims cannot be independently reproduced yet.</li>
+            </ul>
+
+            <h2 id="table-of-contents">Contents</h2>
+            <ol id="toc-list">
+                <li><a href="#release">What Actually Launched, and When</a></li>
+                <li><a href="#space-bunny">Space Bunny: The 200-Trillion-Token Audition</a></li>
+                <li><a href="#architecture">Architecture: M3's Sparse Backbone, Sharpened</a></li>
+                <li><a href="#benchmarks">The Benchmark Record</a></li>
+                <li><a href="#reasoning">Five Reasoning Tiers and No Off Switch</a></li>
+                <li><a href="#economics">Unit Economics: What a Task Actually Costs</a></li>
+                <li><a href="#serving">Serving, Weights and the Local Reality</a></li>
+                <li><a href="#context">Competitive Context</a></li>
+                <li><a href="#limitations">Limitations and Open Questions</a></li>
+                <li><a href="#conclusion">Conclusion</a></li>
+                <li><a href="#references">References</a></li>
+            </ol>
+
+            <hr>
+
+            <h2 id="release">1. What Actually Launched, and When</h2>
+
+            <p>MiniMax took an unusual route to market. On September 27, 2026 it silently made <code>M3.1-Flash-Preview</code> selectable inside MiniMax Code, its agent-oriented coding product. There was no model card, no pricing sheet and no benchmark table — developers noticed the entry in the model picker before the company confirmed it. The only disclosed parameters were a 1M-token context window and five reasoning-effort levels (<code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code>, <code>max</code>), with thinking permanently on.</p>
+
+            <p>Three weeks later, on October 19, the full release arrived: the model is now available through the MiniMax API, the M Plan subscription and MiniMax Code, with flat pricing and a proper launch post containing benchmark numbers. It is still not open weights. MiniMax says only that "model weights will be released later," and the launch post closes with a teaser that a higher-capability "Pro" tier is also coming.</p>
+
+            <div class="spec-box">
+                <h4 style="margin-top: 0;">Release Card: MiniMax M3.1 Flash</h4>
+                <div class="spec-grid">
+                    <div class="spec-item"><div class="spec-label">Released</div><div class="spec-value">October 19, 2026</div></div>
+                    <div class="spec-item"><div class="spec-label">Preview</div><div class="spec-value">September 27, 2026 (MiniMax Code)</div></div>
+                    <div class="spec-item"><div class="spec-label">Parameters</div><div class="spec-value">428B total / ~23B active</div></div>
+                    <div class="spec-item"><div class="spec-label">Architecture</div><div class="spec-value">Sparse MoE VLM (M3 family)</div></div>
+                    <div class="spec-item"><div class="spec-label">Context / Output</div><div class="spec-value">1M / up to 512K tokens</div></div>
+                    <div class="spec-item"><div class="spec-label">Modalities</div><div class="spec-value">Text + image + video in, text out</div></div>
+                    <div class="spec-item"><div class="spec-label">Throughput</div><div class="spec-value">200+ TPS, P50 170+ TPS</div></div>
+                    <div class="spec-item"><div class="spec-label">Price / 1M tokens</div><div class="spec-value">$0.15 in · $0.60 out · $0.015 cached</div></div>
+                    <div class="spec-item"><div class="spec-label">License</div><div class="spec-value">Proprietary (weights later)</div></div>
+                    <div class="spec-item"><div class="spec-label">Access</div><div class="spec-value">MiniMax API, M Plan, MiniMax Code</div></div>
+                </div>
+            </div>
+
+            <p>The naming deserves a note because it obscures the lineage. "Flash" here does not mean a small distilled model. M3.1 Flash keeps the same 428-billion-parameter envelope as M3; the differentiation is sparsity, post-training and serving efficiency. MiniMax's own phrasing is that it "further optimized M3.1 Flash's inference efficiency through more aggressive sparsity," which is a statement about how many parameters fire per token and how many tokens the model wastes per task — not about shrinking the checkpoint.</p>
+
+            <h2 id="space-bunny">2. Space Bunny: The 200-Trillion-Token Audition</h2>
+
+            <p>The most interesting detail in the launch post is buried in one sentence: "Space Bunny, which processed more than 200 trillion tokens while operating anonymously, was an early version of MiniMax M3.1 Flash." Stealth launches are common in 2026 — GLM's Ox Alpha preview was itself a disguised GLM-5.3 Flash — but the scale here is different. Two hundred trillion tokens is more than the entire pre-training budget of many frontier models, spent on a model nobody could attribute.</p>
+
+            <p>There are three practical consequences. First, the benchmark numbers should be read as post-trained results, not just architecture claims: the model had an unusually long real-world deployment window in which failure modes could be observed and trained against. Second, the community's model-attribution problem got worse. Arena scores and provider telemetry accumulated for "Space Bunny" have to be retroactively relabelled, and anyone who built routing rules around it now owns a migration. Third, the tactic itself is a signal about intent: MiniMax was not testing whether the model could win a launch-week comparison, it was testing whether it could survive production traffic before pricing was attached.</p>
+
+            <div class="highlight-box">
+                <h4>Why 200T tokens matters for the evaluation</h4>
+                <p>Most benchmark tables measure a model under a fixed harness over a few thousand tasks. Two hundred trillion production tokens is a different kind of evidence: it exercises tool failures, malformed environments, long retry loops and context drift at a volume no academic suite can match. It is not reproducible evidence, but it is a plausible explanation for why the agentic gains in this release are larger than the architecture changes alone would suggest.</p>
+            </div>
+
+            <h2 id="architecture">3. Architecture: M3's Sparse Backbone, Sharpened</h2>
+
+            <p>MiniMax has not published a model card for M3.1 Flash, so the architecture has to be inferred from the M3 family, the preview documentation and provider metadata. What is consistent across those sources is a 428B-parameter, roughly 23B-active mixture-of-experts vision-language model. The M3 technical report describes the following backbone.</p>
+
+            <div class="spec-box">
+                <h4 style="margin-top: 0;">Inherited M3 Backbone (Disclosed for M3, assumed for M3.1 Flash)</h4>
+                <div class="spec-grid">
+                    <div class="spec-item"><div class="spec-label">Total / active</div><div class="spec-value">428B / ~23B</div></div>
+                    <div class="spec-item"><div class="spec-label">Layers</div><div class="spec-value">60 (3 dense + 57 MoE)</div></div>
+                    <div class="spec-item"><div class="spec-label">Attention heads</div><div class="spec-value">64 query heads</div></div>
+                    <div class="spec-item"><div class="spec-label">Experts</div><div class="spec-value">128 total, 4 activated per token</div></div>
+                    <div class="spec-item"><div class="spec-label">Sparse attention</div><div class="spec-value">MiniMax Sparse Attention (MSA)</div></div>
+                    <div class="spec-item"><div class="spec-label">Vision tower</div><div class="spec-value">CLIP-style ViT, 32 layers, ~600M params</div></div>
+                    <div class="spec-item"><div class="spec-label">Image resolution</div><div class="spec-value">336×336 up to 2016×2016</div></div>
+                    <div class="spec-item"><div class="spec-label">Precision</div><div class="spec-value">BF16, MXFP8, NVFP4 serving</div></div>
+                </div>
+            </div>
+
+            <h3>3.1 MiniMax Sparse Attention</h3>
+
+            <p>MSA is the architectural idea that made a 1M-token context economically viable in the first place. Instead of computing attention over every prior token, MSA first scores blocks of the KV cache with a lightweight indexer, then runs attention only over the blocks that survive. At the operator level each selected block is read once with contiguous memory access, which matters more than the asymptotic story: NVIDIA's measurements of M3 put per-token compute at 1/20th of the previous M2 generation at a 1M-token context, with 9× faster prefill and 15× faster decode.</p>
+
+            <p>For M3.1 Flash, MiniMax claims "more aggressive sparsity" without disclosing the block size, top-k budget or indexer design. If the M3 defaults carried over — a block budget on the order of a few thousand key tokens per query — then "more aggressive" likely means a smaller budget or a cheaper indexer, both of which reduce compute per token at the cost of recall on far-apart evidence. That trade-off is exactly what Flash tiers are for: most agent traffic reads a repository, a ticket and a handful of tool outputs repeatedly, and does not need pristine recall across a million tokens. The risk is the long-context needle-in-a-haystack case, and neither MiniMax nor any independent evaluator has published a 1M-token retrieval curve for M3.1 Flash yet.</p>
+
+            <h3>3.2 Native multimodality, text-only output</h3>
+
+            <p>M3 was trained on text, images and video from the first pre-training step rather than having a vision adapter bolted on later. M3.1 Flash inherits that input stack — the model accepts text, images and video, and produces text. That matters for computer-use agents, which constantly ingest screenshots, and for document workflows, where the alternative is a separate OCR pass. It does not mean the model generates images or video; the H3 line covers that.</p>
+
+            <h3>3.3 What "Flash" changed</h3>
+
+            <p>The honest answer is: less architecture, more post-training and serving. The parameter count is unchanged, the context ceiling is unchanged and the modality set is unchanged. The two measurable deltas are sparsity (fewer active compute paths per token) and output behavior (faster, shorter, more task-oriented). MiniMax reports 200+ TPS with a P50 above 170 TPS, and claims the model's "overall usage cost is 70% lower than its predecessor" for agentic tasks. A 70% task-cost reduction cannot come from the token price alone if the architecture is the same, so the claim bundles three effects: cheaper serving, shorter outputs, and fewer retries per completed task.</p>
+
+            <h2 id="benchmarks">4. The Benchmark Record</h2>
+
+            <p>MiniMax's launch post reports six numbers. Unlike the preview, which shipped with none, these are specific enough to compare — with the caveat that no harness, seed or attempt budget is disclosed. The table below pairs them with the closest site-tracked numbers for competing Flash-tier models. Cells marked with a dash were not published by that vendor.</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Benchmark</th>
+                            <th>M3.1 Flash</th>
+                            <th>DeepSeek V4.1 Flash</th>
+                            <th>GLM-5.3 Flash</th>
+                            <th>Qwen3.8 Flash-Next</th>
+                            <th>Gemini 3.8 Flash</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>DeepSWE v1.1</strong></td>
+                            <td><strong>73.7</strong></td>
+                            <td>77.0</td>
+                            <td>63.4</td>
+                            <td>58.7</td>
+                            <td>71.0*</td>
+                        </tr>
+                        <tr>
+                            <td><strong>OSWorld V2</strong></td>
+                            <td><strong>61.7</strong></td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>52.3†</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Agents' Last Exam</strong></td>
+                            <td><strong>29.6</strong></td>
+                            <td>35.4</td>
+                            <td>26.3</td>
+                            <td>24.3</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>CyberGym</strong></td>
+                            <td><strong>82.0</strong></td>
+                            <td>—</td>
+                            <td>84.5</td>
+                            <td>—</td>
+                            <td>Frontier-level‡</td>
+                        </tr>
+                        <tr>
+                            <td><strong>BankerToolBench</strong></td>
+                            <td><strong>76.2</strong></td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>AutomationBench-AA</strong></td>
+                            <td><strong>Top tier (no score)</strong></td>
+                            <td>60.5§</td>
+                            <td>48.8§</td>
+                            <td>—</td>
+                            <td>—</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Input / output $/M</strong></td>
+                            <td><strong>$0.15 / $0.60</strong></td>
+                            <td>$0.15–0.30 / $0.60–1.20</td>
+                            <td>$0.15 / $0.50</td>
+                            <td>TBD</td>
+                            <td>$0.75 / $3.75</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p class="table-note">* Gemini 3.8 Flash's 71.0 is on DeepSWE v1, not v1.1; the suites are not directly comparable. † Qwen reports OSWorld 2.0 partial (52.3) and binary (19.4), a different aggregation from MiniMax's OSWorld V2 number. ‡ Google reports frontier-level CyberGym performance without a scalar. § Automation-Bench v1.0.6, a different version from AutomationBench-AA. Sources: vendor launch posts and model cards, October 2026.</p>
+
+            <figure class="chart-figure">
+                <svg viewBox="0 0 720 300" role="img" aria-label="Horizontal bar chart of DeepSWE v1.1 scores: DeepSeek V4.1 Flash 77.0, MiniMax M3.1 Flash 73.7, Gemini 3.8 Flash 71.0 on v1, GLM-5.3 Flash 63.4, Qwen3.8 Flash-Next 58.7" xmlns="http://www.w3.org/2000/svg">
+                    <text x="0" y="18" font-family="Inter, system-ui, sans-serif" font-size="15" font-weight="700" fill="currentColor">DeepSWE v1.1 — vendor-reported scores</text>
+                    <g font-family="Inter, system-ui, sans-serif" font-size="12" fill="currentColor">
+                        <text x="0" y="62">DeepSeek V4.1 Flash</text>
+                        <rect x="190" y="48" width="477" height="20" rx="4" fill="#2563eb" opacity="0.35"/>
+                        <text x="676" y="63" font-weight="700">77.0</text>
+
+                        <text x="0" y="106">MiniMax M3.1 Flash</text>
+                        <rect x="190" y="92" width="456" height="20" rx="4" fill="#2563eb"/>
+                        <text x="655" y="107" font-weight="700">73.7</text>
+
+                        <text x="0" y="150">Gemini 3.8 Flash (v1)</text>
+                        <rect x="190" y="136" width="440" height="20" rx="4" fill="#60a5fa"/>
+                        <text x="639" y="151" font-weight="700">71.0</text>
+
+                        <text x="0" y="194">GLM-5.3 Flash</text>
+                        <rect x="190" y="180" width="392" height="20" rx="4" fill="#93c5fd"/>
+                        <text x="591" y="195" font-weight="700">63.4</text>
+
+                        <text x="0" y="238">Qwen3.8 Flash-Next</text>
+                        <rect x="190" y="224" width="364" height="20" rx="4" fill="#bfdbfe"/>
+                        <text x="563" y="239" font-weight="700">58.7</text>
+                    </g>
+                    <line x1="190" y1="40" x2="190" y2="252" stroke="currentColor" stroke-opacity="0.25"/>
+                    <text x="190" y="278" font-family="Inter, system-ui, sans-serif" font-size="11" fill="currentColor" opacity="0.7">Bars scaled from 0 to 80. Gemini bar is DeepSWE v1 and is not directly comparable.</text>
+                </svg>
+            </figure>
+
+            <h3>4.1 Reading the numbers honestly</h3>
+
+            <p><strong>Coding.</strong> DeepSWE v1.1 at 73.7 puts M3.1 Flash in the same band as DeepSeek's October refresh (77.0) and Gemini 3.8 Flash's v1 score (71.0), and comfortably ahead of GLM-5.3 Flash (63.4) and Qwen3.8 Flash-Next (58.7). DeepSWE is designed to punish models that can write a patch but cannot verify it, so a high score here is more informative than SWE-bench Verified, which is close to saturation in this tier.</p>
+
+            <p><strong>Computer use.</strong> OSWorld V2 at 61.7 is the strongest number in the release relative to peers. MiniMax claims first place among Chinese models, and no competitor in this table has published a directly comparable OSWorld V2 figure. Qwen's 52.3 is an OSWorld 2.0 partial score, and mixing the two would be a category error. Treat 61.7 as a credible but unverified claim.</p>
+
+            <p><strong>Agents' Last Exam.</strong> This is where the launch post becomes harder to defend. MiniMax says 29.6 ranks first among Chinese models, but DeepSeek's own V4.1 Flash card reports 35.4 on Agents' Last Exam, and even the September build reports 31.8. Either MiniMax is using a different version of the benchmark, a different scoring rule, or the claim is scoped to a subset of models. None of that is disclosed. The 29.6 number is not bad — it beats GLM-5.3 Flash (26.3) and Qwen3.8 Flash-Next (24.3) — but the superlative does not survive contact with the other vendors' published tables.</p>
+
+            <p><strong>Cybersecurity.</strong> CyberGym at 82% is strong, and MiniMax says internal red-team evaluations covered code auditing, patching, penetration testing, malware analysis and reverse engineering. It is also not the highest number in the tier: GLM-5.3 Flash reports 84.5% on the same benchmark family. A two-and-a-half-point gap is within harness noise, but it means "leading" is doing marketing work in the launch post.</p>
+
+            <div class="highlight-box">
+                <h4>The benchmark verdict</h4>
+                <p>M3.1 Flash is genuinely competitive on agentic coding and computer use, and its price makes those scores unusually accessible. But the release is a launch post, not a model card: no harness, no seeds, no attempt budget, no independent replication. The correct posture is "promising and worth piloting," not "proven frontier parity."</p>
+            </div>
+
+            <h2 id="reasoning">5. Five Reasoning Tiers and No Off Switch</h2>
+
+            <p>M3.1 Flash exposes five reasoning-effort levels: <code>low</code>, <code>medium</code>, <code>high</code>, <code>xhigh</code> and <code>max</code>. MiniMax Code maps them to a picker; the API accepts a reasoning-effort parameter. Thinking cannot be disabled. That design choice separates MiniMax from DeepSeek, whose Flash line still offers a non-thinking mode, and from GLM, which also forces thinking on.</p>
+
+            <p>The practical implication is that every request pays a reasoning-token tax, even trivial ones. For a coding agent that is usually fine — the baseline cost is low enough that a few hundred thinking tokens do not change the budget — but for classification, extraction and high-volume chat it is wasteful. MiniMax's answer is to use <code>low</code> for those workloads, which shortens the thinking block rather than removing it.</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Workload</th>
+                            <th>Suggested effort</th>
+                            <th>Why</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Bug fixes, small refactors, test writing</td>
+                            <td><code>medium</code></td>
+                            <td>Enough budget to run the test loop without over-thinking single-file changes</td>
+                        </tr>
+                        <tr>
+                            <td>Multi-file feature work, repository-scale tasks</td>
+                            <td><code>high</code> / <code>xhigh</code></td>
+                            <td>The DeepSWE-class workloads where the model earns its score</td>
+                        </tr>
+                        <tr>
+                            <td>Computer-use and OS-level automation</td>
+                            <td><code>high</code></td>
+                            <td>Screenshot grounding plus retry loops benefit from more deliberation than chat</td>
+                        </tr>
+                        <tr>
+                            <td>Security analysis, audit, exploit reasoning</td>
+                            <td><code>xhigh</code> / <code>max</code></td>
+                            <td>Long evidence chains; the CyberGym profile rewards exhaustive checking</td>
+                        </tr>
+                        <tr>
+                            <td>Classification, extraction, routing</td>
+                            <td><code>low</code></td>
+                            <td>Thinking stays on, so keep the budget minimal; consider a non-thinking model instead</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>One open question: the launch materials do not publish the token overhead per tier. In practice that is the number that determines cost. A <code>max</code> request that spends 8,000 thinking tokens to save 500 output tokens is a losing trade at any price, and without per-tier averages, teams should measure their own ratio before standardizing on a high effort level.</p>
+
+            <h2 id="economics">6. Unit Economics: What a Task Actually Costs</h2>
+
+            <p>MiniMax's pricing is flat: $0.15 per million input tokens, $0.60 per million output tokens, $0.015 per million cached input tokens. There is no peak/off-peak schedule, no long-context multiplier and no batch discount listed at launch. That simplicity is itself a feature for budgeting: the same request costs the same amount at 3 a.m. and 3 p.m.</p>
+
+            <p>Because agents are input-heavy, the blended rate matters more than the sticker price. At a 20:1 input-to-output ratio — typical for a coding loop that re-reads a repository and emits a patch — the blended cost per million tokens is:</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Model</th>
+                            <th>Input $/M</th>
+                            <th>Output $/M</th>
+                            <th>Blended $/M (20:1)</th>
+                            <th>Relative to M3.1 Flash</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>MiniMax M3.1 Flash</strong></td>
+                            <td>$0.15</td>
+                            <td>$0.60</td>
+                            <td><strong>$0.171</strong></td>
+                            <td>1.0×</td>
+                        </tr>
+                        <tr>
+                            <td>GLM-5.3 Flash</td>
+                            <td>$0.15</td>
+                            <td>$0.50</td>
+                            <td>$0.167</td>
+                            <td>0.97×</td>
+                        </tr>
+                        <tr>
+                            <td>DeepSeek V4.1 Flash (off-peak)</td>
+                            <td>$0.15</td>
+                            <td>$0.60</td>
+                            <td>$0.171</td>
+                            <td>1.0×</td>
+                        </tr>
+                        <tr>
+                            <td>DeepSeek V4.1 Flash (peak)</td>
+                            <td>$0.30</td>
+                            <td>$1.20</td>
+                            <td>$0.343</td>
+                            <td>2.0×</td>
+                        </tr>
+                        <tr>
+                            <td>Gemini 3.8 Flash</td>
+                            <td>$0.75</td>
+                            <td>$3.75</td>
+                            <td>$0.893</td>
+                            <td>5.2×</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>The blended comparison is the fair one, and it produces a surprising result: M3.1 Flash is not the cheapest option in the tier. GLM-5.3 Flash is marginally cheaper at this ratio because its output price is lower, and DeepSeek V4.1 Flash matches M3.1 Flash exactly during off-peak hours. The differentiator is not the per-token price — it is whether the model finishes the task in fewer tokens and fewer retries.</p>
+
+            <h3>6.1 A worked example</h3>
+
+            <p>Consider a coding agent that reads a 100,000-token repository slice, emits a 5,000-token patch and does not retry. On M3.1 Flash the first turn costs:</p>
+
+            <ul>
+                <li>Input: 100,000 × $0.15 / 1M = <strong>$0.0150</strong></li>
+                <li>Output: 5,000 × $0.60 / 1M = <strong>$0.0030</strong></li>
+                <li>Total: <strong>$0.018</strong> per turn</li>
+            </ul>
+
+            <p>If 90% of that context is a stable prefix served from cache — the normal case in an iterative agent loop — the input cost becomes 90,000 × $0.015 / 1M = $0.00135 plus 10,000 × $0.15 / 1M = $0.0015, for a total of about <strong>$0.0059</strong> per turn. The same workload on Gemini 3.8 Flash costs roughly $0.094 before caching, or about 16× more than the cached M3.1 Flash turn.</p>
+
+            <p>Now add the retry profile. If M3.1 Flash completes a task in 6 turns and a cheaper-looking competitor needs 9 because it fails verification twice, the effective cost per completed task reverses the sticker-price ranking. This is why MiniMax's "70% lower usage cost" claim is best read as a task-level claim, not a token-level one: the token price fell, but the bigger multiplier is fewer wasted turns.</p>
+
+            <div class="highlight-box">
+                <h4>Budgeting rule of thumb</h4>
+                <p>For agentic coding, estimate 3–8 million input tokens and 150–400K output tokens per completed task at <code>high</code> effort. That lands between $0.54 and $1.44 per task on M3.1 Flash before cache effects, and well under a dollar with a warm prefix cache. Measure your own retry rate before scaling — it dominates the bill.</p>
+            </div>
+
+            <h2 id="serving">7. Serving, Weights and the Local Reality</h2>
+
+            <p>At launch M3.1 Flash is API-only. MiniMax says the weights will be released later but has not committed to a date or a license. That is a reversal of the M3 playbook: M3 shipped open weights under the MiniMax Community License, and the local community built quantization and serving recipes around it within weeks. Until the Flash weights appear, the only way to run it is through MiniMax's endpoints, and the only way to audit it is through its outputs.</p>
+
+            <p>When the weights do arrive, the hardware math is unforgiving. The model is 428B parameters in total, and even though only ~23B activate per token, every expert must be resident somewhere. That produces the following planning envelope:</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Precision / format</th>
+                            <th>Weight footprint (est.)</th>
+                            <th>Realistic hardware</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BF16</td>
+                            <td>~856 GB</td>
+                            <td>Multi-node H200/B200 deployment</td>
+                        </tr>
+                        <tr>
+                            <td>FP8 / MXFP8</td>
+                            <td>~428 GB</td>
+                            <td>8× H200 or 4× B200 with expert parallelism</td>
+                        </tr>
+                        <tr>
+                            <td>NVFP4</td>
+                            <td>~214 GB</td>
+                            <td>4× B200 / GB300 class, TensorRT-LLM or vLLM with FP4 kernels</td>
+                        </tr>
+                        <tr>
+                            <td>Q4-class GGUF</td>
+                            <td>~220–240 GB</td>
+                            <td>512 GB RAM workstation or 4× 80 GB GPUs; quality loss on long-context recall</td>
+                        </tr>
+                        <tr>
+                            <td>Q2-class GGUF</td>
+                            <td>~120–140 GB</td>
+                            <td>256 GB RAM server; not recommended for agentic work</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>Two serving details are likely to matter more than raw memory. First, MSA is not a standard attention kernel: M3 required custom support in SGLang, vLLM and TensorRT-LLM, and "more aggressive sparsity" in the Flash build may require newer kernels than the ones shipped for M3. Second, the vision tower adds activation memory on screenshot-heavy workloads, so computer-use agents need more headroom than text-only benchmarks suggest.</p>
+
+            <p>For local-AI readers the honest summary is: this is not a workstation model. The practical local story is the same as M3's — watch the GGUF and NVFP4 ecosystem after the weights drop, and expect the interesting builds to target 4× B200 or 8× H200 servers, not single GPUs. If you need a local agentic model today, the 125B–320B Flash class remains the realistic ceiling, and even those need aggressive quantization.</p>
+
+            <h2 id="context">8. Competitive Context</h2>
+
+            <p>M3.1 Flash lands in the most crowded segment of the 2026 market: the "near-frontier agentic model at a commodity price" tier. Its direct rivals are DeepSeek V4.1 Flash, GLM-5.3 Flash, Qwen3.8 Flash-Next and Gemini 3.8 Flash, each with a different trade-off.</p>
+
+            <ul>
+                <li><strong>DeepSeek V4.1 Flash</strong> is the closest functional substitute: similar price, higher DeepSWE and ALE scores, but a peak/off-peak pricing schedule and a very different architecture (causal encoder-decoder with an aggressively compressed KV cache). It is the better default for pure coding if you can schedule around peak hours.</li>
+                <li><strong>GLM-5.3 Flash</strong> matches on price, leads on CyberGym (84.5) and GDPval-AA, and has open weights under a permissive license. It is the stronger choice for finance, legal and security workflows where domain benchmarks matter more than DeepSWE.</li>
+                <li><strong>Qwen3.8 Flash-Next</strong> is smaller and cheaper to serve (125B + 51B N-gram, 6B active) and strong on multimodal benchmarks, but trails badly on DeepSWE (58.7). It is the efficiency play, not the capability play.</li>
+                <li><strong>Gemini 3.8 Flash</strong> costs five times more per blended token but brings Google's tooling, safety stack and a much stronger single-shot reasoning profile. It remains the safer choice for regulated deployments.</li>
+            </ul>
+
+            <p>The strategic read is that MiniMax is no longer competing on being the cheapest. At $0.15/$0.60 it is at parity with DeepSeek's off-peak rate and slightly more expensive than GLM on output. What it is selling is throughput and task completion: 200+ TPS, a 1M context, native screenshots, and a model tuned to keep going until the test passes. That is a product bet, not a price bet, and it explains why the release was folded into MiniMax Code first.</p>
+
+            <h2 id="limitations">9. Limitations and Open Questions</h2>
+
+            <p><strong>No model card.</strong> The launch post is a marketing document with six numbers. There is no technical report, no architecture diagram for the Flash variant, no training-token count, no data mixture and no evaluation harness. Claims about "more aggressive sparsity" cannot be checked.</p>
+
+            <p><strong>No independent benchmarks.</strong> At publication time, third-party evaluators had not published M3.1 Flash results. Vendor-reported numbers on DeepSWE and OSWorld are useful for triage but not for procurement decisions. The ALE discrepancy with DeepSeek's published 35.4 is a concrete example of why.</p>
+
+            <p><strong>Always-on thinking.</strong> Every request pays a reasoning tax. For high-volume extraction or classification this is a structural cost disadvantage against models with a non-thinking mode, and per-tier token overhead is not published.</p>
+
+            <p><strong>Proprietary at launch.</strong> No weights means no local deployment, no fine-tuning, no audit and no ability to pin a version. MiniMax's history suggests weights will come, but the license and timeline are unknown, and the M3 Community License already carried territorial restrictions that matter to some teams.</p>
+
+            <p><strong>Benchmark scope.</strong> The six disclosed benchmarks are all agentic or security-oriented. There is no MMLU-Pro, GPQA, HLE or long-context retrieval number. That is consistent with the positioning — this is a work model, not a trivia model — but it means the model's ceiling on knowledge-heavy tasks is unknown.</p>
+
+            <h2 id="conclusion">10. Conclusion</h2>
+
+            <p>MiniMax M3.1 Flash is the clearest example yet of a 2026 pattern: the Flash tier is where the real competition moved. The flagship releases get the attention, but the models that change engineering budgets are the ones that deliver 70–80% of frontier agentic performance at 5–20% of the price. M3.1 Flash does that with a 428B sparse backbone, a 1M context, native screenshots and a flat $0.15/$0.60 rate, and it backs the pitch with credible DeepSWE and OSWorld numbers.</p>
+
+            <p>It is not a clean sweep. DeepSeek V4.1 Flash still leads on DeepSWE and Agents' Last Exam, GLM-5.3 Flash matches it on price with open weights, and the missing model card makes every headline number provisional. But the direction is unmistakable: MiniMax built a model for agents that run for hours, priced it for teams that run thousands of them, and tested it anonymously on 200 trillion tokens before asking anyone to trust the benchmark table.</p>
+
+            <p>For builders, the practical move is a contained pilot: route repository-scale coding and screenshot-driven automation to M3.1 Flash at <code>high</code> effort, keep a second provider in the fallback path, and measure cost per completed task rather than cost per token. If the retry numbers hold, the 70% claim stops being marketing and starts being an accounting fact.</p>
+
+            <h2 id="references">11. References &amp; Citations</h2>
+            <ol>
+                <li>MiniMax, "MiniMax M3.1 Flash: Redefining Agent Performance and Cost," official launch post, minimax.io/blog/minimax-m31f, October 19, 2026.</li>
+                <li>MiniMax, "M3.1-Flash-Preview: Coding &amp; Research," MiniMax Agent tools documentation (428B total / ~23B active MoE, sparse attention, visual encoder), agent.minimax.io/tools/m3-1-flash-preview, accessed October 20, 2026.</li>
+                <li>MiniMax-AI, "MiniMax-M3" model card and technical report (428B total / ~23B active, 60 layers, 128 experts, MSA), GitHub and arXiv:2606.13392, June 2026.</li>
+                <li>NVIDIA, "Deploy Long-Context Reasoning and Agentic Workflows with MiniMax M3 on NVIDIA Accelerated Infrastructure" (MSA efficiency, 1/20 compute, 9× prefill, 15× decode, NVFP4), developer.nvidia.com, June 12, 2026.</li>
+                <li>LLM Stats, "MiniMax M3.1 Flash: Benchmarks, Pricing &amp; Context Window" (1M input / 524K output, $0.15/$0.60/$0.015, multimodal input), llm-stats.com, accessed October 20, 2026.</li>
+                <li>OpenCode Data, "MiniMax AI Model Usage &amp; Rankings" (M3.1 Flash release date, 1M context, 512K max output, token share), opencode.ai/data/minimax, October 19, 2026.</li>
+                <li>Local AI Zone, "DeepSeek V4.1 Flash 1017: Wish-Driven Programming Deep Dive" (DeepSWE 77.0, ALE 35.4, pricing), October 17, 2026.</li>
+                <li>Local AI Zone, "GLM-5.3 Flash Deep Dive" (DeepSWE 63.4, CyberGym 84.5, Automation-Bench 48.8), October 2026.</li>
+                <li>Local AI Zone, "Qwen3.8 Flash-Next Deep Dive" (DeepSWE 58.7, ALE 24.3, OSWorld 2.0 partial 52.3), October 2026.</li>
+                <li>Local AI Zone, "Gemini 3.8 Flash Technical Breakdown" (DeepSWE v1 71.0, $0.75/$3.75), September 2026.</li>
+            </ol>
+
+            <hr>
+
+            <img src="minimax-m3-1-flash-deep-dive-hero.png" alt="MiniMax M3.1 Flash specification recap" style="width: 100%; border-radius: 12px;">
+
+        </div>
+
+<section id="faq" class="article-section faq">
+<h2>Frequently asked questions</h2>
+<h3>What is MiniMax M3.1 Flash?</h3>
+<p>MiniMax M3.1 Flash is a 428B-parameter mixture-of-experts model with roughly 23B active parameters, a 1M-token context window and native text, image and video input. Released on October 19, 2026, it is the high-throughput member of the M3 family, tuned for agentic coding, computer use and cybersecurity rather than single-shot trivia. It is available through the MiniMax API, M Plan and MiniMax Code.</p>
+<h3>What was Space Bunny?</h3>
+<p>Space Bunny was the anonymous codename for an early M3.1 Flash build that MiniMax deployed before announcing the model. The company says it processed more than 200 trillion tokens while unattributed, which gave MiniMax an unusually large production feedback loop — and gave the community an attribution problem when the model was revealed.</p>
+<h3>How does M3.1 Flash compare with DeepSeek V4.1 Flash?</h3>
+<p>On the numbers each vendor publishes, DeepSeek V4.1 Flash leads on DeepSWE v1.1 (77.0 vs 73.7) and Agents' Last Exam (35.4 vs 29.6), while M3.1 Flash claims a stronger OSWorld V2 score (61.7) and roughly triple the output throughput. Pricing is close: both sit near $0.15/$0.60 per million tokens, though DeepSeek doubles its rates during peak hours and MiniMax does not.</p>
+<h3>Can I run MiniMax M3.1 Flash locally?</h3>
+<p>Not yet. At launch it is API-only and MiniMax says the weights will come later without a date or license. When they do, the 428B backbone needs roughly 214 GB at NVFP4, 428 GB at FP8 or 220–240 GB at Q4-class quantization, so expect multi-GPU server deployments rather than consumer hardware.</p>
+</section>
+
+<section class="post-help" aria-labelledby="post-help-title">
+        <div class="post-help-inner">
+            <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+            <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+            through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+            pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+            you&rsquo;re reading.</p>
+            <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: MiniMax M3.1 Flash">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>Ask me about this post</span>
+            </button>
+        </div>
+    </section>
+
+</article>
+
+    <footer style="background: #1e293b; color: #e2e8f0; padding: 40px 20px; margin-top: 60px;">
+        <div class="container" style="max-width: 900px; margin: 0 auto; text-align: center;">
+            <p style="margin: 0 0 15px 0; font-size: 0.95em;">&copy; 2026 Local AI Zone. All rights reserved.</p>
+            <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #94a3b8;">MiniMax M3.1 Flash Deep Dive — Release-Week Technical Analysis</p>
+            <p style="margin: 0; font-size: 0.85em; color: #64748b;">
+                <a href="../index.html" style="color: #60a5fa; text-decoration: none;">Home</a> •
+                <a href="../blog.html" style="color: #60a5fa; text-decoration: none;">Blog</a> •
+                <a href="../about.html" style="color: #60a5fa; text-decoration: none;">About</a> •
+                <a href="../services.html" style="color: #60a5fa; text-decoration: none;">Services</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="../js/theme-switcher.js"></script>
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        document.querySelectorAll('pre code').forEach((block) => {
+            const button = document.createElement('button');
+            button.innerHTML = 'Copy';
+            button.style.cssText = 'position: absolute; top: 8px; right: 8px; padding: 4px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em; opacity: 0; transition: opacity 0.3s;';
+
+            const pre = block.parentElement;
+            pre.style.position = 'relative';
+            pre.appendChild(button);
+
+            pre.addEventListener('mouseenter', () => button.style.opacity = '1');
+            pre.addEventListener('mouseleave', () => button.style.opacity = '0');
+
+            button.addEventListener('click', () => {
+                navigator.clipboard.writeText(block.textContent);
+                button.innerHTML = 'Copied!';
+                setTimeout(() => button.innerHTML = 'Copy', 2000);
+            });
+        });
+
+        const sections = document.querySelectorAll('h2[id], h3[id]');
+        const tocLinks = document.querySelectorAll('#table-of-contents a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.style.fontWeight = link.getAttribute('href') === '#' + current ? '600' : '400';
+                link.style.color = link.getAttribute('href') === '#' + current ? '#2563eb' : 'inherit';
+            });
+        });
+    </script>
+<script src="/js/goatcounter.js" defer></script>
+    <button id="contact-tab-button"
+            class="contact-tab-button"
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2 2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <div id="contact-form-panel"
+         class="contact-form-panel"
+         role="dialog"
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close"
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" id="contact-name" name="name" class="form-input" placeholder="Your name" required aria-required="true" aria-describedby="contact-name-error">
+                <div id="contact-name-error" class="form-error" role="alert" aria-live="polite"></div>
+            </div>
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" id="contact-email" name="email" class="form-input" placeholder="your.email@example.com" required aria-required="true" aria-describedby="contact-email-error">
+                <div id="contact-email-error" class="form-error" role="alert" aria-live="polite"></div>
+            </div>
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" id="contact-subject" name="subject" class="form-input" placeholder="What is this about?" required aria-required="true" aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" class="form-error" role="alert" aria-live="polite"></div>
+            </div>
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" name="message" class="form-input form-textarea" rows="6" placeholder="Your message..." required aria-required="true" aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" class="form-error" role="alert" aria-live="polite"></div>
+            </div>
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+    <a href="https://www.instagram.com/nazary.ai" class="floating-instagram-btn" rel="noopener" target="_blank" aria-label="Connect with me on Instagram" title="Connect with me on Instagram" style="position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 8px 24px rgba(225, 48, 108, 0.4); z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255, 255, 255, 0.2);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span style="color: white; font-weight: 600; white-space: nowrap;">Connect with me on Instagram</span>
+    </a>
+</body>
+</html>

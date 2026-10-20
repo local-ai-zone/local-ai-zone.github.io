@@ -1379,6 +1379,27 @@ const IMAGES = [
     footnote: 'A Local AI Zone original, first published Jan 1, 2026.',
   },
 
+  /* ---- minimax-m3-1-flash-deep-dive.html ---- */
+  {
+    file: 'minimax-m3-1-flash-deep-dive-hero.png',
+    kind: 'hero',
+    layout: 'hero',
+    post: 'minimax-m3-1-flash-deep-dive.html',
+    accent: '#2563eb',
+    accentSoft: '#eff6ff',
+    accent2: '#1d4ed8',
+    kicker: 'Deep dive &middot; MiniMax',
+    title: 'MiniMax M3.1 Flash, in depth',
+    sub: 'A 428B sparse MoE built for agents: 1M context, native screenshots, five effort tiers and flat $0.15 / $0.60 pricing. What MiniMax disclosed, what it withheld, and what a completed task actually costs.',
+    stats: [
+      { v: '428B / 23B', k: 'Total and active parameters' },
+      { v: '73.7', k: 'DeepSWE v1.1, vendor-reported' },
+      { v: '1M', k: 'Context window, up to 512K output' },
+      { v: '$0.15 / $0.60', k: 'Per 1M input / output tokens' },
+    ],
+    footnote: 'A Local AI Zone original, first published Oct 20, 2026.',
+  },
+
   /* ---- mistral-large-4-deep-dive.html ---- */
   {
     file: 'mistral-large-4-deep-dive-hero.png',
@@ -1710,9 +1731,12 @@ const IMAGES = [
  * ------------------------------------------------------------------ */
 function buildHtml(img) {
   const body = LAYOUTS[img.layout](img);
+  const accent = img.accent
+    ? ` style="--accent:${img.accent};--accent-soft:${img.accentSoft || img.accent};--accent-2:${img.accent2 || img.accent}"`
+    : '';
   return `<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8"><title>${esc(img.file)}</title><style>${CSS}</style></head>
-<body class="${img.kind}"><div class="card">${body}</div></body></html>`;
+<body class="${img.kind}"${accent}><div class="card">${body}</div></body></html>`;
 }
 
 async function render(browser, img, check = false) {
