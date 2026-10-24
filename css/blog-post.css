@@ -1018,23 +1018,119 @@ html[data-theme='dark'] .blog-article-page .article-content pre {
 }
 
 html[data-theme='dark'] .blog-article-page .article-content table th {
-  background: var(--bp-blue-900);
-  color: #e2e8f0;
-  border-color: var(--bp-line);
+  background: var(--bp-blue-800) !important;
+  color: #e2e8f0 !important;
+  border-color: var(--bp-line) !important;
 }
 
 html[data-theme='dark'] .blog-article-page .article-content table td {
-  background: var(--bp-surface);
-  color: var(--bp-ink);
-  border-color: var(--bp-line);
+  background: var(--bp-surface) !important;
+  color: var(--bp-ink) !important;
+  border-color: var(--bp-line) !important;
 }
 
 html[data-theme='dark'] .blog-article-page .article-content table tr:nth-child(even) td {
-  background: var(--bp-surface-alt);
+  background: var(--bp-surface-alt) !important;
+  border-color: var(--bp-line) !important;
 }
 
 html[data-theme='dark'] .blog-article-page .article-content table tr:hover td {
-  background: rgba(37, 99, 235, 0.16);
+  background: rgba(37, 99, 235, 0.16) !important;
+  border-color: var(--bp-line) !important;
+}
+
+/* Dark mode for inline styled elements */
+html[data-theme='dark'] .blog-article-page .article-content p[style*="background"] {
+  background-color: rgba(37, 99, 235, 0.12) !important;
+  color: var(--bp-ink) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .article-content p[style*="border-left"] {
+  border-left-color: var(--bp-accent) !important;
+}
+
+/* Dark mode for doc-info and spec boxes */
+html[data-theme='dark'] .blog-article-page .doc-info-box,
+html[data-theme='dark'] .blog-article-page .spec-box {
+  background: var(--bp-surface) !important;
+  border-color: var(--bp-line) !important;
+  color: var(--bp-ink) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .doc-info-box h2,
+html[data-theme='dark'] .blog-article-page .spec-box h4 {
+  color: var(--bp-accent) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .doc-info-label {
+  color: var(--bp-muted) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .doc-info-value,
+html[data-theme='dark'] .blog-article-page .spec-value {
+  color: var(--bp-ink) !important;
+}
+
+/* Ensure all paragraphs and list items have proper text color in dark mode */
+html[data-theme='dark'] .blog-article-page .article-content p,
+html[data-theme='dark'] .blog-article-page .article-content li,
+html[data-theme='dark'] .blog-article-page .article-content h2,
+html[data-theme='dark'] .blog-article-page .article-content h3,
+html[data-theme='dark'] .blog-article-page .article-content h4 {
+  color: var(--bp-ink) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .article-content a {
+  color: var(--bp-accent) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .article-content a:hover {
+  color: var(--bp-accent-strong) !important;
+}
+
+/* Fix compare-table in dark mode */
+html[data-theme='dark'] .blog-article-page .compare-table th {
+  background: var(--primary-700) !important;
+  color: white !important;
+  border-color: var(--border-color) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .compare-table td {
+  background: var(--card-background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .compare-table tr:nth-child(even) {
+  background: var(--background-secondary) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .compare-table tr:nth-child(even) td {
+  background: var(--background-secondary) !important;
+}
+
+/* Fix memory-table in dark mode */
+html[data-theme='dark'] .blog-article-page .memory-table {
+  background: var(--card-background) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .memory-table th {
+  background: var(--primary-700) !important;
+  color: white !important;
+}
+
+html[data-theme='dark'] .blog-article-page .memory-table td {
+  background: var(--card-background) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .memory-table tr:nth-child(even) {
+  background: var(--background-secondary) !important;
+}
+
+html[data-theme='dark'] .blog-article-page .memory-table tr:hover {
+  background: rgba(37, 99, 235, 0.12) !important;
 }
 
 html[data-theme='dark'] .blog-article-page .article-section {
@@ -1554,7 +1650,7 @@ html[data-theme='dark'] .blog-article-page .faq-item summary {
 html[data-theme='dark'] .blog-article-page .article-content .faq .faq-body { color: #e2e8f0 }
 html[data-theme='dark'] .blog-article-page .article-content .faq summary { color: #93c5fd }
 html[data-theme='dark'] .blog-article-page .article-content figure figcaption { color: #9ca3af }
-html[data-theme='dark'] .blog-article-page .article-content table tr:nth-child(odd) td { background: #0f172a !important; color: #e0e0e0 !important }
+html[data-theme='dark'] .blog-article-page .article-content table tr:nth-child(odd) td { background: var(--bp-surface) !important; color: var(--bp-ink) !important }
 html[data-theme='dark'] .blog-article-page .article-section a { color: var(--primary-400) !important }
 html[data-theme='dark'] .blog-article-page .article-section a:hover { color: var(--primary-300) !important }
 html[data-theme='dark'] .blog-article-page .article-section blockquote { background: rgba(37, 99, 235, 0.1) !important; border-left-color: #60a5fa !important; color: #e2e8f0 !important }
