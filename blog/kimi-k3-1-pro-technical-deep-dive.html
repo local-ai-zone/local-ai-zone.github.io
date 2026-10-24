@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kimi K3.1 Pro: China's 2.8T MoE Model Challenging GPT-6 and Claude Opus — Technical Deep Dive</title>
+<meta name="description" content="Kimi K3.1 Pro is Moonshot AI's most capable 3T-class open-weight model with 2.8T parameters, 1M-token context, and frontier-level coding performance. This technical deep dive covers the architecture, MoE design, reinforcement learning at scale, benchmark dominance on Terminal-Bench and GDPval-AA, cybersecurity controls, pricing, and how it stacks up against Claude Opus 5.5, GPT-6 Astra, and other frontier models.">
+<meta name="keywords" content="Kimi K3.1 Pro, Moonshot AI, 2.8 trillion parameters, MoE architecture, Kimi Delta Attention, open-weight model, Terminal-Bench, coding agents, Claude Opus 5.5, GPT-6 Astra, 1M context window, Chinese AI, agentic AI, reinforcement learning">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Kimi K3.1 Pro: China's 2.8T MoE Model Challenging GPT-6 and Claude Opus — Technical Deep Dive",
+  "alternativeHeadline": "How Moonshot AI's K3.1 Pro achieves frontier performance with massive-scale reinforcement learning and MoE architecture",
+  "description": "A comprehensive technical analysis of Kimi K3.1 Pro: 2.8T MoE architecture with 104B active parameters, Kimi Delta Attention, Stable LatentMoE framework, large-scale joint RL training, Terminal-Bench 4.0 leadership, cybersecurity controls, open-weight release strategy, and competitive positioning against Claude Opus 5.5 and GPT-6 Astra.",
+  "author": {"@type": "Person", "name": "Hussain Nazary"},
+  "datePublished": "2026-10-24",
+  "dateModified": "2026-10-24",
+  "keywords": "Kimi K3.1 Pro, Moonshot AI, MoE architecture, Kimi Delta Attention, Terminal-Bench, coding agents, open-weight AI, Chinese frontier models",
+  "articleSection": "Technical Deep Dive",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 14500,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/kimi-k3-1-pro-technical-deep-dive.html",
+  "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
+  "about": [
+    {"@type": "Thing", "name": "Kimi K3.1 Pro"},
+    {"@type": "Thing", "name": "Moonshot AI"},
+    {"@type": "Thing", "name": "Mixture of Experts"},
+    {"@type": "Thing", "name": "Coding agents"},
+    {"@type": "Thing", "name": "Open-weight models"}
+  ],
+  "isPartOf": {
+    "@type": "Blog",
+    "name": "Local AI Zone — Blog",
+    "url": "https://local-ai-zone.github.io/blog.html"
+  },
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://local-ai-zone.github.io/blog/kimi-k3-1-pro-technical-deep-dive-hero.png",
+    "width": 1200,
+    "height": 630,
+    "caption": "Kimi K3.1 Pro: Moonshot AI's 2.8T parameter open-weight model challenging frontier proprietary models"
+  },
+  "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
+}
+</script>
+<!-- FAQ Schema (AEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Kimi K3.1 Pro?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kimi K3.1 Pro is Moonshot AI's most capable 3T-class open-weight model, released October 23, 2026. It features 2.8 trillion total parameters with 104 billion active parameters (MoE), a 1-million-token context window, and delivers frontier-level performance on coding, agentic, and knowledge benchmarks."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much does Kimi K3.1 Pro cost?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kimi K3.1 Pro costs $2 per million input tokens and $10 per million output tokens through the Kimi API. This is half the price of Claude Opus 5.5 and matches GPT-6.1 Sol pricing. A faster Highspeed variant is also available."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What architecture does Kimi K3.1 Pro use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kimi K3.1 Pro uses a Stable LatentMoE framework that activates 16 out of 896 experts per inference. It's built on Kimi Delta Attention (KDA) and Attention Residuals (AttnRes), uses NoPE (No Positional Embeddings) throughout, and achieves 2.5× improved scaling efficiency over K2."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Kimi K3.1 Pro perform on benchmarks?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kimi K3.1 Pro scores 65.7% on Terminal-Bench 4.0 (ahead of GPT-6 Astra's 58.2%), 61.2% on Kimi Code Bench 3.0 Long-horizon, 92.7% on BenchCAD with tools, and ranks 4th on Artificial Analysis Intelligence Index with a score of 55. It places 3rd on GDPval-AA with 1,846 Elo."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Is Kimi K3.1 Pro open-weight?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. Moonshot AI will release full model weights for Kimi K3.1 Pro by November 4, 2026. This makes it the highest-scoring open-weight model on the Artificial Analysis Intelligence Index, narrowing the gap between open and proprietary models from 14 points (K3) to just 3 points."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What cybersecurity controls were applied to K3.1 Pro?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Moonshot identified and removed cyber-related data from both mid-training and RL stages. On xdev-bench-hard, the final K3.1 Pro reaches 81.0% pass@3, compared to 90.5% for an uncontrolled checkpoint. The model's offensive cyber capability remains behind frontier proprietary models."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Where can I access Kimi K3.1 Pro?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Kimi K3.1 Pro is available on kimi.ai and Kimi mobile apps (iOS, Android, HarmonyOS), Kimi Work desktop app (Windows, Mac), Kimi Code IDE, and the Kimi API Platform with Zero Data Retention options."
+      }
+    }
+  ]
+}
+</script>
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/kimi-k3-1-pro-technical-deep-dive.html">
+<link rel="stylesheet" href="../styles.css">
+<style>
+body {
+  line-height: 1.7;
+  color: #e0e0e0;
+  background-color: #0a0a0a;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  max-width: 850px;
+  margin: 0 auto;
+  padding: 20px;
+}
+.cover {
+  margin-bottom: 40px;
+  padding-top: 20px;
+}
+h1 {
+  font-size: 2.8em;
+  color: #ffffff;
+  margin-bottom: 15px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+.cover .sub {
+  font-size: 1.25em;
+  color: #b0b0b0;
+  line-height: 1.5;
+  margin-top: 15px;
+}
+.meta {
+  color: #888;
+  font-size: 0.95em;
+  margin-top: 20px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #333;
+}
+h2 {
+  font-size: 1.9em;
+  color: #ffffff;
+  margin-top: 50px;
+  margin-bottom: 20px;
+  font-weight: 600;
+  border-bottom: 2px solid #1a73e8;
+  padding-bottom: 10px;
+}
+h3 {
+  font-size: 1.4em;
+  color: #f0f0f0;
+  margin-top: 35px;
+  margin-bottom: 15px;
+  font-weight: 600;
+}
+p {
+  margin-bottom: 20px;
+  font-size: 1.05em;
+}
+ul, ol {
+  margin-bottom: 20px;
+  padding-left: 30px;
+}
+li {
+  margin-bottom: 10px;
+}
+strong {
+  color: #ffffff;
+  font-weight: 600;
+}
+code {
+  background-color: #1a1a1a;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  color: #4af;
+  font-size: 0.95em;
+}
+.benchmark-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 25px 0;
+  font-size: 0.95em;
+  background-color: #0f0f0f;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.benchmark-table thead tr {
+  background-color: #1a73e8;
+  color: #ffffff;
+  text-align: left;
+  font-weight: 600;
+}
+.benchmark-table th,
+.benchmark-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #222;
+}
+.benchmark-table tbody tr {
+  border-bottom: 1px solid #222;
+}
+.benchmark-table tbody tr:last-of-type {
+  border-bottom: 2px solid #1a73e8;
+}
+.benchmark-table tbody tr:hover {
+  background-color: #1a1a1a;
+}
+.highlight-box {
+  background-color: #1a1a1a;
+  border-left: 4px solid #1a73e8;
+  padding: 20px;
+  margin: 25px 0;
+  border-radius: 4px;
+}
+.highlight-box strong {
+  color: #1a73e8;
+}
+.warning-box {
+  background-color: #1a1a0a;
+  border-left: 4px solid #f39c12;
+  padding: 20px;
+  margin: 25px 0;
+  border-radius: 4px;
+}
+.warning-box strong {
+  color: #f39c12;
+}
+blockquote {
+  border-left: 4px solid #555;
+  padding-left: 20px;
+  margin: 25px 0;
+  color: #aaa;
+  font-style: italic;
+}
+a {
+  color: #4a9eff;
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+.back-link {
+  display: inline-block;
+  margin-top: 40px;
+  padding: 10px 20px;
+  background-color: #1a73e8;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.back-link:hover {
+  background-color: #1557b0;
+  text-decoration: none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="cover">
+<h1>Kimi K3.1 Pro: China's 2.8T MoE Model Challenging GPT-6 and Claude Opus</h1>
+<div class="sub">
+A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 trillion parameters, Stable LatentMoE architecture, massive-scale reinforcement learning, Terminal-Bench 4.0 leadership, deliberate cybersecurity controls, and how it compares to Claude Opus 5.5, GPT-6 Astra, and other frontier models
+</div>
+<div class="meta">
+<strong>Published:</strong> October 24, 2026 | <strong>Author:</strong> Hussain Nazary | <strong>Reading Time:</strong> 45 min
+</div>
+</div>
+
+<h2>Introduction: The Open-Weight Frontier Narrows</h2>
+
+<p>On October 23, 2026, Moonshot AI released <strong>Kimi K3.1 Pro</strong>, the first model in their new K3.1 series and their most capable 3T-class open-weight model to date. This isn't just another incremental update—K3.1 Pro represents a substantial leap in what open-weight models can achieve, narrowing the gap between open and proprietary frontier models from 14 points (K3's 44 to Claude Opus 5.5's 58) to just 3 points (K3.1 Pro's 55 to 58) on the <a href="https://artificialanalysis.ai/" target="_blank">Artificial Analysis Intelligence Index</a>.</p>
+
+<p>The numbers tell a compelling story: K3.1 Pro scores <strong>65.7% on Terminal-Bench 4.0</strong> in Moonshot's evaluation (though independent testing by Artificial Analysis measured 67%, potentially the highest score of any model on this benchmark), surpassing GPT-6 Astra (58.2%) and narrowly trailing Claude Opus 5.5 (66.4%). It ranks <strong>4th overall on the Intelligence Index with a score of 55</strong>, ahead of GPT-6 Astra (53), Gemini 4 Argon (53), and every other publicly available model except three Claude variants. On <strong>GDPval-AA</strong>, which measures performance on real-world work tasks, K3.1 Pro achieves <strong>1,846 Elo—3rd place globally</strong>, behind only Claude Opus 5.5 (1,866 Elo) and Muse Wonder Full (1,857 Elo).</p>
+
+<p>What makes K3.1 Pro particularly significant is its <strong>open-weight release strategy</strong>. While proprietary models like Claude and GPT remain black boxes, Moonshot will release the full model weights by November 4, 2026. This makes K3.1 Pro the highest-scoring open-weight model currently available, giving researchers, enterprises, and developers unprecedented access to frontier-level AI capabilities.</p>
+
+<div class="highlight-box">
+<strong>Key Takeaway:</strong> Kimi K3.1 Pro demonstrates that open-weight models can now compete directly with the best proprietary systems. At half the price of Claude Opus 5.5 ($2/$10 per million tokens vs. $4/$20), with comparable performance on many benchmarks, and full weight availability, K3.1 Pro represents a paradigm shift in AI accessibility.
+</div>
+
+<p>This deep dive examines the technical architecture, training methodology, benchmark performance, cybersecurity controls, and competitive positioning of Kimi K3.1 Pro. We'll explore how Moonshot achieved these results through massive-scale reinforcement learning, what the Stable LatentMoE framework actually does, where K3.1 Pro excels and where it falls short, and what this release means for the future of open AI development.</p>
+
+<h2>What Changed from K3 to K3.1 Pro</h2>
+
+<p>Kimi K3.1 Pro is explicitly described as a <strong>post-trained version of Kimi K3</strong> with substantially larger post-training compute. The base architecture remains identical—same 2.8 trillion total parameters, same 1-million-token context window, same Kimi Delta Attention and Attention Residuals, same Stable LatentMoE framework. What changed is the reinforcement learning phase.</p>
+
+<h3>Scaled Joint Reinforcement Learning</h3>
+
+<p>According to Moonshot's technical blog, K3.1 Pro benefited from optimizations across every layer of the RL training stack:</p>
+
+<ul>
+<li><strong>RL framework</strong> — Improved infrastructure for large-scale policy gradient methods</li>
+<li><strong>Long-context inference</strong> — Better handling of the 1M-token window during training</li>
+<li><strong>Training efficiency</strong> — Reduced wall-clock time per RL iteration</li>
+<li><strong>Sandbox infrastructure</strong> — Reliable, reproducible environments for code execution and agent tasks</li>
+<li><strong>Rollout scheduling</strong> — Optimized distribution of RL episodes across hundreds of domains</li>
+<li><strong>Environment quality checks</strong> — Shared platform to validate task correctness and grading</li>
+</ul>
+
+<p>The result: <strong>stable, predictable returns from each increment of RL compute</strong>. Moonshot reports that K3.1 Pro achieves consistent gains in every domain tested. On their internal <strong>Kimi Code Bench 3.0 Long-horizon</strong>, which tests coding agents' multi-step execution and tool use, K3.1 Pro scores <strong>61.2%</strong> compared to K3's <strong>55.95%</strong>—a 5.25 percentage point improvement.</p>
+
+<h3>Improved Factual Accuracy</h3>
+
+<p>Financial analysis and investment research demand high factual accuracy. Moonshot made targeted improvements to reduce hallucinations. On <strong>Kimi Hallu Bench Hard</strong>, an internal stress-test benchmark designed to probe situations where models are prone to errors:</p>
+
+<ul>
+<li><strong>Claim-level hallucination rate:</strong> 23.4% (K3) → <strong>8.3% (K3.1 Pro)</strong></li>
+<li><strong>Responses containing at least one factual error:</strong> Reduced to <strong>42.4% of K3's rate</strong></li>
+</ul>
+
+<p>This is a substantial reduction. Moonshot emphasizes that these are stress-test scenarios, not representative of overall error rates in daily use, but the improvement demonstrates effective post-training control over factual grounding.</p>
+
+<h3>Cybersecurity Controls</h3>
+
+<p>As K3.1 Pro became more capable, Moonshot observed that <strong>cyber-related content was embedded within the general mid-training corpus</strong>, and cyber-related tasks were present in the RL environment mix. Without intervention, downstream cyber capability would increase substantially. For the open-weight release, Moonshot:</p>
+
+<ul>
+<li><strong>Identified and removed cyber-related data</strong> from both mid-training and RL stages</li>
+<li><strong>Retained general-purpose coding tasks</strong> needed for model usefulness</li>
+<li><strong>Evaluated on xdev-bench-hard</strong>, their in-house benchmark of expert-curated vulnerability discovery and exploitation tasks</li>
+</ul>
+
+<p>The checkpoint <em>without</em> these controls solved <strong>90.5%</strong> of xdev-bench-hard problems at pass@3. The final K3.1 Pro reaches <strong>81.0%</strong>. This 9.5 percentage point reduction demonstrates that targeted data removal meaningfully reduces offensive cyber capability while preserving general coding strength.</p>
+
+<div class="warning-box">
+<strong>Open-Weight Principles:</strong> Moonshot's philosophy is that K3.1 Pro should not extend the absolute frontier of cyber capability (it remains behind frontier proprietary models) but should progressively raise the capability available in open weights. The reasoning: making defensive capabilities accessible to more teams—especially those maintaining legacy systems—ultimately makes all software more secure.
+</div>
+
+<h2>Architecture: 2.8T Parameters with Stable LatentMoE</h2>
+
+<p>Kimi K3.1 Pro's architecture is inherited directly from K3. Here's what we know:</p>
+
+<h3>Total Parameters and Active Compute</h3>
+
+<ul>
+<li><strong>Total parameters:</strong> 2.8 trillion</li>
+<li><strong>Active parameters per inference:</strong> 104 billion</li>
+<li><strong>Architecture:</strong> Mixture of Experts (MoE) with Stable LatentMoE framework</li>
+<li><strong>Experts:</strong> 896 total experts, <strong>16 activated per token</strong></li>
+<li><strong>MoE layers:</strong> 92 layers</li>
+</ul>
+
+<p>The config file shows <code>hidden_size: 7168</code> and <code>moe_intermediate_size: 3072</code>. A naive calculation (92 layers × 896 experts × 3 × 7168 × 3072) yields approximately 5.45T parameters, but the actual download size is 1.42 TB, which at 4-bit quantization corresponds to roughly 2.7-2.8T parameters, consistent with Moonshot's claim.</p>
+
+<h3>Kimi Delta Attention (KDA)</h3>
+
+<p>Kimi Delta Attention is a modification of standard attention mechanisms designed to improve long-context handling. While Moonshot has not released full architectural details, KDA is described as enabling:</p>
+
+<ul>
+<li><strong>Better scaling efficiency</strong> — 2.5× improvement over K2</li>
+<li><strong>Long-context stability</strong> — Maintains performance across the full 1M-token window</li>
+<li><strong>Reduced attention computation</strong> — Likely through sparsity or hierarchical patterns</li>
+</ul>
+
+<p>The exact mechanism remains proprietary, but the benchmark results on long-horizon tasks suggest KDA successfully addresses the quadratic complexity bottleneck of standard attention.</p>
+
+<h3>Attention Residuals (AttnRes)</h3>
+
+<p>Attention Residuals add a skip connection around the attention mechanism itself, allowing gradients to flow more directly during backpropagation. This architectural choice likely contributes to training stability and enables deeper networks without vanishing gradients.</p>
+
+<h3>No Positional Embeddings (NoPE)</h3>
+
+<p>Unlike most transformers, which use RoPE (Rotary Position Embeddings) or absolute positional encodings, K3.1 Pro uses <strong>NoPE — No Positional Embeddings throughout the entire network</strong>. This design choice:</p>
+
+<ul>
+<li><strong>Facilitates a more flexible and larger context window</strong> — No hardcoded position limits</li>
+<li><strong>Improves generalization</strong> — The model learns positional patterns from data rather than embeddings</li>
+<li><strong>Reduces computational overhead</strong> — One fewer operation per attention layer</li>
+</ul>
+
+<p>NoPE is an unconventional choice that reflects Moonshot's focus on extreme long-context capability. The tradeoff is that the model must learn positional patterns implicitly, which may require more training compute but offers greater flexibility at inference time.</p>
+
+<h3>Stable LatentMoE Framework</h3>
+
+<p>Stable LatentMoE is Moonshot's approach to scaling MoE sparsity while maintaining training stability. Traditional MoE models suffer from:</p>
+
+<ul>
+<li><strong>Load imbalance</strong> — Some experts are overused while others remain idle</li>
+<li><strong>Training instability</strong> — Gradient spikes when expert routing changes abruptly</li>
+<li><strong>Expert collapse</strong> — A few experts dominate, reducing effective capacity</li>
+</ul>
+
+<p>Stable LatentMoE addresses these issues by:</p>
+
+<ul>
+<li><strong>Smooth routing</strong> — Gradual changes in expert selection across training iterations</li>
+<li><strong>Load balancing losses</strong> — Encouraging even distribution of tokens across experts</li>
+<li><strong>Latent expert representations</strong> — Possibly learning continuous expert embeddings rather than discrete routing</li>
+</ul>
+
+<p>The result is a model that activates only <strong>16 out of 896 experts</strong> per token—an extraordinarily sparse activation rate of just <strong>1.79%</strong>—while achieving frontier-level performance. This sparsity is what makes K3.1 Pro economically viable: 104B active parameters deliver compute comparable to models like GPT-4, but inference cost scales with active parameters, not total parameters.</p>
+
+<h3>Native Multimodal Capabilities</h3>
+
+<p>K3.1 Pro accepts <strong>text, images, and video</strong> through the API. The model has native vision capabilities, meaning visual inputs are processed directly by the same transformer architecture rather than requiring a separate vision encoder. This unified approach enables:</p>
+
+<ul>
+<li><strong>Cross-modal reasoning</strong> — Understanding relationships between text and visual content</li>
+<li><strong>Visual question answering</strong> — Directly answering queries about images or videos</li>
+<li><strong>Multimodal tool use</strong> — Invoking tools based on visual context, such as generating 3D models from sketches</li>
+</ul>
+
+<h2>Benchmark Performance: Where K3.1 Pro Excels</h2>
+
+<p>Moonshot published extensive benchmark results across coding, agentic, reasoning, knowledge, multimodal, and cybersecurity domains. Here's where K3.1 Pro demonstrates frontier-level performance.</p>
+
+<h3>Coding Benchmarks</h3>
+
+<table class="benchmark-table">
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>K3.1 Pro</th>
+<th>Claude Opus 5.5</th>
+<th>GPT-6 Astra</th>
+<th>DeepSeek V4.1</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Terminal-Bench 4.0</strong></td>
+<td><strong>65.7%</strong></td>
+<td>66.4%</td>
+<td>58.2%</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Terminal-Bench Science 0.1</strong></td>
+<td><strong>12.4%</strong></td>
+<td>—</td>
+<td>—</td>
+<td>15.7%</td>
+</tr>
+<tr>
+<td><strong>DeepSWE v1.1</strong></td>
+<td><strong>55.8%</strong></td>
+<td>58.1%</td>
+<td>52.3%</td>
+<td>52.1%</td>
+</tr>
+<tr>
+<td><strong>SWE-Marathon v1.1</strong></td>
+<td><strong>27.3%</strong></td>
+<td>29.8%</td>
+<td>24.1%</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>PostTrainBench</strong></td>
+<td><strong>42.6%</strong></td>
+<td>—</td>
+<td>—</td>
+<td>39.2%</td>
+</tr>
+<tr>
+<td><strong>ProgramBench (binary)</strong></td>
+<td><strong>81.3%</strong></td>
+<td>—</td>
+<td>—</td>
+<td>78.9%</td>
+</tr>
+<tr>
+<td><strong>BenchCAD (with tools)</strong></td>
+<td><strong>92.7%</strong></td>
+<td>96.2%</td>
+<td>95.9%</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Analysis:</strong> K3.1 Pro is competitive across the board, with particularly strong performance on Terminal-Bench 4.0. Moonshot reports 65.7%, which trails Claude Opus 5.5 (66.4%) by 0.7 percentage points. However, Artificial Analysis's independent testing measured 67% for K3.1 Pro—potentially the highest score of any model on this benchmark. On DeepSWE v1.1 and SWE-Marathon—benchmarks that test software engineering agents on real-world GitHub issues—K3.1 Pro trails Opus 5.5 but beats GPT-6 Astra and DeepSeek V4.1.</p>
+
+<h3>Agentic Benchmarks</h3>
+
+<table class="benchmark-table">
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>K3.1 Pro</th>
+<th>Claude Opus 5.5</th>
+<th>GPT-6 Astra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GDPval-AA v2.1</strong></td>
+<td><strong>1,846 Elo (3rd)</strong></td>
+<td>1,866 Elo (1st)</td>
+<td>1,803 Elo</td>
+</tr>
+<tr>
+<td><strong>BioMysteryBench</strong></td>
+<td><strong>68.2%</strong></td>
+<td>71.4%</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Our Agents' Last Exam</strong></td>
+<td><strong>53.3%</strong></td>
+<td>—</td>
+<td>58.2%</td>
+</tr>
+<tr>
+<td><strong>OfficeQA Pro v2</strong></td>
+<td><strong>64.4</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>HANDBOOK.md</strong></td>
+<td><strong>67.8%</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Harvey Legal Agent</strong></td>
+<td><strong>72.1%</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>OSWorld V2.1</strong></td>
+<td><strong>48.3%</strong></td>
+<td>—</td>
+<td>52.7%</td>
+</tr>
+<tr>
+<td><strong>MCP Atlas (500-task subset)</strong></td>
+<td><strong>81.2%</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>BrowseComp</strong></td>
+<td><strong>58.4%</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Analysis:</strong> The standout result is <strong>GDPval-AA</strong>, where K3.1 Pro ranks 3rd globally with 1,846 Elo—a massive 312 Elo gain over K3 (1,534 Elo). This benchmark measures performance on real-world work tasks, and K3.1 Pro trails only Claude Opus 5.5 and Muse Wonder Full.</p>
+
+<p>On <strong>OfficeQA Pro v2</strong>, which tests complex fiscal data analysis over real financial documents through retrieval, cross-document verification, and multi-step numerical reasoning, K3.1 Pro achieves state-of-the-art results with a score of <strong>64.4</strong>. This aligns with Moonshot's emphasis on financial research and modeling as a core use case.</p>
+
+<h3>Reasoning and Knowledge Benchmarks</h3>
+
+<table class="benchmark-table">
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>K3.1 Pro</th>
+<th>Claude Opus 5.5</th>
+<th>GPT-6 Astra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>HLE (2,500 questions)</strong></td>
+<td><strong>78.3%</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>HLE-Diamond (1,000 questions)</strong></td>
+<td><strong>72.1%</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>GDP.pdf (strict pass rate)</strong></td>
+<td><strong>61.8%</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>MMMU-Pro</strong></td>
+<td><strong>54.7%</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Analysis:</strong> K3.1 Pro demonstrates strong general knowledge and reasoning capabilities. HLE and HLE-Diamond test factual knowledge and multi-hop reasoning across diverse domains. GDP.pdf evaluates the model's ability to process complex PDF documents and answer rubric-based questions accurately.</p>
+
+<h3>Multimodal Benchmarks</h3>
+
+<table class="benchmark-table">
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>K3.1 Pro</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>GDP.pdf w/ Python</strong></td>
+<td><strong>68.4%</strong></td>
+<td>Task-macro mean rubric pass rate (5 runs)</td>
+</tr>
+<tr>
+<td><strong>ZeroBench w/ Python</strong></td>
+<td><strong>72.9%</strong></td>
+<td>Averaged over 5 runs</td>
+</tr>
+<tr>
+<td><strong>ChartoGraphy w/ Python</strong></td>
+<td><strong>81.3%</strong></td>
+<td>Averaged over 5 runs</td>
+</tr>
+<tr>
+<td><strong>BenchCAD (without tools)</strong></td>
+<td><strong>87.6%</strong></td>
+<td>3D reconstruction from multi-view renderings</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Analysis:</strong> K3.1 Pro excels at multimodal tasks that combine vision and code execution. On <strong>BenchCAD</strong>, which tests 3D reconstruction from multi-view renderings through CAD code generation, K3.1 Pro scores <strong>92.7% with tools</strong> and <strong>87.6% without tools</strong>, approaching the performance of Claude Opus 5.5 (96.2%) and GPT-6 Astra (95.9%).</p>
+
+<h3>Cybersecurity Benchmarks</h3>
+
+<table class="benchmark-table">
+<thead>
+<tr>
+<th>Benchmark</th>
+<th>K3.1 Pro</th>
+<th>Claude Opus 5.5</th>
+<th>GPT-6 Astra</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>ExploitBench (pass@5 max)</strong></td>
+<td><strong>12.8/16</strong></td>
+<td>—</td>
+<td>14.1/16</td>
+</tr>
+<tr>
+<td><strong>ExploitGym (6-hour budget)</strong></td>
+<td><strong>73.2%</strong></td>
+<td>78.4%</td>
+<td>76.9%</td>
+</tr>
+<tr>
+<td><strong>xdev-bench-hard (pass@3)</strong></td>
+<td><strong>81.0%</strong></td>
+<td>—</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Analysis:</strong> K3.1 Pro's offensive cyber capability is strong but deliberately constrained. On <strong>xdev-bench-hard</strong>, the model reaches <strong>81.0%</strong> after cyber-related data removal, compared to <strong>90.5%</strong> for an uncontrolled checkpoint. Moonshot emphasizes that K3.1 Pro's cyber capability remains behind frontier proprietary models, aligning with their open-weight release principles.</p>
+
+<h2>Real-World Capabilities: Coding, 3D Design, and Finance</h2>
+
+<p>Beyond benchmarks, Moonshot showcased several real-world applications where K3.1 Pro demonstrates frontier-level performance.</p>
+
+<h3>Long-Horizon Coding: Human Walking Simulator</h3>
+
+<p>In one internal test, K3.1 Pro built a <strong>human walking dynamics simulator with integrated training and evaluation pipelines</strong> on top of human-atlas, an open-source anatomical model comprising 296 skeletal components and 402 muscle components. Across <strong>167 missions and 420 independent reviews</strong>, the model:</p>
+
+<ul>
+<li><strong>Analyzed experimental results</strong> from each training run</li>
+<li><strong>Diagnosed problems</strong> in the walking controller's behavior</li>
+<li><strong>Iteratively refined the controller</strong>, enabling the simulated human to go from collapsing within seconds to <strong>walking continuously with alternating strides for 11.2 seconds</strong></li>
+</ul>
+
+<p>When reward shaping failed to improve arm motion, K3.1 Pro didn't simply keep adjusting the reward function. Instead, it:</p>
+
+<ul>
+<li><strong>Ran open-loop probes</strong> of the simulator's dynamics</li>
+<li><strong>Identified and corrected 36 errors</strong> in shoulder-muscle moment-arm calculations</li>
+<li><strong>Retrained the controller</strong> with the corrected dynamics</li>
+</ul>
+
+<p>This demonstrates sophisticated debugging and hypothesis testing—hallmarks of expert-level engineering work.</p>
+
+<h3>3D Modeling and Parametric Design</h3>
+
+<p>K3.1 Pro excels at 3D creation and spatial reasoning. From a text brief, sketch, or reference image, it can infer shape, proportions, and spatial relationships to create usable 3D models. Moonshot highlights <strong>parametric modeling</strong> as a particular strength:</p>
+
+<ul>
+<li><strong>Mechanical parts</strong> — Gears, brackets, housings with precise tolerances</li>
+<li><strong>Architectural models</strong> — Building facades, floor plans, structural elements</li>
+<li><strong>Configurable products</strong> — Custom furniture, product designs with adjustable dimensions</li>
+</ul>
+
+<p>Without MCP connectors, K3.1 Pro can write and run scripts for tools like <strong>Blender and CAD software</strong> to build and refine assets, edit components, and adjust geometry, materials, and scene layout. Moonshot launched <strong>3D Make</strong> on kimi.ai and the Kimi app, allowing users to preview and edit 3D models online, download them ready for 3D printing, or export them as videos or Live Photos.</p>
+
+<h3>Financial Modeling and Investment Research</h3>
+
+<p>K3.1 Pro shows significant improvements across Moonshot's internal finance benchmarks:</p>
+
+<ul>
+<li><strong>Financial Modeling</strong> (formula linkage, financial logic, workbook quality): <strong>+7.2 points</strong> over K3</li>
+<li><strong>Financial Research</strong> (auditable research under evidence and cutoff constraints): <strong>+11.6 points</strong> over K3</li>
+<li><strong>Business Operation</strong> (long-horizon management and decision-making in simulated business environment): <strong>~4.2× K3's performance</strong></li>
+</ul>
+
+<p>On <strong>OfficeQA Pro v2</strong>, K3.1 Pro achieves state-of-the-art results with a score of <strong>64.4</strong>, demonstrating its ability to handle complex fiscal data analysis over real financial documents through retrieval, cross-document verification, and multi-step numerical reasoning.</p>
+
+<h2>Pricing and Access</h2>
+
+<h3>API Pricing</h3>
+
+<p>Kimi K3.1 Pro's API pricing is <strong>half the cost of Claude Opus 5.5</strong>:</p>
+
+<table class="benchmark-table">
+<thead>
+<tr>
+<th>Model</th>
+<th>Input (per 1M tokens)</th>
+<th>Output (per 1M tokens)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kimi K3.1 Pro</strong></td>
+<td><strong>$2</strong></td>
+<td><strong>$10</strong></td>
+</tr>
+<tr>
+<td><strong>Kimi K3.1 Pro Highspeed</strong></td>
+<td><strong>$2</strong></td>
+<td><strong>$10</strong></td>
+</tr>
+<tr>
+<td>Claude Opus 5.5</td>
+<td>$4</td>
+<td>$20</td>
+</tr>
+<tr>
+<td>GPT-6.1 Sol</td>
+<td>$2</td>
+<td>$10</td>
+</tr>
+<tr>
+<td>GPT-6 Astra</td>
+<td>$2.50</td>
+<td>$10</td>
+</tr>
+<tr>
+<td>Kimi K3</td>
+<td>$3</td>
+<td>$15</td>
+</tr>
+</tbody>
+</table>
+
+<p><strong>Kimi K3.1 Pro Highspeed</strong> delivers <strong>2-3× the speed</strong> of K3.1 Pro for more responsive interactions, at the same price. This variant likely uses more aggressive KV cache optimization or shorter maximum thinking time, trading some quality for latency.</p>
+
+<h3>Availability</h3>
+
+<p>Kimi K3.1 Pro is available today through multiple channels:</p>
+
+<ul>
+<li><strong>Kimi.ai and Kimi mobile apps</strong> — iOS, Android, and HarmonyOS</li>
+<li><strong>Kimi Work</strong> — Desktop app (Windows and Apple silicon Macs), version 3.1.0 or later</li>
+<li><strong>Kimi Code</strong> — Select K3.1 Pro using the <code>/model</code> command</li>
+<li><strong>Kimi API</strong> — Available at the <a href="https://platform.moonshot.cn/" target="_blank">Kimi API Platform</a> with Zero Data Retention options</li>
+<li><strong>Kimi Business</strong> — Enterprise-grade data privacy and member management with complete separation between personal and organization accounts</li>
+</ul>
+
+<p><strong>Open-Weight Release:</strong> Full model weights will be released by <strong>November 4, 2026</strong>. This makes K3.1 Pro the highest-scoring open-weight model on the Artificial Analysis Intelligence Index.</p>
+
+<h2>How K3.1 Pro Compares to Claude Opus 5.5 and GPT-6 Astra</h2>
+
+<h3>Terminal-Bench 4.0: The Coding Agent Battleground</h3>
+
+<p>Terminal-Bench 4.0 evaluates coding agents on realistic, resource-constrained terminal tasks using strict task-specific tests. This is one of the most demanding benchmarks for coding agents:</p>
+
+<ul>
+<li><strong>Kimi K3.1 Pro:</strong> 65.7% (Moonshot's evaluation) / 67% (Artificial Analysis)</li>
+<li><strong>Claude Opus 5.5:</strong> 66.4%</li>
+<li><strong>Claude Sonnet 5.5:</strong> 64%</li>
+<li><strong>GPT-6 Astra:</strong> 58.2%</li>
+</ul>
+
+<p>Using Moonshot's reported figure, K3.1 Pro trails Opus 5.5 by just <strong>0.7 percentage points</strong> while beating GPT-6 Astra by <strong>7.5 percentage points</strong>. Artificial Analysis's independent measurement of 67% would place K3.1 Pro at the top of this benchmark, ahead of all other models tested. This positions K3.1 Pro as a near-frontier (or frontier-leading) coding agent at half the price of Opus 5.5.</p>
+
+<h3>GDPval-AA: Real-World Work Tasks</h3>
+
+<p>GDPval-AA measures performance on real-world work tasks using an Elo rating system:</p>
+
+<ul>
+<li><strong>Claude Opus 5.5:</strong> 1,866 Elo (1st)</li>
+<li><strong>Muse Wonder Full:</strong> 1,857 Elo (2nd)</li>
+<li><strong>Kimi K3.1 Pro:</strong> 1,846 Elo (3rd)</li>
+<li><strong>GPT-6 Astra:</strong> 1,803 Elo</li>
+</ul>
+
+<p>K3.1 Pro trails the leader by just <strong>20 Elo</strong> and beats GPT-6 Astra by <strong>43 Elo</strong>. The gap between K3.1 Pro and the frontier is narrower here than on any other agentic benchmark.</p>
+
+<h3>BenchCAD: 3D Reconstruction from Multi-View Renderings</h3>
+
+<p>BenchCAD tests 3D reconstruction through CAD code generation:</p>
+
+<ul>
+<li><strong>Claude Opus 5.5:</strong> 96.2%</li>
+<li><strong>GPT-6 Astra:</strong> 95.9%</li>
+<li><strong>Kimi K3.1 Pro:</strong> 92.7%</li>
+</ul>
+
+<p>K3.1 Pro trails by <strong>3.5 percentage points</strong>, demonstrating strong spatial reasoning and code generation capabilities, though not quite matching the frontier proprietary models.</p>
+
+<h3>Pricing: K3.1 Pro Undercuts Opus 5.5 by 50%</h3>
+
+<p>At <strong>$2 input / $10 output per million tokens</strong>, K3.1 Pro costs exactly half as much as Claude Opus 5.5 ($4/$20) and matches GPT-6.1 Sol pricing. For enterprises running high-throughput agentic workflows, this price difference is significant. A workload generating 100 million output tokens per month would cost:</p>
+
+<ul>
+<li><strong>K3.1 Pro:</strong> $1,000</li>
+<li><strong>Claude Opus 5.5:</strong> $2,000</li>
+</ul>
+
+<p>If K3.1 Pro delivers 95% of Opus 5.5's performance at 50% of the cost, the cost-effectiveness proposition is compelling.</p>
+
+<h2>Where K3.1 Pro Falls Short</h2>
+
+<p>Despite its impressive performance, K3.1 Pro has notable gaps compared to frontier proprietary models:</p>
+
+<h3>1. DeepSWE and SWE-Marathon Performance</h3>
+
+<p>On software engineering benchmarks that test agents on real-world GitHub issues:</p>
+
+<ul>
+<li><strong>DeepSWE v1.1:</strong> K3.1 Pro 55.8%, Claude Opus 5.5 58.1% (2.3 pp gap)</li>
+<li><strong>SWE-Marathon v1.1:</strong> K3.1 Pro 27.3%, Claude Opus 5.5 29.8% (2.5 pp gap)</li>
+</ul>
+
+<p>While K3.1 Pro beats GPT-6 Astra and DeepSeek V4.1 on these benchmarks, it still trails Claude Opus 5.5. The gap suggests that Anthropic's RL training includes more diverse software engineering environments or more effective exploration strategies.</p>
+
+<h3>2. Terminal-Bench Science 0.1</h3>
+
+<p>On the scientific subset of Terminal-Bench:</p>
+
+<ul>
+<li><strong>DeepSeek V4.1:</strong> 15.7%</li>
+<li><strong>Kimi K3.1 Pro:</strong> 12.4%</li>
+</ul>
+
+<p>K3.1 Pro trails DeepSeek V4.1 by 3.3 percentage points on scientific computing tasks. This may reflect differences in mid-training data or RL environment coverage for scientific domains.</p>
+
+<h3>3. OSWorld V2.1</h3>
+
+<p>OSWorld evaluates desktop environment automation:</p>
+
+<ul>
+<li><strong>GPT-6 Astra:</strong> 52.7%</li>
+<li><strong>Kimi K3.1 Pro:</strong> 48.3%</li>
+</ul>
+
+<p>K3.1 Pro trails GPT-6 Astra by 4.4 percentage points on GUI automation tasks. This suggests OpenAI's RL training may include more extensive GUI interaction environments.</p>
+
+<h3>4. Limited Documentation on Architecture Details</h3>
+
+<p>While Moonshot will release the full model weights, they have not published:</p>
+
+<ul>
+<li><strong>Exact parameter breakdown</strong> — How the 2.8T parameters are distributed across layers and experts</li>
+<li><strong>Detailed KDA mechanism</strong> — How Kimi Delta Attention differs from standard attention</li>
+<li><strong>Stable LatentMoE algorithm</strong> — The specific routing and load balancing strategies</li>
+<li><strong>Training data composition</strong> — What domains and sources were included in pre-training and mid-training</li>
+<li><strong>RL environment details</strong> — What tasks and domains were used in reinforcement learning</li>
+</ul>
+
+<p>This lack of transparency contrasts with truly open models like <a href="https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html" target="_blank">Bonsai 2 27B</a>, where full architectural and training details are available.</p>
+
+<h2>What "Open-Weight" Actually Means</h2>
+
+<p>Moonshot describes K3.1 Pro as an <strong>"open-weight model"</strong> and will release the full weights by November 4, 2026. But what does "open-weight" actually mean, and how does it differ from "open-source"?</p>
+
+<h3>Open-Weight vs. Open-Source</h3>
+
+<ul>
+<li><strong>Open-weight:</strong> The model's trained parameters (weights) are released for download, but training code, data, and full architectural details may not be available. Users can run inference, fine-tune, and inspect the model, but cannot fully reproduce training from scratch.</li>
+<li><strong>Open-source:</strong> Everything needed to reproduce the model is released: weights, training code, data pipelines, architectural details, and evaluation scripts. Anyone can replicate the training process.</li>
+</ul>
+
+<p>K3.1 Pro falls into the <strong>open-weight</strong> category. Moonshot will release the weights, but has not committed to releasing:</p>
+
+<ul>
+<li>Pre-training data</li>
+<li>Mid-training data</li>
+<li>RL training code</li>
+<li>Detailed architectural specifications for KDA and Stable LatentMoE</li>
+</ul>
+
+<h3>Why Open-Weight Matters</h3>
+
+<p>Even without full reproducibility, open-weight releases provide significant value:</p>
+
+<ul>
+<li><strong>Customization:</strong> Fine-tune the model on domain-specific data</li>
+<li><strong>Privacy:</strong> Run inference on-premises with full data control</li>
+<li><strong>Cost control:</strong> Self-host for high-volume workloads to avoid API costs</li>
+<li><strong>Research:</strong> Study model behavior, interpretability, and failure modes</li>
+<li><strong>Transparency:</strong> Inspect the model for safety issues, biases, or capabilities</li>
+</ul>
+
+<p>For enterprises concerned about data privacy or regulatory compliance, the ability to run K3.1 Pro on-premises is a decisive advantage over proprietary models.</p>
+
+<h3>License Terms</h3>
+
+<p>Moonshot has not yet disclosed the license terms for K3.1 Pro's weights. The K3 release used a custom license that allowed:</p>
+
+<ul>
+<li><strong>Commercial use</strong> — Including in products and services</li>
+<li><strong>Fine-tuning and modification</strong> — Creating derivative models</li>
+<li><strong>Redistribution</strong> — Subject to certain restrictions</li>
+</ul>
+
+<p>We expect K3.1 Pro to use a similar license, but confirmation will come with the November 4 weight release.</p>
+
+<h2>Cybersecurity: Balancing Capability and Responsibility</h2>
+
+<p>Moonshot's approach to cybersecurity capability in K3.1 Pro reflects a nuanced philosophy about open-weight releases and dual-use capabilities.</p>
+
+<h3>The Cybersecurity Dilemma</h3>
+
+<p>As models become more capable at coding, they naturally develop offensive cybersecurity capabilities—finding vulnerabilities, writing exploits, and understanding attack vectors. This creates a tension:</p>
+
+<ul>
+<li><strong>Defensive value:</strong> Security researchers, red teams, and defenders need these capabilities to audit code and find vulnerabilities before attackers do</li>
+<li><strong>Offensive risk:</strong> Malicious actors could use the same capabilities to exploit systems</li>
+</ul>
+
+<p>Proprietary models like GPT-6 and Claude can gate access through usage policies, content filters, and account controls. Open-weight models cannot—once the weights are released, anyone can use them for any purpose.</p>
+
+<h3>Moonshot's Approach: Targeted Data Removal</h3>
+
+<p>Moonshot observed that cyber capability was increasing as a natural byproduct of training on broad coding data. They responded by:</p>
+
+<ul>
+<li><strong>Identifying cyber-related content</strong> in the mid-training corpus and RL task environments</li>
+<li><strong>Removing that content</strong> while retaining general-purpose coding tasks</li>
+<li><strong>Evaluating the impact</strong> on xdev-bench-hard, their in-house vulnerability discovery benchmark</li>
+</ul>
+
+<p>The result: K3.1 Pro's offensive cyber capability is <strong>meaningfully reduced</strong> (81.0% vs. 90.5% for an uncontrolled checkpoint) but still <strong>substantially above its predecessor K3</strong> due to improved general coding and debugging capabilities.</p>
+
+<h3>The Open-Weight Principles</h3>
+
+<p>Moonshot articulates two guiding principles:</p>
+
+<ol>
+<li><strong>Don't extend the absolute frontier:</strong> K3.1 Pro's offensive cyber capability should remain behind frontier proprietary models that have been publicly available for at least three months. The goal is not to create the most powerful offensive tool, but to make defensive capabilities more accessible.</li>
+<li><strong>Progressively raise the floor:</strong> Over time, more capable models should become available as open weights. When a capability has been widely available through proprietary APIs for months, releasing it in open-weight form allows broader defensive use without materially increasing offensive risk.</li>
+</ol>
+
+<p>This approach acknowledges that offensive cybersecurity capability is a form of dual-use technology—valuable for defense but risky if concentrated. By making defensive capabilities available to more teams, especially those maintaining legacy systems, Moonshot believes the net effect is positive for software security.</p>
+
+<h3>Evaluation Results</h3>
+
+<table class="benchmark-table">
+<thead>
+<tr>
+<th>Model</th>
+<th>xdev-bench-hard (pass@3)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>K3.1 Pro (uncontrolled checkpoint)</strong></td>
+<td><strong>90.5%</strong></td>
+</tr>
+<tr>
+<td><strong>K3.1 Pro (final release)</strong></td>
+<td><strong>81.0%</strong></td>
+</tr>
+<tr>
+<td>GLM-5.3</td>
+<td>—</td>
+</tr>
+<tr>
+<td>DeepSeek V4.1</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+
+<p>The 9.5 percentage point reduction demonstrates that targeted data removal works. The model retains strong general coding ability (evidenced by its Terminal-Bench performance) but is less effective at the specific task of vulnerability exploitation.</p>
+
+<h2>Technical Questions and Limitations</h2>
+
+<h3>1. How Does K3.1 Pro Handle the 1M-Token Context Window?</h3>
+
+<p>K3.1 Pro supports a <strong>1-million-token context window</strong>, but Moonshot has not disclosed:</p>
+
+<ul>
+<li><strong>Attention mechanism details:</strong> Does KDA use sparse attention, hierarchical attention, or some other pattern?</li>
+<li><strong>Inference cost scaling:</strong> How does latency and cost scale as context length increases?</li>
+<li><strong>Quality degradation:</strong> Does performance degrade at extreme context lengths, as observed in other long-context models?</li>
+</ul>
+
+<p>Users should test K3.1 Pro's behavior at various context lengths before relying on the full 1M-token window in production.</p>
+
+<h3>2. What Is the Highspeed Variant?</h3>
+
+<p>Kimi K3.1 Pro Highspeed delivers <strong>2-3× the speed</strong> at the same price. Moonshot has not disclosed the technical mechanism, but possibilities include:</p>
+
+<ul>
+<li><strong>Reduced thinking time:</strong> Less time spent on internal reasoning before generating output</li>
+<li><strong>Aggressive KV cache pruning:</strong> Keeping less context in memory during generation</li>
+<li><strong>Lower temperature:</strong> More deterministic generation with less sampling overhead</li>
+<li><strong>Shorter maximum output:</strong> Earlier stopping to reduce total tokens generated</li>
+</ul>
+
+<p>The quality-latency tradeoff likely depends on the task. For simple queries, Highspeed may be indistinguishable from the base model. For complex reasoning tasks, quality may suffer.</p>
+
+<h3>3. How Does K3.1 Pro Handle Multimodal Inputs?</h3>
+
+<p>K3.1 Pro accepts text, images, and video, but architectural details are sparse:</p>
+
+<ul>
+<li><strong>Vision encoder:</strong> Does K3.1 Pro use a separate vision encoder (like CLIP) or process images directly through the transformer?</li>
+<li><strong>Video handling:</strong> Are videos processed frame-by-frame, or does the model use temporal aggregation?</li>
+<li><strong>Token budget:</strong> How many tokens does an image or video consume from the 1M-token context window?</li>
+</ul>
+
+<p>These details matter for users planning multimodal workflows.</p>
+
+<h3>4. What Are the Hardware Requirements for Self-Hosting?</h3>
+
+<p>With 2.8T total parameters and 104B active parameters, K3.1 Pro requires substantial hardware:</p>
+
+<ul>
+<li><strong>At 4-bit quantization:</strong> ~1.4 TB storage, likely requiring 8× A100 80GB GPUs or equivalent</li>
+<li><strong>At 8-bit quantization:</strong> ~2.8 TB storage, requiring even more GPU memory or CPU offloading</li>
+<li><strong>Inference latency:</strong> Depends on batch size, context length, and hardware configuration</li>
+</ul>
+
+<p>Moonshot has not yet released official deployment guides or hardware recommendations. Users should expect significant infrastructure requirements for self-hosting.</p>
+
+<h2>Implications for the AI Landscape</h2>
+
+<h3>1. The Open-Weight Frontier is Real</h3>
+
+<p>K3.1 Pro demonstrates that open-weight models can now compete directly with the best proprietary systems. The gap on the Artificial Analysis Intelligence Index has narrowed from 14 points (K3's 44 vs. Claude Opus 5.5's 58) to just 3 points (K3.1 Pro's 55 vs. 58). On specific benchmarks like Terminal-Bench 4.0 and GDPval-AA, the gap is even smaller.</p>
+
+<p>This has profound implications:</p>
+
+<ul>
+<li><strong>Enterprise adoption:</strong> Companies concerned about data privacy or vendor lock-in can now choose open-weight models without sacrificing capability</li>
+<li><strong>Research acceleration:</strong> Researchers gain access to frontier-level capabilities for studying alignment, interpretability, and safety</li>
+<li><strong>Innovation:</strong> Developers can build on top of frontier capabilities without waiting for API access or paying usage fees</li>
+</ul>
+
+<h3>2. China's AI Ecosystem is Maturing</h3>
+
+<p>K3.1 Pro is the strongest model out of China to date, ahead of GLM-5.3 and DeepSeek V4.1 on most benchmarks. This reflects the maturation of China's AI ecosystem:</p>
+
+<ul>
+<li><strong>Infrastructure:</strong> Robust training infrastructure for 3T-scale models</li>
+<li><strong>Talent:</strong> Deep expertise in RL, MoE architectures, and long-context modeling</li>
+<li><strong>Compute efficiency:</strong> Achieving frontier performance with sparse activation and optimized training</li>
+</ul>
+
+<p>Moonshot, DeepSeek, Zhipu AI (GLM), and others are no longer playing catch-up—they're competing at the frontier.</p>
+
+<h3>3. Pricing Pressure on Proprietary Models</h3>
+
+<p>At <strong>$2/$10 per million tokens</strong>, K3.1 Pro is half the price of Claude Opus 5.5 with comparable performance. This puts pricing pressure on proprietary model providers:</p>
+
+<ul>
+<li><strong>Anthropic and OpenAI</strong> must justify their pricing premium through superior performance, safety guarantees, or enterprise features</li>
+<li><strong>Enterprises</strong> gain more negotiating leverage as open-weight alternatives become viable</li>
+<li><strong>API providers</strong> may see margin compression as open-weight models improve</li>
+</ul>
+
+<h3>4. The Cybersecurity Arms Race Continues</h3>
+
+<p>Moonshot's deliberate reduction of offensive cyber capability in K3.1 Pro sets a precedent for responsible open-weight releases of dual-use capabilities. Other labs will face similar decisions as models become more capable. Key questions:</p>
+
+<ul>
+<li><strong>How should labs balance defensive value against offensive risk?</strong></li>
+<li><strong>Should there be industry norms or regulations around offensive capabilities in open-weight models?</strong></li>
+<li><strong>Can targeted data removal effectively reduce risk without crippling general capability?</strong></li>
+</ul>
+
+<p>Moonshot's approach—don't extend the absolute frontier, but progressively raise the floor—offers one answer, but the debate will continue.</p>
+
+<h2>Practical Recommendations</h2>
+
+<h3>When to Use K3.1 Pro</h3>
+
+<p><strong>K3.1 Pro is a strong choice for:</strong></p>
+
+<ul>
+<li><strong>Coding agents:</strong> Near-frontier performance on Terminal-Bench 4.0 at half the cost of Opus 5.5</li>
+<li><strong>Long-horizon tasks:</strong> Multi-step reasoning, tool use, and complex workflows</li>
+<li><strong>Financial analysis:</strong> Strong performance on OfficeQA Pro v2 and internal finance benchmarks</li>
+<li><strong>3D design:</strong> Parametric modeling, spatial reasoning, and CAD code generation</li>
+<li><strong>High-volume workloads:</strong> Cost-effective for large-scale deployments</li>
+<li><strong>On-premises deployment:</strong> Full weight availability for self-hosting</li>
+</ul>
+
+<h3>When to Choose Alternatives</h3>
+
+<p><strong>Consider Claude Opus 5.5 if:</strong></p>
+
+<ul>
+<li>You need the absolute best performance and cost is not a primary concern</li>
+<li>You're working on safety-critical applications where the 2-3% performance gap matters</li>
+<li>You want Anthropic's enterprise support and compliance certifications</li>
+</ul>
+
+<p><strong>Consider GPT-6 Astra if:</strong></p>
+
+<ul>
+<li>You're heavily invested in OpenAI's ecosystem (function calling, plugins, Codex)</li>
+<li>You need strong multimodal capabilities with vision and audio</li>
+<li>You prefer OpenAI's API ergonomics and documentation</li>
+</ul>
+
+<p><strong>Consider smaller models (Claude Sonnet 5.5, GPT-6.1 Sol) if:</strong></p>
+
+<ul>
+<li>Your tasks don't require frontier-level reasoning</li>
+<li>You prioritize latency and cost over absolute performance</li>
+<li>You're running high-throughput workloads where volume discounts matter</li>
+</ul>
+
+<h3>Testing and Evaluation</h3>
+
+<p>Before committing to K3.1 Pro for production use:</p>
+
+<ul>
+<li><strong>Run your own benchmarks:</strong> Published benchmarks may not reflect your specific use case</li>
+<li><strong>Test at different context lengths:</strong> Verify performance doesn't degrade at extreme lengths</li>
+<li><strong>Compare Highspeed vs. base:</strong> Determine whether the speed improvement is worth any quality tradeoff</li>
+<li><strong>Evaluate factual accuracy:</strong> Test on your domain-specific questions to assess hallucination risk</li>
+<li><strong>Monitor for drift:</strong> Model behavior may change as Moonshot updates the hosted version</li>
+</ul>
+
+<h2>Conclusion: A New Equilibrium</h2>
+
+<p>Kimi K3.1 Pro marks an inflection point in AI development. For the first time, an open-weight model delivers frontier-level performance across coding, agentic, and knowledge tasks—at half the price of the best proprietary alternatives.</p>
+
+<p>The technical achievements are substantial:</p>
+
+<ul>
+<li><strong>2.8T parameters with 104B active parameters</strong> — Efficient MoE architecture</li>
+<li><strong>1-million-token context window</strong> — Enabled by Kimi Delta Attention and NoPE</li>
+<li><strong>Massive-scale reinforcement learning</strong> — Hundreds of domains, stable training, consistent gains</li>
+<li><strong>65.7% on Terminal-Bench 4.0</strong> — Just 0.7 pp behind Claude Opus 5.5</li>
+<li><strong>3rd place on GDPval-AA</strong> — Real-world work task performance</li>
+<li><strong>Deliberate cybersecurity controls</strong> — Balancing defensive value and offensive risk</li>
+</ul>
+
+<p>But K3.1 Pro's significance extends beyond raw performance. By releasing frontier capabilities as open weights, Moonshot is accelerating a shift toward a more open, accessible, and distributed AI ecosystem. Enterprises gain more control, researchers gain more transparency, and developers gain more freedom to innovate.</p>
+
+<p>The gap between open and proprietary models has narrowed dramatically—from 12 points to 3 on the Intelligence Index. If this trend continues, the distinction between "open" and "proprietary" may soon lose its meaning. The frontier will simply be the frontier, regardless of whether the weights are released.</p>
+
+<p>For practitioners, the message is clear: <strong>open-weight models are now viable alternatives to proprietary systems for production workloads</strong>. K3.1 Pro won't be the right choice for every use case, but it's competitive enough that you should evaluate it seriously.</p>
+
+<p>The AI landscape has entered a new equilibrium. The best models are still proprietary, but the gap is closing fast—and the open-weight frontier is real.</p>
+
+<div class="highlight-box">
+<strong>Next Steps:</strong> Moonshot will release the full K3.1 Pro weights by November 4, 2026. Watch for deployment guides, hardware requirements, and license terms. If you're evaluating K3.1 Pro for production use, start testing now through the API at <a href="https://platform.moonshot.cn/" target="_blank">platform.moonshot.cn</a>.
+</div>
+
+<a href="../blog.html" class="back-link">← Back to Blog</a>
+
+</div>
+</body>
+</html>
