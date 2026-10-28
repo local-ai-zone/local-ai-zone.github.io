@@ -1,6 +1,6 @@
 # LFM3: A Technical Deep Dive into Liquid AI's Tri-Hybrid 2B Multimodal Family
 
-> **TL;DR** — Liquid AI released **LFM3** on **October 27, 2026**, a new generation of Liquid Foundation Models built for "specialized intelligence." The first release is six 2B-class open-weight models — text, vision, audio, omni, and two decision models — all branched from a single **LFM3-1.7B-Base** backbone trained on **22T tokens**. The headline change is a **tri-hybrid architecture**: of 24 layers, 13 are gated short convolutions (kernel size 7, up from 3), 5 are sliding-window attention (256-token window), and 6 are global attention, with head-wise gated attention, partial RoPE, and sandwich norm. **LFM3-1.7B** beats its predecessor LFM2.5-2.6B using **35% fewer parameters**, averages **49.37** across its reported suite (vs 47.24 for Qwen3.5-9B), posts the best agent scores in its class (LiveClaw 45.60, AutomationBench 41.29, WebArena-Verified 38.42), carries a **256K-token context window**, fits in **~1 GB at 4-bit**, and decodes **1.8–2.8× faster than the next-fastest model** on every edge device Liquid measured. Post-training runs through four stages ending in agentic RL inside real harnesses (Hermes Agent, Pi, OpenClaw). Weights are open under the **LFM Open License v1.0** on Hugging Face. This post breaks down the architecture, the full benchmark record, each family member, the training pipeline, how to run it locally, and what it means for the edge-model race.
+> **TL;DR** — Liquid AI released **LFM3** on **October 27, 2026**, a new generation of Liquid Foundation Models built for "specialized intelligence." The first release is six 2B-class open-weight models — text, vision, audio, omni, and two decision models — all branched from a single **LFM3-1.7B-Base** backbone trained on **22T tokens**. The headline change is a **tri-hybrid architecture**: of 24 layers, 13 are gated short convolutions (kernel size 7, up from 3), 5 are sliding-window attention (256-token window), and 6 are global attention, with head-wise gated attention, partial RoPE, and sandwich norm — every one of those details verified line-by-line against the released config.json and reference implementation in Section 2. **LFM3-1.7B** beats its predecessor LFM2.5-2.6B using **35% fewer parameters**, averages **49.37** across its reported suite (vs 47.24 for Qwen3.5-9B), posts the best agent scores in its class (LiveClaw 45.60, AutomationBench 41.29, WebArena-Verified 38.42), carries a **256K-token context window**, fits in **~1 GB at 4-bit**, and decodes **1.8–2.8× faster than the next-fastest model** on every edge device Liquid measured. Post-training runs through four stages ending in agentic RL inside real harnesses (Hermes Agent, Pi, OpenClaw). Weights are open under the **LFM Open License v1.0** on Hugging Face. This post breaks down the architecture, the full benchmark record, each family member, the training pipeline, how to run it locally, and what it means for the edge-model race.
 
 ---
 
@@ -21,6 +21,8 @@ The base and post-trained models are open-weight and available today on Hugging 
 | **Generation** | LFM3 (third generation of LFMs) |
 | **Architecture** | Tri-hybrid: gated short convolutions + sliding-window attention + global attention |
 | **Layer mix** | 24 layers: 13 conv (kernel 7), 5 SWA (window 256), 6 global attention |
+| **Attention** | GQA 16 Q / 4 KV heads, head_dim 128, QK-RMSNorm, per-head sigmoid gate |
+| **KV Cache @ 128K** | 1.6 GB (≈12 KB/token, 6 global layers) |
 | **Parameters** | 1.73B |
 | **Context window** | 256K tokens (input + output) |
 | **Vocabulary** | 128,000 tokens (shared with LFM2.5-8B-A1B) |
@@ -57,43 +59,134 @@ The models Liquid positions as replacements tell you where the product line is g
 
 ---
 
-## 2. Architecture: The Tri-Hybrid Backbone
+## 2. Architecture: The Tri-Hybrid Backbone, From the Config Up
 
-LFM2 made Liquid's name with a hybrid of gated short convolutions and attention that ran fast on-device. LFM3 keeps that DNA but adds a third operator to the mix — and changes several details of the attention itself. The design came from Liquid's automated hardware-in-the-loop architecture search, which for LFM3 expanded from "CPUs in one phone and one laptop" to **14 device and backend combinations**: Samsung Galaxy S26 Ultra and OnePlus 15 phones, a Raspberry Pi 5, Apple M4 Max and AMD Ryzen AI laptops, Arm and x86 cloud CPUs, plus GPUs and the Qualcomm Hexagon NPU. Every architectural change had to survive that gauntlet: kept only where it improved quality "without a meaningful speed cost."
+LFM2 made Liquid's name with a hybrid of gated short convolutions and attention that ran fast on-device. LFM3 keeps that DNA but adds a third operator to the mix — and changes several details of the attention itself. Everything in this section is cross-checked against four primary sources: the launch announcement [1], the released **config.json** [11], the **Apache-2.0 reference implementation** (`modeling_lfm3.py`) [12], and — for operator lineage — the **LFM2 Technical Report** [13]. Layer counts, head counts, rotary settings, and normalization structure are quoted from the config and the code; parameter totals and cache sizes are our derivations, cross-checked against Liquid's published figures and labeled as such.
 
-### 2.1 The 24-Layer Mix
+*Figure: `lfm3-architecture-anatomy.png` — the verbatim 24-layer schedule from `layer_types`, the sandwich-norm decoder-layer flow, and the operator internals.*
 
-The tri-hybrid stack combines three sequence operators:
+### 2.1 The Exact 24-Layer Schedule
 
-| Operator | Count | Notes |
-|---|---|---|
-| **Gated short convolution** | 13 | Kernel size **7**, up from 3 in LFM2 |
-| **Sliding-window attention (SWA)** | 5 | 256-token window, full RoPE |
-| **Global attention** | 6 | Partial RoPE |
+The config ships the layout as an explicit `layer_types` array. Reading it out: the stack opens with **two convolutions**, then repeats a four-layer unit — **global attention, conv, SWA, conv** — five times (layers 3–22), and closes with a final global-attention + conv pair (layers 23–24). Counts: 13 convolutions, 5 sliding-window layers, 6 global attention layers. No two attention layers are ever adjacent — every attention layer is braced by convolutions.
 
-Convolutions still make up over half the layers — that's what keeps decode fast and memory bounded. The new ingredient is SWA: Liquid tried swapping convolutions for other sequence blocks and sliding-window attention gave the best quality–speed tradeoff. The five SWA layers add a cheap "local attention" tier between the convolutions and the six global layers, which is where the extra capability per parameter comes from. Per parameter, Liquid reports that LFM3-1.7B matches LFM2-1.2B on short prompts across edge devices, and **with 8K tokens in context it is about 25% faster**.
+| Operator | Count | Params / block | Key settings (from config) |
+|---|---|---|---|
+| **Gated short convolution** | 13 | ≈16.8 M | Kernel `conv_L_cache = 7` (up from 3 in LFM2), `conv_bias = false`, depthwise, causal |
+| **Sliding-window attention** | 5 | ≈10.5 M | `sliding_window = 256`, full RoPE, θ = 10,000 |
+| **Global attention** | 6 | ≈10.5 M | Full context (262,144), zero-tail partial RoPE (½ of dims), θ = 1,000,000 |
 
-The layer recipe rhymes with the local/global interleaving that Gemma and Llama popularized, but the proportions are inverted: where those models keep only a minority of local layers, LFM3 keeps a majority of convolutions and a minority of attention. The result reads less like a shrunken transformer and more like a state-space-style sequence model with three attention layers bolted on for global state.
+Every layer also carries a SwiGLU FFN (7,680 intermediate, ≈47.2 M) — including the conv layers.
 
-### 2.2 Head-Wise Gated Attention
+Convolutions make up over half the stack — that is what keeps decode fast and memory bounded. The new ingredient relative to LFM2 is SWA: Liquid reports trying swaps of convolutions for other sequence blocks and finding sliding-window attention gave the best quality–speed tradeoff. Per parameter, LFM3-1.7B matches LFM2-1.2B on short prompts across edge devices, and with 8K tokens in context it is about 25% faster [1][14].
 
-Each attention head's output is scaled by a sigmoid gate, so a head can switch itself off when it has nothing to add. Liquid cites two benefits: suppressing the activation outliers that hurt quantization (a big deal for a model whose flagship deployment is Q4_0 on phones), and improving training stability. This continues the gating theme of the LFM line — LFM2 gated its convolutions, LFM3 gates its attention heads too.
+**Why three operators?** The recipe rhymes with the local/global interleaving that Gemma and Llama popularized, but the proportions are inverted: LFM3 keeps a majority of convolutions and a minority of attention. It reads less like a shrunken transformer and more like a state-space-style sequence model with eleven attention layers bolted on — five for local, six for global state. For agentic workloads — long transcripts of tool calls and observations, mostly local locality with occasional global jumps — that is the right shape of compute.
 
-### 2.3 Partial RoPE
+### 2.2 The Gated Short Convolution, Formally
 
-In the six global attention layers, RoPE rotates only the highest-frequency half of each head; the low-frequency half is left unrotated, so those dimensions match on content regardless of distance. SWA layers keep full RoPE. This is the same family of "let some dimensions attend by content, not position" tricks that recent long-context models use to keep long-range retrieval stable, and it pairs with the mid-training context extension described in Section 5.
+The conv block is structurally unchanged from LFM2, whose technical report gives the formal definition; the LFM3 reference implementation instantiates it with the new kernel size [12][13]:
 
-### 2.4 Sandwich Norm
+```
+(B, C, x) = W_in h          # W_in ∈ ℝ^(2048 × 6144), no bias
+u         = B ⊙ x           # input gate
+z_t       = Σ_{i=0..6} K_i · u_{t−6+i}   # causal depthwise conv, kernel 7
+y         = C ⊙ z           # output gate
+out       = W_out y          # W_out ∈ ℝ^(2048 × 2048), no bias
+```
 
-Each block normalizes both its input and its output. Pre-norm transformers normalize only the input; the post-norm pass keeps activations well-scaled through 24 layers of mixed operators, which matters when conv, SWA, and global branches have different activation magnitudes.
+Four implementation details from the code matter in real deployments. First, the convolution is **depthwise** — one 7-tap filter per channel (14,336 weights per layer), so cost is linear in width and per-layer parameters are dominated by the projections. Second, during token-by-token decode the conv layer keeps a rolling state of just **6 positions × 2,048 channels** (~24 KB per layer in BF16) — why the 13 conv layers contribute almost nothing to long-context memory (Section 2.8). Third, inference uses dedicated **width-7 Triton kernels** (`lfm3_causal_conv1d` / `lfm3_causal_conv1d_update`) because the commonly bundled `causal_conv1d` kernels only accept widths 2–4 — an early sign that runtimes need LFM3-specific builds. Fourth — the genuinely novel bit — the convolution is **document-aware**: on packed-document prefill, a `seq_idx`-driven segmented convolution ensures a conv window *never reads across a document boundary*. A transcript boundary in a packed agent prefill behaves like a hard reset, not a smoothing window [12].
 
-### 2.5 The 128K Vocabulary
+Raising the kernel from LFM2's 3 to 7 triples the per-layer receptive field: thirteen layers at kernel 7 give every position direct access to a 79-token backward window (13 × 6 + 1) before any attention is consulted.
 
-LFM3 uses the same 128,000-token vocabulary as LFM2.5-8B-A1B, built to tokenize non-Latin scripts more efficiently. For a family that ships 16 languages — and whose audio model handles 18 — the tokenizer choice directly affects how much real content fits in the 256K window.
+### 2.3 Attention: GQA 4:1, QK-Norm, and the Head Gate
 
-### 2.6 Designed by Hardware-in-the-Loop Search — Now at 14 Targets
+The config specifies **16 query heads and 4 key/value heads at head_dim 128** — grouped-query attention with a 4:1 ratio (Section 2.8 shows what that alone is worth at 128K). Three refinements sit on top, all visible in the reference code [12]:
 
-The meta-story of LFM3's architecture is the search itself. LFM2's block layout was searched against CPUs in one phone and one laptop. LFM3's was searched against 14 device/backend combinations spanning phones (Galaxy S26 Ultra, OnePlus 15), a Raspberry Pi 5, laptops (Apple M4 Max, AMD Ryzen AI), Arm and x86 cloud CPUs, GPUs, and the Qualcomm Hexagon NPU. Liquid is effectively productizing the search: the claims that matter to edge developers (decode speed at Q4_0, memory footprint, prefill at 32K) are the fitness function, not an afterthought.
+**QK-RMSNorm.** Query and key vectors are RMS-normalized per head (eps 1e-5) after their projections and *before* RoPE — a stabilizer carried over from LFM2, whose technical report notes its attention blocks use "RoPE with QK-Norm" [13].
+
+**The head-wise sigmoid gate.** After the softmax-weighted sum over values, each head's output slice is multiplied by its own scalar gate before the output projection:
+
+```
+gate  = sigmoid(W_gate h)        # W_gate ∈ ℝ^(2048 × 16), no bias — one scalar per head
+out   = W_o (attn ⊙ gate)        # applied per head, before flattening heads
+```
+
+Two specifics the launch post doesn't spell out: the gate is computed from the **block's input hidden state** (the post-operator-norm residual stream), not from the attention output; and it is applied on the **output side**, so it re-weights heads — it does not sparsify attention patterns. Cost: one 2,048 → 16 linear map, a trivial 32,768 parameters per attention layer. Liquid cites two benefits: suppressing the activation outliers that hurt quantization (a big deal for a Q4_0-on-phones flagship), and improving training stability [1][12].
+
+**No biases anywhere.** Every projection — Q, K, V, O, gate, both conv projections, all three FFN matrices — is bias-free, matching `conv_bias: false`. On edge runtimes that removes a class of small, awkward tensor ops from the decode graph.
+
+### 2.4 RoPE: Per-Type Thetas and the Zero-Tail Partial Rotation
+
+Each attention type gets its own rotary module with its own theta — a per-layer-type arrangement the code comments compare to Gemma 3:
+
+| Layer type | RoPE theta | Dims rotated | Rationale (our reading) |
+|---|---|---|---|
+| Global attention (6) | 1,000,000 | 64 of 128 (partial factor 0.5) | High-frequency half carries position over huge distances; the other half matches on content regardless of distance |
+| Sliding-window attention (5) | 10,000 | All 128 | Within a 256-token window, fine-grained position is what matters |
+
+The detail that makes this more than a standard partial-RoPE toggle is **zero-tail partial rotation**. The naive way to rotate half a head is to build 32 frequency pairs and rotate a 64-wide slice (the Gemma-style shrink). LFM3 instead computes the inverse-frequency table over the **full 128-dimension progression** and then **zeroes the tail 64 frequencies**. The rotated half keeps exactly the frequency plan of a full-dimension RoPE head — which matters for context-extension math or checkpoint surgery — while the unrotated half becomes a pure position-independent content channel [11][12].
+
+One honest observation ties this to Section 3: RULER 128K is the one long-context score where LFM3-1.7B clearly trails Qwen3.5's full-attention models (65.56 vs 84.63/87.11). A zero-tail design halves the position-carrying capacity of each global head, and five of the eleven attention layers see only a 256-token window. That is a plausible — unproven — mechanical account of the retrieval gap; flagged as a hypothesis in Section 8.
+
+### 2.5 Sandwich Norm — Four RMSNorms per Layer
+
+Reading `Lfm3DecoderLayer.forward`, each of the 24 layers runs:
+
+```
+residual = h
+h1 = RMSNorm_pre(h)               # operator_norm
+h1 = Mixer(h1)                    # conv (k=7) or attention
+h1 = RMSNorm_post(h1)             # post_operator_norm   ← the "sandwich" top slice
+h  = h1 + residual
+
+f1 = RMSNorm_pre(h)               # ffn_norm
+f1 = SwiGLU_FFN(f1)
+f1 = RMSNorm_post(f1)             # post_ffn_norm        ← second sandwich
+h  = f1 + h
+```
+
+That is **four RMSNorms per layer** — pre-norm and post-norm around *each* of the two sublayers — plus a final RMSNorm (named `embedding_norm`, but applied *after* the last layer, serving as the pre-LM-head norm). Pre-norm transformers normalize only the input; the post-norm pass keeps activations well-scaled through 24 layers of mixed operators — exactly what a quantization-first edge model needs, in a network where LFM2 got away with pre-norm only [11][12].
+
+### 2.6 The FFN: SwiGLU at 3.75×, in Every Layer
+
+Both conv and attention layers are followed by the same SwiGLU FFN — `w2(silu(w1(x)) ⊙ w3(x))` — projecting 2,048 → **7,680** → 2,048, no biases. The FFN is where the parameters live: 47.2 M per layer × 24 ≈ **1,133 M parameters, about 66% of the model**. Worth internalizing when reading the fine-tuning claims: LoRA-style adaptation on the FFN projections touches two-thirds of the parameter mass [11][12].
+
+### 2.7 Where the 1.73 Billion Parameters Go
+
+The model card states 1.73B parameters; the released config lets you rebuild that number exactly (derivation ours; total confirmed by the model card [2][11]):
+
+| Component | Count | Parameters | Share |
+|---|---|---|---|
+| Token embeddings (128,000 × 2,048, tied with lm_head) | 1 | 262.1 M | 15% |
+| SwiGLU FFNs (3 × 2,048 × 7,680) | 24 | 1,132.5 M | 66% |
+| Conv blocks (in_proj 12.6 M + out_proj 4.2 M + depthwise taps) | 13 | 218.3 M | 13% |
+| Attention blocks (Q 4.2 M + K/V 2 × 1.0 M + O 4.2 M + gate 0.03 M) | 11 | 115.7 M | 7% |
+| RMSNorms (4 per layer + 1 final) | 97 | ≈0.2 M | <1% |
+| **Total** | — | **≈1,728.8 M ≈ 1.73 B** | 100% |
+
+Three things fall out. The attention layers hold barely 7% of the parameters; the FFN channel-mixers hold two-thirds. Tied embeddings mean the 128K vocabulary costs one table, not two (262 M parameters doing double duty as the output head). And the 13 convolutions cost less than the embedding table — efficiency here is not "fewer layers," it is "cheap sequence mixing, expensive channel mixing."
+
+### 2.8 The Memory Math Behind "1.6 GB at 128K"
+
+Liquid's most-quoted edge number follows from the config (derivation ours; total matches Liquid's published figure [1][11]):
+
+```
+per token, per global layer:  2 (K+V) × 4 heads × 128 dims × 2 bytes (BF16) = 2,048 B
+six global layers:            6 × 2,048 B = 12,288 B ≈ 12 KB/token
+at 131,072 tokens:            131,072 × 12,288 B ≈ 1.61 GB   ← Liquid's "1.6 GB"
+at 262,144 tokens:            ≈ 3.22 GB
+```
+
+The other nineteen layers: the five SWA layers cache only their 256-token windows (5 × 256 × 1,024 values × 2 B ≈ **2.6 MB, flat**); the thirteen conv layers hold rolling states of 6 frames × 2,048 channels (≈**0.32 MB, flat**). So a 256K-context session costs ~3.2 GB of cache, 128K ~1.6 GB, 32K ~0.4 GB — against 4.3 GB and 5.6 GB that two 2B–4B-class competitors need *at 128K*. The Q4_0 weights themselves are roughly 0.9–1.0 GB (our estimate), so at 128K the cache is still the larger half of the footprint — and the GQA 4:1 ratio is the single biggest lever that made it so.
+
+### 2.9 Vocabulary and Special Tokens
+
+LFM3 uses the same **128,000-token vocabulary as LFM2.5-8B-A1B**, built to tokenize non-Latin scripts more efficiently — for a family shipping 16 languages (18 on the audio model), the tokenizer directly affects how much real content fits in the 256K window. The config pins the control tokens: BOS 124,894, EOS 124,900, pad 124,893, with `tie_word_embeddings: true` confirming the input/output weight sharing [1][11].
+
+### 2.10 Hardware-in-the-Loop Search: What the Fitness Function Actually Was
+
+The LFM2 Technical Report documents the search machinery in formal detail [13]. The search space is wide: local-context candidates included gated short convolutions at various kernel sizes, sliding-window attention, linear-attention variants, and state-space models (S4, Liquid-S4, S5, RTF, Mamba, Mamba2), plus Liquid-Time-Constant networks; global candidates were GQA blocks at various group counts and head dimensions; position-wise blocks were SwiGLU FFNs with search-chosen expansion ratios; the layout search decided the interleaving. Candidates were evaluated under explicit device budgets — time-to-first-token, p50/p95 decode latency at batch 1, prefill throughput, peak RSS at 4K and 32K — and ranked by hypervolume improvement on the quality–latency–memory Pareto frontier. Convolutions did not win by ideology; they won by surviving that gauntlet.
+
+For LFM3, Liquid expanded the fitness hardware to **14 device and backend combinations** — Galaxy S26 Ultra and OnePlus 15 phones, a Raspberry Pi 5, Apple M4 Max and AMD Ryzen AI laptops, Arm and x86 cloud CPUs, GPUs, and the Qualcomm Hexagon NPU — and re-ran the redesign with agentic long-context workloads as the target. The claims that matter to edge developers (decode speed at Q4_0, memory footprint, prefill at 32K) are the fitness function, not an afterthought [1][14].
 
 ---
 
@@ -170,7 +263,7 @@ Liquid's own scale demo points the same direction: **more than 300,000 LFM3-1.7B
 
 ### 3.5 How to Read These Numbers
 
-Three cautions before you extrapolate. First, this is a vendor-reported table on a benchmark suite that includes several agent environments closely tied to Liquid's own tooling (OpenClaw, Claw-Eval); treat the agentic margins as directional until independent replications land. Second, the suite's composition matters: the Average row weights 28 rows in which instruction-following and agentic tasks dominate, which flatters a model tuned precisely for those. Third, the comparison models were run at their full context lengths in BF16 — nobody's RULER 128K score reflects what you'd see at Q4_0 on a phone. The edge numbers in Section 6 are the ones to quote for on-device decisions.
+Three cautions before you extrapolate. First, this is a vendor-reported table on a benchmark suite that includes several agent environments closely tied to Liquid's own tooling (OpenClaw, Claw-Eval); treat the agentic margins as directional until independent replications land. Second, the suite's composition matters: the Average row weights 29 rows in which instruction-following and agentic tasks dominate, which flatters a model tuned precisely for those. Third, the comparison models were run at their full context lengths in BF16 — nobody's RULER 128K score reflects what you'd see at Q4_0 on a phone. The edge numbers in Section 6 are the ones to quote for on-device decisions.
 
 ---
 
@@ -180,7 +273,7 @@ Three cautions before you extrapolate. First, this is a vendor-reported table on
 
 LFM3-VL-2B (1.9B parameters) is the vision member, and its three headline capabilities are new for the LFM line: **video input** (a first for LFM vision models), **thinking** (step-by-step reasoning before answering, aimed at chart and multi-step visual problems), and **spatial/embodied reasoning** (localizing objects and reasoning about their relationships — the robotics groundwork). Across **62 vision benchmarks**, Liquid reports LFM3-VL-2B averages **71.4**, at least 7.4 points ahead of every same-size competitor, essentially matching **Gemma 4 12B (71.7)** — a model more than six times larger — while surpassing Gemini 3.5 Flash Lite (70.0) and sitting within two points of GPT-5.6 Luna (73.4).
 
-| Category | LFM3-VL-2B (1.9B) | LFM2.5-VL-3B (3.1B) | MiniCPM-V 4.7 1B | Qwen3.5-2B-VL | Gemma 4 E2B (5.1B) | Gemma 4 12B | GPT-5.6 Luna | Gemini 3.5 Flash Lite |
+| Category | LFM3-VL-2B (1.9B) | LFM2.5-VL-3B (3.1B) | MiniCPM-V 4.7 1B (1.6B) | Qwen 3.5 2B (2.3B) | Gemma 4 E2B (5.1B) | Gemma 4 12B | GPT-5.6 Luna | Gemini 3.5 Flash Lite |
 |---|---|---|---|---|---|---|---|---|
 | General | 66.0 | 57.6 | 59.8 | 64.0 | 56.9 | 74.0 | 72.2 | 74.1 |
 | Perception | 75.6 | 67.9 | 65.5 | 71.2 | 59.1 | 73.5 | 71.0 | 73.0 |
@@ -231,6 +324,8 @@ LFM3-1.7B-Base was pre-trained on **22T tokens** in two stages. The main stage's
 3. **Multi-domain on-policy distillation (MOPD):** six specialist RL teachers — code, math, tool use, long context, agentic work, and enterprise workflows — distilled back into the single generalist. This is the same "cultivate experts, then merge them" pattern DeepSeek popularized with V4's domain-expert pipeline, adapted to on-policy distillation.
 4. **Agentic RL:** tasks from web browsing to office work run inside **real agent harnesses**, so the model's deployment environment (multi-step, tool-calling, error-recovering) is also its training environment.
 
+Two lineage notes sharpen the picture. First, the multi-teacher distillation is an evolution of a recipe Liquid has published in full before: the LFM2 Technical Report defines a tempered, decoupled Top-K knowledge distillation objective, designed to avoid support mismatch between teacher and student distributions. MOPD extends that idea to six on-policy RL teachers, each specialized by reinforcement learning before being distilled back into the single generalist [13]. Second, LFM3 itself has no technical report yet: the training details come from the model cards, and the architecture details in Section 2 are quoted from the released config.json and reference implementation. An LFM3 paper with ablations — kernel-size sweeps, head-gate ablations, search-space comparisons — has not been published as of October 29, 2026 [11][12].
+
 The pipeline's shape is the message: LFM3 is post-trained for being an *agent* first and a chatbot second.
 
 ---
@@ -256,7 +351,7 @@ Long context stays affordable because of the conv/SWA-heavy stack: a full **128K
 | MLX | MLX | 4-bit quantization for Apple Silicon |
 | ONNX | ONNX Runtime | Cross-platform |
 
-Thirteen community quantizations of LFM3-1.7B were already listed on Hugging Face within the first day, and the model runs in Docker via Model Runner (`docker model run hf.co/LiquidAI/LFM3-1.7B`). For an agent box, vLLM or SGLang with the BF16 checkpoint is the straightforward path; for anything battery-powered, the Q4_0 GGUF is the intended target.
+Community quantizations of LFM3-1.7B were appearing on Hugging Face within the first day, and the model runs in Docker via Model Runner (`docker model run hf.co/LiquidAI/LFM3-1.7B`). For an agent box, vLLM or SGLang with the BF16 checkpoint is the straightforward path; for anything battery-powered, the Q4_0 GGUF is the intended target.
 
 ### 6.3 Chat Template, Thinking, and Tool Calling
 
@@ -281,7 +376,7 @@ Liquid's card specifies two regimes:
 - **General** (chat, tool use, agents, coding): `temperature=0.1`, `top_k=50`, `repetition_penalty=1.1`
 - **Math & STEM**: `temperature=1.0`, `top_p=0.95`, `top_k=20`
 
-The near-greedy default is worth respecting: small agentic models are more sensitive to sampling noise than frontier ones, and most of the table in Section 3 was produced near-greedy.
+The near-greedy default is worth respecting: small agentic models are more sensitive to sampling noise than frontier ones, and the Section 3 table itself was produced at temperature 0.6 with top_p 0.95 — close to, though not exactly, the near-greedy defaults recommended here.
 
 ### 6.5 Fine-Tuning on a Single GPU
 
@@ -320,9 +415,11 @@ For the local-AI stack specifically, three things change. First, **the agent tie
 3. **Upstream llama.cpp support timeline** — LFM3 needs an LFM3-compatible build rather than release b11744; when the support lands upstream (and in Ollama's library) determines friction for the average user.
 4. **Whether LFM3 scales up** — the release is 2B-class only. LFM2 went 350M → 24B-A2B over its life; the LFM3 roadmap beyond 2B (and the relationship to the separately released d1-ultra decision flagship) is unannounced.
 5. **Thinking-mode off-switch reliability** — Liquid itself flags that disabling thinking traces "can be inconsistent, especially for reasoning-heavy tasks."
-6. **RULER 128K gap** — whether the long-context retrieval deficit vs Qwen3.5 (65.56 vs 84.63/87.11) is a partial-RoPE tradeoff, a data issue, or a fixed-in-a-refresh issue is unexplained.
+6. **RULER 128K gap** — whether the long-context retrieval deficit vs Qwen3.5 (65.56 vs 84.63/87.11) is a data issue, a training issue, or an architectural tradeoff is unexplained. The config adds a concrete candidate for the architectural reading: the six global layers rotate only 64 of 128 head dims (zero-tail partial RoPE) and the five SWA layers see just 256 tokens, so positional precision for exact needle retrieval is structurally scarcer than in a full-attention model — our hypothesis, not a Liquid explanation (Section 2.4).
 7. **Training cost** — 22T tokens on unspecified hardware; no FLOPs or GPU-hour disclosure.
-8. **Independent agentic verification** — LiveClaw/Claw-Eval margins are the launch's biggest claim and the least third-party-verified; MacPaw's 65-task macOS test is the only external signal so far.
+8. **No LFM3 technical report or ablations** — unlike LFM2 (arXiv:2511.23404), LFM3 has no paper. The kernel-size choice, the head-gate ablation, the zero-tail RoPE design, and the search-space winners are unexplained at the ablation level; config.json and the reference implementation are the deepest public sources [11][12].
+9. **Head-gate behavior in practice** — the per-head sigmoid gates are a central novelty, but no measurements exist of how sparse the gates run, whether heads specialize or switch off permanently, or how gate activity changes after fine-tuning.
+10. **Independent agentic verification** — LiveClaw/Claw-Eval margins are the launch's biggest claim and the least third-party-verified; MacPaw's 65-task macOS test is the only external signal so far.
 
 ---
 
@@ -346,3 +443,7 @@ The honest caveats are the ones Liquid prints itself: this is not a coding agent
 8. MacPaw (Ivan Petrukha, Staff AI Engineer, LLM Efficiency Lead). Statement on LFM3-1.7B macOS agent testing, as quoted in the LFM3 launch post, October 27, 2026 — 65 everyday agent tasks vs Qwen3.5-2B.
 9. Liquid AI. "LFM2.5-2.6B-GGUF." Hugging Face, August 2026. https://huggingface.co/LiquidAI/LFM2.5-2.6B-GGUF — the predecessor model used as LFM3-1.7B's primary comparison point.
 10. AMD, Ambarella, Qualcomm, and Mercedes-Benz launch-partner statements, as published in the LFM3 launch post, October 27, 2026.
+11. Liquid AI. "config.json" — LFM3-1.7B, revision main. Hugging Face, October 2026. https://huggingface.co/LiquidAI/LFM3-1.7B/blob/main/config.json — the released hyperparameters quoted in Section 2: layer_types, hidden_size 2,048, 16 query / 4 KV heads at head_dim 128, intermediate_size 7,680, conv_L_cache 7, sliding_window 256, rope_parameters (θ 1e6 / partial 0.5 global; θ 1e4 SWA), use_sandwich_norm, tie_word_embeddings, vocab_size 128,000, max_position_embeddings 262,144.
+12. Liquid AI and the Hugging Face team. "modeling_lfm3.py" — LFM3-1.7B reference implementation (Apache-2.0). Hugging Face, October 2026. https://huggingface.co/LiquidAI/LFM3-1.7B/blob/main/modeling_lfm3.py — implementation source for the per-head sigmoid gate, QK-RMSNorm, zero-tail partial RoPE, the four-norm sandwich decoder layer, the document-boundary segmented convolution, and the width-7 Triton kernels.
+13. Amini, A., Banaszak, A., Benoit, H., et al. "LFM2 Technical Report." arXiv:2511.23404, November 2025. https://arxiv.org/abs/2511.23404 — formal definition of the gated short convolution and the hardware-in-the-loop search LFM3's backbone search extends, plus the tempered decoupled Top-K distillation objective that MOPD evolves.
+14. Liquid AI. "Build specialized multimodal models with LFM3." Hugging Face blog, October 27, 2026. https://huggingface.co/blog/LiquidAI/lfm3 — per-model usage guide, vision/audio encoder details, robotics results, and the hardware-in-the-loop target list.
