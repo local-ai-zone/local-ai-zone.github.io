@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="stylesheet" href="../css/contact-form.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="A source-level deep dive into LFM3-Harness, the community-built local AI coworker: four small models (d1-2B, LFM3-1.7B, VL-2B, Audio-2B) running on CPU through llama.cpp, held in place by a Rust harness — 75% write-gate floors, frozen SHA-256 acceptance contracts, diff approvals, and benchmarks that caught two silent bugs.">
+    <meta name="keywords" content="LFM3 Harness, LFM3-Harness, Liquid AI, LFM3-1.7B, d1-2B, LFM3-VL-2B, LFM3-Audio-2B, llama.cpp, Tauri, Rust agent harness, local AI coworker, offline AI assistant, verified tasks, acceptance contract, agent safety rails, small language models, local-first AI">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="theme-color" content="#2563eb">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
+    <meta property="og:description" content="A 1.7B model cannot be trusted to be right — but the system around it can make it safe to use. Source-level tour of the router floors, preflight write gates, frozen acceptance contracts, and the benchmark that exposed two silent bugs in LFM3-Harness v0.1.1.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-11-01T00:00:00Z">
+    <meta property="article:modified_time" content="2026-11-01T00:00:00Z">
+    <meta property="article:section" content="Local AI">
+    <meta property="article:tag" content="AI Agents">
+    <meta property="article:tag" content="Technical Analysis">
+    <meta property="article:tag" content="Local Models">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:creator" content="@hussainnazary">
+    <meta name="twitter:title" content="LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
+    <meta name="twitter:description" content="Four small models, one Rust harness, zero cloud. Write gates at 75% floors, approvals that expire in ten minutes, finish-claims refused until the deliverable exists — and a benchmark that caught routing silently faking itself. An introduction to the machinery, not an endorsement of the capability.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png">
+    <meta name="twitter:image:alt" content="LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "headline": "LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy",
+      "description": "Source-level analysis of LFM3-Harness v0.1.1, the community-built local AI coworker: its Tauri-plus-Rust architecture with four pinned llama.cpp model servers, the d1-2B router and its confidence floors, the preflight write and evidence gates, frozen SHA-256 acceptance contracts, single-run benchmark results including two silent bugs the benchmark exposed, the Python-to-Rust rewrite, and the project's own published limitations.",
+      "image": "https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png",
+      "author": {"@type": "Person", "name": "Hussain Nazary"},
+      "publisher": {"@type": "Organization", "name": "Local AI Zone"},
+      "datePublished": "2026-11-01",
+      "dateModified": "2026-11-01",
+      "proficiencyLevel": "Advanced",
+      "about": [
+        {"@type": "Thing", "name": "LFM3-Harness"},
+        {"@type": "Thing", "name": "Small language models"},
+        {"@type": "Thing", "name": "AI agent harnesses"},
+        {"@type": "Thing", "name": "llama.cpp"},
+        {"@type": "Thing", "name": "Local-first AI"}
+      ],
+      "mainEntityOfPage": "https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive.html",
+      "isAccessibleForFree": true
+    }
+    </script>
+
+    <!-- FAQ Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": "What is LFM3-Harness?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "LFM3-Harness is a free, MIT-licensed, community-built desktop app for Windows 10/11 x64 and Linux x64 that runs Liquid AI's LFM3 models entirely on your own CPU through llama.cpp. You pick a folder and chat; the assistant reads files, searches, and drafts changes, but every write is shown as an exact diff and happens only after you click Allow. It is not affiliated with or endorsed by Liquid AI."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "How does it stop a 2B model from doing damage?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "The harness, not the model, carries the trust: a separate decision model checks every proposed write against the user's request with a 75%-confidence floor and can hold the change without ever showing an approval card; every tool path is canonicalised and rejected before touching the filesystem if it escapes the chosen folder; claims of completion are refused until the required output actually exists on disk; and verified tasks are judged only by frozen, SHA-256-hashed acceptance contracts that cannot be weakened mid-run."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "What hardware does it need?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "A CPU-only x64 machine with at least 8 GB of RAM. The app deliberately launches every llama-server child with -ngl 0 (no GPU offload), and the four model weights together are about 4.9 GB, downloaded separately inside the app. The installer itself is about 15 MB on Windows."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is LFM3-Harness really offline?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Once models are installed, yes. All four model servers are pinned to 127.0.0.1 on ports 8080-8083, the packaged build refuses any non-loopback endpoint, and network use is limited to user-initiated model downloads or links you open. There is no account, no telemetry by default, and no engine sidecar talking to the outside."
+                }
+            },
+            {
+                "@type": "Question",
+                "name": "Is LFM3-Harness actually capable?",
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": "Not by frontier standards. The writer is a 1.7B model running on CPU, and the project's own 50-job benchmark passes 43/50 with two false passes, a 1/5 score in its weakest category (search), and only one mission qualified end-to-end on real models. The harness is designed to keep a weak model from doing damage or lying about what it did — which is a safety property, not a capability claim."
+                }
+            }
+        ]
+    }
+    </script>
+
+    <!-- Breadcrumb Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "LFM3 Harness Deep Dive", "item": "https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive.html"}
+        ]
+    }
+    </script>
+
+  <link rel="stylesheet" href="../css/blog-post.css">
+</head>
+<body class="blog-article-page has-site-header">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy</h1>
+                <div class="article-meta">
+                    <span class="article-date">November 1, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Technical Analysis</span>
+                    <span class="article-read-time">📖 22 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+
+            <header class="paper-header">
+                <div class="eyebrow"><span class="dot"></span>Source Note · Agent Harnesses</div>
+                <h1 class="title">LFM3-Harness v0.1.1</h1>
+                <p class="subtitle">A free, community-built desktop coworker that runs four Liquid AI models, the biggest around 2B parameters, entirely on your CPU. The interesting part is not the models — it is the Rust harness that refuses to let them lie, wander, or finish early. Here is a source-level tour of every rail, gate and floor, with the benchmark numbers the project itself published.</p>
+                <div class="byline">
+                    <span><span class="label">Author</span> Hussain Nazary</span>
+                    <span><span class="label">Published</span> November 1, 2026</span>
+                    <span><span class="label">Reading time</span> ~22 minutes</span>
+                    <span><span class="label">Level</span> Advanced</span>
+                </div>
+            </header>
+            <h2 id="tl-dr">Executive Summary</h2>
+            <ul>
+                <li><strong>What it is:</strong> LFM3-Harness is a free, MIT-licensed desktop app (Windows 10/11 x64, Linux x64) that runs Liquid AI's LFM3 models locally through llama.cpp on CPU. You pick a folder, chat your way through work, and every proposed file change appears as an exact diff that you must explicitly allow. It is an independent community project — not affiliated with, endorsed by, or sponsored by Liquid AI.</li>
+                <li><strong>The bet:</strong> four small models — d1-2B as router, LFM3-1.7B as the acting writer, LFM3-VL-2B for images, LFM3-Audio-2B for hearing and speaking — none of which should be trusted to be right. The trust lives in the harness instead: confidence floors, preflight gates, path confinement, approvals that expire, and completion claims that are refused until the deliverable exists on disk.</li>
+                <li><strong>The machinery, in numbers:</strong> a write gate that holds any change the decision model scores below a 75% alignment floor — and shows no approval card at all when it holds; an advisory evidence gate at 65%; a 55% router-confidence floor with a keyword fallback that a low-confidence model answer can never override; a hard 10-minute (600 s) approval TTL; 12 tool rounds per chat turn maximum; and frozen, SHA-256-hashed acceptance contracts for verified tasks that cannot be weakened during retries.</li>
+                <li><strong>The benchmark story:</strong> the project's own 2026-10-31 multimodel run scored 21/21 on routing with a 122 ms median route decision — and exposed two genuine bugs, including that the fancy decision-model router had been <em>silently falling back to keywords for every request</em> because it was calling an endpoint the native model answers with HTTP 501.</li>
+                <li><strong>Honest limits:</strong> the 50-job agent benchmark passes 43/50 with two false passes; three semantic missions stay human-review-only because the automatic-pass holdout was never run; every number comes from one machine and one run; and the README keeps a public "Known gaps" list that this post quotes rather than papers over.</li>
+                <li><strong>What this review is and is not:</strong> this post is an introduction to how the thing is built, not a confirmation that it works well. A 1.7B writer produces 1.7B-grade prose; the harness mostly succeeds at preventing it from doing damage, which is a different and lower claim than being useful at everything a frontier model does.</li>
+            </ul>
+
+            <h2 id="table-of-contents">Contents</h2>
+            <ol id="toc-list">
+                <li><a href="#why-harness">Why the Harness Is the Product</a></li>
+                <li><a href="#what-it-is">What the App Actually Is</a></li>
+                <li><a href="#architecture">Architecture: One Executable, Four Subprocesses, Three Databases</a></li>
+                <li><a href="#routing">Routing: A Decision Model With Veto-Limited Influence</a></li>
+                <li><a href="#gates">The Trust Machinery: Write Gates, Evidence Gates, Diff Approvals</a></li>
+                <li><a href="#victory">Refusing to Let the Model Declare Victory</a></li>
+                <li><a href="#benchmark">Benchmark Forensics: A Test Suite That Caught Two Silent Bugs</a></li>
+                <li><a href="#rewrite">The Python→Rust Rewrite, and How It Is Enforced</a></li>
+                <li><a href="#lessons">Design Lessons for Constrained Agents</a></li>
+                <li><a href="#limitations">Limitations and Open Questions</a></li>
+                <li><a href="#conclusion">Conclusion</a></li>
+                <li><a href="#references">References</a></li>
+            </ol>
+
+            <hr>
+
+            <h2 id="why-harness">1. Why the Harness Is the Product</h2>
+
+            <p>Almost every local-AI post on this site is about a model: parameters, quantization, benchmark tables. This one is about the system around four models that, by any honest measure, are not very smart. The biggest writer in the stack has 1.7B parameters. There is no GPU involved. Nothing is in the cloud.</p>
+
+            <p>The premise of LFM3-Harness is that a small local model plus a loose harness equals confident nonsense — an assistant that hallucinates file paths, overwrites the wrong document, and announces success when the output does not exist. The fix is not a bigger model. It is rails: a piece of software that never lets the model's self-report count as evidence.</p>
+
+            <p>That premise shows up in one line of Rust that I think is the most honest sentence written about agents this year, from <code>crates/lfm3-harness/src/agent/loop_agent.rs</code>:</p>
+
+            <pre><code class="language-rust">"finish refused: {path} does not exist or is empty; keep working"</code></pre>
+
+            <p>When the acting model decides it is done and calls <code>finish</code>, the harness checks the filesystem. If the promised deliverable is not there, the claim is rejected and the loop keeps going. Everything else in this post is the same idea, applied one layer down.</p>
+
+            <p>One piece of candor before the tour, because it shapes how to read every number below: this is not a capable general assistant. It will not refactor your codebase, hold a long research thread, or match anything you have used from a frontier model. The writer is a 1.7B model running on a laptop CPU, and its output quality is what a 1.7B model on a laptop CPU produces. What the project attempts is narrower: make such a model safe enough to touch real files, and document — publicly, in its own README — where even that fails. This post introduces the machinery and reports the measurements. It does not certify the result.</p>
+
+            <h2 id="what-it-is">2. What the App Actually Is</h2>
+
+            <p>Pick a folder, then chat. The assistant can list, read, search, and find related files inside that folder, and it can draft reports or edits — but it asks before it writes anything, showing the exact diff and waiting for an explicit "Allow once." There is no shell tool, no browsing, and no path outside the chosen folder. The <a href="https://lfm3-harness.github.io/" rel="noopener" target="_blank">project site's</a> tagline is the whole pitch: <em>No account. No cloud. No telemetry out of the box.</em></p>
+
+            <p>Work happens in two modes. Free-form chat is conversational and still gated. <strong>Verified tasks</strong> are stricter: the mission ships with a frozen acceptance contract, and only the deterministic checks in that contract — never the model's say-so — decide whether the task passed.</p>
+
+            <p>The model split is a deliberate division of labour, one small specialist per sense:</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Role</th><th>Model</th><th>Job</th><th>Weights</th></tr></thead>
+                    <tbody>
+                        <tr><td>Router / judge</td><td>d1-2B ("decision")</td><td>Classify each message into a task shape; preflight-check proposed writes; adjudicate semantic checks</td><td>1.10 GB</td></tr>
+                        <tr><td>Actor</td><td>LFM3-1.7B (text)</td><td>Plans, calls folder tools, writes the report or edit</td><td>1.10 GB</td></tr>
+                        <tr><td>Vision</td><td>LFM3-VL-2B</td><td>Looks at PNG/JPEG/WebP/GIF and reports measured facts</td><td>1.25 GB</td></tr>
+                        <tr><td>Voice</td><td>LFM3-Audio-2B</td><td>Transcribes dictation and audio files; speaks replies via llama-tts</td><td>1.40 GB</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note">Four models, ≈4.9 GB of weights total, downloaded separately inside the app (~15 MB installer). Key facts from the <a href="https://lfm3-harness.github.io/" rel="noopener" target="_blank">project site</a> and <a href="https://github.com/LFM3-Harness/LFM3-Harness" rel="noopener" target="_blank">README</a>, v0.1.1.</p>
+
+            <p>Everything below is verified against the source tree on <code>main</code> (16 commits at time of writing); file paths are given so you can check each claim yourself.</p>
+
+            <h2 id="architecture">3. Architecture: One Executable, Four Subprocesses, Three Databases</h2>
+
+            <p>The README's architecture section is direct about what it is <em>not</em>:</p>
+
+            <blockquote>"The shell embeds the harness engine in-process: there is no sidecar, no loopback engine server, and no shell command surface." — README.md, §Architecture</blockquote>
+
+            <p>So: a React/TypeScript webview inside a Tauri 2 shell, talking to an embedded Rust engine (<code>crates/lfm3-harness</code>) only through typed commands in <code>apps/desktop/src-tauri/src/commands.rs</code> and durable event channels (<code>lfm3:run-event</code>, <code>lfm3:job-event</code>, <code>lfm3:chat-event</code>). No Python sidecar, no local HTTP server that anything else on the machine could talk to. The one thing the engine does spawn is four llama.cpp children:</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Server child</th><th>Endpoint (pinned)</th><th>Context</th><th>Sampling</th></tr></thead>
+                    <tbody>
+                        <tr><td>text / actor</td><td>127.0.0.1:8080</td><td>32,000 tokens</td><td>temp 0.1, top-k 50, repetition penalty 1.1</td></tr>
+                        <tr><td>vision (VL-2B)</td><td>127.0.0.1:8081</td><td>8,192 tokens</td><td>greedy</td></tr>
+                        <tr><td>audio (Audio-2B)</td><td>127.0.0.1:8082</td><td>8,192 tokens</td><td>greedy</td></tr>
+                        <tr><td>d1 (decision)</td><td>127.0.0.1:8083</td><td>8,192 (batch 8,192)</td><td>greedy; native choice protocol</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note">Ports and defaults in <code>crates/lfm3-harness/src/config.rs</code>; launch arguments built in <code>apps/desktop/src-tauri/src/engine.rs</code>; per-role sampling in <code>crates/lfm3-harness/src/agent/profile.rs</code>. The 32k window is not arbitrary — LFM3 family members are trained for 32k context.</p>
+
+            <div class="hfm-topo" aria-hidden="true" style="margin: 24px 0;">
+                <style>
+                    .hfm-topo{display:flex;flex-direction:column;align-items:center;gap:6px;padding:20px;border:1px solid rgba(128,128,128,.35);border-radius:12px;font-size:.85rem;}
+                    .hfm-topo .hfm-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+                    .hfm-topo .hfm-box{border:1px solid rgba(128,128,128,.5);border-radius:10px;padding:10px 14px;text-align:center;min-width:130px;background:rgba(128,128,128,.06);}
+                    .hfm-topo .hfm-sub{display:block;opacity:.75;font-size:.9em;margin-top:2px;}
+                    .hfm-topo .hfm-down{opacity:.65;}
+                    .hfm-topo .hfm-engine{border-color:#2563eb;}
+                    .hfm-topo .hfm-model{border-color:#16a34a;min-width:118px;}
+                    .hfm-topo .hfm-user{border-color:#f59e0b;}
+                </style>
+                <div class="hfm-row">
+                    <div class="hfm-box hfm-user">You — pick one folder</div>
+                </div>
+                <div class="hfm-down">▼</div>
+                <div class="hfm-row">
+                    <div class="hfm-box">React/TS UI<br><span class="hfm-sub">Tauri 2 webview</span></div>
+                </div>
+                <div class="hfm-down">▼ typed commands / events only</div>
+                <div class="hfm-row">
+                    <div class="hfm-box hfm-engine">Rust engine (in-process, no sidecar)<br><span class="hfm-sub">router → actor → gates → journal</span></div>
+                </div>
+                <div class="hfm-down">▼ fixed command lines, -ngl 0 (CPU)</div>
+                <div class="hfm-row">
+                    <div class="hfm-box hfm-model">llama-server :8080<br><span class="hfm-sub">LFM3-1.7B acts</span></div>
+                    <div class="hfm-box hfm-model">llama-server :8081<br><span class="hfm-sub">VL-2B sees</span></div>
+                    <div class="hfm-box hfm-model">llama-server :8082<br><span class="hfm-sub">Audio-2B hears/speaks</span></div>
+                    <div class="hfm-box hfm-model">llama-server :8083<br><span class="hfm-sub">d1-2B decides</span></div>
+                </div>
+            </div>
+
+            <p>Three details are worth noting, because they are the parts that keep the topology honest rather than decorative:</p>
+
+            <p><strong>The children cannot be talked into anything.</strong> The launch arguments are built in one place, as the doc comment on <code>crates/lfm3-harness/src/model/process.rs</code> says: <em>"Builds the fixed command line; no planner-provided text is accepted."</em> A model that hallucinates a clever flag has nowhere to put it. Readiness is confirmed by polling each server's identity endpoint, and an <code>IdentityMismatch</code> is a hard fail rather than a warning — the wrong weight on a port stops the boot.</p>
+
+            <p><strong>The children cannot outlive the parent.</strong> On Windows every child is assigned to a job object created with <code>JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE</code> (<code>crates/lfm3-harness/src/supervisor/windows.rs</code>) — the processes are created suspended, joined to the job, then resumed. On Linux each child gets its own process group. Kill the app and nothing keeps chewing your RAM at 100% CPU. This sounds trivial; anyone who has orphaned a <code>llama-server</code> knows it is not.</p>
+
+            <p><strong>The loopback pin is enforced at packaging time.</strong> <code>Config::validate_local</code> rejects any non-loopback URL under the <code>Packaged</code> profile, and the packaged build forbids user-supplied download switches and external-server reuse. The offline claim is a property of the shipped binary, not a privacy policy.</p>
+
+            <p>State is split across three separate SQLite files, and the comment on <code>crates/lfm3-harness/src/chat/store.rs</code> explains why: <em>"a conversation is not a verified run."</em> The mission journal (append-only, <code>user_version</code>-keyed migrations, WAL mode) records runs, steps, attempts, tool results, check results, events, and artifacts keyed by <code>sha256 UNIQUE</code>; chat history and its approvals live in a separate <code>chat.db</code>; jobs in <code>jobs.db</code>. A chatty mistake can never pollute the evidence trail of a verified task, and a verified task's journal stays replayable.</p>
+
+            <h2 id="routing">4. Routing: A Decision Model With Veto-Limited Influence</h2>
+
+            <p>Every chat message gets classified into one of seven intents — <code>general</code>, <code>explore</code>, <code>summarize</code>, <code>related</code>, <code>report</code>, <code>vision</code>, <code>voice</code> — and the route decides which capabilities get hinted to the actor. The classifier is d1-2B, consulted through a native choice protocol rather than free text:</p>
+
+            <ul>
+                <li>Messages shorter than 24 characters skip the model entirely — they are greetings, not work. (A comment in <code>chat/router.rs</code> notes that keywords are a poor judge of intent when no group fires, so genuinely tiny utterances are the <em>only</em> case the heuristic keeps unchallenged.)</li>
+                <li>The request evidence is clipped to 8,000 characters, "well inside the range where d1 stays accurate."</li>
+                <li>A decision counts only at ≥55% confidence: <code>MIN_DECISION_CONFIDENCE_BPS = 5_500</code> in <code>chat/router.rs</code>. Below the floor, an undeclared label, or a d1 outage, the keyword route stands.</li>
+                <li>A confident <code>general</code> answer never overrides keywords — the code literally requires <code>intent != ChatIntent::General</code>. "This is just conversation" is not treated as a routing opinion.</li>
+            </ul>
+
+            <p>The protocol itself is where the design gets specific. d1 answers <code>POST /v1/systemone</code> with a typed choice and a probability, and the client enforces <code>type == "choice"</code>, a declared label, and a confidence in [0,1]. If you ask a native decision model for ordinary chat, it answers <code>HTTP 501</code> — which, as we will see in §7, is exactly how a benchmark caught the router pretending to work.</p>
+
+            <p>And the invariant that ties the section together: <strong>a route grants capability hints, never authority.</strong> Being classified as "report" tells the actor which tools might help. It does not let anything write a file.</p>
+
+            <h2 id="gates">5. The Trust Machinery: Write Gates, Evidence Gates, Diff Approvals</h2>
+
+            <p>Three independent layers stand between "the actor wants to change a file" and "the file changed." None of them can approve or execute anything on their own — they can only advise, hold, or refuse.</p>
+
+            <p><strong>Layer one: the filesystem itself.</strong> Every model-supplied path is resolved through <code>crates/lfm3-harness/src/paths.rs</code>, whose header comment reads:</p>
+
+            <blockquote>"Parent components, absolute paths, reserved device names, link and reparse-point traversal, and canonical escapes are rejected before any caller can touch the filesystem."</blockquote>
+
+            <p>Symlinks are checked component by component; on Windows, trailing dots, trailing spaces and device names like <code>CON</code> and <code>COM1</code> are rejected too. The release acceptance suite includes an escape fixture asking the mission to write <code>../escaped.md</code> — the request is rejected <em>before planning</em>, in 0.25 s, with no leftover processes.</p>
+
+            <p><strong>Layer two: the preflight gates.</strong> A second model — d1, not the actor grading its own homework — reviews each proposal. The constants, from <code>chat/decisions.rs</code>:</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Gate</th><th>Floor</th><th>Labels</th><th>Outcomes</th><th>Powers</th></tr></thead>
+                    <tbody>
+                        <tr><td>Write gate</td><td><code>WRITE_GATE_FLOOR_BPS = 7_500</code> (75%)</td><td>aligned / uncertain / contradicts</td><td>Allow / Advise / Hold</td><td>A Hold <strong>suppresses the approval card entirely</strong>; the change is not written and not retryable</td></tr>
+                        <tr><td>Evidence gate</td><td><code>EVIDENCE_GATE_FLOOR_BPS = 6_500</code> (65%)</td><td>sufficient / insufficient / off_topic</td><td>Advisory note only</td><td>Never blocks; flags thin evidence after read-only work</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note">Gate decisions time out at 12 s (<code>DECISION_TIMEOUT</code>); evidence is capped at 7,000 chars total, with the user request at 3,000 and the file excerpt at 2,000.</p>
+
+            <p>The gate prompt is deliberately paranoid. It feeds d1 two clearly labelled inputs:</p>
+
+            <pre><code class="language-text">REQUEST (the person's words, the only authorization):
+{...}
+
+PROPOSED ACTION (model-authored, untrusted):
+{...}</code></pre>
+
+            <p>The actor's proposal is data under review, not an instruction. When the write gate holds, what the actor sees is <code>hold_message()</code> — and note there is no appeal path:</p>
+
+            <pre><code class="language-rust">"Harness preflight held the change to {target} (d1, {n}% confidence): {reason}.
+No approval card was shown and nothing was written. Do not retry the same
+change. Either propose a change that clearly matches the request, or answer
+with what you need."</code></pre>
+
+            <p><strong>Layer three: you.</strong> If a proposal survives the gates, it arrives as an approval card in the UI (<code>apps/ui/src/chat/ActionCard.tsx</code>): a "Review the exact change" expander with the old and new text side by side as a remove/insert diff grid, and two buttons — <em>Allow once</em>, <em>Deny</em>. There is no "allow always." Approvals expire: <code>APPROVAL_TTL = 600</code> seconds in <code>apps/desktop/src-tauri/src/chat.rs</code>, ten minutes, batch-expired by the store. A diff you thought about for eleven minutes is a diff you must be re-asked about.</p>
+
+            <h2 id="victory">6. Refusing to Let the Model Declare Victory</h2>
+
+            <p>Sections 4–5 gate the model's <em>actions</em>. The hardest problem is gating its <em>claims</em>, because a 1.7B model will claim success with complete sincerity and nothing to show for it. The harness treats three kinds of claim as unprovable until checked:</p>
+
+            <ul>
+                <li><strong>"I'm done."</strong> <code>agent/loop_agent.rs</code> refuses <code>finish</code> unless the required deliverable exists and is non-empty on disk — the quote that opens this post — and refuses again ("finish refused: re-read the output first") unless the actor re-reads what it just wrote. A finish backed by an empty or placeholder write is refused outright, as is overwriting a source file with the report.</li>
+                <li><strong>"The evidence supports this."</strong> That is what the evidence gate (§5) spot-checks after read-only work — advisory, but at least a second model looked.</li>
+                <li><strong>"The task passed."</strong> In verified tasks, nobody gets to claim this — including the harness's models. Acceptance is a frozen spec, canonicalised and SHA-256-hashed the moment it loads, recorded in an <code>acceptance_specs</code> table, and <em>never weakened during retries or replanning</em>. Checks are deterministic: file exists, content matches, content absent, JSON schema, numeric consistency, report complete. The mission declares its required artifact; chat's warm fuzzies cannot satisfy any check.</li>
+            </ul>
+
+            <p>Semantic judgments — the cases a deterministic check cannot express — exist in the code (<code>verify/semantic.rs</code>: VL criteria, d1 choice and grounded checks, default confidence floor <code>8_000</code> bps, and a <code>d1_grounded</code> rule requiring the claimed string to occur literally in frozen input bytes before any model is consulted). But for three of the four missions — <code>screen_qa</code>, <code>voice_intake</code>, <code>doc_extract</code> — the acceptance spec declares <code>"mode": "human_review_only"</code> and the engine refuses to start them under automatic judgment. The documented bar for flipping a semantic check to automatic is at least three packaged end-to-end runs with zero confident false completions. That qualification has never been performed, and the README says so instead of quietly enabling it.</p>
+
+            <p>Only <code>desk_task</code> — frozen inputs, ten file tools, seven deterministic checks, required artifact <code>out/summary.md</code>, empty command templates — has passed end-to-end acceptance with real models: 5.99 s, with peak <code>llama-server</code> memory of 1,603,924 KB recorded, across an eight-case release suite that includes escape, crash, timeout and missing-model scenarios, all leaving no leftover process IDs.</p>
+
+            <h2 id="benchmark">7. Benchmark Forensics: A Test Suite That Caught Two Silent Bugs</h2>
+
+            <p>On 2026-10-31 the project ran its multimodel benchmark — one run, one machine, results published in <code>bench/multimodel/REPORT.md</code> with the caveats attached. Headline numbers first:</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Suite</th><th>Result</th><th>Notes</th></tr></thead>
+                    <tbody>
+                        <tr><td>Router accuracy</td><td>21/21</td><td>Keywords alone would have managed only 14/21; d1 was consulted 21/21 times and replaced the keyword route 20 times with zero regressions</td></tr>
+                        <tr><td>Route latency</td><td>122 ms median</td><td>Per d1 decision</td></tr>
+
+                        <tr><td>Edge cases</td><td>7/7 + 3/3</td><td>Override-winners 7/7; keyword blind spots recovered by d1 3/3</td></tr>
+                        <tr><td>Chat turns</td><td>12/12</td><td>With tool rounds, gates consulted live</td></tr>
+                        <tr><td>Vision / voice</td><td>2/2 · 1/1</td><td>TTS + ASR round-trip 2/2 at 0% WER (text-level)</td></tr>
+                        <tr><td>Gates in the run</td><td>2 write · 8 evidence</td><td>0 write holds fired; one gate answer at 55% fell below the 75% floor; 2 evidence advisories; 2 gate answers rejected as inconclusive</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="table-note">One real run on one local machine with a pinned llama.cpp runtime; synthetic fixtures; generated PNGs; no webview involved — the report states nothing is scripted. All caveats are the project's own.</p>
+
+            <p>Read the 21/21 with one caveat the report itself implies: before the bug below was fixed, the router that actually shipped was the keyword table, and the keyword table alone scores 14/21. The headline number describes the system as it was intended to work on the bench day — not a capability that had ever been running in the app.</p>
+
+            <p>What makes the benchmark worth reading is not what it proved but what it <em>caught</em>. The report was written around questions like: "Does d1 actually receive the prompt, or silently fall back?" Two genuine defects answered that question the hard way:</p>
+
+            <p><strong>Bug one: the router was theater.</strong> The client was calling <code>/v1/chat/completions</code> on the decision model — an endpoint native d1 answers with <code>HTTP 501</code>. Routing had been "silently using keywords for every request." The app still <em>felt</em> right because the keyword table handles the obvious cases; the 21/21 number, had it been measured a week earlier, would have been 14/21 while claiming the d1 path was exercised. The fix speaks <code>/v1/systemone</code> and enforces the declared label, the choice type, and a [0,1] confidence — so a fallback can never masquerade as a decision again. The lesson generalises to any multi-model agent setup: <em>instrument whose answer you actually used, not which endpoint you configured.</em></p>
+
+            <p><strong>Bug two: approval purgatory.</strong> A chat action the user approved could stay stuck in <code>approved</code> forever, because the store's transition rule only accepted moves <em>from</em> <code>pending</code>. The two-transition path (<code>approved → applied | failed</code>, preserving <code>decided_at</code>) now exists, with the rationale kept as a comment in <code>chat/store.rs</code> — the sort of state-machine bug that a fake-model test suite misses and a real click-through finds.</p>
+
+            <p>The 50-job agent benchmark (<code>bench/agent50/REPORT.md</code>) is equally unsparing: 43/50 harness-pass (86%), 41/50 on the stricter semantic judgment, <strong>two false passes</strong> (jobs t27/t36, both from word-count bounds that said "too long" where the real failure was different), zero false failures, average 5.7 turns, median 30.5 s — and a weakest category, search, at 1/5. The report is explicit that the harness being more lenient than the semantic judge is precisely the gap you should worry about, because the harness is the thing shipping success messages.</p>
+
+            <h2 id="rewrite">8. The Python→Rust Rewrite, and How It Is Enforced</h2>
+
+            <p>The harness began as a Python prototype. The README now opens with: <em>"The Python implementation, tests, caches, and Python project configuration have been removed"</em> — while the model weights, llama.cpp runtime, demo materials and missions carried over. PLAN.md bans Python from "development, packaging, or runtime" outright.</p>
+
+            <p>The part worth noticing is the enforcement. A dead stack is easy to resurrect accidentally: one old script left in the repo, one CI job invoking <code>python</code>, one packaged <code>.py</code> nobody notices. So removal is a <em>checked assertion</em>, not a claim. <code>scripts/accept.ps1</code> runs a step literally titled "no Python project files" across the source tree; the packaged smoke test installs the NSIS build into a path containing spaces and verifies the installed tree contains no Python source; STEPS.md requires an audit expecting none. Legacy <code>.lfm3/</code> data from the prototype is deliberately not migrated. There is no blog-post lesson-learned narrative in the repo — the rewrite's memory survives as gates in the pipeline, which is a more durable kind of record anyway.</p>
+
+            <h2 id="lessons">9. Design Lessons for Constrained Agents</h2>
+
+            <p>Strip away the specific models and the harness leaves a reusable checklist for anyone building on small, cheap, local models:</p>
+
+            <ul>
+                <li><strong>Separate hints from authority.</strong> Classification, routing and proposals inform the system; only deterministic checks and human approvals change state. If a model output can trigger a side effect, you built the trust wrong.</li>
+                <li><strong>Cap everything, and say so when a cap fires.</strong> 12 tool rounds per turn, 8 plan steps, 3 attempts per strategy, 64 turns per job, 900 s run timeout, 32,000-character inputs, 240 messages of history. When the round cap hits, the app tells the user ("I stopped after 12 tool rounds to keep this turn bounded") instead of failing silently.</li>
+                <li><strong>Give each role the sampling it needs.</strong> The actor gets temperature 0.1/top-k 50/repetition penalty 1.1; the judges get greedy decoding — you want a reviewer to be deterministic. Chat runs warmer (0.3) than the working loop. TTS gets 1.0/top-k 128 with a 120 s watchdog.</li>
+                <li><strong>Fail closed by default.</strong> Loopback-only pins enforced in the packaged binary; <code>allow_download</code> forbidden after packaging; children killed by job object if the parent dies; interrupted jobs reported as <code>interrupted</code>, never silently resumed; a second message during an active turn is rejected rather than queued.</li>
+                <li><strong>Make claims cost something.</strong> "Done" requires a file on disk. "Passed" requires a frozen contract. "I looked at the image" requires re-read evidence. The harness's whole personality is: <em>show me, don't tell me.</em></li>
+                <li><strong>Publish your gaps.</strong> The README's Known-gaps list and the benchmark caveats do more for the project's credibility than any 21/21 headline could.</li>
+            </ul>
+
+            <h2 id="limitations">10. Limitations and Open Questions</h2>
+
+            <p>V0.1.1 is honest about being experimental — in its own words, per the README's "Known gaps" and product-constraints sections:</p>
+
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Limitation</th><th>Status, as documented</th></tr></thead>
+                    <tbody>
+                        <tr><td>Single-run numbers</td><td>Every benchmark figure is one machine, one run, synthetic fixtures; zero real contradictory-write holds measured in the benchmark (the 55%-confidence case was the closest)</td></tr>
+                        <tr><td>Semantic missions unqualified</td><td><code>screen_qa</code>, <code>voice_intake</code>, <code>doc_extract</code> are human-review-only; the ≥3 packaged-run semantic holdout has never been performed</td></tr>
+                        <tr><td>Under-qualified paths</td><td>Routing, search, report, streamed calls, cancellation and approval-expiry not yet qualified against real models across scenarios; replanning tested only by automation</td></tr>
+                        <tr><td>Token caps not wired</td><td><code>limits.max_tokens</code> is not enforced by the executor or planner, which hardcode 512 and 1,536 output tokens respectively — flagged in the README as a known gap</td></tr>
+                        <tr><td>Voice playback in-app</td><td>llama-tts is not exercised end-to-end inside the desktop app; coverage is by components and an ignored test</td></tr>
+                        <tr><td>Platform reach</td><td>Windows 10/11 x64 and Linux x64 only (no macOS); CPU-only by design (<code>-ngl 0</code>; a 594 MB CUDA backend exists in llama.cpp but is deliberately not bundled); Linux needs WebKitGTK 4.1 + GTK 3</td></tr>
+                        <tr><td>Unsigned installer</td><td>The 15.2 MB Windows NSIS build is unsigned, so SmartScreen will warn; SHA-256 hashes are published for every artifact instead</td></tr>
+                        <tr><td>Scope</td><td>Purpose-bound by policy: one folder, no shell, no web browsing, no cloud services, no telemetry unless explicitly enabled, no resume of interrupted jobs, legacy prototype data not migrated</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <p>The open questions mostly reduce to scale: this design <em>assumes</em> the actor is unreliable and spends real engineering on compensating. Whether the gate floors (75/65/55%) still feel right with a 7B actor, whether semantic holdout qualification will survive contact with false-pass rates like agent50's 2/50, and whether search at 1/5 is a model ceiling or a tool-design bug — the project has measured the questions; the answers are still ahead.</p>
+
+            <h2 id="conclusion">11. Conclusion</h2>
+
+            <p>LFM3-Harness is a small app with a clear thesis: <strong>with small models, the harness is the product.</strong> The four LFM3 members are modest, and the design accepts that — it wraps every model output in a check performed by something that is not the model: a path resolver that answers before the filesystem does, a decision model that grades proposals it did not write, a finish verb that refuses until the file exists, an acceptance contract frozen in SHA-256 before anyone starts working, and a benchmark whose most useful result is two silent bugs it caught in its own plumbing.</p>
+
+            <p>What the harness cannot do is make 1.7B smarter. Rails that reliably prevent damage are not the same thing as capability, and the measurements in this post are the project's own ceiling talking: 43/50 on jobs with two false passes, search at 1/5, one mission qualified end-to-end, everything else single-run. If you are looking for a coworker that does real work, this is not it yet — and at this model scale, arguably it never will be; the rails make a weak assistant safe, not strong. The honest pitch is narrower: if you build agents on small or cheap models, the repo is worth reading as a catalogue of verification patterns — <code>chat/decisions.rs</code>, <code>agent/loop_agent.rs</code>, <code>paths.rs</code> — and the Known-gaps section is worth reading first, because it tells you exactly which of those patterns have not survived contact with a real model yet. Treat this post as an introduction, not an endorsement.</p>
+
+            <h2 id="references">References</h2>
+            <ol>
+                <li><a href="https://lfm3-harness.github.io/" rel="noopener" target="_blank">LFM3-Harness project site</a> — lfm3-harness.github.io (capabilities, download hashes, model table, FAQ), accessed November 1, 2026.</li>
+                <li><a href="https://github.com/LFM3-Harness/LFM3-Harness" rel="noopener" target="_blank">LFM3-Harness/LFM3-Harness</a> on GitHub — README.md (architecture §144; benchmark defects §231; licenses and Liquid AI notice §3, §443; known gaps §439), plus PLAN.md (system spec: in-process engine, child supervision, no-Python rule) and STEPS.md (implementation and audit steps), accessed November 1, 2026.</li>
+                <li><code>crates/lfm3-harness/src/config.rs</code> (loopback port pins 8080–8083, <code>validate_local</code>), <code>chat/router.rs</code> (<code>MIN_DECISION_CONFIDENCE_BPS = 5_500</code>, 24-char skip, General veto), <code>chat/decisions.rs</code> (<code>WRITE_GATE_FLOOR_BPS = 7_500</code>, <code>EVIDENCE_GATE_FLOOR_BPS = 6_500</code>, <code>hold_message</code>, gate prompt labels), <code>paths.rs</code> (escape rejection header), <code>agent/loop_agent.rs</code> (finish refusals), <code>verify/semantic.rs</code> (<code>default_confidence_bps() = 8_000</code>), <code>model/process.rs</code> (fixed command line), <code>supervisor/windows.rs</code> (kill-on-close job object), <code>store/migrations.rs</code> (journal schema) — LFM3-Harness repository, main branch.</li>
+                <li><code>apps/desktop/src-tauri/src/chat.rs</code> (<code>MAX_ROUNDS = 12</code>, <code>APPROVAL_TTL = 600s</code>, <code>TURN_TIMEOUT = 900s</code>), <code>chat_bench.rs</code> (benchmark turn timeout 300 s), <code>engine.rs</code> (<code>TEXT_CONTEXT_TOKENS = 32_000</code>, <code>-ngl 0</code> launch), <code>apps/ui/src/chat/ActionCard.tsx</code> (diff approval card) — same repository.</li>
+                <li><code>bench/multimodel/REPORT.md</code> (2026-10-31 run: 21/21 router, 122 ms median route latency, gate consult counts, caveats) and <code>bench/agent50/REPORT.md</code> (43/50 harness pass, 41/50 semantic, t27/t36 false passes) — same repository.</li>
+                <li><code>missions/desk_task.json</code>, <code>missions/screen_qa.json</code>, <code>missions/voice_intake.json</code>, <code>missions/doc_extract.json</code> (frozen acceptance specs and <code>human_review_only</code> declarations) — same repository.</li>
+                <li><code>scripts/accept.ps1</code> ("no Python project files" step) and README smoke-test description — same repository.</li>
+                <li>Liquid AI LFM3 model weights under the LFM Open License; llama.cpp runtime bundle v0.8.0 (build 11960), CPU-only.</li>
+                <li>Related Local AI Zone coverage: "Low-Resource AI Agents: Experiment Archive" and "System-One Decision Models Deep Dive," this site, 2026.</li>
+            </ol>
+
+            <hr>
+
+            <img src="lfm3-harness-deep-dive-hero.png" alt="LFM3 Harness deep-dive recap: four local models, gate floors, benchmark results" style="width: 100%; border-radius: 12px;">
+
+        </div>
+
+<section id="faq" class="article-section faq">
+<h2>Frequently asked questions</h2>
+<h3>What is LFM3-Harness?</h3>
+<p>LFM3-Harness is a free, MIT-licensed, community-built <a href="https://lfm3-harness.github.io/" rel="noopener" target="_blank">desktop app</a> for Windows 10/11 x64 and Linux x64 that runs Liquid AI's LFM3 models entirely on your own CPU through llama.cpp. You pick a folder and chat; the assistant can list, search, read and summarise files and draft reports or edits, but every write is shown as an exact diff and happens only after you explicitly allow it. It is an independent project and is not affiliated with, endorsed by, or sponsored by Liquid AI.</p>
+<h3>How does it stop a 2B model from doing damage?</h3>
+<p>Through the harness rather than the model: a separate decision model preflight-checks every proposed write against your request with a 75% confidence floor and, when it holds a change, shows no approval card at all; every path is canonicalised and rejected before touching the filesystem if it tries to escape the chosen folder; claims of completion are refused until the deliverable exists on disk; and verified tasks are judged only by frozen, SHA-256-hashed acceptance contracts that cannot be weakened mid-run. Diff approvals expire after ten minutes, and you can only ever "Allow once."</p>
+<h3>What hardware does it need, and is it really offline?</h3>
+<p>A CPU-only x64 machine with at least 8 GB RAM — it deliberately launches every model server with GPU offload disabled. Once the ≈4.9 GB of weights are downloaded in-app (verified byte-for-byte with SHA-256), everything runs locally: the four llama-server children are pinned to 127.0.0.1 on ports 8080–8083, the packaged build refuses any non-loopback endpoint, and there is no account, no telemetry by default, and no engine sidecar.</p>
+<h3>Can it be trusted as "done" work?</h3>
+<p>Read the project's own numbers before deciding. Its 50-job agent benchmark passed 43/50 with two false passes and a weak search category (1/5), all documented with caveats; three of its four missions remain human-review-only because the semantic qualification holdout has never been run; every benchmark figure comes from one machine and one run. The harness is transparent about exactly how far its guarantees reach — which is worth more, when evaluating experimental software, than a stronger product with a vaguer story.</p>
+<h3>But is it actually capable?</h3>
+<p>No, not by frontier standards, and the project would not claim it is. The writer is a 1.7B model on CPU: expect small-model output quality with a hard ceiling, roughly one job in twelve failing its own checks even when the harness reports success, and search — the most agent-critical skill in its benchmark — at 1/5. What it is, is careful: the design's real achievement is that the assistant rarely gets to lie about what it did. Safe to try on a folder of notes; not a replacement for anything you currently use an agent for.</p>
+</section>
+
+<section class="post-help" aria-labelledby="post-help-title">
+        <div class="post-help-inner">
+            <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+            <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+            through it &mdash; whether you want to run LFM3-Harness yourself, adapt its gate
+            design to your own agent, or pick the local models that fit your machine. Your
+            message arrives with this article attached, so I&rsquo;ll know exactly what
+            you&rsquo;re reading.</p>
+            <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: LFM3 Harness Deep Dive">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>Ask me about this post</span>
+            </button>
+        </div>
+    </section>
+</article>
+
+    <footer style="background: #1e293b; color: #e2e8f0; padding: 40px 20px; margin-top: 60px;">
+        <div class="container" style="max-width: 900px; margin: 0 auto; text-align: center;">
+            <p style="margin: 0 0 15px 0; font-size: 0.95em;">&copy; 2026 Local AI Zone. All rights reserved.</p>
+            <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #94a3b8;">LFM3 Harness Deep Dive — The Harness, Not the Model</p>
+            <p style="margin: 0; font-size: 0.85em; color: #64748b;">
+                <a href="../index.html" style="color: #60a5fa; text-decoration: none;">Home</a> •
+                <a href="../blog.html" style="color: #60a5fa; text-decoration: none;">Blog</a> •
+                <a href="../about.html" style="color: #60a5fa; text-decoration: none;">About</a> •
+                <a href="../services.html" style="color: #60a5fa; text-decoration: none;">Services</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="../js/theme-switcher.js"></script>
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        document.querySelectorAll('pre code').forEach((block) => {
+            const button = document.createElement('button');
+            button.innerHTML = 'Copy';
+            button.style.cssText = 'position: absolute; top: 8px; right: 8px; padding: 4px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em; opacity: 0; transition: opacity 0.3s;';
+
+            const pre = block.parentElement;
+            pre.style.position = 'relative';
+            pre.appendChild(button);
+
+            pre.addEventListener('mouseenter', () => button.style.opacity = '1');
+            pre.addEventListener('mouseleave', () => button.style.opacity = '0');
+
+            button.addEventListener('click', () => {
+                navigator.clipboard.writeText(block.textContent);
+                button.innerHTML = 'Copied!';
+                setTimeout(() => button.innerHTML = 'Copy', 2000);
+            });
+        });
+
+        const sections = document.querySelectorAll('h2[id], h3[id]');
+        const tocLinks = document.querySelectorAll('#table-of-contents a');
+
+        window.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= sectionTop - 100) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            tocLinks.forEach(link => {
+                link.style.fontWeight = link.getAttribute('href') === '#' + current ? '600' : '400';
+                link.style.color = link.getAttribute('href') === '#' + current ? '#2563eb' : 'inherit';
+            });
+        });
+    </script>
+<script src="/js/goatcounter.js" defer></script>
+    <button id="contact-tab-button"
+            class="contact-tab-button"
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2 2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <div id="contact-form-panel"
+         class="contact-form-panel"
+         role="dialog"
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close"
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" id="contact-name" name="name" class="form-input" placeholder="Your name" required aria-required="true" aria-describedby="contact-name-error">
+                <div id="contact-name-error" class="form-error" role="alert" aria-live="polite"></div>
+            </div>
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" id="contact-email" name="email" class="form-input" placeholder="your.email@example.com" required aria-required="true" aria-describedby="contact-email-error">
+                <div id="contact-email-error" class="form-error" role="alert" aria-live="polite"></div>
+            </div>
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" id="contact-subject" name="subject" class="form-input" placeholder="What is this about?" required aria-required="true" aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" class="form-error" role="alert" aria-live="polite"></div>
+            </div>
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" name="message" class="form-input form-textarea" rows="6" placeholder="Your message..." required aria-required="true" aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" class="form-error" role="alert" aria-live="polite"></div>
+            </div>
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+    <a href="https://www.instagram.com/nazary.ai" class="floating-instagram-btn" rel="noopener" target="_blank" aria-label="Connect with me on Instagram" title="Connect with me on Instagram" style="position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 8px 24px rgba(225, 48, 108, 0.4); z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255, 255, 255, 0.2);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span style="color: white; font-weight: 600; white-space: nowrap;">Connect with me on Instagram</span>
+    </a>
+</body>
+</html>

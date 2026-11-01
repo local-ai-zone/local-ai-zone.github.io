@@ -5,8 +5,15 @@
     <link>https://local-ai-zone.github.io/blog.html</link>
     <description>Guides, research papers and analysis for running AI locally.</description>
     <language>en-us</language>
-    <lastBuildDate>Tue, 20 Oct 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 01 Nov 2026 00:00:00 +0000</lastBuildDate>
     <atom:link href="https://local-ai-zone.github.io/feed.xml" rel="self" type="application/rss+xml"/>
+        <item>
+      <title>LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy</title>
+      <link>https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive.html</link>
+      <guid isPermaLink="true">https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive.html</guid>
+      <pubDate>Sat, 01 Nov 2026 00:00:00 +0000</pubDate>
+      <description>A source-level deep dive into LFM3-Harness v0.1.1, the free community-built desktop coworker that runs four Liquid AI models - d1-2B as router, LFM3-1.7B as actor, LFM3-VL-2B for vision, LFM3-Audio-2B for voice - entirely on CPU through llama.cpp. The post walks the harness that makes small models safe to use: loopback-pinned model servers on 127.0.0.1:8080-8083 with kill-on-close supervision, a 55%-floor router with keyword fallback, a preflight write gate at a 75% mismatch floor that suppresses the approval card when it holds, an advisory evidence gate at 65%, ten-minute expiring diff approvals, path-escape refusal before the filesystem is touched, finish claims refused until the deliverable exists on disk, and frozen SHA-256 acceptance contracts. It closes with the project's own benchmark record - 21/21 routing at 122 ms median that exposed two silent bugs (a decision router secretly falling back to keywords via an endpoint answered with HTTP 501, and approvals stuck in the approved state), 43/50 on the 50-job agent suite with two false passes - and the honest Known-gaps list the README publishes.</description>
+    </item>
         <item>
       <title>LFM3: A Technical Deep Dive into Liquid AI's Tri-Hybrid Multimodal Family - Local AI Zone</title>
       <link>https://local-ai-zone.github.io/blog/lfm3-deep-dive.html</link>
