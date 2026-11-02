@@ -27,7 +27,7 @@
 
     <!-- Open Graph / Facebook -->
     <meta property="og:title" content="LFM3: Technical Deep Dive into Liquid AI's Tri-Hybrid Multimodal Family">
-    <meta property="og:description" content="Full architectural breakdown: the tri-hybrid backbone (13 conv + 5 SWA + 6 global attention), six 2B-class multimodal models, 22T-token training, 256K context in 1.6 GB of KV cache, agent benchmarks, and edge inference. Every disclosed number explained.">
+    <meta property="og:description" content="Full architectural breakdown: the tri-hybrid backbone (13 conv + 5 SWA + 6 global attention), six 2B-class multimodal models, 22T-token training, a 256K context (1.6 GB of KV cache at 128K), agent benchmarks, and edge inference. Every disclosed number explained.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://local-ai-zone.github.io/blog/lfm3-deep-dive.html">
     <meta property="og:image" content="https://local-ai-zone.github.io/blog/lfm3-deep-dive-hero.png">
@@ -1174,7 +1174,7 @@ temperature=1.0, top_p=0.95, top_k=20</code></pre>
 
             <div class="highlight-box">
                 <h4>✅ Final Verdict</h4>
-                <p>LFM3 is the most consequential small-model release of late 2026 for people who run models on their own hardware. The tri-hybrid backbone is a real architectural step — convolutions for speed, five sliding-window layers for cheap capability, six global layers for long-range state, plus gating, partial RoPE, and sandwich norm to keep it all quantization-friendly — and the benchmark record backs the pitch: 49.37 average, better agentic scores than a 9B model, 256K context in 1.6 GB of KV cache, ~1 GB at 4-bit, fastest decode on every device Liquid measured.</p>
+                <p>LFM3 is the most consequential small-model release of late 2026 for people who run models on their own hardware. The tri-hybrid backbone is a real architectural step — convolutions for speed, five sliding-window layers for cheap capability, six global layers for long-range state, plus gating, partial RoPE, and sandwich norm to keep it all quantization-friendly — and the benchmark record backs the pitch: 49.37 average, better agentic scores than a 9B model, a 256K context whose 1.6 GB of KV cache covers 128K tokens, ~1 GB at 4-bit, fastest decode on every device Liquid measured.</p>
                 <p>The honest caveats are the ones Liquid prints itself: this is not a coding agent, not a knowledge engine, and the agentic benchmark suite is Liquid's home turf. But for the workload this site cares about — private, always-on, on-device agents with tool access — LFM3-1.7B is the new default starting point, and the five sibling models (VL, Audio, Omni, d1-2B, d1-Omni-2B) make it a platform rather than a one-off. Run the Q4_0 GGUF in llama.cpp, keep a retrieval layer in front of it, fine-tune it on your own task, and it will be very hard to justify replacing it with an API call.</p>
             </div>
 

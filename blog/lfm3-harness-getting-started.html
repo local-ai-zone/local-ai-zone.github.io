@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LFM3-Harness Setup Guide: Install, Download Weights, Run a Checked Task - Local AI Zone</title>
+    <meta name="description" content="A practical LFM3-Harness setup guide for Windows and Linux: check the machine, verify the installer hash, download the four LFM3 weights, read the approval card, and run the one verified task that has passed end-to-end.">
+    <meta name="keywords" content="LFM3-Harness setup, LFM3-Harness install, lfm3-harness.github.io, LFM3-1.7B, d1-2B, LFM3-VL-2B, LFM3-Audio-2B, llama.cpp CPU, local AI coworker, offline AI assistant, verified task, acceptance contract, SHA-256, Tauri desktop app">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="theme-color" content="#2563eb">
+
+    <meta property="og:title" content="LFM3-Harness Setup Guide: Install, Download Weights, Run a Checked Task">
+    <meta property="og:description" content="From a 15 MB unsigned installer to a 4.9 GB local model stack: the order of operations, the hashes worth checking, the ports that conflict, and what the approval card is actually telling you.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/lfm3-harness-getting-started.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="LFM3-Harness: four LFM3 models on CPU, gated by a Rust harness">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-11-02T00:00:00Z">
+    <meta property="article:section" content="Guides">
+    <meta property="article:tag" content="LFM3-Harness">
+    <meta property="article:tag" content="Local AI">
+    <meta property="article:tag" content="Installation">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:creator" content="@hussainnazary">
+    <meta name="twitter:title" content="LFM3-Harness Setup Guide">
+    <meta name="twitter:description" content="Verify the installer, fetch 4.9 GB of LFM3 weights, understand the 75% write gate, and run the one mission that has passed end-to-end acceptance. A practical first-run guide.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png">
+
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/lfm3-harness-getting-started.html">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "HowTo",
+      "name": "LFM3-Harness setup guide",
+      "description": "Install LFM3-Harness on Windows or Linux, download the four LFM3 model weights, verify the artifacts, and run a verified task.",
+      "image": "https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png",
+      "totalTime": "PT45M",
+      "estimatedCost": {"@type": "MonetaryAmount", "currency": "USD", "value": "0"},
+      "author": {"@type": "Person", "name": "Hussain Nazary"},
+      "publisher": {"@type": "Organization", "name": "Local AI Zone"},
+      "datePublished": "2026-11-02",
+      "mainEntityOfPage": "https://local-ai-zone.github.io/blog/lfm3-harness-getting-started.html",
+      "about": [
+        {"@type": "Thing", "name": "LFM3-Harness"},
+        {"@type": "Thing", "name": "llama.cpp"},
+        {"@type": "Thing", "name": "Local-first AI"}
+      ]
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "How much RAM does LFM3-Harness need?",
+          "acceptedAnswer": {"@type": "Answer", "text": "The project states a minimum of 8 GB of RAM on a CPU-only x64 machine. The four model weights total about 4.9 GB, and they run alongside the KV cache, the webview and the operating system. There is no GPU path: every llama-server child is launched with GPU offload disabled."}
+        },
+        {
+          "@type": "Question",
+          "name": "Why does Windows SmartScreen warn about the installer?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Because the 15.2 MB NSIS installer is unsigned. The project publishes a SHA-256 hash for every artifact instead of paying for code signing, so the correct procedure is to hash the file you downloaded, compare it to the published value, and only then run it."}
+        },
+        {
+          "@type": "Question",
+          "name": "Does it work on macOS or with a GPU?",
+          "acceptedAnswer": {"@type": "Answer", "text": "No to both, as of v0.1.1. The builds are Windows 10/11 x64 and Linux x64 only, and the engine deliberately launches every model server with -ngl 0, so GPU offload is not used even when a GPU is present."}
+        },
+        {
+          "@type": "Question",
+          "name": "Why did the assistant say 'finish refused'?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Because that guard is working. The harness rejects a completion claim unless the promised deliverable exists and is non-empty on disk, and it asks the actor to re-read the output before finishing. It is a refusal of an unproven claim, not an error."}
+        },
+        {
+          "@type": "Question",
+          "name": "Which ports does the app use?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Four loopback ports: 8080 for the text actor, 8081 for vision, 8082 for audio and 8083 for the d1 decision model, all pinned to 127.0.0.1. Anything else already listening on those ports will prevent a model server from starting."}
+        }
+      ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="stylesheet" href="../css/contact-form.css">
+    <link rel="stylesheet" href="../css/blog-post.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+</head>
+<body class="blog-article-page has-site-header">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">&#9728;&#65039;</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">&#127769;</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">LFM3-Harness Setup Guide: Install, Download Weights, Run a Checked Task</h1>
+                <div class="article-meta">
+                    <span class="article-date">November 2, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Guides</span>
+                    <span class="article-read-time">&#128214; 11 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+
+            <p>Two posts on this site already cover <a href="lfm3-harness-deep-dive.html">LFM3-Harness in depth</a> and the <a href="lfm3-deep-dive.html">LFM3 model family</a> behind it. This one is the practical companion: what to do on a machine you actually own, in the order you should do it, and the checks that catch the two failures that waste the most time &mdash; a bad download and a port that is already occupied.</p>
+
+            <p>Everything below describes version 0.1.1 as the project documents it on November 2, 2026. The app is an independent community project: MIT-licensed, not affiliated with Liquid AI, and honest in its own README about the parts that are unfinished. Read the limitations section before you invest an evening in it.</p>
+
+            <div style="border:1px solid var(--border-color, #e5e7eb);border-left:4px solid var(--accent-primary, #2563eb);background:var(--card-background, var(--background-secondary, #f8fafc));color:var(--text-primary, #111827);border-radius:8px;padding:18px 20px;margin:28px 0;">
+            <p style="margin:0 0 10px;font-weight:700;font-size:1.02em;">Verification note: what is quoted, what is measured</p>
+            <ul style="margin:0;padding-left:20px;">
+                <li><strong>Code behaviour and limits</strong> are quoted from the LFM3-Harness source and README at v0.1.1 &mdash; confidence floors, timeouts, round caps, acceptance contracts and process supervision &mdash; with file paths given so each claim can be checked.</li>
+                <li><strong>Packaging facts</strong> &mdash; installer size, bundle formats, artifact byte counts and SHA-256 hashes &mdash; come from the project site and the repository's release notes.</li>
+                <li><strong>Model facts</strong> &mdash; parameter counts, context windows, licences and weight sizes &mdash; come from Liquid AI's model cards and launch post. LFM3-Harness is an independent community project, not affiliated with Liquid AI.</li>
+                <li><strong>Benchmark numbers</strong> are the project's own measurements on one machine in one run (multimodel, 2026-10-31; the 50-job agent suite), not independently replicated here, and are reported with the project's caveats attached.</li>
+                <li>This guide is assembled from the README, release artifacts and project site. Local AI Zone did not install or run the app to produce it, so treat the commands as documented procedure rather than a tested transcript.</li>
+            </ul>
+        </div>
+
+<h2 id="what-you-install">1. What you are actually installing</h2>
+
+            <p>The download is about 15 MB. That is the entire application: a Tauri 2 desktop shell around an embedded Rust engine. There is no Python sidecar, no local engine HTTP server, and no shell tool. The models are not in the installer. They are downloaded separately, inside the app, and they total roughly 4.9 GB.</p>
+
+            <p>At runtime the app supervises four <code>llama-server</code> children, each pinned to loopback and each given a fixed command line built in one place. The application code is MIT. The weights belong to Liquid AI and ship under the LFM Open License, which is a different document with different terms &mdash; read it if you intend to redistribute anything.</p>
+
+            <h2 id="requirements">2. Check the machine first</h2>
+
+            <div class="table-scroll">
+            <table>
+                <thead><tr><th>Component</th><th>Requirement</th><th>Why it matters</th></tr></thead>
+                <tbody>
+                    <tr><td>Operating system</td><td>Windows 10/11 x64, or Linux x64</td><td>There is no macOS build in v0.1.1.</td></tr>
+                    <tr><td>Linux desktop libraries</td><td>WebKitGTK 4.1 and GTK 3</td><td>The webview will not start without them, including when you use the AppImage.</td></tr>
+                    <tr><td>RAM</td><td>8 GB minimum</td><td>About 4.9 GB of weights, plus KV cache, webview and OS.</td></tr>
+                    <tr><td>Free disk</td><td>About 5.5 GB</td><td>Install, four model files, and the run journal.</td></tr>
+                    <tr><td>GPU</td><td>Not used</td><td>Every server is launched with <code>-ngl 0</code>; CPU only, by design.</td></tr>
+                    <tr><td>Network</td><td>Downloads only</td><td>After the weights land, traffic is loopback on ports 8080&ndash;8083.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p>If you were hoping to point this at a GPU box on your network, note that the packaged build refuses non-loopback endpoints outright. The offline claim is enforced in the binary, not promised in a policy page.</p>
+
+            <h2 id="pick-folder">3. Pick the folder before you install</h2>
+
+            <p>The folder you choose is the entire permission surface. The assistant can list, read and search inside it, and it can propose edits inside it. It cannot open a shell, browse the web, or reach a path outside it &mdash; every model-supplied path is resolved and rejected before the filesystem is touched if it tries to escape through <code>..</code>, an absolute path, a symlink or a Windows device name.</p>
+
+            <p>Three habits make the first session boring, which is the goal:</p>
+
+            <ul>
+                <li><strong>Give it a copy, not the original.</strong> Create a working folder, copy the documents into it, and keep your only copy elsewhere.</li>
+                <li><strong>Keep secrets out.</strong> Read access is confined to the folder, but the model can still read everything in it. Do not put keys, tokens or client material there.</li>
+                <li><strong>Prefer something versioned or backed up.</strong> If the folder is a git repository or a synced directory, a bad edit is recoverable.</li>
+            </ul>
+
+            <h2 id="download">4. Download, then verify the hash</h2>
+
+            <p>The project publishes a SHA-256 hash for every artifact on <a href="https://lfm3-harness.github.io/" rel="noopener" target="_blank">lfm3-harness.github.io</a>. Verify before running anything. This is not ceremony: the Windows installer is unsigned, so the hash is the only integrity signal you get.</p>
+
+            <p>On Windows, in PowerShell:</p>
+
+            <pre><code>Get-FileHash .\LFM3-Harness-Setup.exe -Algorithm SHA256 | Format-List</code></pre>
+
+            <p>On Linux:</p>
+
+            <pre><code>sha256sum ./LFM3-Harness.AppImage</code></pre>
+
+            <p>Compare character by character with the published value. A mismatch means a truncated or tampered download: delete the file and fetch it again from the project site rather than from a mirror you found somewhere else.</p>
+
+            <h2 id="install">5. Install the app</h2>
+
+            <p><strong>Windows.</strong> Run the NSIS installer normally. SmartScreen will warn you because the build is unsigned &mdash; that is documented, not a red flag on its own. Confirm the hash first, then choose the option to run it anyway. Installing to a path containing spaces is supported; the project's own smoke test installs into a directory with spaces on purpose.</p>
+
+            <p><strong>Linux.</strong> The <code>.deb</code> installs with apt:</p>
+
+            <pre><code>sudo apt install ./lfm3-harness_0.1.1_amd64.deb</code></pre>
+
+            <p>The AppImage needs no installation, but it still needs the system desktop libraries:</p>
+
+            <pre><code>chmod +x ./LFM3-Harness.AppImage
+./LFM3-Harness.AppImage</code></pre>
+
+            <p>Both bundles still need WebKitGTK 4.1 and GTK 3 present on the system. If the window never appears and the terminal mentions a missing <code>webkit2gtk-4.1</code> or GTK 3 library, install those packages and try again; the project's Linux bootstrap script prints the exact command when they are missing. This is the single most common Linux first-run failure.</p>
+
+            <h2 id="weights">6. First launch: the 4.9 GB download</h2>
+
+            <p>Nothing downloads on its own. Open <strong>Models</strong> in the chat header and start each role's download explicitly; the app streams it to a partial file, checks the published byte length and SHA-256, and only then moves it into place. The four files have separate jobs:</p>
+
+            <div class="table-scroll">
+            <table>
+                <thead><tr><th>Role</th><th>Model</th><th>Weight size</th><th>Loopback port</th><th>Context</th></tr></thead>
+                <tbody>
+                    <tr><td>Actor / writer</td><td>LFM3-1.7B</td><td>1.10 GB</td><td>8080</td><td>32,000</td></tr>
+                    <tr><td>Router / judge</td><td>d1-2B</td><td>1.10 GB</td><td>8083</td><td>8,192</td></tr>
+                    <tr><td>Vision</td><td>LFM3-VL-2B</td><td>1.25 GB</td><td>8081</td><td>8,192</td></tr>
+                    <tr><td>Voice</td><td>LFM3-Audio-2B</td><td>1.40 GB</td><td>8082</td><td>8,192</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p>The downloads happen inside the app and are verified, and the packaged build does not accept user-supplied download switches or an external server URL. When a model file is ready, the engine starts its server with a fixed command line &mdash; a hallucinated flag has nowhere to go &mdash; then polls that server's identity endpoint. If the model answering on a port is not the model that port is assigned to, the boot fails hard with an identity mismatch rather than quietly running the wrong weights.</p>
+
+            <p>Expect the first start of each server to take a while and the machine to feel heavy. Four processes holding roughly 4.9 GB of weights plus their caches is the normal state, not a leak.</p>
+
+            <h2 id="first-chat">7. Your first chat, and what the approval card means</h2>
+
+            <p>Chat is the default mode. A router classifies each message into one of seven intents &mdash; general, explore, summarize, related, report, vision, voice &mdash; and the intent only decides which capabilities get hinted to the writer. It never grants permission to write. Messages shorter than 24 characters skip the model entirely, and a route is only accepted at 55% confidence or better; below that, a keyword table decides.</p>
+
+            <p>When you ask for a change, three things stand between the proposal and the file:</p>
+
+            <ol>
+                <li><strong>Path resolution</strong> &mdash; the target must be inside your folder, canonically, after symlinks and platform quirks are accounted for.</li>
+                <li><strong>A preflight gate</strong> &mdash; a separate decision model, not the writer, scores the proposal against your actual request at a 75% confidence floor. A confident <em>contradicts</em> becomes a hold: <em>no approval card is shown at all</em>, nothing is written, and the writer is told not to retry. A confident <em>uncertain</em> adds an advisory note instead. Below the floor, or after a 12-second timeout, the gate abstains and your approval decides.</li>
+                <li><strong>You</strong> &mdash; a surviving proposal arrives as an exact diff, in a review expander, with <strong>Allow once</strong> and <strong>Deny</strong>. There is no allow-always, and approvals expire after ten minutes; an old card cannot be applied later.</li>
+            </ol>
+
+            <p>If a card never appears, a confident contradiction is the likely reason, not a bug. The refusal message names the target and the confidence it scored.</p>
+
+            <h2 id="verified-task">8. Run a verified task</h2>
+
+            <p>Free chat is gated but conversational. Verified tasks are stricter: the mission carries a frozen acceptance contract, hashed with SHA-256 the moment it loads, and only the deterministic checks in that contract decide whether the task passed. Checks are things like <em>file exists</em>, <em>content matches</em>, <em>content absent</em>, <em>JSON schema</em>, <em>numeric consistency</em>, <em>report complete</em>. The model's opinion is not one of them, and the contract cannot be weakened during retries or replanning.</p>
+
+            <p>Of the four missions shipped in v0.1.1, only <code>desk_task</code> has passed end-to-end acceptance against real models. Its reference run completed in 5.99 seconds with a peak llama-server memory of about 1.6 GB, writing its required artifact to <code>out/summary.md</code>. The other three &mdash; screen QA, voice intake and document extraction &mdash; are explicitly marked human-review-only, because the qualification run that would justify automatic grading has never been performed. That is a deliberate refusal, and it is the most trustworthy thing in the release.</p>
+
+            <h2 id="troubleshooting">9. Troubleshooting the first hour</h2>
+
+            <div class="table-scroll">
+            <table>
+                <thead><tr><th>Symptom</th><th>Likely cause</th><th>What to do</th></tr></thead>
+                <tbody>
+                    <tr><td>SmartScreen blocks the installer</td><td>Build is unsigned</td><td>Verify the SHA-256, then run it anyway.</td></tr>
+                    <tr><td>A model server will not start</td><td>Something else owns 8080&ndash;8083</td><td>Find the listener (<code>netstat -ano | findstr :8080</code> on Windows, <code>ss -ltnp</code> on Linux) and stop it.</td></tr>
+                    <tr><td>Boot fails with an identity mismatch</td><td>Wrong or partial weights on a port</td><td>Re-download that model; do not rename files between roles.</td></tr>
+                    <tr><td>The window never opens on Linux</td><td>Missing WebKitGTK 4.1 or GTK 3</td><td>Install the desktop libraries; the AppImage still needs them.</td></tr>
+                    <tr><td>Download stops partway</td><td>Interrupted transfer</td><td>Restart it in the app; the file is verified before use.</td></tr>
+                    <tr><td>&ldquo;finish refused: &hellip; does not exist or is empty&rdquo;</td><td>The guard doing its job</td><td>Let it keep working, or restate the deliverable. Nothing was written.</td></tr>
+                    <tr><td>A <code>llama-server</code> is still running after a crash</td><td>The parent was force-killed</td><td>End it in Task Manager or with <code>ps</code>. Normal exits are cleaned up by the supervisor.</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <h2 id="limits">10. What it will not do</h2>
+
+            <p>The writer is a 1.7B model on a CPU. Its prose is 1.7B-grade, its planning is short-horizon, and the project's own 50-job benchmark passes 43/50 with two false passes and a 1/5 score in its weakest category, search. One mission is end-to-end qualified; three are not. Every benchmark figure is one machine and one run.</p>
+
+            <p>There are also documented rough edges worth knowing before you file a bug: output token caps are hardcoded in the executor and planner rather than read from the configured limit, in-app voice playback is exercised only at the component level, interrupted jobs are reported as interrupted rather than resumed, and there is no macOS or GPU build. Set your expectations at &ldquo;a careful 2B assistant inside one folder&rdquo; and the app is coherent; set them at &ldquo;a local Claude&rdquo; and it is not.</p>
+
+            <h2 id="hygiene">11. A five-minute hygiene checklist</h2>
+
+            <ul>
+                <li>Hash verified against the project site before the first launch.</li>
+                <li>Working folder is a copy, under version control or backed up.</li>
+                <li>No credentials, keys or client data inside the folder.</li>
+                <li>Nothing else listening on 8080&ndash;8083.</li>
+                <li>First write reviewed in the diff view, not accepted from the summary line.</li>
+            </ul>
+
+            <p>If you want the reasoning behind those gates rather than the steps, read <a href="lfm3-harness-deep-dive.html">the source-level deep dive</a>. If you want to port the gates into your own agent, <a href="lfm3-harness-verification-patterns.html">the verification-patterns guide</a> is the companion piece.</p>
+
+            <h2 id="faq">Frequently asked questions</h2>
+
+            <h3>How much RAM does LFM3-Harness need?</h3>
+            <p>The project states a minimum of 8 GB on a CPU-only x64 machine. The four weights total about 4.9 GB, and they run alongside the KV cache, the webview and the operating system. There is no GPU path: every model server is launched with GPU offload disabled.</p>
+
+            <h3>Why does Windows SmartScreen warn about the installer?</h3>
+            <p>Because the 15.2 MB NSIS installer is unsigned. The project publishes a SHA-256 hash for every artifact instead of paying for code signing, so hash the file you downloaded, compare it to the published value, and only then run it.</p>
+
+            <h3>Does it work on macOS or with a GPU?</h3>
+            <p>No to both, as of v0.1.1. Builds are Windows 10/11 x64 and Linux x64 only, and the engine deliberately launches every server with <code>-ngl 0</code>, so a GPU is not used even when one is present.</p>
+
+            <h3>Why did the assistant say &ldquo;finish refused&rdquo;?</h3>
+            <p>Because that guard is working. The harness rejects a completion claim unless the promised deliverable exists and is non-empty on disk, and asks the actor to re-read the output before finishing. It is a refusal of an unproven claim, not an error.</p>
+
+            <h3>Which ports does the app use?</h3>
+            <p>Four loopback ports: 8080 for the text actor, 8081 for vision, 8082 for audio and 8083 for the decision model, all pinned to 127.0.0.1. Anything else listening there will prevent a server from starting.</p>
+
+            <h2 id="references">References</h2>
+
+            <ul>
+                <li>LFM3-Harness project site &mdash; <a href="https://lfm3-harness.github.io/" rel="noopener" target="_blank">lfm3-harness.github.io</a>: downloads, published SHA-256 hashes, model table, FAQ, accessed November 2, 2026.</li>
+                <li><a href="https://github.com/LFM3-Harness/LFM3-Harness" rel="noopener" target="_blank">LFM3-Harness/LFM3-Harness</a> &mdash; README.md (requirements, architecture, Known gaps), PLAN.md and STEPS.md, accessed November 2, 2026.</li>
+                <li>Liquid AI LFM3 model cards and the LFM Open License, for the weights themselves.</li>
+                <li>Local AI Zone: <a href="lfm3-harness-deep-dive.html">LFM3-Harness Deep Dive</a> and <a href="lfm3-deep-dive.html">LFM3: A Technical Deep Dive</a>.</li>
+            </ul>
+
+        </div>
+
+        <section class="related-articles-section">
+            <div class="container">
+                <h2 class="section-title">Keep reading</h2>
+                <div class="articles-grid">
+                    <a href="lfm3-harness-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LFM3-Harness Deep Dive</h3><p class="article-card-excerpt">The source-level tour: router floors, preflight gates, frozen acceptance contracts, and the benchmark that caught two silent bugs.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                    <a href="lfm3-harness-verification-patterns.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Seven Verification Patterns You Can Reuse</h3><p class="article-card-excerpt">Portable patterns for making a small local model safe to point at real files, with the tests that prove each one.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                    <a href="lfm3-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LFM3: Liquid AI's Tri-Hybrid Family</h3><p class="article-card-excerpt">The models behind the harness: one tri-hybrid backbone, six 2B-class checkpoints, and a 256K context on a 1.6 GB cache at 128K.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                </div>
+            </div>
+        </section>
+    </article>
+
+    <footer style="background: #1e293b; color: #e2e8f0; padding: 40px 20px; margin-top: 60px;">
+        <div class="container" style="max-width: 900px; margin: 0 auto; text-align: center;">
+            <p style="margin: 0 0 15px 0; font-size: 0.95em;">&copy; 2026 Local AI Zone. All rights reserved.</p>
+            <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #94a3b8;">LFM3-Harness Setup Guide</p>
+            <p style="margin: 0; font-size: 0.85em; color: #64748b;">
+                <a href="../index.html" style="color: #60a5fa; text-decoration: none;">Home</a> &bull;
+                <a href="../blog.html" style="color: #60a5fa; text-decoration: none;">Blog</a> &bull;
+                <a href="../about.html" style="color: #60a5fa; text-decoration: none;">About</a> &bull;
+                <a href="../services.html" style="color: #60a5fa; text-decoration: none;">Services</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="../js/theme-switcher.js"></script>
+    <script>
+        document.querySelectorAll('pre code').forEach((block) => {
+            const button = document.createElement('button');
+            button.innerHTML = 'Copy';
+            button.style.cssText = 'position: absolute; top: 8px; right: 8px; padding: 4px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em; opacity: 0; transition: opacity 0.3s;';
+            const pre = block.parentElement;
+            pre.style.position = 'relative';
+            pre.appendChild(button);
+            pre.addEventListener('mouseenter', () => button.style.opacity = '1');
+            pre.addEventListener('mouseleave', () => button.style.opacity = '0');
+            button.addEventListener('click', () => {
+                navigator.clipboard.writeText(block.textContent);
+                button.innerHTML = 'Copied!';
+                setTimeout(() => button.innerHTML = 'Copy', 2000);
+            });
+        });
+    </script>
+    <script src="/js/goatcounter.js" defer></script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy - Local AI Zone</title>
+    <title>LFM3-Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy - Local AI Zone</title>
     <link rel="stylesheet" href="../css/premium-styles.css">
     <link rel="stylesheet" href="../css/custom.css">
     <link rel="stylesheet" href="../css/blog-article.css">
@@ -14,7 +14,7 @@
 
     <!-- Meta tags for SEO -->
     <meta name="description" content="A source-level deep dive into LFM3-Harness, the community-built local AI coworker: four small models (d1-2B, LFM3-1.7B, VL-2B, Audio-2B) running on CPU through llama.cpp, held in place by a Rust harness — 75% write-gate floors, frozen SHA-256 acceptance contracts, diff approvals, and benchmarks that caught two silent bugs.">
-    <meta name="keywords" content="LFM3 Harness, LFM3-Harness, Liquid AI, LFM3-1.7B, d1-2B, LFM3-VL-2B, LFM3-Audio-2B, llama.cpp, Tauri, Rust agent harness, local AI coworker, offline AI assistant, verified tasks, acceptance contract, agent safety rails, small language models, local-first AI">
+    <meta name="keywords" content="LFM3-Harness, Liquid AI, LFM3-1.7B, d1-2B, LFM3-VL-2B, LFM3-Audio-2B, llama.cpp, Tauri, Rust agent harness, local AI coworker, offline AI assistant, verified tasks, acceptance contract, agent safety rails, small language models, local-first AI">
     <meta name="author" content="Hussain Nazary">
     <meta name="creator" content="Local AI Zone">
     <meta name="publisher" content="Local AI Zone">
@@ -26,7 +26,7 @@
     <meta name="theme-color" content="#2563eb">
 
     <!-- Open Graph / Facebook -->
-    <meta property="og:title" content="LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
+    <meta property="og:title" content="LFM3-Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
     <meta property="og:description" content="A 1.7B model cannot be trusted to be right — but the system around it can make it safe to use. Source-level tour of the router floors, preflight write gates, frozen acceptance contracts, and the benchmark that exposed two silent bugs in LFM3-Harness v0.1.1.">
     <meta property="og:type" content="article">
     <meta property="og:url" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive.html">
@@ -35,7 +35,7 @@
     <meta property="og:image" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
+    <meta property="og:image:alt" content="LFM3-Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
     <meta property="article:author" content="Hussain Nazary">
     <meta property="article:published_time" content="2026-11-01T00:00:00Z">
     <meta property="article:modified_time" content="2026-11-01T00:00:00Z">
@@ -48,17 +48,17 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@localaizone">
     <meta name="twitter:creator" content="@hussainnazary">
-    <meta name="twitter:title" content="LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
+    <meta name="twitter:title" content="LFM3-Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
     <meta name="twitter:description" content="Four small models, one Rust harness, zero cloud. Write gates at 75% floors, approvals that expire in ten minutes, finish-claims refused until the deliverable exists — and a benchmark that caught routing silently faking itself. An introduction to the machinery, not an endorsement of the capability.">
     <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png">
-    <meta name="twitter:image:alt" content="LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
+    <meta name="twitter:image:alt" content="LFM3-Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy">
 
     <!-- Structured data -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "ScholarlyArticle",
-      "headline": "LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy",
+      "headline": "LFM3-Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy",
       "description": "Source-level analysis of LFM3-Harness v0.1.1, the community-built local AI coworker: its Tauri-plus-Rust architecture with four pinned llama.cpp model servers, the d1-2B router and its confidence floors, the preflight write and evidence gates, frozen SHA-256 acceptance contracts, single-run benchmark results including two silent bugs the benchmark exposed, the Python-to-Rust rewrite, and the project's own published limitations.",
       "image": "https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png",
       "author": {"@type": "Person", "name": "Hussain Nazary"},
@@ -136,7 +136,7 @@
         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
             {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
-            {"@type": "ListItem", "position": 3, "name": "LFM3 Harness Deep Dive", "item": "https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive.html"}
+            {"@type": "ListItem", "position": 3, "name": "LFM3-Harness Deep Dive", "item": "https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive.html"}
         ]
     }
     </script>
@@ -193,7 +193,7 @@
                     </svg>
                     Back to All Articles
                 </a>
-                <h1 class="article-title">LFM3 Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy</h1>
+                <h1 class="article-title">LFM3-Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy</h1>
                 <div class="article-meta">
                     <span class="article-date">November 1, 2026</span>
                     <span class="article-author">By Hussain Nazary</span>
@@ -207,7 +207,7 @@
 
             <header class="paper-header">
                 <div class="eyebrow"><span class="dot"></span>Source Note · Agent Harnesses</div>
-                <h1 class="title">LFM3-Harness v0.1.1</h1>
+                <div class="title">LFM3-Harness v0.1.1</div>
                 <p class="subtitle">A free, community-built desktop coworker that runs four Liquid AI models, the biggest around 2B parameters, entirely on your CPU. The interesting part is not the models — it is the Rust harness that refuses to let them lie, wander, or finish early. Here is a source-level tour of every rail, gate and floor, with the benchmark numbers the project itself published.</p>
                 <div class="byline">
                     <span><span class="label">Author</span> Hussain Nazary</span>
@@ -220,7 +220,7 @@
             <ul>
                 <li><strong>What it is:</strong> LFM3-Harness is a free, MIT-licensed desktop app (Windows 10/11 x64, Linux x64) that runs Liquid AI's LFM3 models locally through llama.cpp on CPU. You pick a folder, chat your way through work, and every proposed file change appears as an exact diff that you must explicitly allow. It is an independent community project — not affiliated with, endorsed by, or sponsored by Liquid AI.</li>
                 <li><strong>The bet:</strong> four small models — d1-2B as router, LFM3-1.7B as the acting writer, LFM3-VL-2B for images, LFM3-Audio-2B for hearing and speaking — none of which should be trusted to be right. The trust lives in the harness instead: confidence floors, preflight gates, path confinement, approvals that expire, and completion claims that are refused until the deliverable exists on disk.</li>
-                <li><strong>The machinery, in numbers:</strong> a write gate that holds any change the decision model scores below a 75% alignment floor — and shows no approval card at all when it holds; an advisory evidence gate at 65%; a 55% router-confidence floor with a keyword fallback that a low-confidence model answer can never override; a hard 10-minute (600 s) approval TTL; 12 tool rounds per chat turn maximum; and frozen, SHA-256-hashed acceptance contracts for verified tasks that cannot be weakened during retries.</li>
+                <li><strong>The machinery, in numbers:</strong> a write gate that holds a change the decision model confidently contradicts at a 75% floor — showing no approval card at all while it holds, and only advising when the judgement is merely uncertain; an advisory evidence gate at 65%; a 55% router-confidence floor with a keyword fallback that a low-confidence model answer can never override; a hard 10-minute (600 s) approval TTL; 12 tool rounds per chat turn maximum; and frozen, SHA-256-hashed acceptance contracts for verified tasks that cannot be weakened during retries.</li>
                 <li><strong>The benchmark story:</strong> the project's own 2026-10-31 multimodel run scored 21/21 on routing with a 122 ms median route decision — and exposed two genuine bugs, including that the fancy decision-model router had been <em>silently falling back to keywords for every request</em> because it was calling an endpoint the native model answers with HTTP 501.</li>
                 <li><strong>Honest limits:</strong> the 50-job agent benchmark passes 43/50 with two false passes; three semantic missions stay human-review-only because the automatic-pass holdout was never run; every number comes from one machine and one run; and the README keeps a public "Known gaps" list that this post quotes rather than papers over.</li>
                 <li><strong>What this review is and is not:</strong> this post is an introduction to how the thing is built, not a confirmation that it works well. A 1.7B writer produces 1.7B-grade prose; the harness mostly succeeds at preventing it from doing damage, which is a different and lower claim than being useful at everything a frontier model does.</li>
@@ -241,6 +241,17 @@
                 <li><a href="#conclusion">Conclusion</a></li>
                 <li><a href="#references">References</a></li>
             </ol>
+
+<div style="border:1px solid var(--border-color, #e5e7eb);border-left:4px solid var(--accent-primary, #2563eb);background:var(--card-background, var(--background-secondary, #f8fafc));color:var(--text-primary, #111827);border-radius:8px;padding:18px 20px;margin:28px 0;">
+            <p style="margin:0 0 10px;font-weight:700;font-size:1.02em;">Verification note: what is quoted, what is measured</p>
+            <ul style="margin:0;padding-left:20px;">
+                <li><strong>Code behaviour and limits</strong> are quoted from the LFM3-Harness source and README at v0.1.1 &mdash; confidence floors, timeouts, round caps, acceptance contracts and process supervision &mdash; with file paths given so each claim can be checked.</li>
+                <li><strong>Packaging facts</strong> &mdash; installer size, bundle formats, artifact byte counts and SHA-256 hashes &mdash; come from the project site and the repository's release notes.</li>
+                <li><strong>Model facts</strong> &mdash; parameter counts, context windows, licences and weight sizes &mdash; come from Liquid AI's model cards and launch post. LFM3-Harness is an independent community project, not affiliated with Liquid AI.</li>
+                <li><strong>Benchmark numbers</strong> are the project's own measurements on one machine in one run (multimodel, 2026-10-31; the 50-job agent suite), not independently replicated here, and are reported with the project's caveats attached.</li>
+                <li>This post is a source-level review: the desktop interface was not exercised for it, no benchmark was re-run, and no figure here is a hands-on measurement by Local AI Zone.</li>
+            </ul>
+        </div>
 
             <hr>
 
@@ -504,7 +515,7 @@ with what you need."</code></pre>
 
             <hr>
 
-            <img src="lfm3-harness-deep-dive-hero.png" alt="LFM3 Harness deep-dive recap: four local models, gate floors, benchmark results" style="width: 100%; border-radius: 12px;">
+            <img src="lfm3-harness-deep-dive-hero.png" alt="LFM3-Harness deep-dive recap: four local models, gate floors, benchmark results" style="width: 100%; border-radius: 12px;">
 
         </div>
 
@@ -530,7 +541,7 @@ with what you need."</code></pre>
             design to your own agent, or pick the local models that fit your machine. Your
             message arrives with this article attached, so I&rsquo;ll know exactly what
             you&rsquo;re reading.</p>
-            <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: LFM3 Harness Deep Dive">
+            <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: LFM3-Harness Deep Dive">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
                 </svg>
@@ -543,7 +554,7 @@ with what you need."</code></pre>
     <footer style="background: #1e293b; color: #e2e8f0; padding: 40px 20px; margin-top: 60px;">
         <div class="container" style="max-width: 900px; margin: 0 auto; text-align: center;">
             <p style="margin: 0 0 15px 0; font-size: 0.95em;">&copy; 2026 Local AI Zone. All rights reserved.</p>
-            <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #94a3b8;">LFM3 Harness Deep Dive — The Harness, Not the Model</p>
+            <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #94a3b8;">LFM3-Harness Deep Dive — The Harness, Not the Model</p>
             <p style="margin: 0; font-size: 0.85em; color: #64748b;">
                 <a href="../index.html" style="color: #60a5fa; text-decoration: none;">Home</a> •
                 <a href="../blog.html" style="color: #60a5fa; text-decoration: none;">Blog</a> •
