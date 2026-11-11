@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Local AI Blog: DeepSeek, GGUF &amp; Local Inference Guides - Local AI Zone</title>
+    <meta name="description" content="Guides, research papers and analysis for running AI locally: DeepSeek architecture deep dives, GGUF quantization, agent loops, inference hardware, and 2026 open-weight model roundups.">
+    <meta name="keywords" content="local AI blog, DeepSeek, GGUF, llama.cpp, local LLM, quantization, AI agents, inference, open-weight models, 2026">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="revisit-after" content="3 days">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog.html">
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog.html">
+    <link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog.html">
+    <link rel="alternate" type="application/rss+xml" title="Local AI Zone — Blog RSS" href="https://local-ai-zone.github.io/feed.xml">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Local AI Blog: DeepSeek, GGUF &amp; Local Inference Guides">
+    <meta property="og:description" content="Guides, research papers and analysis for running AI locally: DeepSeek architecture deep dives, GGUF quantization, agent loops, inference hardware, and 2026 open-weight model roundups.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://local-ai-zone.github.io/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Local AI Zone Blog">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:creator" content="@hussainnazary">
+    <meta name="twitter:title" content="Local AI Blog: DeepSeek, GGUF &amp; Local Inference Guides">
+    <meta name="twitter:description" content="Guides, research papers and analysis for running AI locally: DeepSeek architecture deep dives, GGUF quantization, agent loops, inference hardware, and 2026 open-weight model roundups.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/og-image.png">
+
+    <!-- Structured data -->
+    <script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "Blog",
+  "name": "Local AI Zone — Blog",
+  "description": "Guides, research papers and analysis for running AI locally: DeepSeek architecture deep dives, GGUF quantization, agent loops, inference hardware and 2026 model roundups.",
+  "url": "https://local-ai-zone.github.io/blog.html",
+  "inLanguage": "en-US",
+  "publisher": {
+    "@type": "Organization",
+    "name": "Local AI Zone",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://local-ai-zone.github.io/logo.svg"
+    }
+  },
+  "mainEntity": {
+    "@type": "ItemList",
+    "itemListOrder": "https://schema.org/ItemListOrderDescending",
+    "numberOfItems": 24,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "url": "https://local-ai-zone.github.io/blog/lfm3-harness-getting-started.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "url": "https://local-ai-zone.github.io/blog/lfm3-harness-verification-patterns.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "url": "https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 4,
+        "url": "https://local-ai-zone.github.io/blog/lfm3-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 5,
+        "url": "https://local-ai-zone.github.io/blog/deepseek-v4-1-flash-1017-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 6,
+        "url": "https://local-ai-zone.github.io/blog/mistral-large-4-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 7,
+        "url": "https://local-ai-zone.github.io/blog/local-voice-models-2026.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 8,
+        "url": "https://local-ai-zone.github.io/blog/local-image-generation-2026.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 9,
+        "url": "https://local-ai-zone.github.io/blog/decision-models-vs-rerankers.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 10,
+        "url": "https://local-ai-zone.github.io/blog/meta-muse-wonder-full-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 11,
+        "url": "https://local-ai-zone.github.io/blog/gemini-4-argon-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 12,
+        "url": "https://local-ai-zone.github.io/blog/claude-haiku-5-5-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 13,
+        "url": "https://local-ai-zone.github.io/blog/system-one-decision-models-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 14,
+        "url": "https://local-ai-zone.github.io/blog/October_2026_AI_Model_Updates.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 15,
+        "url": "https://local-ai-zone.github.io/blog/deepseek-kv-cache-optimization-research-paper.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 16,
+        "url": "https://local-ai-zone.github.io/blog/deepseek-ffn-moe-evolution-research-paper.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 17,
+        "url": "https://local-ai-zone.github.io/blog/context-management-agent-loops-research-paper.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 18,
+        "url": "https://local-ai-zone.github.io/blog/how-to-build-an-ai-agent-step-by-step-guide.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 19,
+        "url": "https://local-ai-zone.github.io/blog/bonsai-2-27b-ternary-quantization-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 20,
+        "url": "https://local-ai-zone.github.io/blog/deepseek-v4-1-flash-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 21,
+        "url": "https://local-ai-zone.github.io/blog/gpt-6-astra-deep-dive.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 22,
+        "url": "https://local-ai-zone.github.io/blog/Gemini_3.8_Flash_Technical_Breakdown.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 23,
+        "url": "https://local-ai-zone.github.io/blog/September_2026_AI_Model_Updates.html"
+      },
+      {
+        "@type": "ListItem",
+        "position": 24,
+        "url": "https://local-ai-zone.github.io/blog/deepseek-v4-flash-deep-dive.html"
+      }
+    ]
+  }
+}</script>
+    <script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "https://local-ai-zone.github.io/"
+    },
+    {
+      "@type": "ListItem",
+      "position": 2,
+      "name": "Blog",
+      "item": "https://local-ai-zone.github.io/blog.html"
+    }
+  ]
+}
+    </script>
+    <link rel="stylesheet" href="css/premium-styles.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="css/blog-article.css">
+    <link rel="stylesheet" href="css/contact-form.css">
+    <link rel="stylesheet" href="css/theme.css">
+    <link rel="stylesheet" href="css/theme-overrides.css">
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
+    
+    <!-- EmailJS SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <style>
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 40px 0;
+        }
+        .section-title {
+            color: var(--accent-primary);
+            font-size: 2em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Premium Header (matches homepage) -->
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='index.html'">
+                                <img src="logo.svg" alt="Local AI Zone Logo" class="logo-image"
+                                    onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                        stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="index.html">Home</a>
+                        <a href="about.html">About</a>
+                        <a href="services.html">Need Help?</a>
+                        <a href="blog.html" class="active">Blog</a>
+                        <a href="traffic.html">Traffic</a>
+                    </nav>
+                    <!-- Theme Switcher -->
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Floating Instagram Button - Always Visible -->
+    <a href="https://www.instagram.com/nazary.ai" class="floating-instagram-btn" rel="noopener" target="_blank" aria-label="Connect with me on Instagram" title="Connect with me on Instagram">
+        <svg class="btn-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span class="btn-text">Connect with me on Instagram</span>
+    </a>
+
+    <main class="premium-main">
+        <div class="container">
+            <div class="articles-header" style="padding-top: 40px;">
+                <h1 class="articles-title">All Articles</h1>
+                <p class="articles-subtitle">Explore every guide, ranking, and technical deep-dive from Local AI Zone.</p>
+            </div>
+
+            <h2 class="section-title">Latest Updates & News</h2>
+            <div class="blog-grid">
+                                                                                                                                <a href="blog/qwen-4-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Qwen 4: The Complete Deep Dive</h3><p class="article-card-excerpt">Alibaba&rsquo;s wire-day answer &mdash; 58 on Intelligence Index v5 at $1/$4, third place on the November table &mdash; is the sharpest intelligence-per-dollar reading the top five has produced. The 1.2T/56B sparse MoE, the omni-native input stack, switchable hybrid thinking vs the Claude contract, the benchmarks vs Fable 5.2 and Kimi K3.1 Pro, and the December 20 Apache 2.0 weight promise.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/gemini-4-carbon-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Gemini 4 Carbon: The Complete Deep Dive</h3><p class="article-card-excerpt">Google&rsquo;s unreleased frontier model &mdash; 60 on Intelligence Index v5, second place, five behind Fable 5.2 &mdash; leads the business-workflow boards it cannot be bought for. What the reading certifies, where it wins, the six gate hypotheses, the economics scenarios, and the playbook for the leaderboard&rsquo;s second slot with no purchase path.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/November_2026_AI_Model_Updates.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">November 2026 AI Model Updates</h3><p class="article-card-excerpt">Fable 5.2 &amp; Mythos 5.2 (Nov 9) &mdash; one model, two safeguard regimes &mdash; debut at No. 1 on the new Intelligence Index v5 (65) at $8/$40, the Fable line&rsquo;s first cut, with deliberate capability caps and a 1,000-agent OS demo. Kimi K3.1 Pro&rsquo;s Apache 2.0 weights arrive Nov 4; Qwen 4 lands Nov 11 at 58/$1-$4 with December 20 weights promised; Gemini 4 Carbon stays gated at 60; every price clock &mdash; Nov 12, Nov 21, Nov 30, Dec 1 &mdash; starts ticking, plus the November GGUF ledger and who shipped nothing.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/claude-fable-5-2-mythos-5-2-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Claude Fable 5.2 &amp; Mythos 5.2: The Complete Deep Dive</h3><p class="article-card-excerpt">Anthropic's November 9, 2026 frontier release: one model, two safeguard regimes. No. 1 on the AA Intelligence Index at 65, the deliberate capability caps, the 1,000-agent bootable OS, Fermat formalized in 30 hours, CVE Rediscovery 89.6%, and the $8/$40 pricing cut &mdash; benchmarks, contract changes, economics, and migration, read for engineers.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                                <a href="blog/lfm3-harness-getting-started.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LFM3-Harness Setup Guide: Install, Download Weights, Run a Checked Task</h3><p class="article-card-excerpt">A practical first-run guide: check the machine, verify the installer hash, fetch 4.9 GB of LFM3 weights, read the 75% write gate, and run the one mission that has passed end-to-end acceptance.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/lfm3-harness-verification-patterns.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Seven Verification Patterns From LFM3-Harness You Can Reuse in Your Own Agent</h3><p class="article-card-excerpt">Portable patterns for keeping a small local model honest: hints separate from authority, a judge model with confidence floors, canonical path resolution, expiring allow-once approvals, proof-of-done, frozen acceptance contracts and fail-closed supervision.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/lfm3-harness-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LFM3-Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy</h3><p class="article-card-excerpt">A source-level tour of LFM3-Harness v0.1.1: four small models (d1-2B router, LFM3-1.7B actor, VL-2B vision, Audio-2B voice) pinned to CPU llama.cpp servers on 127.0.0.1, a 75%-floor preflight write gate that suppresses approval cards when it holds, frozen SHA-256 acceptance contracts, finish claims refused until the file exists on disk &mdash; and the single benchmark run that caught the router silently faking itself. Every number from the project&rsquo;s own reports, caveats included: an introduction to the machinery, not an endorsement of the capability.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/lfm3-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LFM3: A Technical Deep Dive into Liquid AI's Tri-Hybrid Multimodal Family</h3><p class="article-card-excerpt">Liquid AI&rsquo;s October 27 launch: six 2B-class open-weight models from one tri-hybrid backbone (13 gated convolutions, 5 sliding-window, 6 global attention), 22T-token training, a 256K context window with a 1.6&nbsp;GB KV cache at 128K, agent scores that beat a 9B model (LiveClaw 45.60, AutomationBench 41.29), ~1&nbsp;GB at 4-bit, and the fastest decode on every device Liquid measured &mdash; the full architecture, benchmark, and local-deployment record.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/kimi-k3-1-pro-technical-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Kimi K3.1 Pro: China's 2.8T MoE Model Challenging GPT-6 and Claude Opus</h3><p class="article-card-excerpt">Moonshot's October 23 release: 2.8T parameters with 104B active, 1M context, Stable LatentMoE, 65.7% on Terminal-Bench 4.0, third place on GDPval-AA, deliberate cybersecurity controls, and $2/$10 pricing — half of Claude Opus 5.5 — with full weights due November 4 and an index score of 55, the highest open-weight reading ever recorded.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/meta-muse-wonder-full-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Meta Muse Wonder & Wonder Full: Technical Deep Dive</h3><p class="article-card-excerpt">Meta Superintelligence Labs' October 12 release: ~3T parameters trained at the gigawatt-scale Prometheus data center, Active Memory & Active Focus architecture, 1M context window, index scores of 52 (Wonder) and 56 (Wonder Full), and $4/$20 pricing — Meta's return to frontier AI development with personal superintelligence as the mission.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/gemini-4-argon-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Gemini 4 Argon: Technical Deep Dive</h3><p class="article-card-excerpt">Google DeepMind's October 13 release: industry-first 1M token OUTPUT limit, unified input/output budget, Fairwind Program early access for cyber defenders, $2/$10 intro pricing through Nov 30, breakthrough performance in long-horizon reasoning and enterprise automation — the model that redefines stateless agentic workflows.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/claude-haiku-5-5-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Claude Haiku 5.5: The Fast, Adaptive AI That Thinks on Demand</h3><p class="article-card-excerpt">Anthropic's October 7 release: adaptive thinking with inference-time effort controls, 1M context window, 128K output, 72.4% on OSWorld 2.1, subagent orchestration capabilities, and $0.10/$0.50 two-tier pricing — the fastest Claude 5 model built for high-throughput agentic pipelines at 5-10% of frontier cost.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/kimi-k3-1-pro-scientific-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Kimi K3.1 Pro: Complete Scientific Architecture Deep Dive</h3><p class="article-card-excerpt">Research-grade analysis of the K3.1 Pro architecture: Kimi Delta Attention (KDA), Attention Residuals, Stable LatentMoE with 896 experts, Gated MLA, NoPE, MXFP4/MXFP8 quantization, KV cache compression, RL post-training at scale, and the complete benchmark and deployment record.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/minimax-m3-1-flash-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">MiniMax M3.1 Flash: A 428B Agentic Model at Flash-Tier Cost</h3><p class="article-card-excerpt">MiniMax&rsquo;s 428B sparse MoE, GA October 19: 1M-token context, native video and screenshot input, five reasoning tiers and flat $0.15/$0.60 pricing. DeepSWE 73.7, OSWorld V2 61.7, the 200-trillion-token &ldquo;Space Bunny&rdquo; audition, and the unit economics behind the 70% cost-per-task claim.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/deepseek-v4-1-flash-1017-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">DeepSeek V4.1 Flash 1017: Wish-Driven Programming Made Real</h3><p class="article-card-excerpt">DeepSeek&rsquo;s October 17 snapshot of V4.1 Flash: +11.1 on Terminal-Bench, 77.0 on DeepSWE, shorter outputs at the same price, Search &amp; Fetch APIs at $0.75/1k calls, and MIT weights you can download today. Benchmarks, cache economics, and the local-running reality &mdash; all in one deep dive.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/mistral-large-4-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Mistral Large 4 (Le Chonk): 1T Parameters, 49B Active</h3><p class="article-card-excerpt">Mistral&rsquo;s 1T-parameter multimodal MoE, 49B active, previewed Oct 6 with open weights promised by end of October: every disclosed benchmark, the 3,800-GPU training and RL stack, the refusal asymmetry behind its cyber results, and the arithmetic of running 1T parameters on your own hardware.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/local-voice-models-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Text-to-Speech &amp; Speech-to-Text Models 2026</h3><p class="article-card-excerpt">The open-weight voice stack in 2026: a 3B model that outranks ElevenLabs on blind listening tests, a 600M transcriber that beats Whisper large-v3 over identical audio, 27 models across two independent boards, and the licences that decide which of them you can actually ship.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/local-image-generation-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Local Image Generation Models 2026</h3><p class="article-card-excerpt">Eight open-weight diffusion models on your own GPU: FLUX for prompt adherence, Qwen-Image for words in the pixels, SDXL for the LoRA ecosystem &mdash; with real VRAM floors, step counts and the two non-commercial licences that decide what you may ship.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/decision-models-vs-rerankers.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Decision Models vs Rerankers: Can You Use One for the Other?</h3><p class="article-card-excerpt">Both score an input and neither writes a token — so why does one give you a threshold and the other only a sort order? Where decision models (Jev, Von, Laya, Kev, SemIf, Nimble, Rizzo Flow) and reranker cross-encoders (Jina v3.5, Qwen3-Reranker, BGE-Reranker-v2-M3) genuinely differ, and the substitution test in both directions.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/system-one-decision-models-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">System One Decision Models: Jev and the 7 Open Alternatives</h3><p class="article-card-excerpt">How TypeSafe&#39;s Jev returns typed decisions instead of text — the reconstructed architecture, how the KV cache is prefilled once and shared across parallel questions, RLCD calibration, hosting commands for Laya, Nimble, Kev, SemIf, Rizzo Flow, Von and NanoJev, agent patterns and an honest reading of the benchmarks.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/October_2026_AI_Model_Updates.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">October 2026 AI Model Updates</h3><p class="article-card-excerpt">Updated October 24: eight specialist releases, a gated flagship, a cancelled GPT-6.1, DeepSeek’s V4.1 Flash 1017 Pareto update with MIT weights, Tencent’s Hy Memory 2.0, MiniMax M3.1 Flash (Oct 19, weights Oct 23), Kimi K3.1 Pro at an index score of 55 — the open-weight record — and the shift from price per token to cost per completed task.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/deepseek-kv-cache-optimization-research-paper.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">DeepSeek's KV Cache: From 390 KB to 890 Bytes (V1 to V4.1-Flash)</h3><p class="article-card-excerpt">A book-length research paper on DeepSeek's three-year attack on the KV cache: MLA, the V3.2 lightning indexer, CSA/HCA pooling, CSA2 cross-layer reuse and the 890-byte cache of V4.1-Flash.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/deepseek-ffn-moe-evolution-research-paper.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">From One Giant FFN to 384 Tiny Experts: DeepSeek's MoE Evolution</h3><p class="article-card-excerpt">The companion research paper on DeepSeek's feed-forward lineage: dense SwiGLU, DeepSeekMoE fine-grained and shared experts, auxiliary-loss-free balancing, MTP, FP4 experts and V4.1-Flash's Engram memory.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/context-management-agent-loops-research-paper.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Context Management in Agent Loops: The Research and DeepSeek's Answer</h3><p class="article-card-excerpt">Why context rots, what the memory research actually established from MemGPT to MemOS, how the benchmark wars mislead, and how DeepSeek engineered context management from MLA to V4.1-Flash's 196B Engram.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/how-to-build-an-ai-agent-step-by-step-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">How to Build an AI Agent: The Step-by-Step Method Everyone References</h3><p class="article-card-excerpt">Thirteen cited steps assembled from Anthropic, OpenAI and the research they descend from: model selection, tool design, the agent loop, context engineering, guardrails, evaluation and shipping.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/bonsai-2-27b-ternary-quantization-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Bonsai 2 27B: A 27B AI Model That Fits in 5.9 GB</h3><p class="article-card-excerpt">How Prism ML compressed a 27B reasoning model to roughly 5.9 GB at 1.76 bits per weight while retaining 98.2% of its benchmark intelligence — the ternary lineage, kernels, all 20 benchmarks and where to run it.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="blog/deepseek-v4-1-flash-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">DeepSeek V4.1 Flash: Complete Technical Architecture Deep Dive</h3><p class="article-card-excerpt">Causal Encoder-Decoder architecture, CSA2 attention modes, mHC residual connections, FP4 KV cache compression, SwiGLU gating, Engram memory, DSpark speculative decoding. Research-grade analysis with 12,000 words.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/gpt-6-astra-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">GPT-6 Astra: Technical Deep Dive into OpenAI's Most Intelligent Model</h3><p class="article-card-excerpt">Recurrent depth/looped transformer architecture, MoVA vision agents, unified multimodal embedding, 100K Grace Blackwell GPUs, ARC-AGI-3 99.9%, computer use capabilities.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/Gemini_3.8_Flash_Technical_Breakdown.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Gemini 3.8 Flash: Deep Technical Breakdown</h3><p class="article-card-excerpt">Google's fourth Flash model in four months. Architecture lineage, 'works harder' compute design, Terminal-Bench 2.1 90.8%, full pricing, and API migration guide.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/September_2026_AI_Model_Updates.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">September 2026 AI Model Updates</h3><p class="article-card-excerpt">Five frontier launches in ten days (Claude Fable 5.1, GPT-6 Astra, Gemini 3.8 Flash, Muse Spark 1.3, DeepSeek V4.1-Flash), the closing wave of September 28–30 (Claude Sonnet 5.5, GPT-6.1 Sol at DevDay, Gemini 4 Argon), every price change, and the architecture trends redefining the stack.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/deepseek-v4-flash-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">DeepSeek V4 Flash: Technical Deep Dive</h3><p class="article-card-excerpt">284B/13B active MoE with Multi-head Latent Attention, 1M context, native FP8, and $0.14/$0.28 per M tokens. Full architecture, benchmarks, and deployment guide.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/qwen3-8-flash-next-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Qwen3.8-Flash-Next: Alibaba's Qwen4 Architecture Preview</h3><p class="article-card-excerpt">125B+51B multimodal MoE with Gated DeltaNet, Qwen Sparse Attention, 51B N-gram Embedding, 6B active. The most architecturally ambitious open-weight model of 2026.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/glm-5-3-flash-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">GLM-5.3-Flash: Z.ai's 320B-A18B Hybrid-Attention MoE</h3><p class="article-card-excerpt">320B total / 18B active with hybrid KDA linear + NoPE sparse MLA attention, 1M context, MIT license, native FP8. The mystery model behind Ox Alpha.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/ox-alpha-stealth-model-comprehensive-analysis.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">OX Alpha (GLM-5.3-Flash): The Anonymous Frontier Model</h3><p class="article-card-excerpt">80% DeepSWE Pass@1, 1M context, 744B MoE. Comprehensive analysis of the mystery model that topped OpenRouter — revealed as Zhipu GLM-5.3.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/flash-tier-ai-models-comparative-analysis.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Flash-Tier AI Models: Comparative Analysis 2026</h3><p class="article-card-excerpt">Side-by-side comparison of DeepSeek V4 Flash, Qwen3.8-Flash-Next, and GLM-5.3-Flash — benchmarks, pricing, architecture, and deployment.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/qwen3-8-27b-comprehensive-analysis.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Qwen3.8-27B: A Comprehensive Technical Analysis</h3><p class="article-card-excerpt">Research-grade technical analysis of Alibaba's Qwen3.8-27B: architecture, benchmarks, deployment requirements, and comparative performance. Released August 14, 2026.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/muse-glimmer-30b-comprehensive-analysis.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Muse Glimmer 30B: A Comprehensive Technical Analysis</h3><p class="article-card-excerpt">Research-grade technical analysis of Meta's Muse Glimmer 30B: architecture, benchmarks, deployment requirements, and agentic capabilities. Released August 10, 2026.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/how-to-build-local-ai-legal-assistant.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">How to Build a Local AI Assistant for Legal Documents</h3><p class="article-card-excerpt">Complete technical guide to building privacy-first legal document AI using RAG architecture, vector databases, and local LLMs. Learn from Lawyer Assistant by Hussain Nazary.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/lawyer-assistant-privacy-first-legal-ai.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Stop Searching Contracts Manually: Free AI That Finds Clauses &amp; Risks Instantly</h3><p class="article-card-excerpt">Tired of Ctrl+F hunting through 200-page contracts? This free AI answers with exact page numbers and auto-scans for risky clauses — 100% on your machine.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/top-embedding-reranker-ocr-models-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top Embedding, Reranker &amp; OCR Models 2026</h3><p class="article-card-excerpt">The complete 2026 local-AI infrastructure guide: top embedding models (BGE-M3, Qwen3-Embedding), rerankers (Jina v3.5), and OCR (DeepSeek-OCR, GLM-OCR) with benchmarks and GGUF links.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/july-2026-ai-model-roundup.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">July 2026 AI Model Roundup: The Biggest Month in Open-Weight History</h3><p class="article-card-excerpt">Kimi K3, GLM-5.2, DeepSeek V4-Flash-0731, MiniMax M3, Claude Opus 5 and Gemini 3.6 Flash — with a local-deployment comparison table.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/ai-updates-august-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Latest AI Developments: August 2026 Update</h3><p class="article-card-excerpt">Qwen3.8-Max and Qwen3.8-27B, DeepSeek V4-Pro GA, Meta Muse Glimmer, Nemotron 3.5 Lightning, MiniMax H3 — plus agent trends and open-source progress.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/claude-fable-5-1-technical-breakdown.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Claude Fable 5.1: The Full Technical Breakdown</h3><p class="article-card-excerpt">One set of weights, two safeguard regimes - architecture, benchmarks, economics, migration, and safety, read for engineers. Cache reads cut 75%, Terminal-Bench-Science doubles to 52.6%.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/Claude_Mythos_5.1_Technical_Analysis.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Claude Mythos 5.1: Anatomy of the Trusted-Access Frontier Model</h3><p class="article-card-excerpt">The safeguard-free twin of Claude Fable 5.1: Terminal-Bench 4.0 (60.9%), Glasswing vulnerability record, protein design results, CVP/LSVP access, and what the system card actually says.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/how-much-local-ai-costs-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">How Much Does a Custom Local AI System Cost in 2026?</h3><p class="article-card-excerpt">A multi-source verified cost survey of building a custom local AI system in 2026: hardware, electricity, software, models, and ongoing maintenance. Real-world numbers, not theoretical.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+            </div>
+
+            <h2 class="section-title">Guides & Deep Dives</h2>
+            <div class="blog-grid">
+                <a href="blog/system-architect-without-coding.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">How to Become a Systems Architect Without Writing Code</h3><p class="article-card-excerpt">AI can write code on demand, but someone still needs to design the system. Master decomposition, data flow thinking, control flow logic, and failure analysis — the five core skills every architect needs.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/ai-agents-mainstream-claude-cowork.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">AI Agents Go Mainstream: Claude Cowork &amp; Multi-Agent Turf Wars</h3><p class="article-card-excerpt">Claude Cowork expanded to all paid accounts. Anthropic's multi-agent experiment produced emergent turf wars. Here's what's happening with agentic AI in August 2026 and why orchestration is the key unsolved problem.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/what-is-ai-quantization-q4-k-m-q8-gguf-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">The Ultimate Guide to AI Quantization</h3><p class="article-card-excerpt">Understand the magic behind GGUF, Q4_K_M, and Q8_0.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/what-is-ai-model-3b-7b-30b-parameters-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">AI Model Parameters Explained (3B, 7B, 30B)</h3><p class="article-card-excerpt">What do the 'B's in model names mean? A breakdown of parameters.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/ai-model-licensing-complete-legal-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">AI Model Licensing Explained</h3><p class="article-card-excerpt">A complete legal guide for 2026. Can you use that open-source model for your business?</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/best-ai-coding-assistant-models-ultimate-ranking-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Best Open-Source Coding Models (Local)</h3><p class="article-card-excerpt">October 2026 ranking of the top open-weight coding models, from DeepSeek V4.1 Flash and Kimi K3 to Qwen3.8-27B.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/context-length-optimization-ultimate-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Context Length Optimization Guide</h3><p class="article-card-excerpt">Learn expert strategies to get the most out of your model's context window.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/best-ai-multilingual-models-ultimate-ranking-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top Multilingual AI Models</h3><p class="article-card-excerpt">Discover the best models for translation, cross-lingual summarization, and more.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/best-ai-embedding-models-ultimate-ranking-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top Embedding Models 2026</h3><p class="article-card-excerpt">October 2026 ranking of Harrier, Qwen3-Embedding, Jina v5, EmbeddingGemma 2, and BGE-M3 for local RAG, semantic search, and multimodal retrieval.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/best-ai-reranker-models-ultimate-ranking-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top Reranker Models 2026</h3><p class="article-card-excerpt">The precision stage of retrieval: Jina Reranker v3.5, Qwen3-Reranker, BGE-Reranker-v2-M3, and the rest of the top 20.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/best-ai-ocr-models-ultimate-ranking-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top OCR Models 2026</h3><p class="article-card-excerpt">The definitive ranking of OCR models for local document extraction — DeepSeek-OCR, GLM-OCR, PaddleOCR-VL, and more.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/best-ai-research-assistant-models-ultimate-ranking.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">AI Research Assistant Models</h3><p class="article-card-excerpt">A definitive ranking of models that can accelerate your research.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/ai-coding-prompts-master-techniques-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Mastering AI Coding Prompts</h3><p class="article-card-excerpt">Go beyond basic questions. Learn master techniques for crafting prompts.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/ai-research-prompts-expert-strategies-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Expert AI Research Prompts</h3><p class="article-card-excerpt">Unlock your AI's potential for academic and scientific work.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/best-ai-analysis-models-ultimate-ranking-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Best AI Models for Analysis</h3><p class="article-card-excerpt">A comprehensive ranking of the top models for data analysis, sentiment analysis, and logical reasoning.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/best-ai-brainstorming-models-ultimate-ranking-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top AI Brainstorming Models</h3><p class="article-card-excerpt">Break through creative blocks with the best AI models for brainstorming.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="guides/top-20-local-ai-models-mobile-ai-agents-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 20 Local AI Models for Mobile AI Agents</h3><p class="article-card-excerpt">Compare Qwen3-4B, Phi-4-mini, and Gemma 4 E4B for on-device AI agents in 2026.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/gpu-cpu-inference-troubleshooting.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">GPU &amp; CPU Inference Troubleshooting Guide</h3><p class="article-card-excerpt">Diagnose and fix every common inference performance problem in 2026: OOM errors, slow tok/s, KV cache pressure, CPU offload bottlenecks, and vLLM/llama.cpp tuning.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/ai-inference-hardware-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">AI Inference Hardware 2026: A Multi-Vendor Catalog</h3><p class="article-card-excerpt">Complete 2026 catalog of AI inference hardware across NVIDIA, AMD, Apple Silicon, Intel, Qualcomm, and more. Pricing, VRAM, throughput, and best-use guidance.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/top-20-inference-providers-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 20 GPU Rental Providers 2026</h3><p class="article-card-excerpt">Ranked comparison of the top 20 GPU rental providers for AI inference in 2026. Pricing, GPU availability, regions, billing models, and best use cases.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/quantization-formats-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">GGUF vs EXL2 vs AWQ vs GPTQ: Quantization Formats Guide</h3><p class="article-card-excerpt">Master quantization formats for local AI: precision, speed, VRAM, and best use cases for 2026. Recommended defaults per hardware tier.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/migrate-claude-to-local-ai.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Migrating from Claude to Local AI</h3><p class="article-card-excerpt">Step-by-step guide to migrating from Claude to local AI: choosing local equivalents for Claude Opus, Sonnet, and Haiku, prompts, tools, and RAG. Save money, keep privacy.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/low-resource-ai-agents-research-paper.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Maximum Capability from Minimum Silicon (Research Paper)</h3><p class="article-card-excerpt">A book-length engineering research paper on maximizing an 8 GB GPU + 32 GB RAM workstation for complex AI agent workloads. Quantization, KV cache, offloading, engines, and complete recipes.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="blog/low-resource-ai-agents-experiment-archive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">The 8 GB Vanguard: Experiment Archive &amp; Field Guide</h3><p class="article-card-excerpt">A research paper and experiment archive: how people actually ran AI agents on 8 GB VRAM + 32 GB RAM machines, the architectures that worked, and the numbers they measured.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+            </div>
+
+            <h2 class="section-title">AI Model Brands</h2>
+            <div class="blog-grid">
+                
+
+<a href="brands/kimi-ai-moonshot-frontier-guide-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Kimi AI Models Guide</h3><p class="article-card-excerpt">Moonshot AI's K2/K3 family: trillion-parameter MoE efficiency with 1M context.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/minimax-ai-moe-frontier-guide-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">MiniMax AI Models Guide</h3><p class="article-card-excerpt">MiniMax M2, M3 and H3: 1M-context MoE frontier models with GPQA 92.9%.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/glm-ai-general-language-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">GLM AI Models Guide</h3><p class="article-card-excerpt">Zhipu AI's GLM family: from GLM-4.5 to the 744B GLM-5 flagship with SWE-bench 77.8%.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/nemotron-ai-nvidia-reasoning-guide-2026.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">NVIDIA Nemotron AI Guide</h3><p class="article-card-excerpt">Nemotron-3 Nano 30B to Ultra 550B: 1M-context MoE reasoning with GPQA 86.7%.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/alpaca-ai-instruction-tuned-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Alpaca AI Guide</h3><p class="article-card-excerpt">A deep dive into instruction-tuned models.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/bard-ai-google-conversational-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Google's Bard AI</h3><p class="article-card-excerpt">Exploring the conversational AI from Google.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/bert-ai-language-understanding-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">BERT for Language Understanding</h3><p class="article-card-excerpt">A guide to the foundational NLP model.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/bge-ai-embedding-excellence-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">BGE for Embedding Excellence</h3><p class="article-card-excerpt">Learn about this powerful embedding model.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/chatgpt-oss-open-source-models-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Open Source ChatGPT Models</h3><p class="article-card-excerpt">A guide to the open-source alternatives.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/claude-ai-constitutional-ultimate-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Claude AI: The Ultimate Guide</h3><p class="article-card-excerpt">Exploring constitutional AI and safety.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/codellama-ai-programming-ultimate-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">CodeLlama for Programming</h3><p class="article-card-excerpt">The ultimate guide to Meta's coding model.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/constitutional-ai-safety-alignment-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Constitutional AI Guide</h3><p class="article-card-excerpt">Principled, feedback-free AI alignment: the technique Anthropic pioneered, now industry standard.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/deepseek-ai-coding-expert-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">DeepSeek AI Models Guide</h3><p class="article-card-excerpt">DeepSeek-V4 Pro: 1.6T-parameter MoE with 1M context, 93.5% LiveCodeBench and 80.6% SWE-bench.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/dolphin-ai-uncensored-complete-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Dolphin AI: Uncensored Models</h3><p class="article-card-excerpt">A complete guide to the uncensored model series.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/e5-ai-multilingual-embedding-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">E5 Embedding Models Guide</h3><p class="article-card-excerpt">Microsoft E5 embeddings for multilingual RAG, semantic search, and cross-lingual retrieval.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/gemini-ai-multimodal-complete-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Google Gemini AI Models Guide</h3><p class="article-card-excerpt">Gemini 3.1 Pro and Deep Think: Google's 2M-context multimodal frontier and its open Gemma family.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/gemma-ai-google-lightweight-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Gemma: Google's Lightweight AI</h3><p class="article-card-excerpt">A guide to Google's powerful and lightweight models.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/gpt4-ai-advanced-reasoning-master-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">GPT-4 Family & Legacy Guide</h3><p class="article-card-excerpt">From GPT-4 to GPT-5.6: how OpenAI's reasoning lineage shaped today's local AI alternatives.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/grok-ai-xai-realtime-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Grok AI Models Guide</h3><p class="article-card-excerpt">xAI's Grok 4/4.5 with real-time X grounding and heavy test-time compute — plus open alternatives.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/hermes-ai-function-calling-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Hermes Function-Calling Guide</h3><p class="article-card-excerpt">Nous Research's Hermes 4: best-in-class function calling and tool use for local agents.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/lamda-ai-dialogue-breakthrough-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LaMDA Dialogue Model Guide</h3><p class="article-card-excerpt">Google's dialogue-pioneering LaMDA and how its research fed into PaLM and Gemini.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/llama-ai-open-source-complete-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LLaMA: The Complete Guide</h3><p class="article-card-excerpt">A deep dive into Meta's foundational open-source model.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/llava-ai-vision-language-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LLaVA Vision-Language Guide</h3><p class="article-card-excerpt">The visual-instruction recipe that opened local vision AI — and today's successors.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/mistral-ai-european-excellence-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Mistral AI Guide</h3><p class="article-card-excerpt">Exploring the high-performance models from Europe.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/mixtral-ai-mixture-experts-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Mixtral: Mixture of Experts</h3><p class="article-card-excerpt">A guide to the innovative MoE architecture.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/nous-ai-research-optimized-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Nous Research Guide</h3><p class="article-card-excerpt">Hermes 4, DeepHermes, and the open lab shaping the GGUF fine-tune ecosystem.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/openchat-ai-conversation-master-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">OpenChat AI Guide</h3><p class="article-card-excerpt">The RL-tuned conversation pioneer — and the modern models that replaced it.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/orca-ai-reasoning-breakthrough-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Orca Reasoning Guide</h3><p class="article-card-excerpt">Microsoft's explanation-tuning milestone and the Phi-4 line it led to.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/palm-ai-pathways-language-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">PaLM & Pathways Guide</h3><p class="article-card-excerpt">Google's Pathways foundation for Gemini — MoE and chain-of-thought roots.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/phi-ai-microsoft-efficient-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Phi: Microsoft's Efficient AI</h3><p class="article-card-excerpt">A guide to the small, powerful models from Microsoft Research.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/qwen-ai-alibaba-multilingual-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Qwen AI Models Guide</h3><p class="article-card-excerpt">Qwen3-Next 480B and Qwen3.5: frontier MoE with AIME 92.3% and 1M-token context.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/stablelm-ai-stability-optimized-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">StableLM: Stability AI Models</h3><p class="article-card-excerpt">A guide to the models from the creators of Stable Diffusion.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/t5-ai-text-to-text-complete-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">T5 Text-to-Text Guide</h3><p class="article-card-excerpt">The unified text-to-text framework that still powers summarization pipelines.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/vicuna-ai-chatbot-excellence-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Vicuna: Chatbot Excellence</h3><p class="article-card-excerpt">A guide to the popular and capable chatbot model.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/wizardlm-ai-instruction-following-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">WizardLM: Instruction Following</h3><p class="article-card-excerpt">A guide to the models fine-tuned for complex instructions.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/yi-ai-chinese-multilingual-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Yi AI: Multilingual Models</h3><p class="article-card-excerpt">A guide to the powerful models from 01.AI.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+<a href="brands/zephyr-ai-alignment-tuned-guide-2025.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Zephyr: Alignment Tuned AI</h3><p class="article-card-excerpt">A guide to the models focused on helpfulness and alignment.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+
+
+            </div>
+
+            <h2 class="section-title">CPU & Hardware Guides</h2>
+            <div class="blog-grid">
+                <a href="cpu/top-5-apple-m4-max-gguf-models-32gb-64gb-96gb-flagship-performance-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M4 Max</h3><p class="article-card-excerpt">Unleash the flagship performance of the M4 Max with these GGUF models.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m4-pro-gguf-models-16gb-32gb-64gb-advanced-neural-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M4 Pro</h3><p class="article-card-excerpt">A guide to the best models for the advanced neural capabilities of the M4 Pro.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m4-gguf-models-16gb-24gb-32gb-latest-chip-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M4</h3><p class="article-card-excerpt">A guide for the latest chip from Apple.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m3-ultra-gguf-models-64gb-128gb-192gb-ultimate-performance-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M3 Ultra</h3><p class="article-card-excerpt">The ultimate performance guide for Apple's M3 Ultra workstation chip.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m3-max-gguf-models-32gb-64gb-96gb-high-performance-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M3 Max</h3><p class="article-card-excerpt">A high-performance guide for the powerful M3 Max chip.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m3-pro-gguf-models-16gb-32gb-64gb-content-creation-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M3 Pro</h3><p class="article-card-excerpt">A content creator's guide to the best models for the M3 Pro.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m3-gguf-models-8gb-16gb-32gb-premium-ultrabook-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M3</h3><p class="article-card-excerpt">A guide for premium ultrabooks with the Apple M3 chip.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-intel-core-i9-14900k-gguf-models-32gb-64gb-128gb-latest-flagship-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Intel i9-14900K</h3><p class="article-card-excerpt">A guide for Intel's latest flagship CPU.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-intel-core-i9-13900k-gguf-models-32gb-64gb-128gb-flagship-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Intel i9-13900K</h3><p class="article-card-excerpt">A flagship guide for the powerful 13th generation i9.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-intel-core-i7-gguf-models-16gb-32gb-high-performance-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Intel Core i7</h3><p class="article-card-excerpt">A high-performance guide for Intel's popular i7 series.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-intel-core-i5-13600k-gguf-models-16gb-32gb-hybrid-gaming-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Intel i5-13600K</h3><p class="article-card-excerpt">A hybrid gaming and AI guide for the i5-13600K.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-amd-ryzen-9-7950x3d-gguf-models-32gb-64gb-128gb-ultimate-3d-vcache-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for AMD Ryzen 9 7950X3D</h3><p class="article-card-excerpt">The ultimate guide for AMD's 3D V-Cache flagship.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-amd-ryzen-9-7950x-gguf-models-32gb-64gb-128gb-workstation-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for AMD Ryzen 9 7950X</h3><p class="article-card-excerpt">A workstation guide for the powerful Ryzen 9 7950X.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-amd-ryzen-7-7800x3d-gguf-models-16gb-32gb-64gb-gaming-3d-vcache-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for AMD Ryzen 7 7800X3D</h3><p class="article-card-excerpt">A gaming and AI guide for the popular 7800X3D.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-snapdragon-x-elite-gguf-models-16gb-32gb-windows-on-arm-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Snapdragon X Elite</h3><p class="article-card-excerpt">A guide for the new era of Windows on ARM.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m1-gguf-models-8gb-16gb-32gb-ai-performance-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M1</h3><p class="article-card-excerpt">GGUF model recommendations for 8GB, 16GB, 32GB configurations with AI performance analysis.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m2-gguf-models-8gb-16gb-32gb-neural-engine-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M2</h3><p class="article-card-excerpt">GGUF models for 8GB, 16GB, and 32GB configurations with Neural Engine optimization.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m2-pro-gguf-models-16gb-32gb-64gb-professional-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M2 Pro</h3><p class="article-card-excerpt">GGUF model recommendations for 16GB, 32GB, 64GB configurations with detailed performance analysis.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m2-max-gguf-models-32gb-64gb-96gb-workstation-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M2 Max</h3><p class="article-card-excerpt">GGUF model recommendations for 32GB, 64GB, 96GB workstation configurations.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-apple-m2-ultra-gguf-models-64gb-128gb-192gb-workstation-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Apple M2 Ultra</h3><p class="article-card-excerpt">GGUF model recommendations for 64GB, 128GB, 192GB workstation configurations.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-amd-ryzen-5-7600x-gguf-models-16gb-32gb-mid-range-value-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for AMD Ryzen 5 7600X</h3><p class="article-card-excerpt">GGUF model recommendations for 16GB, 32GB configurations with mid-range performance analysis.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-amd-ryzen-9-7900x-gguf-models-16gb-32gb-64gb-high-performance-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for AMD Ryzen 9 7900X</h3><p class="article-card-excerpt">GGUF model recommendations for 16GB, 32GB, 64GB configurations with high-performance analysis.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-amd-ryzen-9-7900x3d-gguf-models-16gb-32gb-64gb-professional-3d-vcache-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for AMD Ryzen 9 7900X3D</h3><p class="article-card-excerpt">GGUF model recommendations for 16GB, 32GB, 64GB with 3D V-Cache performance analysis.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-amd-threadripper-9000-gguf-models-64gb-128gb-256gb-hedt-workstation-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for AMD Threadripper 9000</h3><p class="article-card-excerpt">GGUF model recommendations for 64GB, 128GB, 256GB HEDT workstation configurations.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-intel-core-i3-gguf-models-8gb-16gb-budget-entry-level-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Intel Core i3</h3><p class="article-card-excerpt">GGUF model recommendations for 8GB, 16GB budget-friendly entry-level configurations.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-intel-core-i5-gguf-models-8gb-16gb-32gb-mainstream-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Intel Core i5</h3><p class="article-card-excerpt">GGUF model recommendations for 8GB, 16GB, 32GB mainstream configurations.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                <a href="cpu/top-5-zhaoxin-kh-50000-gguf-models-64gb-128gb-96-core-supercomputing-guide.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Top 5 Models for Zhaoxin KH-50000</h3><p class="article-card-excerpt">GGUF model recommendations for 64GB, 128GB 96-core supercomputing configurations.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+            </div>
+
+        </div>
+    </main>
+
+    <footer class="premium-footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2025 Local AI Zone. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+        
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+        
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+    <script src="js/components/contact-form.js"></script>
+    <script src="js/theme-switcher.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+<script src="/js/goatcounter.js" defer></script>
+</body>
+</html>
