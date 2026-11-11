@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seven Verification Patterns From LFM3-Harness You Can Reuse in Your Own Agent - Local AI Zone</title>
+    <meta name="description" content="Portable verification patterns for agents built on small local models: hints versus authority, a second model as judge, path resolution before the filesystem, expiring approvals, proof-of-done, frozen acceptance contracts, and fail-closed process supervision.">
+    <meta name="keywords" content="agent verification patterns, LFM3-Harness, small language models, local AI agent safety, write gate, confidence floor, approval TTL, acceptance contract, SHA-256, path traversal, llama.cpp, tool calling, agent harness design">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="theme-color" content="#2563eb">
+
+    <meta property="og:title" content="Seven Verification Patterns From LFM3-Harness You Can Reuse in Your Own Agent">
+    <meta property="og:description" content="The harness is the reusable part: seven patterns, their constants, their failure modes, and the test that proves each one is actually running.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/lfm3-harness-verification-patterns.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="LFM3-Harness: four LFM3 models on CPU, gated by a Rust harness">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-11-02T00:00:00Z">
+    <meta property="article:section" content="Engineering">
+    <meta property="article:tag" content="AI Agents">
+    <meta property="article:tag" content="Local AI">
+    <meta property="article:tag" content="LFM3-Harness">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:creator" content="@hussainnazary">
+    <meta name="twitter:title" content="Seven Verification Patterns From LFM3-Harness">
+    <meta name="twitter:description" content="Small model plus loose harness equals confident nonsense. Seven patterns from a working Rust harness that stop a model granting itself permission, approving its own work, or declaring victory early.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png">
+
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/lfm3-harness-verification-patterns.html">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "TechArticle",
+      "headline": "Seven Verification Patterns From LFM3-Harness You Can Reuse in Your Own Agent",
+      "description": "Portable agent-verification patterns extracted from LFM3-Harness v0.1.1: separating capability hints from authority, a judge model with numeric confidence floors, canonical path resolution, expiring allow-once approvals, proof-of-done guards, frozen SHA-256 acceptance contracts, fail-closed process supervision, and the instrumentation that proves the checks are really running.",
+      "image": "https://local-ai-zone.github.io/blog/lfm3-harness-deep-dive-hero.png",
+      "author": {"@type": "Person", "name": "Hussain Nazary"},
+      "publisher": {"@type": "Organization", "name": "Local AI Zone"},
+      "datePublished": "2026-11-02",
+      "dateModified": "2026-11-02",
+      "proficiencyLevel": "Advanced",
+      "about": [
+        {"@type": "Thing", "name": "AI agent verification"},
+        {"@type": "Thing", "name": "LFM3-Harness"},
+        {"@type": "Thing", "name": "Small language models"}
+      ],
+      "mainEntityOfPage": "https://local-ai-zone.github.io/blog/lfm3-harness-verification-patterns.html"
+    }
+    </script>
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Why use a second model as a judge instead of the same model?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Because a model grading its own proposal tends to agree with itself. LFM3-Harness sends each write proposal to a separate decision model, gives that model the user request and the proposal as two clearly labelled inputs, and acts only on confident answers, so a confident contradiction stops the change before it can reach the user for approval."}
+        },
+        {
+          "@type": "Question",
+          "name": "What confidence floor should an agent use?",
+          "acceptedAnswer": {"@type": "Answer", "text": "There is no universal number, but the structure matters more than the value: store floors as integers in basis points, decide what happens strictly below the floor, and make the refusal visible. LFM3-Harness uses 75% for writes, 65% for advisory evidence checks and 55% for routing, and a refusal below the write floor suppresses the approval card entirely."}
+        },
+        {
+          "@type": "Question",
+          "name": "Why freeze an acceptance contract?",
+          "acceptedAnswer": {"@type": "Answer", "text": "Because a model that can rewrite its own success criteria will eventually do so. Hashing a canonicalised acceptance spec at load time and refusing to accept a different spec during retries means a failed attempt cannot quietly redefine what passing means."}
+        },
+        {
+          "@type": "Question",
+          "name": "Do these patterns make a small model capable?",
+          "acceptedAnswer": {"@type": "Answer", "text": "No. They make a weak model harder to misuse and harder to believe. Capability still comes from the model; verification only lowers the ceiling on the damage a wrong answer can do, and it should be described that way to users."}
+        }
+      ]
+    }
+    </script>
+
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="stylesheet" href="../css/contact-form.css">
+    <link rel="stylesheet" href="../css/blog-post.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+</head>
+<body class="blog-article-page has-site-header">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" /></svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">&#9728;&#65039;</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">&#127769;</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/></svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">Seven Verification Patterns From LFM3-Harness You Can Reuse in Your Own Agent</h1>
+                <div class="article-meta">
+                    <span class="article-date">November 2, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Engineering</span>
+                    <span class="article-read-time">&#128214; 14 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+
+            <p>Most of what is interesting in <a href="lfm3-harness-deep-dive.html">LFM3-Harness</a> is not specific to LFM3. The models are ordinary small models on a CPU. The reusable part is the set of checks between a model's output and a file on disk, and those checks port cleanly to any agent stack &mdash; Rust, Python, TypeScript, or a chain of API calls.</p>
+
+            <p>There is a single thesis behind all seven patterns: <strong>a model's self-report is data, not evidence.</strong> Once you accept that, each pattern answers a specific question about who is allowed to certify what. The constants below come from v0.1.1 and are quoted for concreteness, not as universal law. Your floors will differ; the structure should not.</p>
+
+            <div style="border:1px solid var(--border-color, #e5e7eb);border-left:4px solid var(--accent-primary, #2563eb);background:var(--card-background, var(--background-secondary, #f8fafc));color:var(--text-primary, #111827);border-radius:8px;padding:18px 20px;margin:28px 0;">
+            <p style="margin:0 0 10px;font-weight:700;font-size:1.02em;">Verification note: what is quoted, what is measured</p>
+            <ul style="margin:0;padding-left:20px;">
+                <li><strong>Code behaviour and limits</strong> are quoted from the LFM3-Harness source and README at v0.1.1 &mdash; confidence floors, timeouts, round caps, acceptance contracts and process supervision &mdash; with file paths given so each claim can be checked.</li>
+                <li><strong>Packaging facts</strong> &mdash; installer size, bundle formats, artifact byte counts and SHA-256 hashes &mdash; come from the project site and the repository's release notes.</li>
+                <li><strong>Model facts</strong> &mdash; parameter counts, context windows, licences and weight sizes &mdash; come from Liquid AI's model cards and launch post. LFM3-Harness is an independent community project, not affiliated with Liquid AI.</li>
+                <li><strong>Benchmark numbers</strong> are the project's own measurements on one machine in one run (multimodel, 2026-10-31; the 50-job agent suite), not independently replicated here, and are reported with the project's caveats attached.</li>
+                <li>Code excerpts here are illustrative reconstructions of the described logic, not verbatim source, and no gate was re-run for this post.</li>
+            </ul>
+        </div>
+
+<h2 id="p1">1. Capability hints are not authority</h2>
+
+            <p><strong>The failure.</strong> A classifier labels a message &ldquo;report&rdquo; or &ldquo;refactor&rdquo;, and downstream code treats that label as permission. Then a twenty-token prompt that happens to contain the word &ldquo;fix&rdquo; becomes a licence to edit files.</p>
+
+            <p><strong>What the harness does.</strong> Routing produces hints about which tools might help. It cannot write. In LFM3-Harness the router returns one of seven intents, which only influence what the writer is told about available tools; the write path never consults the route. The write path consults paths, gates and the user, in that order.</p>
+
+            <p><strong>The rule.</strong> Draw the line at state change. If a model output can cause a side effect without passing a deterministic check or an explicit human action, the classification is doing authority work it should not have.</p>
+
+            <pre><code>// wrong: the intent grants power
+if (intent === 'report') await writeFile(target, body)
+
+// right: the intent grants hints only
+const tools = hintsFor(intent)          // read-only suggestion
+await proposeWrite(target, body)        // still needs gate + approval</code></pre>
+
+            <p><strong>The test.</strong> Feed the router an intent-shaped message that asks for nothing, and assert that no write is proposed. Then feed it a write request classified as &ldquo;general&rdquo; and assert the write path still runs. A confident &ldquo;this is just conversation&rdquo; answer should never veto keywords that detected work &mdash; LFM3-Harness enforces exactly that by refusing a <code>general</code> label as a route override.</p>
+
+            <h2 id="p2">2. A second model as judge, with numeric floors</h2>
+
+            <p><strong>The failure.</strong> The model that proposed an edit also decides the edit is good. Self-review is not review; it is a second sample from the same distribution.</p>
+
+            <p><strong>What the harness does.</strong> A separate decision model scores each proposed write against the user's request. Two labelled inputs go in &mdash; <code>REQUEST (the person's words, the only authorization)</code> and <code>PROPOSED ACTION (model-authored, untrusted)</code> &mdash; and three labels come out: aligned, uncertain, contradicts. The gate acts only on confident answers. A <em>contradicts</em> at or above a 75% floor becomes a hold: no card, nothing written, and the writer is told not to retry. A confident <em>uncertain</em> adds an advisory note instead. Below the floor, or on the 12-second timeout, the gate abstains and the decision falls to the person.</p>
+
+            <p>A second, weaker gate runs after read-only work at a 65% floor. It never blocks; it attaches an advisory note when the evidence looks thin. Separating &ldquo;may stop you&rdquo; from &ldquo;may warn you&rdquo; keeps the false-positive cost low where the consequence is only a nag.</p>
+
+            <pre><code>const WRITE_FLOOR_BPS: u16 = 7_500;   // 75%
+const DECISION_TIMEOUT = Duration::from_secs(12);
+
+// timeout or unparseable answer =&gt; None =&gt; the gate abstains
+match judge.score(request, proposal).await? {
+    Some(Judgement::Contradicts { confidence_bps, reason })
+        if confidence_bps &gt;= WRITE_FLOOR_BPS =&gt; hold(&amp;reason),      // no card
+    Some(Judgement::Uncertain { confidence_bps })
+        if confidence_bps &gt;= WRITE_FLOOR_BPS =&gt; advise("name what is uncertain"),
+    _ =&gt; show_card(),                                  // allow, or abstain to the user
+}</code></pre>
+
+            <p><strong>Implementation notes that matter.</strong> Store probabilities as integer basis points, so a stray float cannot turn 74.99% into a confident judgement. Give the judge its own timeout and fail closed when it expires. Cap the evidence you send it &mdash; the harness caps total gate input at 7,000 characters, with 3,000 for the request &mdash; because a judge fed a truncated mess will still answer confidently.</p>
+
+            <p><strong>The test.</strong> A request to summarize a file plus a proposal to delete it should be held, not merely flagged. A proposal that is a plausible but unrequested improvement should also be held; that is the case most harnesses miss.</p>
+
+            <h2 id="p3">3. Resolve the path before the filesystem</h2>
+
+            <p><strong>The failure.</strong> The model supplies <code>../../.ssh/id_rsa</code>, an absolute path, or a symlink that points outside the workspace. The tool accepts it because the string looked like a filename.</p>
+
+            <p><strong>What the harness does.</strong> Every model-supplied path goes through one resolver before any caller can touch the disk. Parent components, absolute paths, reserved device names, link and reparse-point traversal, and canonical escapes are rejected up front &mdash; not caught later by an <code>exists()</code> check. On Windows that includes trailing dots, trailing spaces, and names like <code>CON</code> and <code>COM1</code>.</p>
+
+            <pre><code>fn resolve_in_workspace(root: &amp;Path, candidate: &amp;str) -&gt; Result&lt;PathBuf&gt; {
+    let rel = Path::new(candidate);
+    if rel.is_absolute() { bail!("absolute paths are not accepted") }
+    if rel.components().any(|c| matches!(c, Component::ParentDir)) {
+        bail!("parent components are not accepted")
+    }
+    let joined = root.join(rel);
+    let real = joined.canonicalize()?;            // after the cheap checks
+    if !real.starts_with(root.canonicalize()?) { bail!("escapes the workspace") }
+    Ok(real)
+}</code></pre>
+
+            <p><strong>The test.</strong> Keep a fixture that asks for <code>../escaped.md</code> and assert it is rejected <em>before planning</em>, with no process left behind. The harness runs exactly this in its release suite, and the rejection lands in about a quarter of a second because it happens before any model is consulted.</p>
+
+            <h2 id="p4">4. Exact diffs, allow-once, expiring consent</h2>
+
+            <p><strong>The failure.</strong> &ldquo;Allow&rdquo; becomes a permanent capability. A user approves an edit at 10:05 and, at 10:40, a model-authored change to a different file lands under the same blanket.</p>
+
+            <p><strong>What the harness does.</strong> A surviving proposal arrives as a review card with the old and new text as a remove/insert grid, and two buttons: <strong>Allow once</strong> and <strong>Deny</strong>. No allow-always exists. Approvals expire after 600 seconds, and the store batch-expires stale ones, so a card left open through lunch cannot be applied afterwards.</p>
+
+            <p><strong>Why the diff matters more than the approval.</strong> A summary line tells the user what the model believes it is doing. A diff tells them what will change. Those diverge exactly when it counts.</p>
+
+            <p><strong>The test.</strong> Approve an action, wait past the TTL, then attempt to apply it and assert refusal. Also test the state machine directly: the harness shipped a bug where an approved action could stay approved forever because the store only accepted transitions out of <code>pending</code>. Real click-through found it; a fake-model unit test had not.</p>
+
+            <h2 id="p5">5. Refuse &ldquo;done&rdquo; until the artifact exists</h2>
+
+            <p><strong>The failure.</strong> The loop ends on a tool call named <code>finish</code> that the model emits when it feels finished. Nothing checks the output, so an empty file is reported as a completed task.</p>
+
+            <p><strong>What the harness does.</strong> The finish verb is not a message; it is a request the harness may refuse. The required deliverable must exist and be non-empty on disk, or the loop continues with:</p>
+
+            <pre><code>finish refused: {path} does not exist or is empty; keep working</code></pre>
+
+            <p>Two further refusals live in the same guard: the actor must re-read what it just wrote before finishing, and overwriting a source file with the report is rejected outright. A finish backed by a placeholder write does not count.</p>
+
+            <p><strong>The generalisation.</strong> Every terminal claim needs a predicate that lives outside the model. &ldquo;I searched the folder&rdquo; should require tool results that contain hits. &ldquo;I read the image&rdquo; should require bytes that came back from the vision call. If the only evidence is the sentence, the claim is a guess.</p>
+
+            <h2 id="p6">6. Freeze the acceptance contract</h2>
+
+            <p><strong>The failure.</strong> A task defines success loosely, fails once, and the retry &mdash; or the model, asked to help fix the failure &mdash; redefines success until it passes. This is the most common way an agent benchmark becomes fiction.</p>
+
+            <p><strong>What the harness does.</strong> A verified mission ships with an acceptance spec that is canonicalised and hashed with SHA-256 the moment it loads, recorded in a table, and never weakened across retries or replanning. Checks are deterministic and small: file exists, content matches, content absent, JSON schema, numeric consistency, report complete. The mission names its required artifact; prose in the chat cannot satisfy any check.</p>
+
+            <pre><code>let canonical = canonicalise(&amp;spec);
+let digest = sha256(&amp;canonical);
+store.record_acceptance(&amp;mission, &amp;digest)?;
+// every attempt compares against this digest, not a re-read of the file
+ensure!(sha256(&amp;canonicalise(&amp;current)) == digest, "acceptance spec changed");</code></pre>
+
+            <p><strong>The harder half: knowing when not to automate.</strong> Semantic checks exist in the code, but three of four missions are declared human-review-only because the qualification run that would justify automatic grading &mdash; at least three packaged end-to-end runs with zero confident false completions &mdash; has never been performed. Refusing to enable a check you cannot yet defend is part of the pattern, not a gap in it.</p>
+
+            <h2 id="p7">7. Fail closed at the process boundary</h2>
+
+            <p><strong>The failure.</strong> A prompt-injected instruction reaches the model runner as a command-line flag, or a crashed app leaves four servers pinning the CPU at 100%.</p>
+
+            <p><strong>What the harness does.</strong> The child process command line is built in one place from configuration, and the comment on that function is explicit that no planner-provided text is accepted. Readiness is confirmed by asking each server for its identity, and an identity mismatch is a hard failure rather than a warning. On Windows every child is created suspended, assigned to a job object with kill-on-close, then resumed; on Linux each gets its own process group. The packaged profile rejects non-loopback endpoints, so the offline claim survives a hostile config edit.</p>
+
+            <p><strong>The rule.</strong> Model output never becomes argv, env, or URL. If a value comes from the model, it belongs in a typed field that a validator reads &mdash; not in a string that a shell or a subprocess parses.</p>
+
+            <h2 id="habits">Two habits that make the rest hold</h2>
+
+            <p><strong>Cap everything, and say so when a cap fires.</strong> Twelve tool rounds per turn, eight plan steps, three attempts per strategy, sixty-four turns per job, a 900-second run timeout, 32,000-character inputs, 240 messages of history. Caps are not just cost control; they bound the blast radius of a looping model. The detail most projects miss is announcing the cap. LFM3-Harness tells the user it stopped after twelve tool rounds instead of silently truncating the work.</p>
+
+            <p><strong>Publish the gaps.</strong> The README keeps a Known gaps list &mdash; token caps not wired through the executor, in-app voice playback unexercised, routing and search not qualified against real models, no macOS build. A project that lists its unverified surfaces is easier to trust than one that only lists benchmarks, because the list tells you exactly which guarantees to test yourself.</p>
+
+            <h2 id="instrumentation">The test that proves the patterns are running</h2>
+
+            <p>Every gate above can be present in the code and absent from the execution path. LFM3-Harness learned this the expensive way: its router was calling <code>/v1/chat/completions</code> on a decision model that answers that endpoint with HTTP 501, so routing had been silently falling back to the keyword table for every request. The app felt fine, because keywords handle obvious cases. The benchmark exposed it by asking a blunt question: did the decision model actually receive the prompt?</p>
+
+            <p>Instrument the answer you used, not the endpoint you configured. Log which component produced the route, the judgement and the finish decision. Then assert on that field in tests:</p>
+
+            <pre><code>// the assertion that would have caught it on day one
+assert_eq!(route.source, RouteSource::DecisionModel);
+assert_ne!(route.source, RouteSource::KeywordFallback);</code></pre>
+
+            <p>After the fix, the same project's 2026-10-31 multimodel run recorded 21/21 routing accuracy with a 122 ms median decision, and &mdash; more useful &mdash; the earlier keyword-only baseline scored 14/21. That difference is the measurement of a gate that was not actually running.</p>
+
+            <h2 id="limits">What these patterns do not buy</h2>
+
+            <p>They do not make a 1.7B model write like a frontier model, and they should never be described as if they do. They reduce the damage from wrong answers; they do not convert wrong answers into right ones. The project's own numbers keep this honest: 43/50 jobs passing on its harness with two false passes, 41/50 under stricter semantic judgement, search at 1/5, and a single mission qualified end-to-end.</p>
+
+            <p>They also cost latency and tokens. Two model consultations per write, plus a re-read before finish, is real overhead. Budget for it, and skip the judge only where the action is trivially reversible and the blast radius is a single scratch file.</p>
+
+            <h2 id="checklist">Adoption checklist</h2>
+
+            <div class="table-scroll">
+            <table>
+                <thead><tr><th>Pattern</th><th>Minimum implementation</th><th>Failure it prevents</th></tr></thead>
+                <tbody>
+                    <tr><td>Hints vs authority</td><td>Routing output consumed only by the prompt builder</td><td>Classifier labels becoming permissions</td></tr>
+                    <tr><td>Judge with floors</td><td>Separate model call, integer floors, timeout fails closed</td><td>Self-approval and silent drift</td></tr>
+                    <tr><td>Path resolution</td><td>One resolver, canonical prefix check, escape fixture</td><td>Writes outside the workspace</td></tr>
+                    <tr><td>Expiring consent</td><td>Exact diff, allow-once, TTL, no blanket approval</td><td>Stale consent applied to new work</td></tr>
+                    <tr><td>Proof of done</td><td>Terminal claim requires an on-disk predicate and a re-read</td><td>Empty artifacts reported as success</td></tr>
+                    <tr><td>Frozen contract</td><td>Canonicalise and hash at load; compare every retry</td><td>Success criteria rewritten mid-run</td></tr>
+                    <tr><td>Fail closed</td><td>Fixed argv, loopback pins, kill-on-close supervision</td><td>Injection through the runner, orphaned servers</td></tr>
+                </tbody>
+            </table>
+            </div>
+
+            <p>If you adopt only one, make it the judge. If you adopt two, add proof-of-done. Those are the two places where a small model's confidence and its competence diverge most sharply.</p>
+
+            <h2 id="faq">Frequently asked questions</h2>
+
+            <h3>Why use a second model as a judge instead of the same model?</h3>
+            <p>Because a model grading its own proposal tends to agree with itself. LFM3-Harness sends each write proposal to a separate decision model, labels the user request and the proposal as distinct inputs, and acts only on confident answers, so a confident contradiction stops the change before it can reach the user at all.</p>
+
+            <h3>What confidence floor should an agent use?</h3>
+            <p>No universal number exists, but the structure matters more than the value: store floors as integer basis points, define behaviour strictly below the floor, and make refusals visible. The harness uses 75% for writes, 65% for advisory evidence checks and 55% for routing, and a write-gate refusal suppresses the approval card entirely.</p>
+
+            <h3>Why freeze an acceptance contract?</h3>
+            <p>Because a model that can rewrite its own success criteria eventually will. Hashing a canonicalised spec at load and refusing a different spec during retries means a failed attempt cannot quietly redefine what passing means.</p>
+
+            <h3>Do these patterns make a small model capable?</h3>
+            <p>No. They make a weak model harder to misuse and harder to believe. Capability comes from the model; verification lowers the ceiling on the damage a wrong answer can do, and it should be described that way to users.</p>
+
+            <h2 id="references">References</h2>
+
+            <ul>
+                <li><a href="https://github.com/LFM3-Harness/LFM3-Harness" rel="noopener" target="_blank">LFM3-Harness/LFM3-Harness</a> &mdash; <code>chat/decisions.rs</code> (write and evidence floors, hold message), <code>chat/router.rs</code> (confidence floor, General veto), <code>paths.rs</code> (escape rejection), <code>agent/loop_agent.rs</code> (finish refusals), <code>verify/semantic.rs</code>, <code>model/process.rs</code> (fixed command line), <code>supervisor/windows.rs</code> (job object), and <code>bench/multimodel/REPORT.md</code>, accessed November 2, 2026.</li>
+                <li>LFM3-Harness project site &mdash; <a href="https://lfm3-harness.github.io/" rel="noopener" target="_blank">lfm3-harness.github.io</a>, capabilities, model table and FAQ.</li>
+                <li>Local AI Zone: <a href="lfm3-harness-deep-dive.html">LFM3-Harness Deep Dive</a>, <a href="lfm3-harness-getting-started.html">the setup guide</a>, and <a href="how-to-build-an-ai-agent-step-by-step-guide.html">How to Build an AI Agent</a>.</li>
+            </ul>
+
+        </div>
+
+        <section class="related-articles-section">
+            <div class="container">
+                <h2 class="section-title">Keep reading</h2>
+                <div class="articles-grid">
+                    <a href="lfm3-harness-deep-dive.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LFM3-Harness Deep Dive</h3><p class="article-card-excerpt">The full source-level tour of the harness these patterns come from, including the benchmark that caught two silent bugs.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                    <a href="lfm3-harness-getting-started.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">LFM3-Harness Setup Guide</h3><p class="article-card-excerpt">Install it, verify the hashes, download four LFM3 weights, and run the one mission that has passed end-to-end.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                    <a href="low-resource-ai-agents-research-paper.html" class="article-card"><div class="article-card-content"><h3 class="article-card-title">Maximum Capability from Minimum Silicon</h3><p class="article-card-excerpt">An engineering paper on running agent workloads on an 8 GB GPU and 32 GB of RAM: quantization, KV cache, offloading and recipes.</p><div class="article-card-footer"><span class="read-more-link">Read More &rarr;</span></div></div></a>
+                </div>
+            </div>
+        </section>
+    </article>
+
+    <footer style="background: #1e293b; color: #e2e8f0; padding: 40px 20px; margin-top: 60px;">
+        <div class="container" style="max-width: 900px; margin: 0 auto; text-align: center;">
+            <p style="margin: 0 0 15px 0; font-size: 0.95em;">&copy; 2026 Local AI Zone. All rights reserved.</p>
+            <p style="margin: 0 0 15px 0; font-size: 0.9em; color: #94a3b8;">Seven Verification Patterns From LFM3-Harness</p>
+            <p style="margin: 0; font-size: 0.85em; color: #64748b;">
+                <a href="../index.html" style="color: #60a5fa; text-decoration: none;">Home</a> &bull;
+                <a href="../blog.html" style="color: #60a5fa; text-decoration: none;">Blog</a> &bull;
+                <a href="../about.html" style="color: #60a5fa; text-decoration: none;">About</a> &bull;
+                <a href="../services.html" style="color: #60a5fa; text-decoration: none;">Services</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="../js/theme-switcher.js"></script>
+    <script>
+        document.querySelectorAll('pre code').forEach((block) => {
+            const button = document.createElement('button');
+            button.innerHTML = 'Copy';
+            button.style.cssText = 'position: absolute; top: 8px; right: 8px; padding: 4px 12px; background: #3b82f6; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.85em; opacity: 0; transition: opacity 0.3s;';
+            const pre = block.parentElement;
+            pre.style.position = 'relative';
+            pre.appendChild(button);
+            pre.addEventListener('mouseenter', () => button.style.opacity = '1');
+            pre.addEventListener('mouseleave', () => button.style.opacity = '0');
+            button.addEventListener('click', () => {
+                navigator.clipboard.writeText(block.textContent);
+                button.innerHTML = 'Copied!';
+                setTimeout(() => button.innerHTML = 'Copy', 2000);
+            });
+        });
+    </script>
+    <script src="/js/goatcounter.js" defer></script>
+</body>
+</html>

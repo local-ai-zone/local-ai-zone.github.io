@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Qwen 4: The Complete Deep Dive - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="stylesheet" href="../css/contact-form.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Qwen 4: the complete deep dive. Alibaba's November 11, 2026 release - 58 on Artificial Analysis' Intelligence Index v5, third place, at $1/$4 per million tokens: the sharpest intelligence-per-dollar reading the top five has produced. The 1.2T/56B sparse MoE architecture, the omni-native contract, the benchmarks vs Fable 5.2 and Kimi K3.1 Pro, the December 20 Apache 2.0 weight promise, pricing economics, and migration guidance, read for engineers.">
+    <meta name="keywords" content="Qwen 4, Alibaba, Qwen API, qwen-4, Qwen 4 Flash, Artificial Analysis, Intelligence Index v5, sparse MoE, Qwen Sparse Attention, omni input, switchable thinking, Apache 2.0, open weights, intelligence per dollar, cost per task, Claude Fable 5.2, Kimi K3.1 Pro, benchmark deep dive, November 2026">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Qwen 4: The Complete Deep Dive">
+    <meta property="og:description" content="58 on Intelligence Index v5 at $1/$4 - the sharpest intelligence-per-dollar reading the top five has produced. The 1.2T/56B sparse MoE, the omni contract, the benchmarks, and the December 20 weight promise.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/qwen-4-deep-dive-hero.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Qwen 4: The Complete Deep Dive">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/qwen-4-deep-dive.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-11-11T00:00:00Z">
+    <meta property="article:modified_time" content="2026-11-11T00:00:00Z">
+    <meta property="article:section" content="Engineering Deep Dive">
+    <meta property="article:tag" content="Qwen 4">
+    <meta property="article:tag" content="Alibaba">
+    <meta property="article:tag" content="Artificial Analysis">
+    <meta property="article:tag" content="sparse MoE">
+    <meta property="article:tag" content="open weights">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/qwen-4-deep-dive.html">
+    <meta name="twitter:title" content="Qwen 4: The Complete Deep Dive">
+    <meta name="twitter:description" content="58 on Intelligence Index v5 at $1/$4 - the sharpest intelligence-per-dollar reading the top five has produced. The 1.2T/56B sparse MoE, the omni contract, and the December 20 weight promise.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/qwen-4-deep-dive-hero.png">
+    <meta name="twitter:image:alt" content="Qwen 4: The Complete Deep Dive">
+
+    <!-- Additional AEO/GEO Meta Tags -->
+    <meta name="application-name" content="Local AI Zone">
+    <meta name="msapplication-TileColor" content="#2563eb">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="article-publisher" content="https://local-ai-zone.github.io">
+    <meta name="article-content-ttl" content="P1Y">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/qwen-4-deep-dive.html">
+
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/qwen-4-deep-dive.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/qwen-4-deep-dive.html">
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Qwen 4: The Complete Deep Dive",
+        "alternativeHeadline": "Alibaba's wire-day answer - 58 on Intelligence Index v5 at $1/$4, the 1.2T sparse MoE, the omni contract, and the December 20 weight promise",
+        "description": "Qwen 4: the complete deep dive. Alibaba's November 11, 2026 release - 58 on Artificial Analysis' Intelligence Index v5, third place, at $1/$4 per million tokens: the sharpest intelligence-per-dollar reading the top five has produced. The 1.2T/56B sparse MoE architecture, the omni-native contract, the benchmarks vs Fable 5.2 and Kimi K3.1 Pro, the December 20 Apache 2.0 weight promise, pricing economics, and migration guidance, read for engineers.",
+        "image": "https://local-ai-zone.github.io/blog/qwen-4-deep-dive-hero.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-11-11T00:00:00Z",
+        "dateModified": "2026-11-11T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/qwen-4-deep-dive.html"
+        },
+        "keywords": "Qwen 4, Alibaba, Qwen API, qwen-4, Qwen 4 Flash, Artificial Analysis, Intelligence Index v5, sparse MoE, Qwen Sparse Attention, omni input, switchable thinking, Apache 2.0, open weights, intelligence per dollar, November 2026",
+        "articleSection": "Engineering Deep Dive",
+        "wordCount": 7550,
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
+    }
+    </script>
+
+    <!-- Structured Data - FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {"@type": "Question", "name": "What is Qwen 4?", "acceptedAnswer": {"@type": "Answer", "text": "Qwen 4 is Alibaba's flagship release of November 11, 2026: a 1.2-trillion-parameter sparse MoE with 56 billion active parameters, a 1M-token context, omni-native input (text, image, audio, video), switchable hybrid thinking, and pricing of $1/$4 per million tokens. It debuted at 58 on Artificial Analysis' Intelligence Index v5 - third place."}},
+            {"@type": "Question", "name": "How much does Qwen 4 cost?", "acceptedAnswer": {"@type": "Answer", "text": "$1 per million input tokens and $4 per million output tokens through the API - under half of Qwen3.8 Max's $2/$6, a quarter of Claude Opus 5.5's $4/$20, and an eighth of Claude Fable 5.2's $8/$40. Cache reads run $0.10 per million tokens and the Batch API takes a flat 50% off ($0.50/$2). Artificial Analysis measured roughly $2.94 per index task at high reasoning - about one-ninth of Fable 5.2's ~$26.54."}},
+            {"@type": "Question", "name": "Are Qwen 4 weights available?", "acceptedAnswer": {"@type": "Answer", "text": "Not yet. What shipped on November 11 is the API tier. Alibaba has committed to publishing full Apache 2.0 weights for both Qwen 4 and Qwen 4 Flash by December 20, 2026. Until then, Qwen3.8-Flash-Next remains the newest Qwen with published weights."}},
+            {"@type": "Question", "name": "Where does Qwen 4 rank on the Intelligence Index v5?", "acceptedAnswer": {"@type": "Answer", "text": "Third place at 58 - five points behind Google's gated Gemini 4 Carbon at 60, seven behind Claude Fable 5.2 at 65, and three clear of Kimi K3.1 Pro's 55, the open-weight record. The v5 readings are not one-to-one comparable with the earlier v4.3.2 rows."}},
+            {"@type": "Question", "name": "How does Qwen 4's thinking mode differ from Claude's?", "acceptedAnswer": {"@type": "Answer", "text": "Qwen 4's hybrid thinking is switchable: reasoning can be turned on, off, or bounded with an explicit token budget per request, and sampling parameters (temperature, top_p, top_k) are fully supported. Claude Fable 5.2's adaptive thinking is always on, cannot be disabled, and rejects sampling parameters with 400 errors. Qwen 4 keeps the classic OpenAI-compatible contract."}}
+        ]
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "Qwen 4: The Complete Deep Dive", "item": "https://local-ai-zone.github.io/blog/qwen-4-deep-dive.html"}
+        ]
+    }
+    </script>
+    <link rel="stylesheet" href="../css/blog-post.css">
+</head>
+<body class="blog-article-page has-site-header">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">Qwen 4: The Complete Deep Dive</h1>
+                <div class="article-meta">
+                    <span class="article-date">November 11, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Engineering Deep Dive</span>
+                    <span class="article-read-time">📖 38 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+            <p><strong>ENGINEERING DEEP DIVE</strong></p>
+
+            <p><em>Qwen 4: The Complete Deep Dive</em></p>
+
+            <p>Alibaba's wire-day answer - benchmarks, the price-performance record, the omni-native contract, the December 20 weight promise, economics, and migration, read for engineers</p>
+
+            <p>Model IDs: qwen-4 / qwen-4-flash (Alibaba Cloud Model Studio, qwen.ai API, OpenAI-compatible endpoints)</p>
+
+            <p>Release date: November 11, 2026 (API tier); Apache 2.0 weights promised by December 20, 2026</p>
+
+            <p>Sources: Alibaba announcement, Model Studio documentation and rate card; Artificial Analysis; Reuters; The Decoder; TechCrunch; community cadence trackers; this site's GGUF index</p>
+
+            <p>Audience: engineers and technical decision-makers</p>
+
+            <p><em>Technical blog manuscript November 2026</em></p>
+
+            <h2>Executive Summary: What Changed, in Ninety Seconds</h2>
+
+            <p>On Wednesday, November 11, 2026 - the final day of the window this site's November dispatch covers - Alibaba released Qwen 4, the generation the industry had been expecting since the Apsara Conference keynote on September 22 put it "in training" and the community's cadence trackers pointed at the end of October. The trackers were wrong by eleven days, and the release lands at an interesting moment: three days after Claude Fable 5.2 took the Artificial Analysis leaderboard's top slot at 65, and a week after Kimi K3.1 Pro's 2.8T weights made "open-weight frontier" literal. Qwen 4 debuts at <strong>58 on Intelligence Index v5</strong> - third place, five points behind Google's gated Gemini 4 Carbon, seven behind Fable 5.2, and three clear of Kimi K3.1 Pro's open-weight record - at <strong>$1/$4 per million tokens</strong>, the cheapest price card any top-five model has ever shipped with. Artificial Analysis measured the model at roughly $2.94 per index task at high reasoning: five index points below Fable 5.2 for about one-ninth of the spend, the widest intelligence-per-dollar gap at the top of the table this site has tracked.</p>
+
+            <p>The headline moves are four. First, capability: 58 is a real frontier reading, and its distribution matters as much as its total. Qwen 4 posts 47.9% on Frontier Code 2.0 and 66.8% on Frontier SWE v2 - between Opus 5.5 and Fable 5.2 on both agentic-coding boards - and its 1,792 Elo on the AA-Briefcase knowledge-work benchmark edges out Fable 5.2's 1,785 at one-eighth the per-token price, though it remains short of Claude Sonnet 5.5's 1,813. Second, the contract: Qwen 4 is the anti-Fable in API design - sampling parameters (<code>temperature</code>, <code>top_p</code>, <code>top_k</code>) are fully supported, forced tool choice works, and hybrid thinking is switchable per request, including an explicit token budget, where Fable 5.2's adaptive thinking is always on and rejects all of those fields. Third, omni: the flagship ingests text, images, audio and video through one endpoint with no separate Omni SKU, and the launch demo - live 19-language interpretation at sub-400 ms voice latency - is the first credible workstation-class interpretation claim at this price. Fourth, the weight promise: Alibaba committed to full Apache 2.0 weights for both Qwen 4 (1.2T total, 56B active) and Qwen 4 Flash (30B total, 3.3B active) by December 20, 2026 - a published schedule in the Moonshot mold, and the second 1T-class quantisation job the local ecosystem has been handed in a month.</p>
+
+            <p>There is a clear "what did not ship" in the release itself, and it is the same story that defined October: the weights. What went live on November 11 is the API tier only - no download, no Hugging Face repository, no GGUF. Qwen3.8-Flash-Next remains the newest Qwen with published weights, which means the price-performance leader of the v5 table cannot be self-hosted until the December 20 promise lands, and the promise is a schedule, not a delivery. The October precedent cuts both ways: Moonshot hit its published weight date to the day, which is why this site treats dated commitments as meaningful; Alibaba's own record on the Qwen 4 window so far is one missed community expectation, which is why the promise deserves a calendar entry rather than a purchase order.</p>
+
+            <p>The short guidance for engineers: Qwen 4 is not a Fable competitor in workload shape - it is a price-performance re-anchoring of everything below the frontier specialist tier. If your routing table sends routine agentic coding to Opus 5.5 at $4/$20 and knowledge work to Sonnet 5.5 at $2/$10, Qwen 4's benchmark profile at $1/$4 - within two points of both on the coding boards, above Fable on knowledge-work Elo - makes it the new default candidate for both lanes, pending independent reproduction. The sections below cover the lineage, the architecture, the contract differences that will bite OpenAI-native and Claude-native clients in opposite directions, the benchmark fine print, the omni bet, the December 20 weight math for local deployment, the economics, and a migration checklist from Qwen3.8 Max and Flash-Next.</p>
+
+            <figure style="margin: 24px 0; text-align: center;">
+                <img src="qwen-4-deep-dive-hero.png" alt="Qwen 4 deep dive - Alibaba's 1.2T sparse MoE at 58 on Intelligence Index v5" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </figure>
+            <h2>Context: The Road to 4</h2>
+
+            <p>The Qwen 4 window opened at the Apsara Conference on September 22, 2026, when Alibaba confirmed the next generation was in training - and closed, per the community's cadence trackers and multiple press reports, somewhere around the end of October. Nothing shipped by October 29, nothing shipped through the first eight days of November, and this site's November dispatch went to press recording Qwen 4 as one of the month's two missed commitments alongside Mistral Large 4's overdue weight drop. The release then arrived on November 11, the window's final day, in the pattern the dispatch series has learned to expect from Alibaba: quiet, late relative to community expectations, and priced to move the market rather than the leaderboard alone.</p>
+
+            <p>What the release answered was a lineage that had been running hot all autumn. The Qwen3.8 family shipped in September in three tiers - Max (0902) on September 3 at $2/$6 with open weights, Omni Flash on September 21 as the multimodal omni tier, and Max Prime on September 23 at $4/$12 - and Flash-Next followed in October as an architecture preview of what the 4 generation would industrialize: Qwen Sparse Attention, sparse MoE routing refinements, and the Muon-derived optimizer work the team documented in unusual detail. Independent measurement treated the family seriously: Qwen3.8 Max posted a $1.81 average task cost on Artificial Analysis' older index with a reading that made it the price-performance reference for the fall, and the community quant layer followed every drop within days - DavidAU's Qwen3.8 27B Heretic build and the Concept 27B upload both appear on this site's November ledger. Qwen 4 is the generation that turns the Flash-Next preview into a flagship: the sparsity story scaled from the 30B class to 1.2T total parameters, and the omni tier collapsed from a separate SKU into the flagship's native input stack.</p>
+
+            <p>The competitive context is the part worth reading closely. Kimi K3.1 Pro's Apache 2.0 weights landed November 4 and reset the open-weight frontier at 55 on the v5 index - 2.8 trillion total parameters, 104 billion active, the largest downloadable model ever published. Qwen 4's API debut reads three points higher, but the two releases are not in the same market yet: Kimi's model is downloadable today, Qwen 4's is not downloadable until December 20 at the earliest. The Chinese frontier labs are now running the same race on opposite schedules - Moonshot shipped weights first and API prominence second; Alibaba has shipped API prominence first and weights on a promise. For buyers, the practical consequence is a two-week decision window (November 11 to December 20) in which the cheapest 55-plus intelligence is rented from Alibaba at $1/$4 or downloaded from Moonshot at the cost of running 2.8T parameters nobody has yet quantized. For the ecosystem, the December 20 date is the second 1T-class quantisation job in six weeks, arriving just as the K3.1 Pro conversion effort has taught the toolchain builders what a MoE at this scale actually requires.</p>
+
+            <h2>The Family: Two Sizes, One Spine</h2>
+
+            <p>Qwen 4 ships in two sizes on a shared architecture, and the sparse design is the reason the flagship's price card is possible at all. The flagship is a <strong>1.2-trillion-parameter sparse MoE with 56 billion active parameters</strong> - a 4.7% activation ratio that carries the Flash-Next generation's routing refinements to a scale only Kimi's 2.8T/104B exceeds among announced models. Total capacity is what the model knows; active capacity is what each token costs, and the 56B figure is the reason a 58-reading model can be priced at $1/$4 rather than Fable-class rates: per-token compute is Opus-class, not frontier-flagship-class. The second size is <strong>Qwen 4 Flash, 30B total with 3.3B active</strong>, priced at $0.15/$0.60 - the routine-work tier, and the model most local deployments will actually run once weights land, given that 30B at 4-bit is roughly 17 GB.</p>
+
+            <p>Three architecture features carry over from the Flash-Next preview and matter for deployment math. First, <strong>Qwen Sparse Attention (QSA)</strong>, the long-context design the team previewed in October: context length is 1 million tokens on both sizes, with output capped at 256K - a 2x increase over Fable 5.2's 128K output ceiling and the largest output window in the top five. Second, the sparse MoE routing uses fine-grained experts with a shared-attention backbone, which is what keeps a 4.7% activation ratio stable at 1.2T scale; the same design property that makes inference cheap makes the eventual GGUF conversion a serious engineering project, for the same reasons the K3.1 Pro conversion is proving hard - expert tables, sparse routing maps, and quantisation formats the mainstream toolchains were not built around. Third, the flagship is <strong>omni-native</strong>: text, image, audio and video enter through one endpoint and one tokenizer stack, with no separate Omni SKU and no vision surcharge. The September generation's Omni Flash tier exists precisely so this consolidation could be measured before it became the default; Qwen 4 is where it pays off.</p>
+
+            <p>The reasoning stack is the one genuinely new control surface, and it inverts the Claude contract. Qwen 4's hybrid thinking is <strong>switchable per request</strong>: send <code>enable_thinking: true</code> for agentic and math workloads with an optional <code>thinking_budget</code> in tokens, or <code>false</code> for latency-bound turns - and the model's own published tables show the thinking dial behaving the way the effort dial does on Claude, with extra thinking capturing most of max's quality at a fraction of the cost. The difference from Fable 5.2 is philosophical, not just technical: Anthropic ships one mode and a coarse effort parameter because it does not want clients steering reasoning; Alibaba ships the dial in every position because its buyer base - the OpenAI-compatible tooling ecosystem - expects to steer. Neither is wrong; the migration section below covers what each choice breaks.</p>
+            <h2>The Contract: What Changes for Developers</h2>
+
+            <p>Qwen 4's API contract is the OpenAI-compatible surface the Qwen ecosystem has always shipped, and against the November frontier it is deliberately boring - which is the feature. Sampling parameters are fully supported: <code>temperature</code>, <code>top_p</code> and <code>top_k</code> all work and all default to the same values the Qwen3.8 tier shipped. Tool choice is unconstrained: <code>tool_choice</code> accepts <code>auto</code>, <code>any</code> and <code>tool</code>, with strict JSON schemas supported per function - so the forced-tool patterns that 400 on Fable 5.2 run unchanged here. Streaming, partial-message deltas, and the function-calling shapes the OpenAI SDKs emit are all first-class. Teams migrating from GPT-class or Qwen3.8-class clients should expect the swap to be a base-URL and model-ID change; teams migrating from the Claude line should expect the opposite - the fields Fable forced you to delete are the fields Qwen expects you to send.</p>
+
+            <p>The thinking controls are the one place the contract is new. <code>enable_thinking</code> is a first-class request field on both sizes; <code>thinking_budget</code> (in tokens) bounds the reasoning phase and returns a 400 if it is set below the documented floor or above the context; and the response carries a separate <code>reasoning_content</code> field that the Qwen SDKs strip from downstream history by default. Unlike the Claude line's prefix-bound thinking blocks, Qwen 4's reasoning traces are not cryptographically bound to the conversation prefix: you may edit, reorder or delete earlier turns freely, at the documented cost that cross-turn reasoning continuity degrades rather than errors. That is a real capability difference in long agentic sessions - Fable 5.2's binding is also an optimization guarantee, and Qwen 4 trades it for flexibility. The interleaved variant matters for agents: <code>interleaved_thinking</code> lets the model re-enter reasoning between tool calls within one turn, which is the pattern the monorepo-port demo (below) was built on.</p>
+
+            <p>Commercial terms are thin and conventional. The rate card is $1/$4 per million tokens on the flagship and $0.15/$0.60 on Flash; cache reads are $0.10 per million (Qwen's cache pricing has always been aggressive, and 1M-token context sessions are where it compounds), cache writes $1.25 (5-minute) and $2 (1-hour), and the Batch API takes a flat 50% off input and output ($0.50/$2). The docs commit to no training on API inputs - the standing Qwen-tier promise - and a 30-day log retention window with a zero-retention toggle in the console, which puts it on the opposite side of the retention ledger from Fable 5.2's mandatory 30-day Covered-Model window: Qwen's ZDR is a toggle, not an authorization request. Rate limits at launch are 4M tokens per minute and 30K requests per minute on the flagship, with documented expectations of increase within the first month. The model is available through Alibaba Cloud Model Studio, the qwen.ai API, and OpenAI-compatible community endpoints; day-one Bedrock/Foundry-style hyperscaler listings are not part of the launch, and the docs note only that "distribution announcements" are pending - which, given the December 20 weight commitment, reads like a deliberate sequencing choice.</p>
+
+            <h3>Table 1: Qwen 4 at a glance</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>API model IDs</td><td>qwen-4 (flagship) / qwen-4-flash (Alibaba Cloud Model Studio, qwen.ai API; OpenAI-compatible endpoints)</td></tr>
+                    <tr><td>Release / weights</td><td>API tier November 11, 2026; Apache 2.0 weights for both sizes promised by December 20, 2026</td></tr>
+                    <tr><td>Architecture</td><td>Sparse MoE: 1.2T total / 56B active (flagship), 30B total / 3.3B active (Flash); Qwen Sparse Attention; fine-grained experts with shared attention backbone</td></tr>
+                    <tr><td>Context / output</td><td>1M token context; 256K max output tokens (both sizes)</td></tr>
+                    <tr><td>Modalities</td><td>Text, image, audio and video in (omni-native, both sizes); text out</td></tr>
+                    <tr><td>Reasoning</td><td>Hybrid thinking, switchable per request (<code>enable_thinking</code>, <code>thinking_budget</code>, <code>interleaved_thinking</code>); reasoning returned in <code>reasoning_content</code>, not prefix-bound</td></tr>
+                    <tr><td>Knowledge cutoff</td><td>October 2026 (reliable and training)</td></tr>
+                    <tr><td>Pricing (per MTok)</td><td>$1 input / $4 output (flagship); $0.15 / $0.60 (Flash); cache writes $1.25 / $2; cache reads $0.10; Batch API 50% discount ($0.50/$2)</td></tr>
+                    <tr><td>Speed</td><td>~110 output tokens/second on the flagship at launch; Flash documented at roughly 3x flagship throughput</td></tr>
+                    <tr><td>Contract notes</td><td>Sampling parameters supported (<code>temperature</code>/<code>top_p</code>/<code>top_k</code>); full <code>tool_choice</code> surface incl. forced use; history freely editable (no prefix binding); OpenAI-compatible error envelope</td></tr>
+                    <tr><td>Data retention</td><td>30-day logs by default; zero-retention toggle in console; no training on API inputs</td></tr>
+                </tbody>
+            </table>
+            <h2>Benchmarks: The Numbers, Honestly Read</h2>
+
+            <h3>The official picture, with the fine print attached</h3>
+
+            <p>Alibaba's published table follows the release grammar every frontier lab now uses: broad gains over the predecessor, a few rows where the model beats the most expensive competitor, and the interesting distribution hidden in the spread. On the agentic-coding evaluations, Frontier Code 2.0 reads 47.9% - above Claude Opus 5.5's 45.5%, below Claude Fable 5.2's 49.1% - and Frontier SWE v2 reads 66.8%, again between Opus 5.5 (62.3%) and Fable 5.2 (69.9%). Step up in difficulty and the gap to the frontier widens: Terminal-Bench Science 0.1 reads 63.2% against Fable 5.2's 74.6% and Opus 5.5's 58.7%, and HLE-Diamond - the expert-level academic set most models still fail - reads 71.5% against Fable's 80%. The row that will move budgets is AA-Briefcase: Qwen 4 posts 1,792 Elo on the knowledge-work benchmark, two points above Fable 5.2's 1,785 and nine short of Claude Sonnet 5.5's 1,813 - which means the cheapest model in the top five posts the second-best knowledge-work score of the November table, at one-eighth of Fable's per-token price.</p>
+
+            <h3>Table 2: Headline benchmark results, November 2026</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Benchmark</th>
+                        <th>Qwen 4</th>
+                        <th>Fable 5.2</th>
+                        <th>Opus 5.5</th>
+                        <th>Kimi K3.1 Pro</th>
+                        <th>Notes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Intelligence Index v5 (Artificial Analysis)</td><td><strong>58</strong></td><td>65</td><td>n/a on v5</td><td>55</td><td>Third place; not one-to-one comparable with v4.3.2 rows</td></tr>
+                    <tr><td>Frontier Code 2.0 (agentic coding)</td><td>47.9%</td><td>49.1%</td><td>45.5%</td><td>not published</td><td>Between Opus and Fable; extra thinking outscored max</td></tr>
+                    <tr><td>Frontier SWE v2 (agentic coding)</td><td>66.8%</td><td>69.9%</td><td>62.3%</td><td>not published</td><td>+4.5 points over Opus 5.5</td></tr>
+                    <tr><td>Terminal-Bench 4.0</td><td>64.1%</td><td>n/a</td><td>n/a</td><td>65.7% (AA: 67%)</td><td>AA's independent run read 63.4% - a 0.7-point gap, disclosed</td></tr>
+                    <tr><td>Terminal-Bench Science 0.1 (agentic science)</td><td>63.2%</td><td>74.6%</td><td>58.7%</td><td>n/a</td><td>+4.5 over Opus, 11.4 short of Fable</td></tr>
+                    <tr><td>HLE-Diamond (expert academic, no tools)</td><td>71.5%</td><td>80%</td><td>n/a</td><td>n/a</td><td>The frontier-gap row: hardest set, largest spread</td></tr>
+                    <tr><td>AA-Briefcase (knowledge work, Elo)</td><td><strong>1,792</strong></td><td>1,785</td><td>n/a</td><td>n/a</td><td>Above Fable 5.2; Sonnet 5.5 still leads at 1,813</td></tr>
+                    <tr><td>xdev-bench-hard (cyber exploitation, controlled)</td><td>78.6%</td><td>n/a</td><td>n/a</td><td>81.0% (90.5% uncontrolled)</td><td>Disclosed control: 89.0% for the uncontrolled checkpoint</td></tr>
+                </tbody>
+            </table>
+
+            <figure style="margin: 24px 0; text-align: center;">
+                <img src="qwen-4-v5-index.png" alt="Artificial Analysis Intelligence Index v5 - Qwen 4 debuts at 58, third place" style="max-width: 100%; height: auto; border-radius: 8px;">
+                <figcaption style="font-size: 0.9em; color: var(--text-secondary, #6b7280); margin-top: 8px;">Figure 1: The v5 table as it stands on November 11, 2026. Qwen 4 enters at 58 - behind Fable 5.2 and the gated Carbon, ahead of Kimi K3.1 Pro's open-weight record - at a price card none of the others approach.</figcaption>
+            </figure>
+
+            <h3>The thinking dial is a benchmark variable, again</h3>
+
+            <p>Every lesson the effort-dial era taught about reading these tables applies to Qwen 4's thinking dial. Alibaba's published rows were produced at the model's default thinking configuration, and the company's own disclosure notes that extra thinking outscored max thinking on Frontier Code 2.0 - the same inversion Fable 5.2 showed on the same benchmark class. The practical reading: benchmark deltas of a point or two between mid-tier configurations are inside the dial's range, and any buying decision that quotes a single row without quoting the dial setting is reading noise as signal. Artificial Analysis' 58 was measured under its own fixed protocol; Alibaba's 47.9% and 66.8% were measured under Alibaba's; the two agree on ordering, not on spacing, and this article keeps the two tables separate rather than blending them.</p>
+
+            <h3>Where it wins, honestly</h3>
+
+            <p>Three wins are real and load-bearing. Knowledge work at scale: the 1,792 AA-Briefcase reading at $1/$4 makes Qwen 4 the best intelligence-per-dollar option the knowledge-work tier has ever measured - Sonnet 5.5 still scores higher, but at double the input price and five times the output price. Long-output generation: the 256K output ceiling is double Fable 5.2's 128K, and the launch's monorepo-port demo is the existence proof for what a 256K budget buys - whole subsystems emitted in single turns without the fragmentation cost of stitching. And omni at the price: audio and video input at no surcharge undercuts every priced omni tier in the market, and the sub-400 ms interpretation demo (below) suggests the latency work is real rather than a slide. The honest framing for all three: these are measured-at-launch claims from the vendor's own tables plus one independent reading, and the v5 debut is the only figure so far that carries an independent measurement behind it. Treat the 58 as solid; treat the rest as provisional until Artificial Analysis' full Qwen 4 panel lands.</p>
+
+            <h3>Where it loses, honestly</h3>
+
+            <p>The losses are as structured as the wins. Against Fable 5.2 on the hard end - agentic science (63.2 vs 74.6), HLE-Diamond (71.5 vs 80), the long-horizon orchestration rows - Qwen 4 is not competitive, and nothing in the release claims it is; the 58 reading prices in the gap. Against Kimi K3.1 Pro the comparison is sharper than the three-point index spread suggests: Kimi's 55 comes with downloadable Apache 2.0 weights, a 1M context and disclosed cyber controls, while Qwen 4's 58 comes with an API key and a promise. On cyber exploitation, Kimi's controlled 81.0% edges Qwen's 78.6% - both models ship disclosed hygiene, and both read below the frontier proprietary tier. And against Claude Sonnet 5.5 on the knowledge-work Elo, Qwen 4 loses by nine points while costing less - which reads as a win in a price-performance frame but is a genuine loss if your workload sits at the top of the Elo distribution where those nine points live. The router conclusion this site has been drawing since October holds, with one new input: Qwen 4 moves the cheap-and-smart frontier, not the frontier.</p>
+            <h2>The Omni Bet: One Backbone for Text, Vision, Voice</h2>
+
+            <p>The September generation ran omni as a separate tier - Omni Flash shipped September 21 as the multimodal SKU - and Qwen 4 collapses it into the flagship's native input stack. Text, images, audio and video all enter through one endpoint and one tokenizer pipeline, with interleaved mixing allowed within a single request: a session can carry a screen recording, a spoken question about it, and a document, and the model reasons across all three without tool-mediated transcoding. The engineering consequence is latency: no separate omni service hop, no vision-surcharge rate card, and the docs publish a single latency table rather than per-modality pricing. Flash inherits the same input stack, which is the quiet strategic move - omni stops being a premium feature at $0.15/$0.60.</p>
+
+            <p>The launch demo is the first omni claim at this price that is specific enough to check: <strong>live simultaneous interpretation across 19 languages at sub-400 milliseconds end-to-end voice latency</strong>, demonstrated as a two-party conversation with the model translating in both directions while carrying the running transcript. Sub-400 ms matters because it is inside the turn-taking threshold of natural conversation - slower and the interpreter starts colliding with the speaker, which is exactly what every prior latency-tier omni demo did. The second demo is the one for engineers: a <strong>17-hour agentic port of a 2.4-million-line Java monorepo to Go, run by 412 sub-agents under one Qwen 4 orchestrator</strong>, accepted by the port's test suite with zero human commits - the smaller sibling of Fable 5.2's eight-day OS build, and a credible demonstration of the 256K output budget doing real work: whole subsystems emitted per turn, with <code>interleaved_thinking</code> re-entering reasoning between tool calls. Both demos are vendor-produced and neither has an independent replication yet; the monorepo-port one at least publishes its harness, which makes it the one worth attempting first.</p>
+
+            <h2>The Weight Promise: December 20 and the Local Ecosystem</h2>
+
+            <p>The release's most consequential sentence for this site's audience is not on the benchmark slide: Alibaba committed to <strong>full Apache 2.0 weights for both Qwen 4 and Qwen 4 Flash by December 20, 2026</strong> - a dated, permissive-licence commitment in exactly the mold Moonshot set on October 23 and honored on November 4. Apache 2.0, not the Community Licence: no usage restrictions, no revenue caps, no commercial-registration gate - the restriction history that made Qwen3 licensing a checklist item disappears from the 4 generation. The significance is easier to state than the delivery risk. If the promise lands, the local ecosystem gets, in one drop: a 58-reading model as raw BF16 (roughly 2.4 TB at 16-bit for 1.2T parameters), a 30B Flash at roughly 60 GB unquantized, and the second 1T-class quantisation project in six weeks.</p>
+
+            <p>The quantisation math deserves the honesty the K3.1 Pro section of this month's dispatch already modeled. A 1.2T sparse MoE is a harder conversion target than a dense model of equal size: expert tables are the bulk of the parameters, routing maps are activation-sensitive, and the mainstream GGUF toolchains were built for dense architectures - which is why the K3.1 Pro conversion, six weeks in, has produced no credible artifact. The differences here favor Qwen modestly: the fine-grained expert design with a shared-attention backbone means more, smaller experts (better quantisation granularity), the 4.7% activation ratio means CPU-offload inference is viable in a way 104B-active is not for most machines, and Flash at 30B/3.3B is a routine conversion the ecosystem will land within days of the drop. The realistic December-January picture: Flash GGUFs across every quant immediately; a flagship Q8 or Q4 artifact within weeks, at 1.2-2.4 TB resident; and the first practical local deployments running Flash plus API-tier flagship, which is precisely the advisor pattern the Fable economics section made famous - local Flash executes, rented Qwen 4 plans and reviews, and the December 20 drop turns the price-performance frontier into something a laptop can participate in.</p>
+
+            <p>Two caveats belong next to the promise. First, Alibaba's record on the Qwen 4 window is one missed community expectation already - the cadence trackers said end-of-October and got November 11 - so the December 20 date is a schedule to diarize, not a delivery to pre-spend against. Second, "weights by December 20" has not been qualified with size: the announcement's wording covers "both announced models," but whether the flagship ships day one at full 1.2T or in stages is unstated, and the Moonshot precedent (everything, day one, as promised) is the reference case, not the guarantee.</p>
+
+            <h2>Cyber and the Disclosure Pattern</h2>
+
+            <p>Qwen 4 ships with the disclosure pattern Kimi K3.1 Pro normalized in October: the company states, in the release materials, that offensive-exploitation data was removed from the mid-training corpus and the RL environment mix, and it publishes the measurement. The controlled checkpoint reads <strong>78.6% on xdev-bench-hard against 89.0% for an uncontrolled checkpoint</strong> - a 10.4-point disclosed delta, directly comparable to Kimi's 9.5-point delta (81.0% vs 90.5%), and both companies are now making the same claim in the same grammar: frontier-adjacent cyber capability, deliberately narrowed, with the number in the open. What neither release provides is the methodology the Anthropic capability-caps disclosure also declined to publish - how the control is measured, what stops recovery during fine-tuning, and whether the delta survives community fine-tunes. Until that methodology exists, the disclosure pattern is best read as a good-faith signal with an unverifiable ceiling, and the practical defense is unchanged: the models are behind APIs and licences you can read, not behind promises you can audit.</p>
+
+            <p>The licence itself is the simpler half of the governance story: Apache 2.0 with no appendices, per the announcement. For organizations that spent the fall writing Qwen Community Licence compliance checklists - registration thresholds, revenue caps, attribution appendices - the 4 generation's licence section is a deletion, and that deletion is worth more to enterprise adoption than any single benchmark row.</p>
+            <h2>Economics: The Intelligence-Per-Dollar Frontier Moves</h2>
+
+            <p>The price card is the release's sharpest edge, and the arithmetic is simple enough to lead with: <strong>$1/$4 per million tokens</strong> is a quarter of Claude Opus 5.5's $4/$20, an eighth of Claude Fable 5.2's $8/$40, half of Qwen3.8 Max's $2/$6 on input and two-thirds on output, and it undercuts Kimi's API tier ($2/$10) on both lines while measuring three index points higher. Cache reads at $0.10 per million are the cheapest of any 1M-context model this site has tracked - one-half of Fable 5.2's $0.20 and the lowest cache-read rate in the November tables. The batch tier ($0.50/$2) makes asynchronous Qwen 4 cheaper per output token than any Haiku- or Flash-class model in the November tables, at a 58 reading.</p>
+
+            <p>Independent cost measurement is the reality check, and here the release is genuinely strong: Artificial Analysis measured Qwen 4 at <strong>roughly $2.94 per index task at high reasoning</strong> - five index points below Fable 5.2's 65 for about one-ninth of Fable's $26.54 max-effort task cost, and the cheapest per-point reading at the top of the v5 table by a factor the site has not previously recorded. The token-burn profile matters as much as the rate card: the sparse MoE burns meaningfully fewer output tokens per task than the dense frontier tier (the AA panel's early reading is in the low tens of thousands per task, against Fable 5.2's ~98,000), which means the per-task premium story that made Fable expensive does not apply here - the price advantage is structural, not a verbosity artifact. The thinking dial is the cost lever, as it is everywhere in the November tables: thinking-off turns are the cheapest and fastest, extra thinking captures most of max's quality, and the docs' own example budgets put a mixed-routing agent at roughly one-fifth of the same agent's cost on Fable-class routing.</p>
+
+            <figure style="margin: 24px 0; text-align: center;">
+                <img src="qwen-4-cost-efficiency.png" alt="Intelligence Index v5 readings against measured task cost - Qwen 4 leads the price-performance frontier" style="max-width: 100%; height: auto; border-radius: 8px;">
+                <figcaption style="font-size: 0.9em; color: var(--text-secondary, #6b7280); margin-top: 8px;">Figure 2: Index reading against measured average task cost (Artificial Analysis panel, November 2026). Qwen 4 sits alone on the price-performance frontier: 58 points at ~$2.94 per task.</figcaption>
+            </figure>
+
+            <h3>Table 3: Pricing and positioning across the November market</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Input / output (per MTok)</th>
+                        <th>Index (v5)</th>
+                        <th>Positioning</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Claude Fable 5.2</td><td>$8 / $40 (batch $4 / $20)</td><td>65</td><td>Frontier specialist: hardest problems, orchestration, formal science</td></tr>
+                    <tr><td>Gemini 4 Carbon</td><td>no published price</td><td>60</td><td>Second place, no purchase path as of November 11</td></tr>
+                    <tr><td><strong>Qwen 4</strong></td><td><strong>$1 / $4 (batch $0.50 / $2)</strong></td><td><strong>58</strong></td><td>Price-performance frontier: knowledge work, agentic coding, omni input</td></tr>
+                    <tr><td>Kimi K3.1 Pro</td><td>$2 / $10</td><td>55</td><td>Open-weight record: downloadable Apache 2.0 weights since Nov 4</td></tr>
+                    <tr><td>Qwen 4 Flash</td><td>$0.15 / $0.60</td><td>not yet measured</td><td>Routine work and the first local deployment after December 20</td></tr>
+                    <tr><td>Claude Sonnet 5.5</td><td>$2 / $10</td><td>n/a on v5</td><td>Knowledge-work Elo leader (1,813) in the Claude family</td></tr>
+                    <tr><td>Claude Opus 5.5</td><td>$4 / $20</td><td>n/a on v5</td><td>Anthropic's recommended daily driver for coding and knowledge work</td></tr>
+                </tbody>
+            </table>
+
+            <p>The router conclusion falls out of the table and it is the November dispatch's conclusion with a new denominator: Anthropic's two-tier structure (Opus for work, Fable for the hard 10%) now has a third rail. Qwen 4 at $1/$4 undercuts the Opus lane by 4x on input while scoring within two points on the agentic-coding boards and above it on knowledge-work Elo - pending independent reproduction of the vendor rows. The defensible November posture: benchmark your own workload across Opus 5.5, Qwen 4 and your incumbent before the December 20 weight drop reprices the local option too, and treat the Qwen rows as provisional until the independent panel lands.</p>
+
+            <h2>Migration Guide: From Qwen3.8 Max and Flash-Next to 4</h2>
+
+            <p>For Qwen3.8 clients the migration is genuinely small - a model-ID swap plus a rate-card update, with two audit points. First, the thinking fields: <code>enable_thinking</code>, <code>thinking_budget</code> and <code>interleaved_thinking</code> are new request parameters, and existing clients that send unknown parameters to strict proxies will need allowlist updates; the default (thinking on for the flagship) changes turn latency for clients that never reasoned before, so set the dial explicitly per workload rather than inheriting it. Second, the cache behavior: Qwen 4's cache keys are stricter about prefix stability than the 3.8 tier's, so the same prefix-editing patterns that broke Fable 5.1 caches will quietly erode Qwen 4's $0.10 cache-read economics without erroring - audit for mid-session system-prompt mutation the same way the Claude migration guide taught.</p>
+
+            <p>For clients arriving from the Claude line, the migration inverts: the fields Fable forced you to delete come back. Re-enable <code>temperature</code>/<code>top_p</code>/<code>top_k</code> where sampling mattered, restore <code>tool_choice</code> patterns (including forced use) that were rewritten for <code>auto</code>-with-strict-schemas, and remove the refusal-as-HTTP-200 handling - Qwen 4 refuses through the standard OpenAI-compatible error envelope, so legacy GPT-style error handlers work as written. The one capability regression to plan for: reasoning traces are visible in <code>reasoning_content</code> but not prefix-bound, so cross-turn reasoning continuity degrades on history edits instead of being guaranteed - the Claude migration guide's append-only discipline is now optional here, which is a flexibility win and a determinism loss in the same field. Retention posture improves for ZDR shops: the console toggle replaces Fable's express-authorization path.</p>
+
+            <p>On economics, recompute from scratch rather than scaling 3.8 spreadsheets: the rate card halves input and cuts output by a third versus Max, cache economics change an order of magnitude, and the sparse MoE's token burn differs enough per workload that per-task measurement - not per-token extrapolation - is the only honest comparison. The October lesson stands verbatim: take your five most expensive real prompts, run them at two thinking settings on Qwen 4 and your incumbent, and record dollars per completed task.</p>
+
+            <h2>Practical Guidance: Where Qwen 4 Earns Its $1</h2>
+
+            <p>The workload list where the benchmark profile justifies immediate adoption: knowledge work at volume (the 1,792 Elo at $1/$4 is the tier's new reference point), agentic coding in the Opus lane (47.9%/66.8% at a quarter of Opus's price, pending reproduction), long-output generation where the 256K ceiling removes stitching cost (document production, whole-subsystem refactors, batch pipelines), and omni ingestion at latency (interpretation, meeting intelligence, video QA) at rates no priced omni tier approaches. Batch-absorbable work is the quiet case: $0.50/$2 for a 58 reading makes overnight sweeps - research, test generation, corpus review - cheaper per point than any option measured this fall.</p>
+
+            <p>Where it does not (yet) earn a slot: the hard 10% that Fable 5.2 exists for - long-horizon formal science, 1,000-agent orchestration, hardware design - where the 11-16 point gaps on the science rows are real and priced into Fable's premium. Self-hosted deployments until December 20 delivers weights, at which point Flash becomes the local default candidate and the flagship becomes the largest local quantisation project of the winter. And latency-critical interactive UX at the cheapest tier remains Flash/Haiku-class work, not flagship work - 110 tokens/second is respectable, not fast. The one-sentence version: Qwen 4 is the new default below the frontier specialist tier, and the frontier specialist tier is still Fable 5.2's to lose.</p>
+            <h2>Frequently Asked Questions</h2>
+
+            <p><strong>What is Qwen 4?</strong> Alibaba's flagship release of November 11, 2026: a 1.2-trillion-parameter sparse MoE with 56 billion active parameters, a 1M-token context, 256K output, omni-native input (text, image, audio, video through one endpoint), switchable hybrid thinking, and pricing of $1/$4 per million tokens. It debuted at 58 on Artificial Analysis' Intelligence Index v5 - third place, behind Claude Fable 5.2 (65) and Google's gated Gemini 4 Carbon (60), ahead of Kimi K3.1 Pro's 55 open-weight record. A smaller Qwen 4 Flash (30B total, 3.3B active, $0.15/$0.60) ships the same day.</p>
+
+            <p><strong>How much does Qwen 4 cost?</strong> $1 per million input tokens and $4 per million output tokens through the API - a quarter of Claude Opus 5.5's $4/$20, an eighth of Fable 5.2's $8/$40, and under Kimi's $2/$10 on both lines despite the higher reading. Cache reads run $0.10 per million tokens, cache writes $1.25 (5-minute) and $2 (1-hour), and the Batch API takes a flat 50% off ($0.50/$2). Artificial Analysis measured roughly $2.94 per index task at high reasoning - about one-ninth of Fable 5.2's ~$26.54 at max effort, for five fewer index points.</p>
+
+            <p><strong>Are the weights available?</strong> Not yet. What shipped November 11 is the API tier only. Alibaba committed to full Apache 2.0 weights for both sizes by December 20, 2026 - a dated commitment in the Moonshot mold, and one this site treats as a diarized schedule rather than a delivery, given that the community's end-of-October expectation for Qwen 4 itself slipped eleven days. Until the drop, Qwen3.8-Flash-Next remains the newest Qwen with published weights.</p>
+
+            <p><strong>How does Qwen 4's thinking mode differ from Claude's?</strong> It inverts the design. Qwen 4's hybrid thinking is switchable per request - on, off, or bounded with an explicit <code>thinking_budget</code> - and <code>temperature</code>, <code>top_p</code>, <code>top_k</code> and forced tool choice are all fully supported. Fable 5.2's adaptive thinking is always on, cannot be disabled, rejects sampling parameters and forced tool choice with 400 errors, and prefix-binds its thinking blocks. The trade: Qwen gives you the OpenAI-compatible contract and the dial, Claude gives you a reasoning-continuity guarantee and refuses to let you steer.</p>
+
+            <p><strong>Is Qwen 4 better than Kimi K3.1 Pro?</strong> Different products, currently. The index reading is higher (58 vs 55) and the price is lower ($1/$4 vs $2/$10), but Kimi's weights are downloadable today under Apache 2.0 and Qwen 4's are a December 20 promise; Kimi is also the larger model (2.8T/104B vs 1.2T/56B) with the higher controlled cyber score (81.0% vs 78.6% on xdev-bench-hard). If you need the intelligence rented, Qwen 4 is the better card; if you need the weights on disk - for fine-tuning, air-gapped deployment or cost control - Kimi is the only option of the two until the promise lands.</p>
+
+            <p><strong>Should I switch from Opus 5.5 for everyday coding?</strong> Benchmark, then decide - that is the honest answer. Qwen 4 reads within two points of Opus 5.5 on both agentic-coding boards (47.9% vs 45.5% on Frontier Code 2.0, 66.8% vs 62.3% on Frontier SWE v2) at a quarter of the price, which makes it the new default candidate for the Opus lane; but the vendor rows are unreproduced, and Anthropic's routing guidance plus the Sonnet 5.5 knowledge-work record (1,813 Elo) mean the safe posture is a two-week A/B on your own workload before you re-route production. Nothing in Qwen 4's release addresses the Claude-specific contract behaviors (HTTP-200 refusals, thinking-block binding) that your handlers were rewritten for - they simply stop applying.</p>
+
+            <p><strong>What is the omni input actually good for?</strong> Three measured cases from the launch: live interpretation (19 languages at sub-400 ms voice latency - inside natural turn-taking thresholds, which no prior latency-tier demo achieved), mixed-modality session reasoning (screen recording plus voice question plus document in one request, no transcoding hops), and video QA at scale. The strategic point is the price: omni input ships on Flash at $0.15/$0.60 too, which collapses the omni tier as a premium category the same way Qwen's September Omni Flash tier previewed it.</p>
+
+            <p><strong>How big will the local GGUF be?</strong> The flagship's raw BF16 payload is roughly 2.4 TB for 1.2T parameters; expect the first credible quantized artifacts in the 0.3-1.2 TB range depending on expert precision, resident on the same class of hardware the K3.1 Pro conversion effort is targeting. The practical December deployment is Qwen 4 Flash - 30B total is roughly 17 GB at 4-bit, ordinary workstation territory - with the flagship rented at $1/$4 until the conversion tooling catches up. Flash GGUFs should appear within days of the December 20 drop; a flagship artifact is a weeks-scale project, as the K3.1 Pro experience has shown.</p>
+
+            <p><strong>What about data retention and training on my data?</strong> The docs commit to no training on API inputs - the standing Qwen-tier promise - with 30-day log retention by default and a zero-retention toggle in the console. That is a materially different ZDR posture from Fable 5.2's, where zero retention requires express authorization from Anthropic; on Qwen 4 it is a switch you flip yourself.</p>
+
+            <p><strong>Should I wait?</strong> If your workload is knowledge work, Opus-lane coding, long-output generation or omni ingestion, no - benchmark now, because the price-performance claim is checkable this week on your own prompts. If your workload is the hard frontier (formal science, massive orchestration), nothing here changes your architecture. If you are waiting for the local story, diarize December 20 and watch this site's index for the Flash conversions - that is the date the price-performance frontier becomes something you can run at home.</p>
+
+            <h2>Final Verdict</h2>
+
+            <p>Qwen 4 is the release that changes the denominator under everything below the frontier specialist tier. The capability story is real but honest about its shape: 58 is third place, the agentic-science and hard-reasoning rows still belong to Fable 5.2, and the gaps there are 11-16 points, not rounding errors. What the release actually does is reprice the middle of the market - knowledge-work Elo above Fable's at one-eighth the per-token cost, agentic coding within two points of Opus 5.5 at a quarter of its price, omni input collapsed from premium SKU to default feature, and an independently measured $2.94 per task that is the cheapest 55-plus intelligence anyone has ever put on this table. The contract is the anti-Fable: switchable thinking, full sampling surface, no prefix binding, a ZDR toggle instead of an authorization queue - the OpenAI-compatible buyer base's preferences built into an API. And the governance story follows the pattern October normalized: disclosed cyber hygiene with a published delta (78.6% vs 89.0%), Apache 2.0 without appendices, and a dated weight commitment - December 20 - that turns the whole price-performance story into a question the local ecosystem can check. The caveats are the ones this dispatch series keeps having to repeat: the vendor benchmark rows are unreproduced, the weight promise is a schedule with one slip already on Alibaba's record, and the 58 reading has exactly one independent measurement behind it. But the direction is unambiguous, and the December 20 drop is the date the two-lab open-weight race - Moonshot's weights-first, Alibaba's API-first - finally converges on the same download button. Until then: rent the 58 at $1/$4, benchmark it against your Opus lane this week, and let the frontier specialist tier keep paying Fable's rates for the turns that earn them.</p>
+            <h2>Sources</h2>
+
+            <ul>
+                <li><strong>[Official]</strong> Alibaba - Qwen 4 announcement, Model Studio documentation and API rate card, qwen.ai and Alibaba Cloud, November 11, 2026 (model IDs qwen-4 / qwen-4-flash; 1.2T total / 56B active sparse MoE, 30B total / 3.3B active Flash; Qwen Sparse Attention; 1M context, 256K output; omni-native input; switchable hybrid thinking with <code>enable_thinking</code> / <code>thinking_budget</code> / <code>interleaved_thinking</code>; $1/$4 and $0.15/$0.60 per million tokens, cache writes $1.25/$2, reads $0.10, Batch 50%; ~110 output tokens/second flagship; October 2026 knowledge cutoff; no training on API inputs, 30-day logs, console ZDR toggle; Apache 2.0 weights for both sizes promised by December 20, 2026)</li>
+                <li><strong>[Official]</strong> Alibaba - Qwen 4 benchmark tables accompanying the November 11 release (Frontier Code 2.0 47.9%; Frontier SWE v2 66.8%; Terminal-Bench 4.0 64.1% with AA's independent 63.4% disclosed; Terminal-Bench Science 0.1 63.2%; HLE-Diamond 71.5%; AA-Briefcase 1,792 Elo; extra thinking outscored max on Frontier Code 2.0; xdev-bench-hard 78.6% controlled vs 89.0% uncontrolled with disclosed corpus and RL hygiene; the 17-hour, 412-agent, 2.4M-line Java-to-Go monorepo port with published harness; the 19-language sub-400 ms interpretation demo)</li>
+                <li><strong>[Official]</strong> Alibaba - Apsara Conference keynote, September 22, 2026 (Qwen 4 confirmed in training; no date given), and the Qwen3.8 tier record: Max (0902) September 3 at $2/$6 with open weights, Omni Flash September 21, Max Prime September 23 at $4/$12</li>
+                <li><strong>[Independent]</strong> Artificial Analysis - Intelligence Index v5 publication and Qwen 4 panel, November 11, 2026 (Qwen 4 at 58, third place; ~$2.94 average task cost at high reasoning; measured alongside Fable 5.2 at 65 / ~$26.54, Gemini 4 Carbon at 60 gated, Kimi K3.1 Pro at 55, Fable 5.1 at 50; Terminal-Bench 4.0 independent run at 63.4% vs the vendor's 64.1%)</li>
+                <li><strong>[Press]</strong> Reuters - Alibaba release report and the two-lab open-weight race framing, November 11, 2026; The Decoder - release summary from Alibaba data (AA-Briefcase 1,792 vs Sonnet 5.5's 1,813; the 256K output ceiling); TechCrunch - omni consolidation and the Omni Flash tier's September preview lineage</li>
+                <li><strong>[Official]</strong> Moonshot AI - Kimi K3.1 Pro weight release and Apache 2.0 licence text, November 4, 2026, used as the comparison point for the weight-schedule and disclosure patterns (2.8T total / 104B active; xdev-bench-hard 81.0% vs 90.5% uncontrolled; API $2/$10); Anthropic - Fable 5.2 announcement and system card, November 9, 2026, used as the pricing and contract comparison point ($8/$40; adaptive thinking always-on; Covered Model 30-day retention)</li>
+                <li><strong>[Independent]</strong> This site's GGUF index - November snapshot pulled November 10, 2026 (Qwen3.8-family community builds: DavidAU's Qwen3.8 27B Ultimate Heretic at 24,884 downloads, ConceptCountry's Qwen Concept 27B, ccore's Qwen3.5 4B GLB 3D Coder at 38,696 downloads - the quantisation-follows-API pattern Qwen 4's December drop will extend); community cadence trackers (end-of-October Qwen 4 window, missed by eleven days)</li>
+            </ul>
+
+            <p style="margin-top: 30px;"><em>Independently researched from primary and independent sources. All benchmark figures and prices belong to their respective vendors and measurement organizations; where vendor tables and independent measurement disagree - the Terminal-Bench 4.0 gap is the known case - both readings are reported. Coverage window: September 22 - November 11, 2026; last verified November 11, 2026.</em></p>
+
+            <!-- Related Posts Section -->
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <a href="qwen3-8-flash-next-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Qwen3.8-Flash-Next: A Deep-Dive into Alibaba's Qwen4 Architecture Preview</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The October architecture preview that became Qwen 4: Qwen Sparse Attention, the sparse MoE routing refinements, and the Muon optimizer work.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="kimi-k3-1-pro-technical-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Kimi K3.1 Pro: China's 2.8T MoE Model &mdash; Technical Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The weights-first half of the two-lab race: Stable LatentMoE, Kimi Delta Attention, the 55 on the index, and the November 4 weight drop kept on schedule.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="claude-fable-5-2-mythos-5-2-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Claude Fable 5.2 &amp; Mythos 5.2: The Complete Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The frontier specialist tier Qwen 4 prices against: 65 on Intelligence Index v5, the capability caps, the 1,000-agent OS build, and the $8/$40 first cut.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="gemini-4-carbon-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Gemini 4 Carbon: The Complete Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The measured-but-unreleased second slot: 60 on Intelligence Index v5, five above Qwen 4's debut reading, with no purchase path as of November 11.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="November_2026_AI_Model_Updates.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">November 2026 AI Model Updates</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The month in full: Fable 5.2 at 65, Kimi's weight drop, Qwen 4's wire-day debut at 58, the deadline ledger, and the November GGUF wave.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="October_2026_AI_Model_Updates.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">October 2026 AI Model Updates</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Eight specialist releases, Kimi K3.1 Pro at the open-weight record, and the shift from price per token to cost per completed task.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                </div>
+            </div>
+
+            <h2 class="section-title">About the Author</h2>
+            <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of frontier and open-weight language models and practical deployment strategies.</p>
+            <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+            <p style="margin-top: 30px;"><em>Last Updated: November 11, 2026 | Version 1.0</em></p>
+        </div>
+<!-- Need help with this post? -->
+    <section class="post-help" aria-labelledby="post-help-title">
+        <div class="post-help-inner">
+            <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+            <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+            through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+            pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+            you&rsquo;re reading.</p>
+            <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Claude Fable 5.2 and Mythos 5.2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>Ask me about this post</span>
+            </button>
+        </div>
+    </section>
+
+</article>
+
+    <script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+    <!-- Floating Instagram Button - Always Visible -->
+    <a href="https://www.instagram.com/nazary.ai" class="floating-instagram-btn" rel="noopener" target="_blank" aria-label="Connect with me on Instagram" title="Connect with me on Instagram" style="position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 8px 24px rgba(225, 48, 108, 0.4); z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255, 255, 255, 0.2);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span style="color: white; font-weight: 600; white-space: nowrap;">Connect with me on Instagram</span>
+    </a>
+</body>
+</html>

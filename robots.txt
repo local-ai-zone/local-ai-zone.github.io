@@ -1,0 +1,34 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://local-ai-zone.github.io/sitemap.xml
+
+# Image crawlers are welcome to every post image listed in the image sitemap
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
+
+# Disallow crawling of test files
+Disallow: /test-*.html
+Disallow: /debug-*.html
+Disallow: /minimal-test.html
+Disallow: /simple-test.html
+
+# Disallow crawling of development files
+Disallow: /node_modules/
+Disallow: /scripts/
+Disallow: /.git/
+Disallow: /.github/
+Disallow: /venv/
+
+# Allow important resources
+Allow: /css/
+Allow: /js/
+Allow: /models/
+Allow: /gguf_models.json

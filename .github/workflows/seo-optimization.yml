@@ -1,0 +1,259 @@
+name: SEO Optimization
+
+on:
+  schedule:
+    # Run daily at 3:00 AM UTC - optimized timing after prerender-models workflow
+    - cron: '0 3 * * *'
+  workflow_dispatch: # Allow manual triggering
+  workflow_run:
+    workflows: ["Pre-render Model Pages"]
+    types:
+      - completed
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  issues: write
+
+jobs:
+  generate-seo:
+    runs-on: ubuntu-latest
+    # Only run if prerender was successful or if manually triggered
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'schedule' || github.event.workflow_run.conclusion == 'success' }}
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v5
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    # generate-seo.js only imports Node built-ins (fs, path) and the local
+    # slug-utils module — no npm packages are needed, so skip npm ci.
+    - name: Set up Node.js
+      uses: actions/setup-node@v5
+      with:
+        node-version: '18'
+        
+    - name: Configure Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+    - name: Generate SEO optimization files
+      id: generate_seo
+      run: |
+        echo "Generating SEO optimization files..."
+        node scripts/generate-seo.js
+        echo "SEO generation completed"
+        
+    # Image-search regression guard. The sitemap carries one <image:image>
+    # entry per post image, and this workflow regenerates it nightly. If a
+    # stale generator or a bad merge drops those entries, the whole site
+    # silently disappears from Google/Bing image search, so fail here --
+    # before the commit step -- rather than publish a regressed sitemap.
+    - name: Verify image sitemap coverage
+      run: |
+        SUMMARY="${GITHUB_STEP_SUMMARY:-/dev/null}"
+
+        NOW=$(grep -c "<image:loc>" sitemap.xml 2>/dev/null || true)
+        PREV=$(git show HEAD:sitemap.xml 2>/dev/null | grep -c "<image:loc>" || true)
+        NOW=${NOW:-0}
+        PREV=${PREV:-0}
+
+        echo "Image sitemap entries: ${NOW} this run, ${PREV} in the previous commit"
+
+        if [ "${NOW}" -eq 0 ] && [ "${PREV}" -gt 0 ]; then
+          echo "IMAGE GUARD: sitemap.xml has no <image:loc> entries, but the previous commit had ${PREV}."
+          exit 1
+        fi
+
+        if [ "${PREV}" -gt 0 ] && [ "${NOW}" -lt $((PREV / 2)) ]; then
+          echo "IMAGE GUARD: image entries dropped from ${PREV} to ${NOW} (more than 50% loss vs HEAD)."
+          exit 1
+        fi
+
+        if ! grep -q "xmlns:image" sitemap.xml; then
+          echo "IMAGE GUARD: sitemap.xml lost the image namespace."
+          exit 1
+        fi
+
+        for agent in Googlebot-Image Bingbot; do
+          if ! grep -q "User-agent: ${agent}" robots.txt; then
+            echo "IMAGE GUARD: robots.txt no longer allows ${agent}."
+            exit 1
+          fi
+        done
+
+        echo "Image sitemap guard passed: ${NOW} image entries, image crawlers still allowed"
+        {
+          echo ""
+          echo "- Image sitemap entries: ${NOW} (previous commit: ${PREV})"
+        } >> "${SUMMARY}"
+
+    - name: Check for SEO changes
+      id: check_seo_changes
+      run: |
+        # Build list of files that actually exist
+        SEO_FILES=""
+        for file in sitemap.xml robots.txt seo-metadata.json index.html; do
+          if [ -f "$file" ]; then
+            SEO_FILES="$SEO_FILES $file"
+          fi
+        done
+        
+        # Include minimal pages directory if it exists
+        if [ -d "models" ] && [ "$(ls -A models 2>/dev/null)" ]; then
+          SEO_FILES="$SEO_FILES models/"
+        fi
+        
+        if [ -z "$SEO_FILES" ]; then
+          echo "No SEO files found to check"
+          echo "changes=false" >> $GITHUB_OUTPUT
+        elif git diff --quiet $SEO_FILES; then
+          echo "No changes detected in SEO files: $SEO_FILES"
+          echo "changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "Changes detected in SEO files: $SEO_FILES"
+          echo "changes=true" >> $GITHUB_OUTPUT
+          echo "seo_files=$SEO_FILES" >> $GITHUB_OUTPUT
+          
+          # Show what changed
+          echo "Changed files:"
+          git diff --name-only $SEO_FILES || true
+        fi
+        
+    - name: Commit and push SEO changes
+      if: steps.check_seo_changes.outputs.changes == 'true'
+      run: |
+        # Use the files that were actually found and changed
+        SEO_FILES="${{ steps.check_seo_changes.outputs.seo_files }}"
+        if [ -n "$SEO_FILES" ]; then
+          git add $SEO_FILES
+          # Check if there are actually changes to commit
+          if git diff --cached --quiet; then
+            echo "No changes to commit - SEO files are already up to date"
+          else
+            git commit -m "Automated SEO optimization update $(date -u '+%Y-%m-%d %H:%M:%S UTC')
+
+            - Updated sitemap.xml with latest models and minimal pages
+            - Refreshed robots.txt crawling directives  
+            - Generated meta descriptions and structured data
+            - Updated Open Graph tags for social sharing
+            - Added canonical URLs for duplicate content prevention"
+            git push
+          fi
+        else
+          echo "No SEO files to commit"
+        fi
+        
+    - name: Trigger GitHub Pages deployment
+      if: steps.check_seo_changes.outputs.changes == 'true'
+      uses: actions/github-script@v8
+      with:
+        script: |
+          console.log('Triggering GitHub Pages rebuild for SEO updates...');
+          try {
+            await github.rest.repos.requestPagesBuild({
+              owner: context.repo.owner,
+              repo: context.repo.repo
+            });
+            console.log('GitHub Pages rebuild triggered successfully');
+          } catch (error) {
+            console.log('Error triggering Pages rebuild:', error.message);
+            // Don't fail the workflow if Pages rebuild fails
+          }
+          
+    - name: Generate SEO summary
+      if: steps.check_seo_changes.outputs.changes == 'true'
+      run: |
+        echo "## SEO Optimization Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "✅ **SEO files updated successfully**" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        # Count sitemap entries
+        if [ -f sitemap.xml ]; then
+          SITEMAP_URLS=$(grep -c "<loc>" sitemap.xml || echo "0")
+          echo "📄 **Sitemap**: $SITEMAP_URLS URLs generated" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Check robots.txt
+        if [ -f robots.txt ]; then
+          echo "🤖 **Robots.txt**: Updated with crawling directives" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Check SEO metadata
+        if [ -f seo-metadata.json ]; then
+          MODEL_COUNT=$(jq '.models | length' seo-metadata.json 2>/dev/null || echo "0")
+          echo "🏷️ **SEO Metadata**: Generated for $MODEL_COUNT models" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Check minimal pages (generated by prerender-models workflow)
+        if [ -d models ]; then
+          MINIMAL_PAGES_COUNT=$(ls -1 models/*.html 2>/dev/null | wc -l || echo "0")
+          echo "📄 **Minimal Pages**: Found $MINIMAL_PAGES_COUNT existing model pages" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "🚀 **GitHub Pages deployment triggered**" >> $GITHUB_STEP_SUMMARY
+        
+    - name: Create issue on failure
+      if: failure()
+      uses: actions/github-script@v8
+      with:
+        script: |
+          const title = `SEO Optimization Failed - ${new Date().toISOString().split('T')[0]}`;
+          const body = `## Automation Failure: SEO Optimization
+          
+          **Failure Type**: SEO Generation
+          **Timestamp**: ${new Date().toISOString()}
+          **Workflow Run**: [${context.runId}](${context.payload.repository.html_url}/actions/runs/${context.runId})
+          
+          ### Error Details
+          The SEO optimization workflow failed. Please check the workflow logs for detailed error information.
+          
+          ### Affected Components
+          - [ ] Data files
+          - [ ] Dependencies  
+          - [ ] Deployment
+          - [x] SEO files (sitemap.xml, robots.txt, meta tags)
+          
+          ### Recommended Actions
+          1. Check the workflow logs for specific error messages
+          2. Verify the generate-seo.js script is working correctly
+          3. Ensure gguf_models.json file is accessible and valid
+          4. Check if HTML files can be modified
+          
+          ### SEO Files Affected
+          - sitemap.xml - Dynamic sitemap generation (includes minimal pages)
+          - robots.txt - Crawling directives
+          - seo-metadata.json - Model metadata
+          - index.html - Meta tags and structured data
+          - models/ - Individual minimal pages for top models
+          
+          ### Next Steps
+          - Review and fix any issues with the SEO generation script
+          - Re-run the workflow manually once issues are resolved
+          `;
+          
+          github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: title,
+            body: body,
+            labels: ['automation', 'bug', 'seo']
+          });
+          
+    - name: Notify on success
+      if: success() && steps.check_seo_changes.outputs.changes == 'true'
+      run: |
+        echo "✅ SEO optimization completed successfully"
+        echo "📊 SEO files updated and committed"
+        echo "🚀 GitHub Pages deployment triggered"
+        
+    - name: Notify on no changes
+      if: success() && steps.check_seo_changes.outputs.changes == 'false'
+      run: |
+        echo "ℹ️ SEO optimization completed - no changes needed"
+        echo "📊 All SEO files are up to date"

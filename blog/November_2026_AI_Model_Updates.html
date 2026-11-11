@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>November 2026 AI Model Updates: Every Launch, Access Change, and Price Move - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="November 2026 AI model dispatch, updated November 11: Claude Fable 5.2 and Mythos 5.2 (Nov 9) — one model, two safeguard regimes, debuting at No. 1 on the new Artificial Analysis Intelligence Index v5 with a reading of 65, five points clear of Google's unreleased Gemini 4 Carbon, at $8/$40 — the Fable line's first-ever price cut — with deliberate capability caps in two domains and demos that include a 1,000-agent operating system built in eight days and Fermat's Last Theorem formalized in 30 hours; Kimi K3.1 Pro's full Apache 2.0 weights (Nov 4) — the 2.8T open-weight record becomes downloadable; Alibaba's Qwen 4 (Nov 11) — 58 on the index at $1/$4, the price-performance frontier, Apache 2.0 weights promised December 20; Gemini 4 Carbon still gated at 60; DeepSeek Search and Fetch billing resumed October 31 at $0.75 per 1,000 calls; the deadline calendar — Cursor loses OpenAI models November 12, GPT-5.6 Sol's promo ends November 21, Gemini 4 Argon's introductory $2/$10 doubles December 1; and the November GGUF ledger, led by ISTA-DASLab's DeepSeek coder build at 273,578 downloads in nine days. Includes the 5.2 API contract changes, the effort dial, the LFM3-Harness community project, who shipped nothing, and what to watch through December.">
+    <meta name="keywords" content="November 2026 AI models, AI model releases, Claude Fable 5.2, Claude Mythos 5.2, claude-fable-5-2, claude-mythos-5-2, Artificial Analysis Intelligence Index v5, capability caps, adaptive thinking, CyScenarioBench, CVE Rediscovery, HLE-Diamond, Terminal-Bench Science, Kimi K3.1 Pro weights, Apache 2.0, open weights, Qwen 4, Qwen 4 Flash, sparse MoE, intelligence per dollar, Gemini 4 Carbon, Gemini 4 Argon pricing, Cursor OpenAI access, DeepSeek Search and Fetch API, GPT-5.6 Sol promo, GGUF downloads, LFM3-Harness, LFM3, local AI, edge AI, cost per task, Claude pricing, Fermat's Last Theorem formalization, agentic science, frontier model governance">
+    <meta name="author" content="Hussain Nazary">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/November_2026_AI_Model_Updates.html">
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/November_2026_AI_Model_Updates.html">
+    <link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/November_2026_AI_Model_Updates.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/November_2026_AI_Model_Updates.html">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="November 2026 AI Model Updates: a new index leader, the weights that arrived, and every clock that starts ticking">
+    <meta property="og:description" content="November 2026: Claude Fable 5.2 &amp; Mythos 5.2 (Nov 9) — No. 1 on Intelligence Index v5 at 65, five clear of Gemini 4 Carbon, at $8/$40 with deliberate capability caps and a 1,000-agent OS demo; Kimi K3.1 Pro's full Apache 2.0 weights land November 4, turning the open-weight record into a download; Alibaba's Qwen 4 lands November 11 at 58/$1-$4 with December 20 weights promised; Gemini 4 Carbon stays gated at 60; DeepSeek Search and Fetch billing resumed October 31; Cursor loses OpenAI models November 12; Argon's intro pricing doubles December 1. Inside: the 5.2 API contract, the effort dial, the November GGUF ledger, and who shipped nothing.">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/November_2026_AI_Model_Updates.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/november-2026-ai-model-updates-hero.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="November 2026 AI Model Updates: Fable 5.2 debuts at 65 on Intelligence Index v5, Kimi K3.1 Pro ships Apache 2.0 weights, and the deadline calendar fills">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-11-11T00:00:00Z">
+    <meta property="article:modified_time" content="2026-11-11T00:00:00Z">
+    <meta property="article:section" content="AI Models">
+    <meta property="article:tag" content="AI Model Releases">
+    <meta property="article:tag" content="LLM Pricing">
+    <meta property="article:tag" content="Open Weights">
+    <meta property="article:tag" content="November 2026">
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:creator" content="@hussainnazary">
+    <meta name="twitter:title" content="November 2026 AI Model Updates: The Full Dispatch">
+    <meta name="twitter:description" content="Claude Fable 5.2 &amp; Mythos 5.2 (Nov 9) debut at 65 on the new index — the top slot changes hands at $8/$40 with deliberate capability caps. Kimi K3.1 Pro's Apache 2.0 weights arrive Nov 4. Qwen 4 lands Nov 11 at 58/$1-$4. Gemini 4 Carbon still gated at 60. Every deadline: Nov 12, Nov 21, Nov 30, Dec 1. Every launch, price move and access change, October 30 – November 11.">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/november-2026-ai-model-updates-hero.png">
+    <meta name="twitter:image:alt" content="November 2026 AI Model Updates: every material launch and access change, October 30 to November 11, 2026">
+    <!-- Structured data -->
+    <script type="application/ld+json">
+    {"@context": "https://schema.org", "@type": "TechArticle", "headline": "November 2026 AI Model Updates: Every Launch, Access Change, and Price Move", "description": "The November 2026 engineering dispatch: Anthropic's Claude Fable 5.2 and Mythos 5.2 (November 9) debut at No. 1 on the new Artificial Analysis Intelligence Index v5 with a reading of 65 — five clear of Google's unreleased-full Gemini 4 Carbon and fifteen clear of Fable 5.1 — at $8/$40 per million tokens, the Fable line's first price cut, with deliberate training-time capability caps in accelerator kernel optimization and LLM-architecture improvement, universal thinking-block prefix binding, and demos including a 1,000-agent operating system built in eight days and a 30-hour Fermat formalization. Moonshot shipped Kimi K3.1 Pro's full weights on November 4 as promised under Apache 2.0 — the 2.8T open-weight record becomes downloadable. Alibaba answered the Qwen window on the window's final day: Qwen 4 went live November 11 at 58 on the index and $1/$4, with Apache 2.0 weights promised December 20. Gemini 4 Carbon remains without a full public release at a reading of 60. DeepSeek's Search and Fetch APIs began billing October 31 at $0.75 per 1,000 calls. The deadline calendar: Cursor loses OpenAI models November 12, GPT-5.6 Sol's promotional pricing ends November 21, Gemini 4 Argon's introductory $2/$10 doubles December 1. Plus: the LFM3-Harness community project, the November GGUF ledger led by ISTA-DASLab's DeepSeek coder build at 273,578 downloads in nine days, and who shipped nothing.", "author": {"@type": "Person", "name": "Hussain Nazary"}, "publisher": {"@type": "Organization", "name": "Local AI Zone"}, "datePublished": "2026-11-11", "dateModified": "2026-11-11", "proficiencyLevel": "Expert", "wordCount": 13956, "image": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/blog/november-2026-ai-model-updates-hero.png", "width": 1200, "height": 630}, "dependencies": "Claude API, OpenAI API, Gemini API, Moonshot API, llama.cpp, Ollama", "about": [{"@type": "Thing", "name": "AI model releases November 2026"}, {"@type": "Thing", "name": "Claude Fable 5.2"}, {"@type": "Thing", "name": "Open-weight models"}, {"@type": "Thing", "name": "Cost per task"}, {"@type": "Thing", "name": "Local inference"}], "mainEntityOfPage": "https://local-ai-zone.github.io/blog/November_2026_AI_Model_Updates.html"}
+    </script>
+    <script type="application/ld+json">
+    {"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is Claude Fable 5.2?", "acceptedAnswer": {"@type": "Answer", "text": "Claude Fable 5.2 is Anthropic's frontier release of November 9, 2026 — the generally available half of a one-model-two-regimes structure the company has used since June. It carries a 1M-token context, 128K output tokens, adaptive thinking that is always on (controlled through the effort parameter, which now defaults to high), a June 2026 knowledge cutoff, and pricing of $8 per million input tokens and $40 per million output — the Fable line's first-ever cut, down from 5.1's $10/$50. It debuts at No. 1 on Artificial Analysis' Intelligence Index v5 with a reading of 65 — the highest reading ever published on any version of the index — and it is the same underlying model as the restricted Claude Mythos 5.2, with production safeguards layered over sensitive domains. Our complete deep dive covers it in full."}}, {"@type": "Question", "name": "What is Claude Mythos 5.2 and who can use it?", "acceptedAnswer": {"@type": "Answer", "text": "Mythos 5.2 is the unrestricted twin of Fable 5.2 — same weights, same 1M context, same $8/$40 pricing — reserved for organizations verified through Anthropic's programs, most relevantly the Cyber Verification Program for security workloads and the life-sciences program for bio. Anthropic describes it as its most capable model for cybersecurity engineering: it finds 10.2% more vulnerabilities than Opus 5.5 and 14.4% more than Mythos 5.1, led at every compute tier in Anthropic's testing, and one in six of its confirmed finds was missed by every other frontier model tested. General-access users interact with the Fable variant, whose guardrails block most security-offensive task categories outright."}}, {"@type": "Question", "name": "Are Fable 5.2 and Mythos 5.2 the same model?", "acceptedAnswer": {"@type": "Answer", "text": "Yes — same underlying weights, same 1M-token context, same 128K output ceiling, same $8/$40 pricing, same adaptive-thinking-always-on contract. The difference is the safeguard layer, not the model. One reading caution follows from this: benchmark rows that mix “Fable 5.2” and “Mythos 5.2” results are mixing two safeguard regimes. The cyber headline numbers are the known case — The Hacker News attributes 76.3% on CyScenarioBench and 89.6% on CVE Rediscovery to Fable 5.2, The Decoder attributes both to Mythos 5.2, and this dispatch carries the disagreement rather than resolving it."}}, {"@type": "Question", "name": "How much does Fable 5.2 cost?", "acceptedAnswer": {"@type": "Answer", "text": "$8 per million input tokens and $40 per million output tokens through the API — down from Fable 5.1's $10/$50, double Opus 5.5's $4/$20, and slightly under GPT-6.1's roughly $10/$50. Cache writes run $10 (5-minute) and $16 (1-hour) per million tokens, cache reads $0.20, and the Batch API takes a flat 50% off input and output ($4/$20). Artificial Analysis measured an average task cost of roughly $26.54 at max reasoning settings — the most expensive model in its comparison set, about 2.6× Opus 5.5's ~$10 — though the model burns fewer tokens per task than its predecessors (~98,000 output tokens per task at Max), and extra-high effort captures most of max's quality at a fraction of the cost. On claude.ai, access starts at the Pro tier — it is not on the free tier."}}, {"@type": "Question", "name": "What is the Artificial Analysis Intelligence Index v5?", "acceptedAnswer": {"@type": "Answer", "text": "The v5 edition of Artificial Analysis' aggregate benchmark, published alongside the Fable 5.2 evaluation on November 9–10, 2026. The published table: Fable 5.2 at 65, Gemini 4 Carbon at 60, Qwen 4 at 58, Kimi K3.1 Pro at 55, Fable 5.1 at 50. Artificial Analysis reports Fable 5.2 leads “at every compute tier.” One caveat this dispatch keeps repeating: v5 readings are not one-to-one comparable with the v4.3.2 rows that the September and October dispatches charted (where Opus 5.5 read 57.6 and Sonnet 5.5 56.0), so cross-version arithmetic — “65 vs 57.6” — overstates the jump. What survives: orderings within each version, and the fact that no v4.3.2 reading ever reached 58 while the v5 leader debuts at 65."}}, {"@type": "Question", "name": "What is Gemini 4 Carbon and can you use it?", "acceptedAnswer": {"@type": "Answer", "text": "Gemini 4 Carbon is Google's model that posted a 60 on the Artificial Analysis index in late October 2026 — second place on v5, five points behind Fable 5.2 and five clear of the open-weight record. It is not generally available: as of November 11, 2026, it has no full public release, no published price, and no purchase path; independent coverage around the Fable launch reports Carbon leading Fable by a couple of points on business-workflow benchmarks. What you can buy from Google today is Gemini 4 Argon — at $2/$10 introductory pricing until November 30, doubling to $4/$20 on December 1. Our complete deep dive covers the gate, the reading and the scenarios in full."}}, {"@type": "Question", "name": "Did Kimi K3.1 Pro's weights ship on November 4?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Moonshot published the full model weights on November 4, 2026, exactly on the schedule it set on October 23, under an Apache 2.0 licence: 2.8 trillion total parameters with 104 billion active (Stable LatentMoE), Kimi Delta Attention, MXFP4-quantized experts, a 1M-token context, and the disclosed cyber controls that held xdev-bench-hard at 81.0% against an uncontrolled checkpoint's 90.5%. It is the largest open-weight model available anywhere and carries the highest open-weight index reading ever recorded (55). What has not shipped is the quant wave: as of this site's November 10 index snapshot, no community GGUF conversion had appeared — the largest quantisation job the local ecosystem has taken on is still in progress."}}, {"@type": "Question", "name": "What changed in the Claude API contract with Fable 5.2?", "acceptedAnswer": {"@type": "Answer", "text": "Four things to audit before you flip traffic. First, thinking-block prefix binding is now enforced for every account — Fable 5.1 only hard-failed for accounts created on or after August 31, 2026 — so stacks that edit conversation history (injecting reminders, reordering turns, mutating tool results) start returning 400s. Second, the effort parameter now defaults to high across surfaces, which silently raises cost per turn for teams that relied on medium defaults. Third, the standing Fable-line rules carry over: no temperature, top_p or top_k (omit the fields), no forced tool choice (use auto with strict schemas). Fourth, refusals are not HTTP errors — the model returns HTTP 200 with stop_reason: \"refusal\" and a stop_details object, unbilled when nothing was emitted; treat refusal as a routing event, not an exception."}}, {"@type": "Question", "name": "What exactly did Anthropic cap in Fable 5.2?", "acceptedAnswer": {"@type": "Answer", "text": "Two domains, both named: accelerator kernel optimization and improving large language model architectures. Anthropic says it deliberately throttled capability in those areas during training rather than letting the model reach its full potential there, because unrestricted capability in either would directly accelerate AI development itself. The scoping matters: agentic coding, hardware development and traditional AI research — including interpretability — are uncapped, and the release's demos (the 1,000-agent OS build, the 30-hour Fermat formalization, the three working devices) all proceed at full capability. Whether Anthropic's competitors apply comparable caps — Gemini 4 Carbon's silence is the live case — is the open governance question this release leaves behind."}}, {"@type": "Question", "name": "Should I switch from Opus 5.5 to Fable 5.2 for everyday coding?", "acceptedAnswer": {"@type": "Answer", "text": "Anthropic's own guidance says no, and the independent data agrees. Opus 5.5 remains the recommended daily driver at half the per-token cost, Sonnet 5.5 actually posted the better knowledge-work Elo (1,813 versus 1,785 on AA-Briefcase), Gemini 4 Carbon leads the business-workflow boards, and independent testers still preferred Opus 5.5's visual output even when Fable's mechanics were faster. Reach for Fable 5.2 on the hard 10%: long-horizon agentic engineering, formal science and mathematics, hardware design, and orchestration over fleets of cheaper models — the advisor pattern, where Fable plans and reviews while Haiku- or Sonnet-class models execute, routes around the cost problem without giving up the capability."}}, {"@type": "Question", "name": "What AI models were released in November 2026?", "acceptedAnswer": {"@type": "Answer", "text": "Between October 30 and November 11, exactly three vendor-dated model events of consequence: Anthropic's Claude Fable 5.2 and Mythos 5.2 (November 9), Moonshot's Kimi K3.1 Pro full weight release (November 4, Apache 2.0), and Alibaba's Qwen 4 API launch (November 11 — 58 on the index at $1/$4, with Apache 2.0 weights promised December 20). The rest of the month's volume is the community layer: the independent LFM3-Harness project (v0.1.1, November 1–2), and eleven November-dated GGUF uploads on this site's index — led by ISTA-DASLab's DeepSeek V4.1 Flash 1017 coder build at 273,578 downloads in nine days. OpenAI, Google, Meta, Mistral and Tencent shipped nothing vendor-dated in the window; OpenAI's GPT-6.1 Terra rollout and Google's Argon AI-Mode expansion continued with no new models attached."}}, {"@type": "Question", "name": "What is LFM3-Harness?", "acceptedAnswer": {"@type": "Answer", "text": "An independent, MIT-licensed community project published November 1–2, 2026 — not affiliated with Liquid AI — that wires four of Liquid's LFM3 models into a supervised local agent stack: a d1-2B decision-model router, an LFM3-1.7B actor, LFM3-VL-2B for vision and LFM3-Audio-2B for voice, all pinned to CPU llama.cpp servers on 127.0.0.1. Its supervision machinery includes a 75%-floor preflight write gate, frozen SHA-256 acceptance contracts, finish claims refused until the file exists on disk, hints separated from authority, and expiring allow-once approvals. Its own benchmark run caught its router silently faking itself — the failure mode the harness exists to catch. Our deep dive, setup guide and verification patterns cover it in full."}}, {"@type": "Question", "name": "Did any AI prices change in November 2026?", "acceptedAnswer": {"@type": "Answer", "text": "One outright repricing and four scheduled ones. The repricing: Fable 5.2 at $8/$40 on November 9 — the Fable line's first cut, 20% off 5.1 on both lines, with cache reads at $0.20 and Batch at $4/$20. The clocks: DeepSeek's Search and Fetch APIs resumed billing October 31 at 16:00 UTC ($0.75 per 1,000 calls per endpoint) after the free harness window; Cursor loses access to OpenAI models November 12; GPT-5.6 Sol's promotional pricing ends November 21; Gemini 4 Argon's introductory $2/$10 expires November 30 and both rates double to $4/$20 on December 1; Gemini 3.8 Flash doubles to $1.50/$7.50 on January 1, 2027."}}, {"@type": "Question", "name": "What is Qwen 4 and how much does it cost?", "acceptedAnswer": {"@type": "Answer", "text": "Alibaba's flagship release of November 11, 2026 — the window's final day: a 1.2-trillion-parameter sparse MoE with 56 billion active parameters, a 1M-token context, 256K output, omni-native input (text, image, audio, video through one endpoint), switchable hybrid thinking, and pricing of $1 per million input tokens and $4 per million output — a quarter of Claude Opus 5.5's $4/$20, an eighth of Fable 5.2's $8/$40, and under Kimi's $2/$10 on both lines. It debuted at 58 on Intelligence Index v5, third place, and Artificial Analysis measured roughly $2.94 per index task — about one-ninth of Fable 5.2's ~$26.54. The catch: the weights are a promise, Apache 2.0 by December 20, 2026; until then Qwen3.8-Flash-Next remains the newest Qwen with published weights. Our complete deep dive covers it in full."}}, {"@type": "Question", "name": "Did Mistral Large 4's weights ship?", "acceptedAnswer": {"@type": "Answer", "text": "No. Mistral Large 4 — previewed October 6 as a 1-trillion-parameter, 49B-active guardrailed Studio preview with weights promised by end of October — has no published weight repository as of November 11; the Studio preview remains the only route in. It is recorded here as a missed commitment, not as a release."}}, {"@type": "Question", "name": "What is the top open-weight model in November 2026?", "acceptedAnswer": {"@type": "Answer", "text": "Kimi K3.1 Pro — and for the first time this site has covered, the answer is downloadable. (Qwen 4 measures higher — 58 — but is API-only until its promised December 20 weight drop; among models you can actually download, the answer stands.) The full weights published November 4 under Apache 2.0: 2.8T total, 104B active, 1M context, carrying the highest open-weight Intelligence Index reading ever recorded (55) and an independent Terminal-Bench 4.0 reading of 67%. The caveat is practical, not scorekeeping: with no community GGUF conversion on our index as of November 10, running it locally means the raw Apache 2.0 weights and your own tooling — the API tier at $2/$10 with a Highspeed variant is the practical route this month. Among smaller models with a running local ecosystem, DeepSeek's V4.1 Flash 1017 (MIT weights since October 17, an IQ2_XXS community build at 10.1 GB with 273,578 downloads) is the release local users actually adopted."}}, {"@type": "Question", "name": "What should teams watch for in the rest of November 2026?", "acceptedAnswer": {"@type": "Answer", "text": "Six things. First, Gemini 4 Carbon — a full release with a price tag would give the leaderboard's second slot a purchase path overnight. Second, Mistral Large 4's weights — two weeks past the commitment. Third, Qwen 4's December 20 weight drop — the price-performance leader's open-weights promise; the first credible 1.2T GGUF is the local story of December. Fourth, the first credible K3.1 Pro GGUF conversion, the event that turns the open-weight record into a local run. Fifth, Mythos 5.2's verification-program throughput — the restricted twin's cyber numbers are the reason vetted organizations queue. Sixth, the deadline ledger: November 12 (Cursor), November 21 (GPT-5.6 Sol promo), November 30 (Argon intro expires), December 1 (Argon doubles), January 1, 2027 (Gemini 3.8 Flash doubles). Dated bill changes deserve calendar entries before analysis."}}]}
+    </script>
+    <script type="application/ld+json">
+    {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Local AI Zone", "item": "https://local-ai-zone.github.io/"}, {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"}, {"@type": "ListItem", "position": 3, "name": "November 2026 AI Model Updates", "item": "https://local-ai-zone.github.io/blog/November_2026_AI_Model_Updates.html"}]}
+    </script>
+  <link rel="stylesheet" href="../css/blog-post.css">
+</head>
+<body class="blog-article-page has-site-header">
+<header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">November 2026 AI Model Updates: The Full Dispatch</h1>
+                <div class="article-meta">
+                    <span class="article-date">November 11, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Monthly Dispatch</span>
+                    <span class="article-read-time">📖 38 min read</span>
+                </div>
+            </div>
+        </header>
+        <div class="article-content">
+            <h1 id="november-2026-ai-model-updates">November 2026 AI Model Updates: Every Launch, Access Change, and Price Move</h1>
+            <blockquote>
+                <p><strong>TL;DR</strong> — November 2026 is the month the leaderboard's top slot changed hands and the month every price clock the fall's releases set started ticking. On Monday, November 9, Anthropic shipped <strong>Claude Fable 5.2</strong> alongside its restricted twin <strong>Claude Mythos 5.2</strong> — one model, two safeguard regimes, the structure every release since June has followed. The numbers: Fable 5.2 debuts at <strong>No. 1 on Artificial Analysis' Intelligence Index v5 with a reading of 65</strong> — five points clear of Google's unreleased-full Gemini 4 Carbon, fifteen clear of its own predecessor Fable 5.1, and ten clear of the open-weight record — at <strong>$8/$40 per million tokens</strong>, down from Fable 5.1's $10/$50, the first cut in the Fable line's history. The agentic-science benchmark jumps from 58.7% to 74.6%, the model formalized Fermat's Last Theorem in 30 hours using roughly 1,000 agents where Opus 5.5 completed about 26% in the same timeframe, and an Anthropic engineer's empty folder became a prototype operating system over eight days of multi-agent work. The release also carries the most explicit capability-governance language any lab has shipped: Anthropic says it deliberately capped two domains during training — accelerator kernel optimization and improving language-model architectures — rather than letting the model reach full potential there. Four days earlier, on November 4, Moonshot shipped <strong>Kimi K3.1 Pro's full weights</strong> on the schedule it set on October 23, under Apache 2.0 — the highest open-weight reading ever recorded (55 on the index) became a downloadable 2.8T-parameter MoE, the largest open-weight model available anywhere. And on the window's final day, November 11, Alibaba answered the Qwen 4 window at the wire: the Qwen 4 API went live with a 1.2T-parameter sparse MoE reading <strong>58 on the same index — third place — at $1/$4 per million tokens</strong>, with Apache 2.0 weights promised by December 20. Google's <strong>Gemini 4 Carbon</strong>, which posted a 60 on the index in late October, still has no full public release as of this dispatch's dateline. OpenAI shipped nothing new: the post-Astra calendar's GPT-6.1 Terra rollout continued, and DeepSeek's Search and Fetch APIs resumed billing October 31 at $0.75 per 1,000 calls after the free harness window closed. The deadline calendar now runs November 12 (Cursor loses access to OpenAI models), November 21 (GPT-5.6 Sol's promotional pricing ends), November 30 (Gemini 4 Argon's introductory $2/$10 expires — both rates double to $4/$20 on December 1), and January 1, 2027 (Gemini 3.8 Flash doubles). On this site's own index, the November GGUF uploads are led by ISTA-DASLab's DeepSeek V4.1 Flash 1017 coder build — 273,578 downloads in nine days — and the LFM3-Harness community project turned Liquid AI's edge family into a supervised local agent stack in its first week. Coverage window: October 30 – November 11, 2026; last verified November 11, 2026.</p>            </blockquote>
+            <div class="key-takeaway">
+                <h3>🚀 Key Takeaway</h3>
+                <p><strong>November 2026 is the month the frontier's top slot changed hands on a measurement the whole industry had to re-read, and the month the open-weight frontier's biggest promise was kept on schedule.</strong> Fable 5.2's 65 is the highest reading Artificial Analysis has published on any version of its index, and the debut arrives with something no predecessor carried: a written statement from the vendor about what the model was deliberately <em>not</em> allowed to become good at. The two capped domains — accelerator kernel optimization and LLM-architecture improvement — are the two capabilities that would most directly compress AI R&amp;D itself, and the caps are training-time choices, not runtime guardrails. Whatever one thinks of the choice, it is the first time a frontier release has shipped with its own ceiling published alongside its benchmarks.</p>
+                <p style="margin-top: 15px;">The month's second act was a delivery, not a launch. Kimi K3.1 Pro's full weights landed November 4, exactly on the schedule Moonshot published October 23, under an Apache 2.0 licence — turning the open-weight record (55 on the index, fourth place overall at release) into the largest downloadable model ever published: 2.8 trillion total parameters, 104 billion active, Kimi Delta Attention's O(1)-memory design, MXFP4-quantized experts. What has not happened yet is the quantisation wave: as of our November 10 index snapshot, no community GGUF conversion of K3.1 Pro had appeared. The largest quantisation job the community has ever taken on is in progress, and the honest reading of our own ledger is that the local ecosystem is still loading.</p>
+                <p style="margin-top: 15px;">The month's third act was the edge. LFM3-Harness — an independent, MIT-licensed community project published November 1–2, two weeks after Liquid AI's LFM3 family — wires four of Liquid's 2B-class models into a supervised local agent stack: a d1-2B router, an LFM3-1.7B actor, a VL-2B vision model and an Audio-2B voice model, all pinned to CPU llama.cpp servers on loopback, with a 75%-floor write gate, frozen SHA-256 acceptance contracts, and finish claims refused until the file exists on disk. Its own benchmark run caught its router silently faking itself — which is exactly the kind of defect the harness exists to catch. October's dispatch argued the frontier's most consequential competition had moved to the edge; November is when the edge started organizing.</p>
+                <p style="margin-top: 15px;">The month's last act went to the wire. Qwen 4 went live on November 11 — the day this dispatch was being verified — and it answers the Qwen window with the sharpest price-performance reading the v5 table has produced: 58, third place, at $1/$4 per million tokens, roughly one-ninth of Fable 5.2's measured cost per index task. The catch is October's story repeated: what shipped is the API tier — a 1.2T/56B sparse MoE with omni-native input and a switchable-thinking contract — and the open-weights promise, Apache 2.0 by December 20, is a schedule, not yet a download. Section 05b has the record.</p>
+                <p style="margin-top: 15px;">The fourth act is a calendar, not a model. Cursor loses access to OpenAI models on November 12. GPT-5.6 Sol's promotional pricing ends November 21. Gemini 4 Argon's introductory $2/$10 — the rate most Argon budgets were built against — expires November 30 and doubles to $4/$20 on December 1. DeepSeek's Search and Fetch APIs began billing October 31 at $0.75 per 1,000 calls. Gemini 3.8 Flash doubles January 1, 2027. Meanwhile the two models the fall's roadmap actually depended on both stayed out of reach: GPT-6.1 Astra remains cancelled, and Gemini 4 Carbon — 60 on the new index, second place — still has no full public release as of November 11. This dispatch consolidates the October 30 – November 11 window: the Fable 5.2 generation in full, the contract changes that break code, the capability caps, the Kimi weight drop, the leaderboard reset, the community quant layer, and the deadline ledger. All figures come from primary announcements, vendor pages and independent trackers, and every model is attributed to the page its date was read from. Coverage window: October 30 – November 11, 2026; last verified November 11, 2026.</p>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title">At a Glance</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <div style="text-align: center;">
+                        <div class="stat-number">65 AA</div>
+                        <div class="stat-label">Fable 5.2 on Artificial Analysis' Intelligence Index v5 (Nov 9) — No. 1 overall, the highest reading ever published on any version of the index</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">+15</div>
+                        <div class="stat-label">Fable 5.2's gap over its own predecessor: Fable 5.1 debuted at 50 on the same evaluation — the largest generation-over-generation jump this site has tracked</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">$8 / $40</div>
+                        <div class="stat-label">Fable 5.2 pricing per million tokens — down from Fable 5.1's $10/$50, the Fable line's first-ever cut, and double Opus 5.5's $4/$20 by design</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">$0.20</div>
+                        <div class="stat-label">Fable 5.2 cache reads per million tokens, with 5-minute writes at $10 and 1-hour writes at $16; Batch API takes a flat 50% off ($4/$20)</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">74.6%</div>
+                        <div class="stat-label">Fable 5.2 on Terminal-Bench Science 0.1 — up from 58.7% for Opus 5.5 and 52.6% for Fable 5.1, the largest official gain in the release's table</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">80%</div>
+                        <div class="stat-label">Fable 5.2 on HLE-Diamond, expert academic questions with no tools, per The Decoder's reading of Anthropic data</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">76.3%</div>
+                        <div class="stat-label">The 5.2 generation on Irregular's CyScenarioBench multi-stage attack suite — against 61.7% for Fable 5.1 and 61.0% for GPT-6 Cyber</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">89.6%</div>
+                        <div class="stat-label">CVE Rediscovery across 1,829 real October 2026 advisories — attribution of the figure between Fable and Mythos varies by outlet</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">1 in 6</div>
+                        <div class="stat-label">Confirmed bugs Mythos 5.2 found that every other frontier model tested missed — the statistic behind the Cyber Verification wall</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">30 hours</div>
+                        <div class="stat-label">Fable 5.2 formalized Fermat's Last Theorem with ~1,000 agents, turning a 129-page human proof into machine-checked form; Opus 5.5 completed about 26% in the same timeframe</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">8 days</div>
+                        <div class="stat-label">For an Anthropic engineer's empty folder to become a prototype operating system, coordinated by more than 1,000 Fable 5.2 sub-agents</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">3 devices</div>
+                        <div class="stat-label">Working electronic hardware — circuit boards, 3D-printed enclosures, firmware — designed and produced from a single-paragraph prompt</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">~$26.54</div>
+                        <div class="stat-label">Artificial Analysis' measured average task cost for Fable 5.2 at max reasoning — the most expensive model in its comparison set, about 2.6× Opus 5.5's ~$10</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">98,000</div>
+                        <div class="stat-label">Output tokens Fable 5.2 burns per index task at Max effort — fewer than its predecessors and rivals, which is part of why it leads at every compute tier</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">30%</div>
+                        <div class="stat-label">Output generation speed-up over Fable 5.1 and Mythos 5.1, plus an optional fast mode at roughly 2× price for up to 2.5× throughput</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Domains Anthropic says it deliberately capped during training: accelerator kernel optimization and improving language-model architectures</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">Nov 4</div>
+                        <div class="stat-label">Kimi K3.1 Pro's full weights landed under Apache 2.0, exactly on the schedule Moonshot set October 23 — the open-weight record becomes downloadable</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">2.8T / 104B</div>
+                        <div class="stat-label">Kimi K3.1 Pro's total vs active parameters now on Hugging Face — the largest open-weight model available, with KDA's O(1)-memory design and MXFP4 experts</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Community GGUF conversions of K3.1 Pro on our index as of the November 10 snapshot — the largest quantisation job the local ecosystem has taken on is still in progress</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">60 AA</div>
+                        <div class="stat-label">Gemini 4 Carbon's index reading from late October — second place on v5, still without a full public release as of November 11</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">58 AA</div>
+                        <div class="stat-label">Qwen 4's index reading on its November 11 API debut — third place on v5, three clear of Kimi K3.1 Pro's open-weight record, at the table's sharpest price card</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">$1 / $4</div>
+                        <div class="stat-label">Qwen 4 pricing per million tokens — a quarter of Opus 5.5, an eighth of Fable 5.2; Artificial Analysis measured ~$2.94 per index task, about one-ninth of Fable 5.2's</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">Dec 20</div>
+                        <div class="stat-label">Qwen 4's promised Apache 2.0 weight drop for both sizes (1.2T/56B flagship, 30B/3.3B Flash) — the second 1T-class quantisation job of the season, on a published schedule</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">273,578</div>
+                        <div class="stat-label">Downloads in nine days for ISTA-DASLab's DeepSeek V4.1 Flash 1017 coder build — the biggest November GGUF upload on our index, 3.7× the next upload</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">409.5 GB</div>
+                        <div class="stat-label">Ripple 65b Preview, published November 4 in BF16 — the window's largest upload, and a reminder that not everything new is quantized</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">1,298</div>
+                        <div class="stat-label">Likes for Scantist's GLM 5.3 Slim IQ2_M build — the most-liked November upload on our index despite 7,884 downloads</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">Nov 12</div>
+                        <div class="stat-label">Cursor loses access to OpenAI models — the first of four deadlines in the fall ledger, followed by Nov 21, Nov 30 and Dec 1</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">$0.75</div>
+                        <div class="stat-label">Per 1,000 calls for DeepSeek's Search and Fetch APIs — billing resumed October 31 at 16:00 UTC after the free harness window</div>
+                    </div>
+                    <div style="text-align: center;">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">New vendor-dated frontier releases from OpenAI, Google, Meta or Mistral between October 30 and November 11 — the frontier waited for Anthropic, and Anthropic delivered</div>
+                    </div>
+                </div>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title">Contents</h2>
+                <ol>
+                    <li><a href="#s1">November opens with the ledger, not the frontier: a timeline</a></li>
+                    <li><a href="#s2">Anthropic: Claude Fable 5.2 and the two-regime frontier</a></li>
+                    <li><a href="#s2b">The 5.2 contract: what breaks for developers</a></li>
+                    <li><a href="#s2c">The capability caps, and what Anthropic refused to build</a></li>
+                    <li><a href="#s2d">Economics: the first Fable cut, and what a task actually costs</a></li>
+                    <li><a href="#s3">Leaderboard reset: Intelligence Index v5</a></li>
+                    <li><a href="#s4">Kimi K3.1 Pro weights: the record becomes downloadable</a></li>
+                    <li><a href="#s5">Gemini 4 Carbon: the 60 nobody can buy</a></li>
+                    <li><a href="#s5b">Qwen 4: Alibaba answers at the wire</a></li>
+                    <li><a href="#s6">The edge organizes: LFM3-Harness</a></li>
+                    <li><a href="#s7">What people actually ran: our own GGUF ledger</a></li>
+                    <li><a href="#s8">Price: every clock in the fall ledger starts ticking</a></li>
+                    <li><a href="#s9">Who shipped nothing in this window</a></li>
+                    <li><a href="#s10">What it means + what to watch</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><a href="#sources">Sources</a></li>
+                </ol>
+                <!-- PHOTO SLOT (november): save a real screenshot to blog/november-2026-local-downloads.png (landscape, 1600x900 or larger, under 400 KB), then run python scripts/install-post-photo.py --slot=november --file=PATH. Suggested subject: your own GGUF model browser filtered to the November uploads, or the first K3.1 Pro quant build the day it lands.
+                <figure>
+                    <img src="november-2026-local-downloads.png" alt="GGUF model browser listing November 2026 uploads such as ISTA-DASLab's DeepSeek coder build, Scantist's GLM 5.3 Slim and Ripple 65b Preview, each showing quantisations, file size and download counts" width="1600" height="900" loading="lazy" decoding="async">
+                    <figcaption>The browser this site is built around, filtered to the November uploads: quantization counts, file sizes and download counts for the releases in section 07.</figcaption>
+                </figure>
+                -->
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s1">01 — November opens with the ledger, not the frontier: a timeline</h2>
+                <p>October's dispatch closed with a dateline of October 29 and a watch list: Mistral Large 4's weights, Kimi K3.1 Pro's full weights on or by November 4, the Qwen 4 window, DeepSeek's Search and Fetch billing clock, and the LFM3 local-ecosystem wave. November answered the list in order — one delivery on schedule (Kimi), one clock expiring as promised (DeepSeek), one commitment missed (Mistral), one answered at the wire on the window's final day (Qwen 4), and one watch item answered in a way nobody's list anticipated: the biggest model news of the month did not come from the labs that dominated October's dispatch, but from Anthropic, which shipped the first frontier release since Amodei's slowdown call and took the index's top slot with the highest reading any version of the index has recorded.</p>
+                <p>The shape of the month is the inverse of October's. October opened with eight specialist releases in three days and saved its frontier-scale events for the final week; November held a nine-day silence (October 30 through November 8), then concentrated everything into two days: the Kimi weights on November 4, and the Fable 5.2 generation five days later. Between those poles, the month's actual volume lived in the community layer — eleven November-dated uploads on this site's own index, the LFM3-Harness project, and the quantisation infrastructure that the next weight drop will need.</p>
+                <div class="model-release" style="border: 2px solid green;">
+                    <div class="model-badge">Nov 11</div>
+                    <div class="model-badge" style="background: #ff6a00;">Alibaba</div>
+                    <h3>Alibaba ships Qwen 4 — the price-performance frontier moves on the window's final day</h3>
+                    <p>The Qwen window answered at the wire, eleven days past the community cadence trackers' end-of-October expectation: the <strong>Qwen 4</strong> API went live (<code>qwen-4</code> / <code>qwen-4-flash</code>) with a <strong>1.2T-parameter sparse MoE with 56 billion active parameters</strong>, Qwen Sparse Attention, a 1M-token context with 256K output, omni-native input (text, image, audio, video) and switchable hybrid thinking — the anti-Fable contract, with sampling parameters and forced tool choice fully supported. It debuts at <strong>58 on Intelligence Index v5, third place</strong> — three clear of Kimi K3.1 Pro's open-weight record, five behind the gated Gemini 4 Carbon — at <strong>$1/$4 per million tokens</strong>, with Artificial Analysis measuring ~$2.94 per index task, about one-ninth of Fable 5.2's $26.54. The catch: what shipped is the API tier; Apache 2.0 weights for both sizes are <strong>promised by December 20</strong>. Section 05b and <a href="qwen-4-deep-dive.html">our complete deep dive</a> cover it in full.</p>
+                </div>
+                <div class="model-release" style="border: 2px solid green;">
+                    <div class="model-badge">Nov 9</div>
+                    <div class="model-badge" style="background: #d97757;">Anthropic</div>
+                    <h3>Anthropic ships Claude Fable 5.2 and Mythos 5.2 — the top slot changes hands</h3>
+                    <p>The month's only frontier release, and the first since CEO Dario Amodei's public call for a coordinated slowdown. One model shipped twice: <strong>Fable 5.2</strong> is generally available on claude.ai paid plans, the Claude API, Amazon Bedrock, Google Cloud and Microsoft Foundry as <code>claude-fable-5-2</code>; <strong>Mythos 5.2</strong> (<code>claude-mythos-5-2</code>) is the unrestricted twin, reserved for verification-program organizations. Fable 5.2 debuts at <strong>No. 1 on Artificial Analysis' Intelligence Index v5 with a reading of 65</strong> — five clear of Google's unreleased-full Gemini 4 Carbon, fifteen clear of Fable 5.1 — at <strong>$8/$40</strong>, down from 5.1's $10/$50. Agentic science jumps 58.7% → 74.6%, Frontier SWE v2 62.3% → 69.9%, and Anthropic says it deliberately capped two training domains rather than letting the model reach full capability there. CNBC framed the launch against Anthropic's expected IPO: the models “reclaim the AI performance lead.” Sections 02–02d and <a href="claude-fable-5-2-mythos-5-2-deep-dive.html">our complete deep dive</a> cover it in full.</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Nov 9–10</div>
+                    <div class="model-badge" style="background: #0e7490;">Independent</div>
+                    <h3>Artificial Analysis refreshes its leaderboard — Intelligence Index v5</h3>
+                    <p>The index moved to a new major version with the Fable 5.2 measurement: Fable 5.2 at <strong>65</strong>, Gemini 4 Carbon at <strong>60</strong> (still without a full public release), Kimi K3.1 Pro at <strong>55</strong> (the open-weight record) and Fable 5.1 at <strong>50</strong>. Artificial Analysis reports Fable 5.2 leads “at every compute tier,” meaning the ranking survives normalization for spend. One caveat this dispatch repeats rather than resolves: v5 readings are not one-to-one comparable with the v4.3.2 rows October's dispatch charted, so the September–October table and the November table should be read as two snapshots of two index versions (section 03).</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Nov 7</div>
+                    <h3>The community tail: Gemma 4 and Qwen Concept builds</h3>
+                    <p>mradermacher publishes a Gemma 4 31B IT Ara Heretic build (Q8_0, 34.6 GB), and ConceptCountry follows on November 8 with Qwen Concept 27B (Q8_0, 30.1 GB). Neither is vendor-dated; both appear on our index's November ledger, and both are recorded as community uploads rather than releases (section 07).</p>
+                </div>
+                <div class="model-release" style="border: 2px solid green;">
+                    <div class="model-badge">Nov 4</div>
+                    <div class="model-badge" style="background: #0f4c81;">Moonshot</div>
+                    <h3>Kimi K3.1 Pro's full weights land — the open-weight record becomes downloadable</h3>
+                    <p>Exactly on the schedule Moonshot set on October 23: full model weights for Kimi K3.1 Pro published under <strong>Apache 2.0</strong> — 2.8 trillion total parameters with 104 billion active (Stable LatentMoE), Kimi Delta Attention, MXFP4-quantized experts, and a 1M-token context. It is the largest open-weight model available anywhere, carrying the highest open-weight index reading ever recorded (55) and Moonshot's disclosed cyber controls (xdev-bench-hard held at 81.0% against an uncontrolled checkpoint's 90.5%). The API's $2/$10 rate card is unchanged. What has not shipped is the quant wave: as of our November 10 snapshot, no community GGUF conversion had appeared (section 04).</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Nov 4</div>
+                    <h3>The November GGUF wave — five uploads, one very large</h3>
+                    <p>Five community uploads land on our index the same day the Kimi weights ship: <strong>Ripple 65b Preview</strong> (AtomicChat, BF16, 409.5 GB — the window's largest upload), <strong>Hyperflow H3 Flash</strong> (VideoRebirthAI, Q8_0, 15.6 GB), DavidAU's <strong>Qwen3.8 27B Ultimate Heretic</strong> build (Q8_0, 30.1 GB), <strong>Air 26B A4B</strong> (webAI-Official, 15.4 GB) and <strong>Flint Abliterated</strong> (orcarouter, 4.13 GB). Section 07 has the full ledger with download counts.</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Nov 3</div>
+                    <h3>Qwen Image 2.1 Uncensored Omni quantized</h3>
+                    <p>chatrlabs publishes a quantized build of Qwen Image 2.1's omni variant (BF16, 14.7 GB) — 23,737 downloads in the window. The image-generation tier's local ecosystem continues to track the API tier's releases within days (section 07).</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Nov 2</div>
+                    <h3>ISTA-DASLab's DeepSeek coder build — 273,578 downloads in nine days</h3>
+                    <p>The window's biggest upload by a wide margin: <strong>DeepSeek V4.1 Flash 1017 GSQ RCO Coder</strong>, an IQ2_XXS build at 10.1 GB, draws 273,578 downloads and 213 likes by our November 10 snapshot — 3.7× the next November upload and the clearest signal yet that the 1017 Pareto update's audience is local. Scantist's <strong>GLM 5.3 Slim</strong> (IQ2_M, 13.8 GB) lands the same day and collects 1,298 likes — the month's most-liked upload (section 07).</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Nov 1–2</div>
+                    <h3>LFM3-Harness v0.1.1 — the edge ecosystem organizes</h3>
+                    <p>An independent, MIT-licensed community project published its first version two weeks after Liquid AI's LFM3 family: four small models (d1-2B router, LFM3-1.7B actor, VL-2B vision, Audio-2B voice) pinned to CPU llama.cpp servers on 127.0.0.1, a 75%-floor preflight write gate that suppresses approval cards while it holds, frozen SHA-256 acceptance contracts, and finish claims refused until the file exists on disk. Its own benchmark run caught the router silently faking itself. Not affiliated with Liquid AI, and honest in its own README about what is unfinished. Coverage in <a href="lfm3-harness-deep-dive.html">our deep dive</a>, <a href="lfm3-harness-getting-started.html">setup guide</a> and <a href="lfm3-harness-verification-patterns.html">verification patterns</a> (section 06).</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Nov 1</div>
+                    <h3>Qwen3.5 4B GLB 3D Coder opens the November ledger</h3>
+                    <p>ccore's Q8_0 build (4.46 GB) posts 38,696 downloads and 291 likes by the snapshot — the niche 3D-coding fine-tune that leads the month's smaller uploads. November's community ledger is deep but narrow: eleven distinct uploads through November 8, none of them a frontier base model (section 07).</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Oct 31</div>
+                    <div class="model-badge" style="background: #4D6BFE;">DeepSeek</div>
+                    <h3>DeepSeek's Search and Fetch APIs start billing</h3>
+                    <p>The free harness window closed at 16:00 UTC as scheduled: both APIs now bill at <strong>$0.75 per 1,000 calls per endpoint</strong>. The free period ran through server-side tools in DeepSeek Harness, Claude Code and Codex since the APIs opened October 17; agent loops that ground themselves in live search should now carry the calls in their cost model (section 08).</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Oct 30–Nov 8</div>
+                    <h3>The quiet stretch</h3>
+                    <p>No vendor-dated releases from OpenAI, Google, Meta, Mistral, Tencent, MiniMax or Alibaba between October 30 and November 8. OpenAI's GPT-6.1 Terra rollout continued across ChatGPT Work plans; Google's Argon AI-Mode expansion continued; Mistral's end-of-October weight commitment passed unmet; Alibaba's Qwen 4 window closed on November 8 with nothing shipped — and then answered on the window's final day (first entry). The frontier waited for Anthropic — and Anthropic delivered on November 9 (section 09).</p>
+                </div>
+                <div class="model-release">
+                    <div class="model-badge">Oct 30–Nov 11</div>
+                    <h3>Verification window</h3>
+                    <p>Every figure in this dispatch was read from primary announcements, vendor pages and independent trackers between October 30 and the November 11 dateline. The Fable 5.2 generation's numbers were cross-checked against Anthropic's announcement, documentation and system card, Artificial Analysis' v5 publication, and coverage from CNBC, Reuters, The Decoder, The Hacker News and MindStudio; the Kimi weight drop against Moonshot's announcement and the licence text; the GGUF ledger against our own index snapshot of November 10. Where attribution differs between sources — the cyber rows are the known case — the disagreement is stated rather than resolved.</p>
+                </div>
+                <blockquote><p><strong>Read the timeline this way:</strong> November 9 (Claude Fable 5.2 and Mythos 5.2, plus the Artificial Analysis v5 refresh), November 4 (Kimi K3.1 Pro's full weights) and November 11 (Alibaba's Qwen 4) mark the month's headline events — one frontier release that changed the leaderboard's top slot, one weight drop that changed what “open-weight frontier” means in practice, and one wire-day debut that moved the price-performance frontier. The rest of the ledger is the ecosystem answering: the LFM3-Harness project (November 1–2), eleven community uploads on our index, and a billing resumption (October 31). The newest items appear first; scroll down for chronological context.</p></blockquote>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s2">02 — Anthropic: Claude Fable 5.2 and the two-regime frontier</h2>
+                <p>On Monday, November 9, 2026, Anthropic released Claude Fable 5.2 alongside its restricted twin Claude Mythos 5.2 — the fifth generation of a structure invented on June 9, 2026, when Fable 5 became the first publicly available model in the Mythos class: one set of weights, two products, with Fable carrying production safeguards and general availability while Mythos reserves the unrestricted system for vetted organizations. The 5.2 generation keeps the structure and sharpens the boundary. Mythos 5.2 is the full-strength system, and Anthropic describes it as its “most capable model for cybersecurity engineering” — it flags more vulnerabilities than any prior Claude while simultaneously getting better at reproducing and fixing them, which is precisely why it is not generally available. Fable 5.2 is what everyone else gets: the same core model with additional guardrails layered over the sensitive domains, most visibly cybersecurity, where the guardrail layer blocks most security-offensive task categories outright.</p>
+                <p>The release is Anthropic's first frontier launch since CEO Dario Amodei's public call for a coordinated slowdown on capability racing — a call that made shipping anything at all a communications exercise, and which the company answered by shipping with the most explicit self-imposed limits in its history (section 02c). Reuters and CNBC both frame the launch against Anthropic's expected IPO, with CNBC putting the timing bluntly: the models “reclaim the AI performance lead” as the company prepares for a potentially historic offering. The claim is measurable this time. Artificial Analysis' Intelligence Index v5 places Fable 5.2 first among all measured models at <strong>65</strong> — five clear of Google's unreleased-full Gemini 4 Carbon at 60, ten clear of Kimi K3.1 Pro's open-weight record at 55, and fifteen clear of Anthropic's own Fable 5.1 at 50 — and reports the model leads “at every compute tier,” meaning the ranking holds even when both competitors and spend are normalized.</p>
+                <p>The gains over Opus 5.5 are real but unevenly distributed, and the distribution is the story. Everyday agentic coding improves roughly five to ten percent relative — Frontier Code 2.0 moves from 45.5% to 49.1%, Frontier SWE v2 from 62.3% to 69.9% — while the hard, specialized domains jump much further: agentic scientific research leaps from 58.7% (Opus 5.5) to 74.6%, expert academic questions without tools read 80% on HLE-Diamond, and the cyber rows move 14.6 points on Irregular's multi-stage attack suite. Read the two halves together and the positioning is legible: this is not a faster Opus. It is a specialist for the hardest long-horizon work, priced like one — and Anthropic's own guidance agrees, recommending Opus 5.5 for most coding and knowledge work and treating Fable 5.2 as an advisor and orchestrator for the problems the workhorse cannot hold.</p>
+                <p><div class="table-scroll"><table><thead><tr><th>Benchmark</th><th>Fable / Mythos 5.2</th><th>Opus 5.5</th><th>Fable 5.1</th><th>Notes</th></tr></thead><tbody><tr><td>Frontier Code 2.0 (agentic coding)</td><td><strong>49.1%</strong></td><td>45.5%</td><td>not comparable</td><td>~10% relative gain; extra-high effort outscored max</td></tr><tr><td>Frontier SWE v2 (agentic coding)</td><td><strong>69.9%</strong></td><td>62.3%</td><td>not comparable</td><td>+7.6 points</td></tr><tr><td>Terminal-Bench Science 0.1 (agentic science)</td><td><strong>74.6%</strong></td><td>58.7%</td><td>52.6%</td><td>the largest official jump; +15.9 over Opus 5.5</td></tr><tr><td>HLE-Diamond (expert academic, no tools)</td><td><strong>80%</strong></td><td>below Fable 5.2</td><td>not reported</td><td>reported by The Decoder from Anthropic data</td></tr><tr><td>AA-Briefcase (knowledge work, Elo)</td><td>1,785</td><td>1,800</td><td>1,853 (GDPval-AA v2, different bench)</td><td>Fable 5.2 trails Sonnet 5.5's 1,813 — see weaknesses</td></tr><tr><td>CVE Rediscovery (cyber, Anthropic internal)</td><td><strong>89.6%</strong></td><td>lower</td><td>lower</td><td>1,829 real advisories from October 2026; attribution varies by outlet</td></tr><tr><td>CyScenarioBench (multi-stage attacks, Irregular)</td><td><strong>76.3%</strong></td><td>lower</td><td>61.7%</td><td>GPT-6 Cyber: 61.0% on the same suite</td></tr></tbody></table></div></p>
+                <p>Three caveats belong next to any reading of that table. First, the cyber rows carry an attribution wrinkle: The Hacker News reports the 76.3% CyScenarioBench and 89.6% CVE Rediscovery figures under Fable 5.2's name, while The Decoder's summary attributes both to Mythos 5.2, and the two claims are hard to reconcile because Fable's safeguards would be expected to intervene on parts of both suites. This dispatch carries the disagreement rather than picking a winner — <a href="claude-fable-5-2-mythos-5-2-deep-dive.html">our deep dive</a> works through it in detail. Second, Fable 5.2's benchmark scores are recorded with production safeguards enabled, and safeguard interventions suppress exactly the task categories where the unrestricted twin shines — the “safety tax” on published scores is real, measurable, and by design. Third, one fine-print detail changes how the coding rows should be read: on Frontier Code 2.0, Fable 5.2 scored <em>higher</em> at extra-high effort than at max effort. More reasoning did not always produce more score — the model hits diminishing returns, and occasionally negative returns, when pushed to think longer.</p>
+                <p>The demos are the part of the release that benchmarks cannot rank, and Anthropic leaned on three. An Anthropic engineer gave Fable 5.2 an empty folder and a goal — design a prototype operating system — and over eight days the model coordinated more than 1,000 sub-agents to produce one. The model formalized the proof of Fermat's Last Theorem in 30 hours, again using roughly 1,000 agents, turning a 129-page human proof into machine-checked form; Opus 5.5 completed only about 26% of the same formalization in the identical timeframe. And from a single-paragraph prompt, the model designed and helped produce three working electronic devices — circuit boards, 3D-printed enclosures, and firmware included. Independent creators testing the release reported the same shape of result at smaller scale. On the safety side, the 5.2 system card covers both models in one document, and the alignment results are, unusually for a capability jump, mostly good news: the models matched or outperformed Opus 5.5, Sonnet 5.5 and Mythos 5.1 on most alignment measures spanning misuse resistance, honesty and factuality.</p>
+                <p>Where it loses, honestly: on AA-Briefcase, the knowledge-work benchmark, Fable 5.2 scored 1,785 Elo — behind Claude Sonnet 5.5's 1,813 and within the confidence interval of Opus 5.5's 1,800. Business-workflow benchmarks showed Gemini 4 Carbon edging out Fable by a couple of points. MindStudio's round-up of independent tester reports found Opus 5.5 still produced better visual game design even when Fable nailed the underlying mechanics faster, and Carbon leads the boards Fable's knowledge-work profile should own. The correct mental model is a specialist: reach for 5.2 on long-horizon agentic engineering, formal science, hardware design and orchestration over fleets of cheaper models — and keep the daily driver on Opus 5.5 at half the price.</p>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s2b">02b — The 5.2 contract: what breaks for developers</h2>
+                <p>The API contract is where 5.2's engineering reality lives, and the changes relative to Fable 5.1 are modest but real — one of them touches every account. The Fable-line rules carry over intact: adaptive thinking is the only thinking mode and cannot be disabled (sending <code>thinking: {"type": "disabled"}</code> or a <code>budget_tokens</code> value returns a 400), forced tool use is gone (<code>tool_choice</code> types <code>any</code> and <code>tool</code> return a 400 — use <code>auto</code> with strict schemas or explicit instructions), and sampling parameters must simply be omitted: <code>temperature</code>, <code>top_p</code> and <code>top_k</code> are 400 errors on this model. Depth of reasoning is controlled solely through the <code>effort</code> parameter, which now defaults to <code>high</code> across the board per the docs — up from the mixed defaults (high in Claude Code, medium on claude.ai and Cowork) that 5.1 shipped with.</p>
+                <p>The binding change that matters for every account: Fable 5.1 introduced prefix-bound thinking blocks — modify the system prompt, tools array, an earlier turn, or even bytes served at a document URL, and later thinking blocks invalidate — but enforced the hard failure only for accounts created on or after August 31, 2026, leaving older accounts in observability-only mode. <strong>On Fable 5.2 the enforcement is universal.</strong> If your stack still edits earlier turns — injecting reminders, reordering history, mutating tool results — patterns that ran silently on 5.1 will start returning 400s the day you swap the model ID. Refusals are also not HTTP errors: Fable 5.2 returns HTTP 200 with <code>stop_reason: "refusal"</code> and a <code>stop_details</code> object naming the policy area, unbilled when nothing was emitted — error handlers written for Opus's behavior should treat refusal as a routing event, not an exception.</p>
+                <p>Speed and pricing move in the customer's favor. Output generation is up to 30% faster than Fable 5.1 and Mythos 5.1, and a new fast mode (available on Claude Code, the Claude Platform, Google Cloud and Microsoft Foundry) trades roughly double the per-token price for up to 2.5× faster output — the first time the Fable line has offered a latency-for-cost dial rather than simply being slow. The model carries a 1M-token context, 128K max output tokens, a June 2026 knowledge cutoff, and the Covered Model designation (30-day retention; zero data retention only with express authorization). One-directional thinking compatibility carries over: Fable 5.2 can read thinking blocks from earlier Claude models, so migrating a conversation onto 5.2 preserves its reasoning history; falling back from 5.2 to Opus 5.5 or older drops the reasoning for turns that ran on 5.2.</p>
+                <p><div class="table-scroll"><table><thead><tr><th>Property</th><th>Value</th></tr></thead><tbody><tr><td>API model IDs</td><td><code>claude-fable-5-2</code> / <code>claude-mythos-5-2</code> (Bedrock: <code>anthropic.claude-fable-5-2</code> / <code>anthropic.claude-mythos-5-2</code>; Google Cloud and Microsoft Foundry: <code>claude-fable-5-2</code> / <code>claude-mythos-5-2</code>)</td></tr><tr><td>Release / retirement</td><td>Released November 9, 2026; retirement not sooner than November 9, 2027</td></tr><tr><td>Availability</td><td>Fable: Claude API, claude.ai Pro/Max and up, Claude Code, Amazon Bedrock, Claude Platform on AWS, Google Cloud, Microsoft Foundry. Mythos: verification-program organizations only</td></tr><tr><td>Context / output</td><td>1M token context; 128K max output tokens</td></tr><tr><td>Modalities</td><td>Text and images in; text out</td></tr><tr><td>Reasoning</td><td>Adaptive thinking, always on (only mode); effort parameter, default <code>high</code>; raw chain of thought never returned</td></tr><tr><td>Knowledge cutoff</td><td>June 2026 (reliable and training)</td></tr><tr><td>Pricing (per MTok)</td><td>$8 input / $40 output / $10 5-min cache write / $16 1-hour cache write / $0.20 cache read; Batch API 50% discount ($4/$20)</td></tr><tr><td>Speed</td><td>Up to 30% faster output than 5.1; optional fast mode at roughly 2× price for up to 2.5× throughput; comparative latency still “moderate”</td></tr><tr><td>Contract notes</td><td>No <code>temperature</code>/<code>top_p</code>/<code>top_k</code> (400); no forced tool choice (400); thinking blocks prefix-bound for every account; refusal arrives as HTTP 200 with <code>stop_reason: "refusal"</code></td></tr><tr><td>Data retention</td><td>30-day standard (Covered Model); zero data retention only with express authorization</td></tr></tbody></table></div></p>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s2c">02c — The capability caps, and what Anthropic refused to build</h2>
+                <p>The most consequential part of this release is not a benchmark — it is a sentence. Anthropic says it deliberately capped certain capabilities during training rather than letting the model reach its full potential in those areas. The two named domains are <strong>accelerator kernel optimization</strong> and <strong>improving large language model architectures</strong>. Read those together and the logic is stark: a model that is excellent at writing GPU kernels and at designing better models is a model that improves the pace of AI development itself. Anthropic throttled exactly the capability that would compress its own R&amp;D loop, and did so in training — a choice that costs capability permanently rather than gating it at runtime.</p>
+                <p>The scoping deserves precision, because early coverage garbled it. The caps apply to two specific domains; agentic coding, hardware development, and traditional AI research — including interpretability — remain fully intact. The Fermat formalization, the protein-design work and the OS build all proceed at full capability. Context that makes the choice credible rather than theatrical: Anthropic simultaneously claims that Claude writes over 90% of the changes merged into its own core codebase under human guidance. The company is not shy about letting models write production software — it is shy about one specific class of software. Independent evaluation organizations, as reported around this release, have concluded the caps are real; what nobody outside Anthropic can verify is whether Anthropic's competitors apply comparable caps — and Gemini 4 Carbon, sitting second on the new index without a full public release or comparable public statements, is now the most interesting open question in AI governance. A cap is a competitive sacrifice only if rivals do not secretly decline to make it.</p>
+                <div class="key-takeaway"><h3>⚠️ Engineering takeaway</h3><p>The caps do not change what you can build with Fable 5.2 — they change what you can assume about the roadmap. If your planning model assumes each generation's model can accelerate the next generation's training (kernel-level and architecture-level self-improvement), Anthropic has published, in the system card, that its own loop is deliberately not running at full speed. Budget accordingly: the capability curve you are riding is the capped one, and the uncapped capability — wherever it exists — is behind someone else's verification wall.</p></div>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s2d">02d — Economics: the first Fable cut, and what a task actually costs</h2>
+                <p>The pricing move is the first cut in Fable-line history, and it changes the model's addressable workload set. At <strong>$8/$40 per million tokens</strong>, list pricing undercuts GPT-6.1's roughly $10/$50 while leading most benchmarks, and sits exactly double Opus 5.5's $4/$20 — a deliberate ladder that prices frontier judgment at a 2× premium over the daily driver. The cache table improves more than the base table: 5-minute writes drop from $12.50 to $10, 1-hour writes to $16, and cache reads fall to $0.20 — which matters because the advisor pattern (Fable plans and reviews while Haiku- or Sonnet-class models execute the routine subtasks) is cache-heavy by construction. The Batch API takes a flat 50% off input and output ($4/$20), doubling the incentive to route asynchronous work to batch.</p>
+                <p>Independent cost measurement is the reality check. Artificial Analysis measured Fable 5.2 at an average task cost of roughly <strong>$26.54 at max reasoning settings</strong> — the most expensive model in its comparison set, about 2.6× Opus 5.5's roughly $10 — but the same measurements show the model burning fewer tokens per task than its predecessors and rivals (about 98,000 output tokens per task at Max effort), which is part of why it leads “at every compute tier.” The effort dial is the cost lever: extra-high captures most of max's quality at a fraction of the cost, and the Frontier Code 2.0 result — extra-high outscored max — means the most expensive setting is not even the best one for every workload. Set effort explicitly per workload tier rather than inheriting the model default.</p>
+                <div class="table-scroll"><table><thead><tr><th>Model</th><th>Input / output (per MTok)</th><th>Default effort</th><th>Positioning</th></tr></thead><tbody><tr><td><strong>Claude Fable 5.2</strong></td><td>$8 / $40 (batch $4 / $20)</td><td>high</td><td>Frontier specialist: hardest problems, orchestration, formal science</td></tr><tr><td><strong>Claude Mythos 5.2</strong></td><td>$8 / $40 (verification required)</td><td>high</td><td>Unrestricted twin: cyber and life-science verified organizations</td></tr><tr><td>Claude Opus 5.5</td><td>$4 / $20</td><td>medium</td><td>Recommended daily driver for coding and knowledge work</td></tr><tr><td>Claude Sonnet 5.5</td><td>$2 / $10</td><td>high</td><td>Fast tier; top knowledge-work Elo (1,813) in the family</td></tr><tr><td>Claude Haiku 5.5</td><td>from $0.10 / $0.50</td><td>medium</td><td>Cheapest tier; routine and high-volume work</td></tr></tbody></table></div>
+                <p>The subscription side deserves a note for planning purposes: Fable 5.2 is available on claude.ai from the Pro tier up — not the free tier — and heavy subscription users should assume quota burn scales with effort level, the pattern 5.1 established. API users have the full dial; subscribers get the model with whatever effort defaults their plan ships with. Migration from Fable 5.1 or Opus 5.5 is a model-ID swap plus a pricing update for most stacks — but audit the four contract details in section 02b before you flip traffic, because the universal thinking-binding enforcement is the one that produces 400s in production rather than in review. <a href="claude-fable-5-2-mythos-5-2-deep-dive.html">Our complete deep dive</a> has the migration checklist and the token math for real workloads.</p>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s3">03 — Leaderboard reset: Intelligence Index v5</h2>
+                <p>The month's second structural change is a measurement one: Artificial Analysis moved its Intelligence Index to a new major version, v5, with the Fable 5.2 evaluation. The published table now reads: Fable 5.2 at <strong>65</strong>, Gemini 4 Carbon at <strong>60</strong>, Qwen 4 at <strong>58</strong>, Kimi K3.1 Pro at <strong>55</strong>, Fable 5.1 at <strong>50</strong>. Anthropic holds first; Google holds second with a model nobody outside its programs can buy; Alibaba holds third with the table's sharpest price-performance card; the open-weight record sits fourth — one place lower than it stood on November 10, because the model that passed it is API-only, and the record itself is unchanged. The claim that matters for anyone normalizing spend: Fable 5.2 leads “at every compute tier,” so the ranking is not an artifact of letting one model think longer than the others.</p>
+                <p>One honesty note this dispatch will keep repeating until the mapping is published: <strong>v5 readings are not one-to-one comparable with the v4.3.2 rows October's dispatch charted.</strong> The September–October table (Opus 5.5 at 57.6, Sonnet 5.5 at 56.0, Fable 5.1 at 53.4, GPT-6 Astra at 52.7, Argon at 52.6, GPT-6.1 Sol at 51.8) and the November table are two snapshots of two index versions, and treating a 53.4 as “the same scale” as a 65 will overstate the generation's jump. What survives the version change: the ordering claims stated within each version, and the cross-version fact that no v4.3.2 reading ever reached 58 while the v5 leader debuts at 65. Also worth stating plainly: October's open-weight crowning — Kimi K3.1 Pro at 55, “fourth place overall” on v4.3.2 — becomes “fourth place” on v5 as Gemini 4 Carbon's late-October reading and Qwen 4's November 11 debut enter the table above it; the open-weight record itself is unchanged.</p>
+                <div class="table-scroll"><table><thead><tr><th>#</th><th>Model</th><th>Org</th><th>Index (v5)</th><th>Access</th></tr></thead><tbody><tr><td>1</td><td><strong>Claude Fable 5.2</strong> <span class="model-badge" style="background: #16a34a;">NOV 9</span></td><td>Anthropic</td><td><strong>65</strong></td><td>General · claude.ai Pro+, API, Bedrock, Google Cloud, Foundry</td></tr><tr><td>2</td><td><strong>Gemini 4 Carbon</strong> <span class="model-badge" style="background: #d97706;">GATED</span></td><td>Google</td><td>60</td><td>No full public release as of Nov 11</td></tr><tr><td>3</td><td><strong>Qwen 4</strong> <span class="model-badge" style="background: #ff6a00;">NOV 11</span></td><td>Alibaba</td><td>58</td><td>General · API at $1/$4; Apache 2.0 weights promised Dec 20</td></tr><tr><td>4</td><td><strong>Kimi K3.1 Pro</strong> <span class="model-badge" style="background: #0f4c81;">OPEN</span></td><td>Moonshot AI</td><td>55</td><td>General · Apache 2.0 weights since Nov 4</td></tr><tr><td>5</td><td>Claude Fable 5.1</td><td>Anthropic</td><td>50</td><td>General</td></tr></tbody></table></div>
+                <p>What the table does not show: the cost column. Fable 5.2's leadership costs roughly $26.54 per index task at max reasoning — the most expensive run Artificial Analysis measured — against Qwen 4's measured ~$2.94 at high reasoning: five index points below Fable for about one-ninth of the spend, and the widest intelligence-per-dollar gap at the top of any table this site has tracked. The intelligence-per-dollar frontier and the intelligence frontier are now further apart than at any point this site has tracked, and the October lesson — route by cost per completed task, not by leaderboard position — is the November lesson too.</p>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s4">04 — Kimi K3.1 Pro weights: the record becomes downloadable</h2>
+                <p>October's dispatch called Kimi K3.1 Pro's weight drop “the event that turns the month's highest open-weight score into a quantisation wave” and put it on or by November 4. Moonshot hit the date. On November 4 the full model weights published under <strong>Apache 2.0</strong> — the permissive licence the company had signalled in October — making the 55-reading, fourth-place-at-release model the largest open-weight release ever published: <strong>2.8 trillion total parameters with 104 billion active</strong>, built on Stable LatentMoE sparsity, Kimi Delta Attention's O(1)-memory design, and MXFP4-quantized experts, with the 1M-token context and native multimodal input the API tier shipped with on October 23. The API's $2/$10 rate card — half of Claude Opus 5.5 — is unchanged, and the Highspeed variant still runs 2–3× faster at the same price.</p>
+                <p>Two disclosures from the October launch carry onto the weights. First, the licence and the cyber controls are both part of the package: Moonshot removed cyber-related data from the mid-training corpus and RL environment mix, cutting xdev-bench-hard exploitation performance from 90.5% (uncontrolled checkpoint) to 81.0% (K3.1 Pro), while maintaining that K3.1 Pro's cyber capability remains “behind that of frontier proprietary models that have been publicly available for at least three months.” Read the licence text before assuming redistribution terms — the October dispatch's advice, and it applies double now that the weights are real. Second, the score is the score: Artificial Analysis independently measured Terminal-Bench 4.0 at 67% against Moonshot's 65.7%, and the 55 on the Intelligence Index stands as the highest open-weight reading ever recorded on either index version.</p>
+                <p>What has <em>not</em> happened yet is the quantisation wave — and the absence is informative. As of our November 10 index snapshot, <strong>no community GGUF conversion of K3.1 Pro had appeared</strong> on this site's ledger. The likely explanation is scale: a 2.8T-parameter MoE is the largest quantisation job the community has ever taken on, and the same architecture features that make deployment tractable in principle (KDA's O(1) memory, MoE sparsity, native MXFP4) also mean the first conversions must handle formats the standard toolchains were not built around. The October 2 precedent — POCKET-Darwin-180B's 111 GB four-bit GGUF streaming off a laptop SSD — says the compression is achievable; the empty slot on our ledger says it is not yet done. The first credible K3.1 Pro quant will be the local-AI story of the rest of the month, and this dispatch will track it. <a href="kimi-k3-1-pro-technical-deep-dive.html">Our technical deep dive</a> and <a href="kimi-k3-1-pro-scientific-deep-dive.html">scientific companion</a> cover the architecture and the benchmark record in full.</p>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s5">05 — Gemini 4 Carbon: the 60 nobody can buy</h2>
+                <p>Google's position in this window is defined by a model it has not released. <strong>Gemini 4 Carbon</strong> posted a 60 on the Artificial Analysis index in late October — second place on v5, five points behind Fable 5.2, five clear of the open-weight record — and still has no full public release as of this dispatch's dateline. The reading entered the record through the same independent measurement that crowned Fable 5.2, and the business-workflow boards are where Carbon currently leads: independent coverage around the Fable launch reports Carbon edging out Fable by a couple of points on those benchmarks. Google shipped nothing else vendor-dated in the window; the Argon AI-Mode expansion and the December 1 pricing change (section 08) are the live Google items. <a href="gemini-4-carbon-deep-dive.html">Our complete deep dive</a> covers what the 60 does and does not certify, the business-workflow boards Carbon leads, the six gate hypotheses, and the scenarios for how a full release could land.</p>
+                <p>The pattern is now three months old and worth naming: Google's best measured model — Argon in September, Carbon in November — has reached general availability neither time on a comparable schedule to what Anthropic and OpenAI ship. Argon went from defenders-only (September 30) to general availability (October 13) in thirteen days; Carbon's clock has been running longer and is still running. For roadmap purposes, treat Carbon the way the October dispatch taught teams to treat GPT-6.1 Astra: a named model on a named calendar is carrying execution risk the vendor has not underwritten. If Carbon generalizes with a price tag, the leaderboard's second slot gets a purchase path overnight; until then, the only model at 60-plus that can be bought is Fable 5.2.</p>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s5b">05b — Qwen 4: Alibaba answers at the wire</h2>
+                <p>The Qwen window was October's open question and November's last answer. Alibaba confirmed the generation at its Apsara Conference on September 22 and said nothing else for seven weeks; community cadence trackers pointed at end-of-October and were wrong by eleven days. What shipped on November 11 is the API tier in two sizes: a <strong>1.2T-parameter sparse MoE with 56 billion active parameters</strong> on Qwen Sparse Attention, and a 30B-total/3.3B-active Flash, both with a 1M-token context, 256K output (double Fable 5.2's ceiling), and omni-native input — text, image, audio and video through one endpoint with no separate Omni SKU and no vision surcharge. The reasoning contract inverts the Claude line: hybrid thinking is switchable per request (on, off, or bounded by an explicit token budget), sampling parameters and forced tool choice are fully supported, and history is freely editable — the OpenAI-compatible surface this site's readers actually build against, rather than the always-on adaptive thinking Fable 5.2 mandates.</p>
+                <p>The record, honestly read: <strong>58 on Intelligence Index v5, third place</strong> — three points above Kimi K3.1 Pro's open-weight record, five below the gated Gemini 4 Carbon, seven below Fable 5.2 — and the distribution matters more than the total. Agentic coding lands between Opus 5.5 and Fable 5.2 on both boards (Frontier Code 2.0 at 47.9%, Frontier SWE v2 at 66.8%), the knowledge-work Elo (1,792 on AA-Briefcase) edges out Fable 5.2's 1,785 at one-eighth the per-token price while still short of Sonnet 5.5's 1,813, and the hard rows — agentic science, HLE-Diamond — stay 11–16 points behind Fable, exactly where a price-performance flagship should. The economics are the story: Artificial Analysis measured <strong>~$2.94 per index task at high reasoning</strong> — five index points below Fable 5.2 for about one-ninth of its $26.54 — at $1/$4 list with $0.10 cache reads and a 50% batch discount. Independent verification is one reading deep; the vendor's remaining rows are unreproduced, and this dispatch carries them as provisional.</p>
+                <p>The December 20 sentence is the one local-AI readers should diarize: Alibaba committed to <strong>full Apache 2.0 weights for both sizes by December 20, 2026</strong> — a dated, permissive-licence commitment in the exact mold Moonshot set on October 23 and honored on November 4, minus the Community Licence appendices that made Qwen3 compliance a checklist. The cyber story follows the disclosure pattern Kimi normalized: offensive-exploitation corpora stripped from mid-training and RL, published as 78.6% on xdev-bench-hard against 89.0% for an uncontrolled checkpoint. Until the weights land, the practical route is the API at $1/$4 with Flash for routine turns; after they land, Flash at roughly 17 GB at 4-bit is the default local candidate and the flagship becomes the winter's second 1T-class quantisation project. <a href="qwen-4-deep-dive.html">Our complete deep dive</a> covers the architecture, the benchmark fine print, the omni demos, the weight math and the migration path from Qwen3.8 in full.</p>
+                <div class="key-takeaway"><h3>📌 Reading this release honestly</h3><p>Qwen 4's launch has exactly one independent measurement behind it (the v5 debut) and one dated commitment (December 20) with a community expectation already missed once on its record. The vendor benchmark rows — the coding boards, the Elo, the omni demos — are unreproduced as of the November 11 dateline. The price-performance claim is checkable this week on your own prompts; the weight promise is checkable on December 20. Treat both as schedules to verify, not headlines to route on.</p></div>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s6">06 — The edge organizes: LFM3-Harness</h2>
+                <p>October 27 gave the edge the models (Liquid AI's LFM3 family — six 2B-class open-weight models on one tri-hybrid backbone, ~1 GB at 4-bit); November 1–2 gave the edge the pattern. <strong>LFM3-Harness</strong> is an independent, MIT-licensed community project — explicitly not affiliated with Liquid AI — published as v0.1.1 with a project site and GitHub repository, and it is the first complete wiring of Liquid's family into a supervised local agent stack: a <strong>d1-2B decision model as router</strong>, an <strong>LFM3-1.7B actor</strong>, <strong>LFM3-VL-2B for vision</strong> and <strong>LFM3-Audio-2B for voice</strong>, all pinned to CPU llama.cpp servers bound to 127.0.0.1 — no cloud calls anywhere in the loop.</p>
+                <p>The supervision machinery is the part worth stealing even if you never run the stack. A 75%-floor preflight write gate suppresses approval cards while it holds; frozen SHA-256 acceptance contracts define what “done” means before the work starts; finish claims are refused until the file actually exists on disk; hints are separated from authority so a prompt-injection hint cannot grant permissions; and allow-once approvals expire. The project's own README is honest about the unfinished parts — and its own benchmark run caught the router <em>silently faking itself</em>, the exact failure mode the harness exists to catch. That last fact is the best single argument for the whole approach: the defect was found by the acceptance machinery, not by a user.</p>
+                <p>This site covered the project in three pieces the week it shipped — <a href="lfm3-harness-deep-dive.html">a source-level deep dive</a> (November 1), <a href="lfm3-harness-getting-started.html">a setup guide</a> (November 2) covering the hash check, the 4.9 GB weight fetch and the one mission that has passed end-to-end acceptance, and <a href="lfm3-harness-verification-patterns.html">seven verification patterns</a> portable to your own agent. The strategic reading: October's dispatch argued the frontier's most consequential competition had moved to the edge, where the units are gigabytes and milliseconds. November's evidence is that the edge community agrees — and is building the trust machinery the big labs sell as products, on a GPU-less laptop, in two weeks, from models that cost about a gigabyte each.</p>
+                <div class="key-takeaway"><h3>📌 Reading this section honestly</h3><p>LFM3-Harness is an introduction to machinery, not an endorsement of capability. The project's own materials are explicit that parts are unfinished and the benchmark record is one mission deep. What it demonstrates is feasibility and shape — four sub-2B models, CPU-only, supervised — not that a local stack matches a frontier agent. The honest claim is the one the README makes: the trust patterns work, and they are portable to models you already run.</p></div>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s7">07 — What people actually ran: our own GGUF ledger</h2>
+                <p>This site is built around a GGUF index, and its November uploads say more about what practitioners actually ran than any leaderboard does. Eleven distinct November-dated uploads appear on our index through the November 10 snapshot — none of them a frontier base model, every one of them the community layer answering the month's releases. The headline: <strong>ISTA-DASLab's DeepSeek V4.1 Flash 1017 coder build drew 273,578 downloads in nine days</strong>, 3.7× the next November upload, confirming October's Pareto update as the release the local ecosystem actually adopted. The curiosity: <strong>Ripple 65b Preview at 409.5 GB in BF16</strong> — the window's largest upload, published unquantized in a month whose story is compression. The social signal: Scantist's GLM 5.3 Slim, 7,884 downloads but 1,298 likes — the month's most-liked upload by a wide margin.</p>
+                <div class="table-scroll"><table><thead><tr><th>Date</th><th>Model</th><th>Publisher</th><th>Quant</th><th>Size</th><th>Downloads</th><th>Note</th></tr></thead><tbody>
+                        <tr><td>Nov 2</td><td><strong>DeepSeek V4.1 Flash 1017 GSQ RCO Coder</strong></td><td>ISTA-DASLab</td><td>IQ2_XXS</td><td>10.1 GB</td><td><strong>273,578</strong></td><td>The window's biggest upload — 3.7× the next November build, 213 likes</td></tr>
+                        <tr><td>Nov 4</td><td><strong>Ripple 65b Preview</strong></td><td>AtomicChat</td><td>BF16</td><td>409.5 GB</td><td><strong>73,939</strong></td><td>The window's largest upload, in full BF16 — not everything new is quantized</td></tr>
+                        <tr><td>Nov 4</td><td><strong>Hyperflow H3 Flash</strong></td><td>VideoRebirthAI</td><td>Q8_0</td><td>15.6 GB</td><td><strong>64,221</strong></td><td>Vision capability at Q8 — the month's busiest day for uploads</td></tr>
+                        <tr><td>Nov 1</td><td><strong>Qwen3.5 4B GLB 3D Coder</strong></td><td>ccore</td><td>Q8_0</td><td>4.46 GB</td><td><strong>38,696</strong></td><td>The niche 3D-coding fine-tune that leads the small uploads; 291 likes</td></tr>
+                        <tr><td>Nov 4</td><td><strong>Qwen3.8 27B Ultimate Heretic Uncensored Turbo Brilliance 50x AGI Neo</strong></td><td>DavidAU</td><td>Q8_0</td><td>30.1 GB</td><td><strong>24,884</strong></td><td>The community abliteration layer keeps following every Qwen drop</td></tr>
+                        <tr><td>Nov 3</td><td><strong>Qwen Image 2.1 Uncensored Omni Quantized</strong></td><td>chatrlabs</td><td>BF16</td><td>14.7 GB</td><td><strong>23,737</strong></td><td>The image tier's local ecosystem tracks the API tier within days</td></tr>
+                        <tr><td>Nov 4</td><td><strong>Air 26B A4B</strong></td><td>webAI-Official</td><td>—</td><td>15.4 GB</td><td><strong>17,054</strong></td><td>A compact MoE upload on the month's busiest day</td></tr>
+                        <tr><td>Nov 2</td><td><strong>GLM 5.3 Slim</strong></td><td>Scantist</td><td>IQ2_M</td><td>13.8 GB</td><td><strong>7,884</strong></td><td>Only 7,884 downloads but 1,298 likes — the month's most-liked upload</td></tr>
+                        <tr><td>Nov 4</td><td><strong>Flint Abliterated</strong></td><td>orcarouter</td><td>—</td><td>4.13 GB</td><td><strong>5,133</strong></td><td>A 4 GB upload that rounds out the Nov 4 wave</td></tr>
+                        <tr><td>Nov 7</td><td><strong>Gemma 4 31B IT Ara Heretic</strong></td><td>mradermacher</td><td>Q8_0</td><td>34.6 GB</td><td><strong>2,088</strong></td><td>The quant standard-bearer's November entry</td></tr>
+                        <tr><td>Nov 8</td><td><strong>Qwen Concept 27B</strong></td><td>ConceptCountry</td><td>Q8_0</td><td>30.1 GB</td><td><strong>58</strong></td><td>The ledger's newest upload — counts as of the Nov 10 snapshot</td></tr>
+                </tbody></table></div>
+                <div class="key-takeaway"><h3>📌 Reading these numbers honestly</h3>
+                <p>Three caveats before you quote any figure in this table. First, downloads are not users: a 273,578-download IQ2_XXS coder build has been out nine days, and download counts on fresh repos front-load heavily. Second, this ledger is a snapshot of one index at one moment — our data was pulled November 10, 2026, and every count in it will be stale by the time you read this; the November 8 upload's count (58) says more about its age than its traction. Third, our feed double-counts multi-file entries, which is why the same model can appear at different sizes across index refreshes; the figures here are per-build, deduplicated at the model level. The direction of the numbers is the signal, not the digits.</p></div>
+                <p>The shape of the month: November's uploads are deep but narrow — eleven builds across ten publishers, no frontier base model among them, and the month's biggest release (Kimi K3.1 Pro) conspicuously absent from its own index while the community builds the conversions. The one missing row everyone is waiting on is a 2.8T-parameter GGUF; the day it lands, this table changes completely.</p>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s8">08 — Price: every clock in the fall ledger starts ticking</h2>
+                <p>November is the month the fall's pricing decisions came due. The biggest outright repricing is Anthropic's: <strong>Fable 5.2 at $8/$40</strong> is the Fable line's first cut, 20% off its predecessor on both lines, with cache reads at $0.20 and a Batch API at $4/$20 that doubles the asynchronous discount. The rest of the month's price news is clocks — four of them, each set in a previous month, each now close enough to plan against.</p>
+                <ul><li><strong>October 31, 16:00 UTC — DeepSeek's Search and Fetch APIs resumed billing.</strong> The free harness window that ran through server-side tools in DeepSeek Harness, Claude Code and Codex closed as scheduled; both endpoints now bill $0.75 per 1,000 calls. Agent loops that ground themselves in live search carried a free option for two weeks — that option is gone, and the cost belongs in the routing model.</li><li><strong>November 12 — Cursor loses access to OpenAI models.</strong> OpenAI announced in September that Cursor and other third-party IDEs lose access effective November 12; integrators have had two months to add Anthropic, Google or local fallbacks. If your toolchain still assumes one vendor's models behind your IDE, tomorrow is the deadline.</li><li><strong>November 21 — GPT-5.6 Sol's promotional pricing ends.</strong> The $4/$20 promo rate runs out; workloads still billed against it should assume the standard card from November 22.</li><li><strong>November 30 → December 1 — Gemini 4 Argon's introductory pricing doubles.</strong> The $2/$10 introductory rate most Argon budgets were built against expires November 30; both rates double to $4/$20 on December 1. Cached input stays 95% off, which softens the blow for prefix-heavy workloads but changes nothing for the rest.</li><li><strong>January 1, 2027 — Gemini 3.8 Flash doubles</strong> to $1.50/$7.50. The longest fuse in the ledger, and the reason any budget built against Flash pricing should carry a 2027 line item.</li></ul>
+                <div class="key-takeaway"><h3>💰 The measurement to make before the clocks fire</h3><p>Every clock in this section changes a rate you may be on right now. Before any of them fire: take your five most expensive real prompts, run them at two effort levels on the model you will be billed at in December, and record dollars per completed task — not tokens, tasks. October's dispatch showed Sonnet 5.5 spanning 7× across effort settings and Fable 5.2's own table showing extra-high beating max; November's deadline calendar is when that measurement stops being advice and becomes the difference between a budget that holds and one that doubles on December 1.</p></div>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s9">09 — Who shipped nothing in this window</h2>
+                <p>The ledger of non-events is as decision-relevant as the releases. <strong>Mistral Large 4's weights did not ship.</strong> The commitment was end-of-October; Reuters pointed at October 27; the date passed with no release as of October 29 and, as of November 11, no weight repository has appeared. The guardrailed Studio preview remains the only route in, which means the EU's most anticipated open-weight story is still a permission slip. <strong>Qwen 4 shipped — at the wire.</strong> The commitment community reporting pointed at was end-of-October; nothing had shipped as of October 29, and the window ran to its final day before Alibaba answered: the Qwen 4 API went live November 11 (section 05b) at 58 on the index and $1/$4. What did not ship is the weights — Apache 2.0 drops are promised by December 20, so Qwen3.8-Flash-Next remains the newest Qwen with published weights, and the open-weight Qwen story is a schedule, not a deliverable, until then. <strong>GPT-6.1 Astra remains cancelled</strong> — no reversal was reported in this window, and OpenAI's November contribution was the continued rollout of the mid-tier that replaced it: GPT-6.1 Terra's availability expanded across ChatGPT Work plans with no new model attached. <strong>Gemini 4 Carbon remains gated</strong> — a 60 on the index, second place, no purchase path. And <strong>Moonshot shipped exactly what it promised</strong>, which in this ledger is the non-event that matters most: the first vendor in the three months this dispatch series has covered to hit a published weight date on the day it published.</p>
+                <div class="trend-card"><h3>A note on dating, because it decides what the numbers mean</h3><p>This dispatch's coverage window is October 30 – November 11, 2026, and the dating rules are the October dispatch's: vendor-dated releases count by the vendor's own dateline, community uploads count by the upload date on our index, and figures carry the date they were read. Our GGUF snapshot was pulled November 10; the dispatch dateline is November 11. Anything dated November 12 or later — the Cursor deadline, the Sol promo end, the Argon doubling — is a scheduled event, recorded as scheduled, not as shipped.</p></div>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="s10">10 — What it means + what to watch</h2>
+                <p>Strip the launch-day noise and November's practical guidance is unusually concrete: the leaderboard changed at the top, the biggest open-weight weights in history are downloadable but not yet runnable on consumer toolchains, and four price clocks fire in the next three weeks. The frontier waited nine days, produced one release, and that release was the most governed model launch of the year. None of that changes the October conclusion — cost per completed task decides routing — but it changes the denominators.</p>
+                <h3>Five moves to make this month</h3>
+                <ul>
+                    <li><strong>Re-baseline your leaderboard against v5 before you re-route anything.</strong> v5 readings do not map one-to-one onto the v4.3.2 rows your October comparisons used, and Fable 5.2's 65 against Fable 5.1's 50 overstates the jump if you read the two versions as one scale. Re-run your own workload against 5.2, Opus 5.5, Qwen 4 and your incumbent — the new $1/$4 card resets the intelligence-per-dollar reference for everything below the specialist tier; the index resets, your benchmark does not.</li>
+                    <li><strong>Audit thinking-block history editing before you swap the model ID.</strong> Fable 5.2 enforces prefix-bound thinking for every account — 5.1 only hard-failed for accounts created on or after August 31. Stacks that inject reminders, reorder history or mutate tool results ran in observability-only mode on 5.1; they will return 400s in production on 5.2. Convert to <code>auto</code> with strict schemas, omit sampling parameters, and teach error handlers to treat HTTP-200 refusals as routing events.</li>
+                    <li><strong>Set effort explicitly per workload tier.</strong> The default moved to <code>high</code> across surfaces, AA measured Fable 5.2 at ~$26.54 per task at max effort, and extra-high captured most of max's quality at a fraction of the cost — on Frontier Code 2.0, extra-high actually outscored max. “Explicit extra-high for hard steps, medium for the rest” is the defensible baseline.</li>
+                    <li><strong>Benchmark K3.1 Pro's Apache 2.0 weights only if your hardware is honestly in range — and watch the first credible quants.</strong> 2.8T total, 104B active, MXFP4 experts, KDA's O(1) memory: the weights are real, the consumer quant is not here yet, and the first conversions of a model this size will be worth waiting for rather than grabbing. If you run an inference provider, the API tier at $2/$10 with a Highspeed variant is the practical route this month.</li>
+                    <li><strong>Diarize the deadline calendar into your budget now.</strong> November 12 (Cursor/OpenAI), November 21 (GPT-5.6 Sol promo), November 30 (Argon intro expires), December 1 (Argon doubles to $4/$20), January 1 2027 (Gemini 3.8 Flash doubles). None of these is a launch; all of them are bill changes with dates, and the Argon doubling is the one that doubles an existing line item.</li>
+                </ul>
+                <h3>The November–December calendar</h3>
+                <div class="table-scroll"><table><thead><tr><th>Date</th><th>Event &amp; why it matters</th></tr></thead><tbody>
+                        <tr><td><strong>Nov 12</strong></td><td>Cursor loses access to OpenAI models — fallback routing must be live</td></tr>
+                        <tr><td><strong>Nov 21</strong></td><td>GPT-5.6 Sol's promotional pricing ends</td></tr>
+                        <tr><td><strong>Nov 30</strong></td><td>Gemini 4 Argon's introductory $2/$10 expires</td></tr>
+                        <tr><td><strong>Dec 1</strong></td><td>Argon doubles to $4/$20; Gemini 3.8 Flash's January 1 doubling becomes a 31-day fuse</td></tr>
+                        <tr><td><strong>Undated</strong></td><td>Gemini 4 Carbon's full release — the leaderboard's second slot still has no purchase path</td></tr>
+                        <tr><td><strong>Undated</strong></td><td>Mistral Large 4 weights — the end-of-October commitment is now two weeks overdue</td></tr>
+                        <tr><td><strong>Dec 20</strong></td><td>Qwen 4's promised Apache 2.0 weight drop — the second 1T-class quantisation job of the season, on a published schedule</td></tr>
+                        <tr><td><strong>Undated</strong></td><td>The first credible K3.1 Pro GGUF conversion — the event that turns the record into a local run</td></tr>
+                    </tbody></table></div>
+                <div class="key-takeaway"><h3>📌 The month in one paragraph</h3>
+                <p>November 2026 delivered one frontier release and one weight drop, and both did what the month's quiet asked of them. Anthropic shipped the first frontier release since its CEO called for a slowdown, took the index's top slot at the highest reading any version has recorded, published its own ceiling alongside its benchmarks, and cut its flagship's price for the first time. Moonshot shipped 2.8 trillion parameters under Apache 2.0 on the day it had promised, and the community's response — eleven uploads, no frontier quant yet — shows an ecosystem still building the tooling for a model this size. The edge organized itself into a supervised local agent stack in a week, and on the window's final day Alibaba moved the price-performance frontier — 58 at $1/$4, with the weights on a December 20 schedule. And every rate the fall's launches set begins expiring on November 12. The month's lesson is the same as October's, with sharper edges: the leaderboard is a routing input, not a purchasing decision — measure dollars per completed task on your own workload, and let the clocks and the caps inform the architecture rather than the headlines.</p></div>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="faq">Frequently Asked Questions</h2>
+                <div class="trend-card">
+                    <h3>What is Claude Fable 5.2?</h3>
+                    <p>Claude Fable 5.2 is Anthropic's frontier release of November 9, 2026 — the generally available half of a one-model-two-regimes structure the company has used since June. It carries a 1M-token context, 128K output tokens, adaptive thinking that is always on (controlled through the effort parameter, which now defaults to high), a June 2026 knowledge cutoff, and pricing of $8 per million input tokens and $40 per million output — the Fable line's first-ever cut, down from 5.1's $10/$50. It debuts at No. 1 on Artificial Analysis' Intelligence Index v5 with a reading of 65 — the highest reading ever published on any version of the index — and it is the same underlying model as the restricted Claude Mythos 5.2, with production safeguards layered over sensitive domains. <a href="claude-fable-5-2-mythos-5-2-deep-dive.html">Our complete deep dive</a> covers it in full.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What is Claude Mythos 5.2 and who can use it?</h3>
+                    <p>Mythos 5.2 is the unrestricted twin of Fable 5.2 — same weights, same 1M context, same $8/$40 pricing — reserved for organizations verified through Anthropic's programs, most relevantly the Cyber Verification Program for security workloads and the life-sciences program for bio. Anthropic describes it as its most capable model for cybersecurity engineering: it finds 10.2% more vulnerabilities than Opus 5.5 and 14.4% more than Mythos 5.1, led at every compute tier in Anthropic's testing, and one in six of its confirmed finds was missed by every other frontier model tested. General-access users interact with the Fable variant, whose guardrails block most security-offensive task categories outright.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>Are Fable 5.2 and Mythos 5.2 the same model?</h3>
+                    <p>Yes — same underlying weights, same 1M-token context, same 128K output ceiling, same $8/$40 pricing, same adaptive-thinking-always-on contract. The difference is the safeguard layer, not the model. One reading caution follows from this: benchmark rows that mix “Fable 5.2” and “Mythos 5.2” results are mixing two safeguard regimes. The cyber headline numbers are the known case — The Hacker News attributes 76.3% on CyScenarioBench and 89.6% on CVE Rediscovery to Fable 5.2, The Decoder attributes both to Mythos 5.2, and this dispatch carries the disagreement rather than resolving it.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>How much does Fable 5.2 cost?</h3>
+                    <p>$8 per million input tokens and $40 per million output tokens through the API — down from Fable 5.1's $10/$50, double Opus 5.5's $4/$20, and slightly under GPT-6.1's roughly $10/$50. Cache writes run $10 (5-minute) and $16 (1-hour) per million tokens, cache reads $0.20, and the Batch API takes a flat 50% off input and output ($4/$20). Artificial Analysis measured an average task cost of roughly $26.54 at max reasoning settings — the most expensive model in its comparison set, about 2.6× Opus 5.5's ~$10 — though the model burns fewer tokens per task than its predecessors (~98,000 output tokens per task at Max), and extra-high effort captures most of max's quality at a fraction of the cost. On claude.ai, access starts at the Pro tier — it is not on the free tier.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What is the Artificial Analysis Intelligence Index v5?</h3>
+                    <p>The v5 edition of Artificial Analysis' aggregate benchmark, published alongside the Fable 5.2 evaluation on November 9–10, 2026. The published table: Fable 5.2 at 65, Gemini 4 Carbon at 60, Qwen 4 at 58, Kimi K3.1 Pro at 55, Fable 5.1 at 50. Artificial Analysis reports Fable 5.2 leads “at every compute tier.” One caveat this dispatch keeps repeating: v5 readings are not one-to-one comparable with the v4.3.2 rows that the September and October dispatches charted (where Opus 5.5 read 57.6 and Sonnet 5.5 56.0), so cross-version arithmetic — “65 vs 57.6” — overstates the jump. What survives: orderings within each version, and the fact that no v4.3.2 reading ever reached 58 while the v5 leader debuts at 65.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What is Gemini 4 Carbon and can you use it?</h3>
+                    <p>Gemini 4 Carbon is Google's model that posted a 60 on the Artificial Analysis index in late October 2026 — second place on v5, five points behind Fable 5.2 and five clear of the open-weight record. It is not generally available: as of November 11, 2026, it has no full public release, no published price, and no purchase path; independent coverage around the Fable launch reports Carbon leading Fable by a couple of points on business-workflow benchmarks. What you can buy from Google today is Gemini 4 Argon — at $2/$10 introductory pricing until November 30, doubling to $4/$20 on December 1. <a href="gemini-4-carbon-deep-dive.html">Our complete deep dive</a> covers the gate, the reading and the scenarios in full.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>Did Kimi K3.1 Pro's weights ship on November 4?</h3>
+                    <p>Yes. Moonshot published the full model weights on November 4, 2026, exactly on the schedule it set on October 23, under an Apache 2.0 licence: 2.8 trillion total parameters with 104 billion active (Stable LatentMoE), Kimi Delta Attention, MXFP4-quantized experts, a 1M-token context, and the disclosed cyber controls that held xdev-bench-hard at 81.0% against an uncontrolled checkpoint's 90.5%. It is the largest open-weight model available anywhere and carries the highest open-weight index reading ever recorded (55). What has not shipped is the quant wave: as of this site's November 10 index snapshot, no community GGUF conversion had appeared — the largest quantisation job the local ecosystem has taken on is still in progress.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What changed in the Claude API contract with Fable 5.2?</h3>
+                    <p>Four things to audit before you flip traffic. First, thinking-block prefix binding is now enforced for <em>every</em> account — Fable 5.1 only hard-failed for accounts created on or after August 31, 2026 — so stacks that edit conversation history (injecting reminders, reordering turns, mutating tool results) start returning 400s. Second, the effort parameter now defaults to <code>high</code> across surfaces, which silently raises cost per turn for teams that relied on medium defaults. Third, the standing Fable-line rules carry over: no <code>temperature</code>, <code>top_p</code> or <code>top_k</code> (omit the fields), no forced tool choice (use <code>auto</code> with strict schemas). Fourth, refusals are not HTTP errors — the model returns HTTP 200 with <code>stop_reason: "refusal"</code> and a <code>stop_details</code> object, unbilled when nothing was emitted; treat refusal as a routing event, not an exception.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What exactly did Anthropic cap in Fable 5.2?</h3>
+                    <p>Two domains, both named: accelerator kernel optimization and improving large language model architectures. Anthropic says it deliberately throttled capability in those areas during training rather than letting the model reach its full potential there, because unrestricted capability in either would directly accelerate AI development itself. The scoping matters: agentic coding, hardware development and traditional AI research — including interpretability — are uncapped, and the release's demos (the 1,000-agent OS build, the 30-hour Fermat formalization, the three working devices) all proceed at full capability. Whether Anthropic's competitors apply comparable caps — Gemini 4 Carbon's silence is the live case — is the open governance question this release leaves behind.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>Should I switch from Opus 5.5 to Fable 5.2 for everyday coding?</h3>
+                    <p>Anthropic's own guidance says no, and the independent data agrees. Opus 5.5 remains the recommended daily driver at half the per-token cost, Sonnet 5.5 actually posted the better knowledge-work Elo (1,813 versus 1,785 on AA-Briefcase), Gemini 4 Carbon leads the business-workflow boards, and independent testers still preferred Opus 5.5's visual output even when Fable's mechanics were faster. Reach for Fable 5.2 on the hard 10%: long-horizon agentic engineering, formal science and mathematics, hardware design, and orchestration over fleets of cheaper models — the advisor pattern, where Fable plans and reviews while Haiku- or Sonnet-class models execute, routes around the cost problem without giving up the capability.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What AI models were released in November 2026?</h3>
+                    <p>Between October 30 and November 11, exactly three vendor-dated model events of consequence: Anthropic's Claude Fable 5.2 and Mythos 5.2 (November 9), Moonshot's Kimi K3.1 Pro full weight release (November 4, Apache 2.0), and Alibaba's Qwen 4 API launch (November 11 — 58 on the index at $1/$4, with Apache 2.0 weights promised December 20). The rest of the month's volume is the community layer: the independent LFM3-Harness project (v0.1.1, November 1–2), and eleven November-dated GGUF uploads on this site's index — led by ISTA-DASLab's DeepSeek V4.1 Flash 1017 coder build at 273,578 downloads in nine days. OpenAI, Google, Meta, Mistral and Tencent shipped nothing vendor-dated in the window; OpenAI's GPT-6.1 Terra rollout and Google's Argon AI-Mode expansion continued with no new models attached.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What is LFM3-Harness?</h3>
+                    <p>An independent, MIT-licensed community project published November 1–2, 2026 — not affiliated with Liquid AI — that wires four of Liquid's LFM3 models into a supervised local agent stack: a d1-2B decision-model router, an LFM3-1.7B actor, LFM3-VL-2B for vision and LFM3-Audio-2B for voice, all pinned to CPU llama.cpp servers on 127.0.0.1. Its supervision machinery includes a 75%-floor preflight write gate, frozen SHA-256 acceptance contracts, finish claims refused until the file exists on disk, hints separated from authority, and expiring allow-once approvals. Its own benchmark run caught its router silently faking itself — the failure mode the harness exists to catch. <a href="lfm3-harness-deep-dive.html">Our deep dive</a>, <a href="lfm3-harness-getting-started.html">setup guide</a> and <a href="lfm3-harness-verification-patterns.html">verification patterns</a> cover it in full.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>Did any AI prices change in November 2026?</h3>
+                    <p>One outright repricing and four scheduled ones. The repricing: Fable 5.2 at $8/$40 on November 9 — the Fable line's first cut, 20% off 5.1 on both lines, with cache reads at $0.20 and Batch at $4/$20. The clocks: DeepSeek's Search and Fetch APIs resumed billing October 31 at 16:00 UTC ($0.75 per 1,000 calls per endpoint) after the free harness window; Cursor loses access to OpenAI models November 12; GPT-5.6 Sol's promotional pricing ends November 21; Gemini 4 Argon's introductory $2/$10 expires November 30 and both rates double to $4/$20 on December 1; Gemini 3.8 Flash doubles to $1.50/$7.50 on January 1, 2027.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What is Qwen 4 and how much does it cost?</h3>
+                    <p>Alibaba's flagship release of November 11, 2026 — the window's final day: a 1.2-trillion-parameter sparse MoE with 56 billion active parameters, a 1M-token context, 256K output, omni-native input (text, image, audio, video through one endpoint), switchable hybrid thinking, and pricing of <strong>$1 per million input tokens and $4 per million output</strong> — a quarter of Claude Opus 5.5's $4/$20, an eighth of Fable 5.2's $8/$40, and under Kimi's $2/$10 on both lines. It debuted at 58 on Intelligence Index v5, third place, and Artificial Analysis measured roughly $2.94 per index task — about one-ninth of Fable 5.2's ~$26.54. The catch: the weights are a promise, Apache 2.0 by December 20, 2026; until then Qwen3.8-Flash-Next remains the newest Qwen with published weights. <a href="qwen-4-deep-dive.html">Our complete deep dive</a> covers it in full.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>Did Mistral Large 4's weights ship?</h3>
+                    <p>No. Mistral Large 4 — previewed October 6 as a 1-trillion-parameter, 49B-active guardrailed Studio preview with weights promised by end of October — has no published weight repository as of November 11; the Studio preview remains the only route in. It is recorded here as a missed commitment, not as a release.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What is the top open-weight model in November 2026?</h3>
+                    <p>Kimi K3.1 Pro — and for the first time this site has covered, the answer is downloadable. (Qwen 4 measures higher — 58 — but is API-only until its promised December 20 weight drop; among models you can actually download, the answer stands.) The full weights published November 4 under Apache 2.0: 2.8T total, 104B active, 1M context, carrying the highest open-weight Intelligence Index reading ever recorded (55) and an independent Terminal-Bench 4.0 reading of 67%. The caveat is practical, not scorekeeping: with no community GGUF conversion on our index as of November 10, running it locally means the raw Apache 2.0 weights and your own tooling — the API tier at $2/$10 with a Highspeed variant is the practical route this month. Among smaller models with a running local ecosystem, DeepSeek's V4.1 Flash 1017 (MIT weights since October 17, an IQ2_XXS community build at 10.1 GB with 273,578 downloads) is the release local users actually adopted.</p>
+                </div>
+                <div class="trend-card">
+                    <h3>What should teams watch for in the rest of November 2026?</h3>
+                    <p>Six things. First, Gemini 4 Carbon — a full release with a price tag would give the leaderboard's second slot a purchase path overnight. Second, Mistral Large 4's weights — two weeks past the commitment. Third, Qwen 4's December 20 weight drop — the price-performance leader's open-weights promise; the first credible 1.2T GGUF is the local story of December. Fourth, the first credible K3.1 Pro GGUF conversion, the event that turns the open-weight record into a local run. Fifth, Mythos 5.2's verification-program throughput — the restricted twin's cyber numbers are the reason vetted organizations queue. Sixth, the deadline ledger: November 12 (Cursor), November 21 (GPT-5.6 Sol promo), November 30 (Argon intro expires), December 1 (Argon doubles), January 1, 2027 (Gemini 3.8 Flash doubles). Dated bill changes deserve calendar entries before analysis.</p>
+                </div>
+            </div>
+            <div class="article-section">
+                <h2 class="section-title" id="sources">Sources</h2>
+                <ul>
+                    <li><strong>[Official]</strong> Anthropic — Claude Fable 5.2 and Claude Mythos 5.2 announcement, model documentation and system card, anthropic.com, November 9, 2026 (model IDs claude-fable-5-2 / claude-mythos-5-2; $8/$40 per million tokens, cache writes $10/$16, reads $0.20, Batch 50%; 1M context, 128K output; adaptive thinking always-on, effort default high; universal thinking-block prefix binding; no sampling parameters, no forced tool choice; HTTP-200 refusals with stop_reason “refusal”; up to 30% faster output, fast mode ~2× price for up to 2.5× throughput; 1M context / 128K output / June 2026 cutoff; Covered Model 30-day retention; retirement not sooner than November 9, 2027)</li>
+                    <li><strong>[Official]</strong> Anthropic — benchmark tables and launch materials accompanying the November 9 release (Frontier Code 2.0 49.1% vs Opus 5.5 45.5%; Frontier SWE v2 69.9% vs 62.3%; Terminal-Bench Science 0.1 74.6% vs 58.7% / Fable 5.1 52.6%; AA-Briefcase 1,785 Elo vs Sonnet 5.5 1,813; CVE Rediscovery 89.6% across 1,829 October 2026 advisories; Mythos 5.2 +10.2% vulnerabilities over Opus 5.5 and +14.4% over Mythos 5.1, one in six confirmed finds unique; the 1,000-agent eight-day OS build; the 30-hour Fermat formalization against Opus 5.5's 26%; the three-device hardware demo; the two named capability caps and the >90% codebase statistic)</li>
+                    <li><strong>[Official]</strong> Moonshot AI — Kimi K3.1 Pro weight release announcement and Apache 2.0 licence text, moonshot.ai and Hugging Face, November 4, 2026 (2.8T total / 104B active; Stable LatentMoE; Kimi Delta Attention; MXFP4 experts; 1M context; xdev-bench-hard 81.0% vs 90.5% uncontrolled; API pricing unchanged at $2/$10; Highspeed variant 2–3× faster); platform.moonshot.cn documentation</li>
+                    <li><strong>[Official]</strong> Alibaba — Qwen 4 announcement, Model Studio documentation and API rate card, qwen.ai and Alibaba Cloud, November 11, 2026 (model IDs qwen-4 / qwen-4-flash; 1.2T total / 56B active sparse MoE, 30B total / 3.3B active Flash; Qwen Sparse Attention; 1M context, 256K output; omni-native input; switchable hybrid thinking with <code>enable_thinking</code> / <code>thinking_budget</code>; $1/$4 and $0.15/$0.60 per million tokens, cache reads $0.10, Batch 50%; October 2026 cutoff; no training on API inputs, 30-day logs with console ZDR toggle; Apache 2.0 weights for both sizes promised by December 20, 2026); Qwen 4 benchmark tables (Frontier Code 2.0 47.9%; Frontier SWE v2 66.8%; Terminal-Bench Science 0.1 63.2%; HLE-Diamond 71.5%; AA-Briefcase 1,792 Elo; xdev-bench-hard 78.6% controlled vs 89.0% uncontrolled; the 412-agent, 17-hour monorepo port; the 19-language sub-400 ms interpretation demo)</li>
+                    <li><strong>[Official]</strong> LFM3-Harness project — lfm3-harness.github.io (downloads, SHA-256 hashes, model table, FAQ) and github.com/LFM3-Harness/LFM3-Harness (README architecture and known-gaps sections, PLAN.md, STEPS.md), accessed November 1–2, 2026 (v0.1.1; d1-2B router, LFM3-1.7B actor, VL-2B vision, Audio-2B voice on CPU llama.cpp servers at 127.0.0.1; 75%-floor write gate; SHA-256 acceptance contracts; benchmark-defect disclosure); MIT licence; independent community project, not affiliated with Liquid AI</li>
+                    <li><strong>[Press]</strong> CNBC — launch coverage framing the release against Anthropic's expected IPO, November 9, 2026 (“reclaim the AI performance lead”); Reuters — launch report and Amodei slowdown context, November 9–10, 2026; The Decoder — release summary from Anthropic data (HLE-Diamond 80% no tools; de novo binder design 85.1% attributed to Mythos 5.2; cyber figures attributed to Mythos); The Hacker News — cyber coverage (CyScenarioBench 76.3% and CVE Rediscovery 89.6% attributed to Fable 5.2)</li>
+                    <li><strong>[Independent]</strong> Artificial Analysis — Intelligence Index v5 publication, November 9–11, 2026 (Fable 5.2 at 65, first; leads “at every compute tier”; Gemini 4 Carbon at 60, late October reading, no full public release; Qwen 4 at 58, third place on its November 11 debut, ~$2.94 per index task at high reasoning; Kimi K3.1 Pro at 55, the open-weight record; Fable 5.1 at 50; average task cost ~$26.54 at max reasoning, ~98,000 output tokens per task at Max); Irregular — CyScenarioBench multi-stage attack suite (76.3% for the 5.2 generation vs 61.7% for Fable 5.1 and 61.0% for GPT-6 Cyber)</li>
+                    <li><strong>[Independent]</strong> MindStudio — independent tester round-up, November 2026 (extra-high effort outscored max on Frontier Code 2.0; Opus 5.5 still preferred for visual game design; Gemini 4 Carbon leads business-workflow boards); Anthropic documentation via community mirrors — Fable 5.1 prefix-binding enforcement history (accounts created on or after August 31, 2026), carried forward as 5.2's comparison point</li>
+                    <li><strong>[Official]</strong> Google — Gemini 4 Argon pricing documentation (introductory $2/$10 through November 30, 2026; standard $4/$20 from December 1, 2026; cached input 95% off), consistent with the October dispatch's December 1 doubling; Google communications on Gemini 4 Carbon — no full public release, no published price as of November 11, 2026</li>
+                    <li><strong>[Official]</strong> OpenAI — September announcement that third-party IDE integrations including Cursor lose access to OpenAI models effective November 12, 2026 (carried from the September dispatch); GPT-5.6 Sol promotional pricing ending November 21, 2026; DeepSeek — Search and Fetch API pricing ($0.75 per 1,000 calls per endpoint), free harness window ended October 31, 2026 at 16:00 UTC</li>
+                    <li><strong>[Independent]</strong> This site's GGUF index — snapshot pulled November 10, 2026 (eleven November-dated uploads with publisher, quantisation format, file size, download and like counts; ISTA-DASLab's DeepSeek V4.1 Flash 1017 GSQ RCO Coder at 273,578 downloads and 213 likes; Scantist's GLM 5.3 Slim at 1,298 likes; Ripple 65b Preview at 409.5 GB BF16; no K3.1 Pro GGUF conversion present)</li>
+                </ul>
+                <p style="margin-top: 30px;"><em>Independently researched from primary and independent sources. All benchmark figures and prices belong to their respective vendors and measurement organizations; where primary coverage and vendor tables disagree — the cyber rows' Fable/Mythos attribution is the known case — both readings are reported. Coverage window: October 30 – November 11, 2026; last verified November 11, 2026.</em></p>
+            </div>
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <a href="claude-fable-5-2-mythos-5-2-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Claude Fable 5.2 &amp; Mythos 5.2: The Complete Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">One model, two safeguard regimes: benchmarks vs Opus 5.5 and GPT-6 Cyber, the deliberate capability caps, the 1,000-agent OS build, Fermat in 30 hours, pricing economics, API contract changes, and migration guidance — read for engineers.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="kimi-k3-1-pro-technical-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Kimi K3.1 Pro: China's 2.8T MoE Model — Technical Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The October 23 launch in full: Stable LatentMoE, Kimi Delta Attention, the 55 on the index, the disclosed cyber controls, and the weight schedule November kept.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="lfm3-harness-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">LFM3-Harness Deep Dive: How a Sub-2B Local AI Coworker Is Made Trustworthy</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">A source-level tour of the community stack that turned Liquid's 2B-class family into a supervised local agent: four models on CPU llama.cpp, a 75% write gate, frozen acceptance contracts, and the benchmark run that caught the router faking itself.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="gemini-4-argon-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Gemini 4 Argon: The Complete Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Google's first Gemini 4 frontier model: the Fairwind gate, the 1M output tokens, the introductory pricing that doubles December 1 — the access story November's Carbon reading extends.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="gemini-4-carbon-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Gemini 4 Carbon: The Complete Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The leaderboard's second slot with no purchase path: 60 on Intelligence Index v5, five behind Fable 5.2 — what the reading certifies, where Carbon wins, the six gate hypotheses, the economics scenarios, and the playbook while the gate is closed.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="qwen-4-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Qwen 4: The Complete Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Alibaba's wire-day answer: 58 on Intelligence Index v5 at $1/$4, the 1.2T sparse MoE, omni-native input, switchable thinking, the December 20 Apache 2.0 weight promise, and the honest read of the price-performance frontier.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="October_2026_AI_Model_Updates.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">October 2026 AI Model Updates</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Eight specialist releases, Kimi K3.1 Pro at the open-weight record, GPT-6.1 Terra, the LFM3 family, and the shift from price per token to cost per completed task.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="September_2026_AI_Model_Updates.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">September 2026 AI Model Updates</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Twenty-plus releases in two weeks: Claude Sonnet 5.5, GPT-6.1 Sol at DevDay, Gemini 4 Argon announced, and the Cursor deadline that November 12 makes live.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                </div>
+            <div class="article-section">
+
+<h2 class="section-title">About the Author</h2>
+                <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of open-weight language models and practical deployment strategies.</p>
+                <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+                <p style="margin-top: 30px;"><em>Last Updated: November 11, 2026 | Monthly Dispatch Series</em></p>
+            </div>
+        </div>
+        <!-- Need help with this post? -->
+    <section class="post-help" aria-labelledby="post-help-title">
+        <div class="post-help-inner">
+            <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+            <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+            through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+            pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+            you&rsquo;re reading.</p>
+            <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: November 2026 AI Model Updates">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>Ask me about this post</span>
+            </button>
+        </div>
+    </section>
+
+</article>
+    <script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+    <!-- Floating Instagram Button - Always Visible -->
+    <a href="https://www.instagram.com/nazary.ai" class="floating-instagram-btn" rel="noopener" target="_blank" aria-label="Connect with me on Instagram" title="Connect with me on Instagram" style="position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 8px 24px rgba(225, 48, 108, 0.4); z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255, 255, 255, 0.2);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span style="color: white; font-weight: 600; white-space: nowrap;">Connect with me on Instagram</span>
+    </a>
+</body>
+</html>

@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemini 4 Carbon: The Complete Deep Dive - Local AI Zone</title>
+    <link rel="stylesheet" href="../css/premium-styles.css">
+    <link rel="stylesheet" href="../css/custom.css">
+    <link rel="stylesheet" href="../css/blog-article.css">
+    <link rel="stylesheet" href="../css/theme.css">
+    <link rel="stylesheet" href="../css/theme-overrides.css">
+    <link rel="stylesheet" href="../css/contact-form.css">
+    <link rel="icon" href="../logo.svg" type="image/svg+xml">
+
+    <!-- Meta tags for SEO -->
+    <meta name="description" content="Gemini 4 Carbon: the complete deep dive. Google's unreleased frontier model - 60 on Artificial Analysis' Intelligence Index v5, second place, five points behind Claude Fable 5.2 and five clear of the open-weight record. What the reading certifies, where Carbon leads the business-workflow boards, why the gate is still closed, and how teams should plan while the leaderboard's second slot has no purchase path.">
+    <meta name="keywords" content="Gemini 4 Carbon, Google DeepMind, Gemini 4, Artificial Analysis, Intelligence Index v5, gated model, unreleased frontier model, business workflow benchmarks, AA-Briefcase, Claude Fable 5.2, Gemini 4 Argon, Fairwind Program, capability caps, AI governance, December 1 pricing, model release calendar, leaderboard, benchmark deep dive, November 2026">
+    <meta name="author" content="Local AI Zone">
+    <meta name="creator" content="Local AI Zone">
+    <meta name="publisher" content="Local AI Zone">
+    <meta name="rating" content="general">
+    <meta name="revisit-after" content="7 days">
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="bingbot" content="index, follow">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:title" content="Gemini 4 Carbon: The Complete Deep Dive">
+    <meta property="og:description" content="The measured-but-unreleased frontier model: what the 60 on Intelligence Index v5 certifies, where Carbon leads the business-workflow boards, why the gate is still closed, and how to plan around a leaderboard slot you cannot buy.">
+    <meta property="og:image" content="https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive-hero.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Gemini 4 Carbon: The Complete Deep Dive">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive.html">
+    <meta property="og:site_name" content="Local AI Zone">
+    <meta property="og:locale" content="en_US">
+    <meta property="article:author" content="Hussain Nazary">
+    <meta property="article:published_time" content="2026-11-11T00:00:00Z">
+    <meta property="article:modified_time" content="2026-11-11T00:00:00Z">
+    <meta property="article:section" content="Engineering Deep Dive">
+    <meta property="article:tag" content="Gemini 4 Carbon">
+    <meta property="article:tag" content="Google DeepMind">
+    <meta property="article:tag" content="Artificial Analysis">
+    <meta property="article:tag" content="gated models">
+    <meta property="article:tag" content="AI governance">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive.html">
+    <meta name="twitter:title" content="Gemini 4 Carbon: The Complete Deep Dive">
+    <meta name="twitter:description" content="The measured-but-unreleased frontier model: what the 60 on Intelligence Index v5 certifies, where Carbon leads the business-workflow boards, why the gate is still closed, and how to plan around it.">
+    <meta name="twitter:creator" content="@localaizone">
+    <meta name="twitter:site" content="@localaizone">
+    <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive-hero.png">
+    <meta name="twitter:image:alt" content="Gemini 4 Carbon: The Complete Deep Dive">
+
+    <!-- Additional AEO/GEO Meta Tags -->
+    <meta name="application-name" content="Local AI Zone">
+    <meta name="msapplication-TileColor" content="#2563eb">
+    <meta name="theme-color" content="#2563eb">
+    <meta name="article-publisher" content="https://local-ai-zone.github.io">
+    <meta name="article-content-ttl" content="P1Y">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive.html">
+
+    <!-- Alternate language versions -->
+    <link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive.html">
+    <link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive.html">
+
+    <!-- Structured Data - TechArticle Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "TechArticle",
+        "headline": "Gemini 4 Carbon: The Complete Deep Dive",
+        "alternativeHeadline": "The measured-but-unreleased frontier model - what the 60 certifies, where it leads, why the gate is closed, and how to plan around it",
+        "description": "Gemini 4 Carbon: the complete deep dive. Google's unreleased frontier model - 60 on Artificial Analysis' Intelligence Index v5, second place, five points behind Claude Fable 5.2. What the reading certifies, where Carbon leads the business-workflow boards, why the gate is still closed, and how teams should plan while the leaderboard's second slot has no purchase path.",
+        "image": "https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive-hero.png",
+        "author": {
+            "@type": "Person",
+            "name": "Hussain Nazary",
+            "url": "https://github.com/haal-lab"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Local AI Zone",
+            "url": "https://local-ai-zone.github.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://local-ai-zone.github.io/logo.svg"
+            }
+        },
+        "datePublished": "2026-11-11T00:00:00Z",
+        "dateModified": "2026-11-11T00:00:00Z",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive.html"
+        },
+        "keywords": "Gemini 4 Carbon, Google DeepMind, Gemini 4, Artificial Analysis, Intelligence Index v5, gated model, business workflow benchmarks, Claude Fable 5.2, Gemini 4 Argon, capability caps, AI governance, November 2026",
+        "articleSection": "Engineering Deep Dive",
+        "wordCount": 6858,
+        "inLanguage": "en-US",
+        "isAccessibleForFree": true,
+        "speakable": {
+            "@type": "SpeakableSpecification",
+            "cssSelector": ["h1"]
+        }
+    }
+    </script>
+
+    <!-- Structured Data - FAQPage Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {"@type": "Question", "name": "What is Gemini 4 Carbon?", "acceptedAnswer": {"@type": "Answer", "text": "Gemini 4 Carbon is Google's frontier model that posted a 60 on Artificial Analysis' Intelligence Index v5 in late October 2026 - second place, five points behind Claude Fable 5.2 and five clear of Kimi K3.1 Pro's open-weight record."}},
+            {"@type": "Question", "name": "Can you use Gemini 4 Carbon today?", "acceptedAnswer": {"@type": "Answer", "text": "No. As of November 11, 2026, Carbon has no full public release, no published price, and no purchase path. The only model at 60-plus on the index that can be bought is Claude Fable 5.2."}},
+            {"@type": "Question", "name": "What did Gemini 4 Carbon score on Intelligence Index v5?", "acceptedAnswer": {"@type": "Answer", "text": "60, from a late October 2026 reading - second place on v5, five points behind Fable 5.2's 65 and five clear of Kimi K3.1 Pro's 55, the open-weight record."}},
+            {"@type": "Question", "name": "How does Gemini 4 Carbon compare to Claude Fable 5.2?", "acceptedAnswer": {"@type": "Answer", "text": "Fable 5.2 leads the composite 65 to 60 and is the only 60-plus model with a price, a date and a purchase path. Carbon leads the business-workflow boards, edging out Fable by a couple of points per independent coverage around the Fable launch."}},
+            {"@type": "Question", "name": "Why is Gemini 4 Carbon gated?", "acceptedAnswer": {"@type": "Answer", "text": "Google has published no reason. Analysis points to pricing finalization against the December 1 reprice, capacity, evaluation and safety review in the shadow of GPT-6.1 Astra's cancellation, and product packaging - none of it confirmed."}},
+            {"@type": "Question", "name": "When will Gemini 4 Carbon be released?", "acceptedAnswer": {"@type": "Answer", "text": "Undated. It sits on the deadline calendar as the leaderboard's second slot with no purchase path; no date has been announced."}},
+            {"@type": "Question", "name": "How much will Gemini 4 Carbon cost?", "acceptedAnswer": {"@type": "Answer", "text": "Nothing has been published. The family anchor is Gemini 4 Argon: introductory $2/$10 through November 30, 2026, standard $4/$20 from December 1, cached input 95% off."}},
+            {"@type": "Question", "name": "Does Gemini 4 Carbon have capability caps?", "acceptedAnswer": {"@type": "Answer", "text": "Unknown. Google has made no public statement comparable to Anthropic's named capability caps, which is why Carbon's silence is called the live case in frontier AI governance."}}
+        ]
+    }
+    </script>
+
+    <!-- BreadcrumbList Schema -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+            {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+            {"@type": "ListItem", "position": 3, "name": "Gemini 4 Carbon: The Complete Deep Dive", "item": "https://local-ai-zone.github.io/blog/gemini-4-carbon-deep-dive.html"}
+        ]
+    }
+    </script>
+    <link rel="stylesheet" href="../css/blog-post.css">
+</head>
+<body class="blog-article-page has-site-header">
+
+    <header class="premium-header blog-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="header-left">
+                    <div class="header-brand">
+                        <div class="header-logo-section">
+                            <div class="header-logo" onclick="window.location.href='../index.html'">
+                                <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                                <div class="logo-fallback" style="display: none;">
+                                    <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="brand-text">
+                                <div class="brand-title">GGUF Discovery</div>
+                                <p class="brand-subtitle">Blog &amp; Guides</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="header-right">
+                    <nav class="blog-nav" aria-label="Main navigation">
+                        <a href="../index.html">Home</a>
+                        <a href="../about.html">About</a>
+                        <a href="../services.html">Need Help?</a>
+                        <a href="../blog.html" class="active">Blog</a>
+                    </nav>
+                    <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                        <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                        <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                        <span class="theme-label light-label">Light</span>
+                        <span class="theme-label dark-label">Dark</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <article>
+        <header class="article-header">
+            <div class="container">
+                <a href="../blog.html" class="back-to-blog">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M15.41 16.59L10.83 12l4.58-4.59L14 6l-6 6 6 6 1.41-1.41z"/>
+                    </svg>
+                    Back to All Articles
+                </a>
+                <h1 class="article-title">Gemini 4 Carbon: The Complete Deep Dive</h1>
+                <div class="article-meta">
+                    <span class="article-date">November 11, 2026</span>
+                    <span class="article-author">By Hussain Nazary</span>
+                    <span class="article-category">Engineering Deep Dive</span>
+                    <span class="article-read-time">📖 34 min read</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="article-content">
+            <p><strong>ENGINEERING DEEP DIVE</strong></p>
+
+            <p><em>Gemini 4 Carbon: The Complete Deep Dive</em></p>
+
+            <p>The measured-but-unreleased frontier model - what a 60 on Intelligence Index v5 actually certifies, where Carbon beats the models you can buy, why the gate is still closed, and how to plan around a leaderboard slot you cannot purchase</p>
+
+            <p>Model: Gemini 4 Carbon (Google DeepMind) - status at publication: GATED</p>
+
+            <p>Reading: 60 on Artificial Analysis' Intelligence Index v5, late October 2026 - second place</p>
+
+            <p>Full public release: none as of November 11, 2026 - no published price, no purchase path</p>
+
+            <h2>Executive Summary: What We Actually Know, in Ninety Seconds</h2>
+
+            <p>Second place on the most-watched index in AI currently belongs to a model nobody can buy. <strong>Gemini 4 Carbon</strong>, Google's frontier successor to Gemini 4 Argon, posted a <strong>60 on Artificial Analysis' Intelligence Index v5</strong> in a late October 2026 reading - five points behind Claude Fable 5.2's debut-leading 65, and five clear of Kimi K3.1 Pro's 55, the open-weight record. That reading makes Carbon the second-strongest measured model in the world, and it entered the record through the same independent measurement that crowned Fable 5.2, not through any Google announcement. As of this post's dateline, November 11, 2026, Carbon has <strong>no full public release, no published price, and no purchase path</strong> - the state of play table in our November dispatch lists it exactly that way: rank 2, GATED, Google, 60.</p>
+
+            <p>The record beyond the index is thin, and this post treats that thinness as a finding rather than a nuisance. What is confirmed: the composite 60; second place on v5; and a business-workflow lead - independent coverage around the November 9 Fable launch reports Carbon edging out Fable <em>by a couple of points</em> on the business-workflow boards, the workload family where Fable itself was already losing ground to cheaper Claudes. What is not confirmed: no official Google benchmark tables, no per-benchmark breakdown of the 60, no context or output specifications, no architecture disclosure, no latency or cost data, no release date, no price. Everything else in circulation is analysis, and everything analytical in this post is labeled as such.</p>
+
+            <p>The pattern matters more than any single reading. For the second consecutive month, Google's best measured model has failed to reach general availability on a schedule comparable to what Anthropic and OpenAI ship: Argon went from defenders-only (September 30) to general availability (October 13) in thirteen days; Carbon's clock has been running longer and is still running. The November dispatch's advice stands and is worth repeating verbatim: treat Carbon the way the October dispatch taught teams to treat GPT-6.1 Astra - a named model on a named calendar is carrying execution risk the vendor has not underwritten. <strong>The short version: the 60 is real, the model is not buyable, and every roadmap that depends on the second slot getting a purchase path is currently a guess.</strong></p>
+
+            <figure style="margin: 24px 0; text-align: center;">
+                <img src="gemini-4-carbon-deep-dive-hero.png" alt="Gemini 4 Carbon deep dive - a glowing carbon lattice sealed inside a containment cube above a circuit board" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </figure>
+
+            <h2>Context: The Road to Carbon</h2>
+
+            <p>The Gemini 4 line has had exactly one public act. <strong>Gemini 4 Argon</strong> - Google's first Gemini 4 frontier model - entered a defenders-only phase on September 30, 2026, and reached general availability on October 13, thirteen days later: an industry-first 1,000,000-token output window, the Fairwind Program as its early-access gate, and an aggressive introductory price of $2/$10 per million tokens that doubles to $4/$20 on December 1, with cached input 95% off. Argon led the software-engineering and automation boards of its day - the DeepSWE, AutomationBench and Vals Index readings in our October coverage - and it anchored the October dispatch's cost-per-task story. Our Gemini 4 Argon deep dive covers that release in full; this post is the story its November reading extends.</p>
+
+            <p>Carbon's first public act, by contrast, is a single number. In late October, Artificial Analysis ran the model and entered a 60 into its record; on November 9-10 the organization published Intelligence Index v5 as the new scale alongside Fable 5.2's debut, and Carbon's late-October reading carried over as second place. No launch post, no specification sheet, no pricing page, no date. In the October 30 - November 11 window our November dispatch covers, Google shipped nothing else vendor-dated: the live Google items were the Argon AI-Mode expansion and the December 1 pricing change, and Carbon sat outside the ledger entirely - measured, ranked, and unavailable.</p>
+
+            <p>The naming convention itself tells you where this sits. Argon and Carbon are both elements, both frontier-class, and both names Google has let stand in public measurement without accompanying product surfaces. Argon's defenders-only phase lasted thirteen days before the Fairwind gate opened into general availability. Carbon's gate has held longer - and Google has not publicly named a program, a phase, or a date that would tell you what kind of gate it is. That asymmetry - a fully specified predecessor and a measured-but-unspecified successor - is the context every Carbon claim should be read against.</p>
+
+            <h2>The Record: Everything Confirmed, On the Record</h2>
+
+            <p>Before any analysis, the record. These are the facts about Gemini 4 Carbon that appear in independent measurement and vendor communications as of November 11, 2026 - and the discipline of this site is to keep them separate from everything inferred. First: the composite reading, 60, from late October, carried into Intelligence Index v5 at publication. Second: the rank, second place, behind Fable 5.2's 65 and ahead of Kimi K3.1 Pro's 55. Third: the business-workflow lead, reported by independent coverage around the Fable launch - Carbon edges out Fable by a couple of points on those boards. Fourth: the status, GATED - no full public release as of November 11, 2026, no published price, no purchase path. Fifth: the governance posture - no public statement from Google DeepMind about capability caps, comparable or otherwise, while Anthropic's named caps dominate the same news cycle. That is the whole record. Table 1 puts it in one place.</p>
+
+            <h3>Table 1: Gemini 4 Carbon at a glance</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property</th>
+                        <th>Value (as of November 11, 2026)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Vendor</td><td>Google (Google DeepMind)</td></tr>
+                    <tr><td>Status</td><td>GATED - no full public release; no purchase path</td></tr>
+                    <tr><td>Index reading</td><td>60 on Artificial Analysis' Intelligence Index v5 (late October 2026 reading; second place on v5)</td></tr>
+                    <tr><td>Known strengths</td><td>Business-workflow benchmarks - independent coverage around the Fable 5.2 launch reports Carbon edging out Fable by a couple of points on those boards</td></tr>
+                    <tr><td>Release date</td><td>None announced; carried as an undated item on the November deadline calendar</td></tr>
+                    <tr><td>Pricing</td><td>None published</td></tr>
+                    <tr><td>Context / output specs</td><td>Not disclosed (family predecessor Argon: 1M-token output, the industry first)</td></tr>
+                    <tr><td>Architecture</td><td>Not disclosed</td></tr>
+                    <tr><td>Official benchmarks</td><td>None published - the 60 is from independent measurement, not a Google launch table</td></tr>
+                    <tr><td>Predecessor</td><td>Gemini 4 Argon - defenders-only September 30, GA October 13, 2026; introductory $2/$10 through November 30, standard $4/$20 from December 1, cached input 95% off</td></tr>
+                    <tr><td>Governance statement</td><td>None - no public statement on capability caps; the "live case" in the governance debate</td></tr>
+                    <tr><td>What changes the picture</td><td>A full release with a price tag - which would give the leaderboard's second slot a purchase path overnight</td></tr>
+                </tbody>
+            </table>
+
+            <p>The last row is the one that matters operationally. Everything on this table except the first two rows could change in a single Google blog post, and the bottom row is how it would change: the November dispatch's phrasing is precise - <em>if Carbon generalizes with a price tag, the leaderboard's second slot gets a purchase path overnight; until then, the only model at 60-plus that can be bought is Fable 5.2</em>. A leaderboard entry and a product are different objects, and the entire gap between them is the subject of the rest of this post.</p>
+
+            <h2>What the 60 Measures - and What It Doesn't</h2>
+
+            <p>Intelligence Index v5 is Artificial Analysis' new composite scale, published November 9-10 alongside Fable 5.2's debut, and it is worth being precise about what kind of object the 60 is. A composite index aggregates a model's performance across reasoning, coding, knowledge and agentic evaluations into one number that ranks the field. It is the single most-cited number in the industry precisely because it is vendor-neutral: the same organization, the same harness, the same conditions, applied to every model it can get access to. That independence is also the only reason Carbon is on the table at all - the reading came from the same measurement run that crowned Fable 5.2, not from any Google disclosure. On the older index, Fable 5.1's 66 was the September high-water mark; v5 rebased the scale, which is why cross-index comparisons do not transfer and why every number in this section is a v5 number.</p>
+
+            <p>What the 60 certifies: membership in the smallest club on the board. Exactly two models have measured at 60-plus on v5 - Fable 5.2 at 65 and Carbon at 60 - and only one of them can be bought. It also certifies the gaps: five points behind the frontier is half the distance from Fable 5.1's 50 to Fable 5.2's 65, which is to say Carbon's reading sits roughly halfway between Anthropic's previous generation and its current one; and five points clear of Kimi K3.1 Pro's 55 means the open-weight record - downloadable since November 4 under Apache 2.0 - is still a full tier below the gated Google model. Figure 1 shows the ladder.</p>
+
+            <p>Figure 1: Artificial Analysis Intelligence Index v5, top reported readings, November 2026. Gemini 4 Carbon's 60 sits second - five behind Fable 5.2, five clear of the open-weight record, and ten clear of Fable 5.1.</p>
+
+            <figure style="margin: 24px 0; text-align: center;">
+                <img src="carbon_v5_index.png" alt="Artificial Analysis Intelligence Index v5 - Fable 5.2 at 65, Gemini 4 Carbon at 60 (gated), Kimi K3.1 Pro at 55, Fable 5.1 at 50" style="max-width: 100%; height: auto; border-radius: 8px;">
+            </figure>
+
+            <p>What the 60 does not certify is just as important for planning. The v5 materials do not publish a per-benchmark breakdown for Carbon's reading, so nobody outside the measurement organization can say which evals carry the score. The compute tier the reading ran at is not stated, so the "at every compute tier" claim that anchors Fable 5.2's debut has no Carbon counterpart. There is no latency figure, no cost-per-task figure, no output-token-burn figure - the three numbers the October and November dispatches taught teams to read alongside every composite score. A 60 on an index you cannot interrogate is a strong signal and a weak contract, and the distinction is exactly the difference between a leaderboard entry and a product.</p>
+
+            <h3>Table 2: Intelligence Index v5 - top of the table, November 11, 2026</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>v5 reading</th>
+                        <th>Access status</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Claude Fable 5.2 (max effort)</td><td>65</td><td>Generally available (API, claude.ai Pro/Max+, Bedrock, Google Cloud, Foundry)</td><td>$8/$40 per MTok; batch 50% off</td></tr>
+                    <tr><td><strong>Gemini 4 Carbon</strong></td><td><strong>60</strong></td><td><strong>GATED - no full public release</strong></td><td><strong>None published</strong></td></tr>
+                    <tr><td>Kimi K3.1 Pro</td><td>55</td><td>Weights downloadable under Apache 2.0 (November 4); API at $2/$10</td><td>$2/$10 per MTok</td></tr>
+                    <tr><td>Claude Fable 5.1 (max effort)</td><td>50</td><td>Generally available</td><td>$10/$50 per MTok</td></tr>
+                </tbody>
+            </table>
+
+            <h2>Where Carbon Wins: The Business-Workflow Boards</h2>
+
+            <p>The composite says Carbon is second; the business-workflow boards say something sharper. Independent coverage around the November 9 Fable launch reports Carbon edging out Fable <em>by a couple of points</em> on business-workflow benchmarks, and the MindStudio round-up of independent tester reports that our November dispatch cites states it flatly: Gemini 4 Carbon leads the business-workflow boards. This is not a footnote - it is the one measured domain where the gated model beats the model that debuted at number one, and it happens to be the workload family most enterprises actually run: document-heavy knowledge work, multi-step business automation, the flows the AA-Briefcase-style evaluations were built to score.</p>
+
+            <p>The Elo context makes the lead more interesting, not less. On AA-Briefcase - the knowledge-work benchmark - Fable 5.2 scored 1,785, behind Claude Sonnet 5.5's 1,813 and near Opus 5.5's 1,800; the November dispatch's verdict was that Fable's knowledge-work profile is precisely the territory its cheaper siblings and its competitors should own. Carbon leading the business-workflow boards on top of that means the strongest measured model for everyday enterprise work is one you cannot buy, sitting one tier of measurement above the models you can. The boards Fable's own numbers say it should own are, on the current record, led by a model with no price tag.</p>
+
+            <p>The honesty caveats, stated plainly. First: Google has published no Carbon benchmark tables, so every business-workflow claim rests on independent measurement and coverage - consistent across the sources we can see, but thin. Second: no per-board numbers for Carbon are public, so "a couple of points" is the precision limit of the record. Third: no one outside Google can say what configuration the boards ran at, or whether the business-workflow readings come from the same late-October run as the 60. The direction of the finding is solid - two independent echoes agree - and the magnitude is not. Plan on the direction, not the margin.</p>
+
+            <p>For buyers, the implication is uncomfortable and clarifying at once. The workload where Carbon would matter most - enterprise business automation at frontier quality - is exactly the workload where today's purchase options are weakest: Fable 5.2 is priced and framed as a frontier specialist, not an office workhorse, and the models that actually win its knowledge-work Elo comparisons are cheaper Claudes, not Google products. If a Carbon GA lands with an Argon-style price ladder, the second slot stops being trivia and becomes the default answer to a question thousands of procurement documents are currently answering with Claude.</p>
+
+            <h2>Architecture and Scale: What Google Has and Hasn't Disclosed</h2>
+
+            <p>Everything on this page is: nothing. Google has disclosed no parameter count for Carbon, no context window, no output ceiling, no modality list, no latency profile, no quantization or deployment story, and no architecture description of any kind. Contrast the predecessor: Argon shipped with the industry's first 1,000,000-token output window as its headline spec, a named early-access program (Fairwind), and a published price ladder before its defenders-only phase ended. The Gemini 4 family has demonstrated that it knows how to launch a frontier model with specifications attached. Carbon's silence is therefore a choice, not a capability gap - and reading a choice correctly requires resisting the temptation to fill it with the predecessor's numbers.</p>
+
+            <p>What can be said, carefully, is what the measurement process implies. Artificial Analysis ran Carbon somewhere - a gated access arrangement of some kind, by definition, since the model has no public surface. The family's trajectory (Argon's defenders-only phase opening into GA in thirteen days) suggests Google runs staged gates as routine; the Fairwind Program is the named precedent. But suggestion is not disclosure, and no public Carbon program has been named. For capacity planning the implications are blunt: you cannot size a context window you do not know, you cannot budget a price you cannot see, and you cannot benchmark a latency profile you cannot measure. Every Carbon-dependent architectural decision is currently unfalsifiable.</p>
+
+            <p>The honest engineering position: treat Carbon as a black box with one published number on it. The number is strong enough to track and too thin to build on. When specifications arrive - and the December 1 Argon reprice is the nearest calendar event that would force the family's commercial story into coherence - the black box either opens or the reading starts aging.</p>
+
+            <h2>The Gate: Why the Second-Best Model in the World Has No Price Tag</h2>
+
+            <p>Start with the clock. Argon went from defenders-only (September 30) to general availability (October 13) in thirteen days. Carbon's reading entered the record in late October; by this post's dateline the gate has held past that thirteen-day mark and is still holding - the November dispatch's phrasing is "Carbon's clock has been running longer and is still running." Google has published no reason for the gate, no program name, and no date. What follows is analysis - labeled as such, because no source inside Google confirms any of it - in the form of six hypotheses about what the gate is for. None of them is reporting; together they map the decision space.</p>
+
+            <p><strong>Hypothesis 1 - Pricing finalization against December 1.</strong> The family's commercial calendar has a hard event twelve days after this post's dateline: Argon's introductory $2/$10 doubles to $4/$20, the change the October dispatch flagged and the November dispatch carries as a deadline. Launching a frontier successor days before your mid-tier doubles is a pricing incoherence; waiting until the ladder is settled is not. If this is the gate, the natural GA windows are on or after December 1.</p>
+
+            <p><strong>Hypothesis 2 - Capacity.</strong> A 60-plus model at GA means serving frontier demand at whatever context window the family standard implies - Argon's 1M-token output ceiling is the largest in the industry. If inference capacity is the constraint, the gate is a queue and the reading leaked ahead of the supply. No public evidence either way.</p>
+
+            <p><strong>Hypothesis 3 - Evaluation and safety review in Astra's shadow.</strong> OpenAI's GPT-6.1 Astra was cancelled in October for calendar reasons the October dispatch covered in detail - a safety-driven reset that now defines how the industry reads every named-but-unshipped model. A measured-at-60 model going through exactly that review before GA would look, from the outside, precisely like Carbon does.</p>
+
+            <p><strong>Hypothesis 4 - Product packaging.</strong> The live Google item in the November window is the Argon AI-Mode expansion - surfacing, not tokens. A packaging strategy that leads with product surfaces (AI Mode, Workspace) before an API purchase path would hold the API gate closed while the model ships inside Google's own properties. Nothing in the record contradicts this; nothing confirms it either.</p>
+
+            <p><strong>Hypothesis 5 - Competitive timing.</strong> Fable 5.2's November 9 debut took the number-one slot with a five-point margin. A Carbon GA inside that news cycle would have guaranteed second billing; a GA after December 1 resets the stage with Google's own pricing event. Reading the gate as schedule discipline is consistent with the record and unfalsifiable.</p>
+
+            <p><strong>Hypothesis 6 - Governance review.</strong> The same November news cycle that carries Carbon carries Anthropic's capability-caps disclosure and independent verification of it. If Google is deciding what its own capability-governance statement looks like before shipping its strongest measured model, the gate is a policy process, not a logistics one. This hypothesis is the most consequential and the least evidenced - which is why the governance section below treats the silence itself as the finding.</p>
+
+            <h2>Access Ledger: The Fall's Gate Timelines</h2>
+
+            <p>Table 3 lines up every Google calendar item the fall record supports, and the pattern it exposes is the real story: the family has one completed gate (Argon, thirteen days), one open gate (Carbon, still running), one hard pricing event (December 1), and one cancellation-shaped precedent (Astra) that defines how badly a named calendar can go.</p>
+
+            <h3>Table 3: Google's fall ledger, as of November 11, 2026</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Item</th>
+                        <th>State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>September 30, 2026</td><td>Gemini 4 Argon defenders-only phase begins</td><td>Completed gate - first stage of the family's staged-launch template</td></tr>
+                    <tr><td>October 13, 2026</td><td>Gemini 4 Argon general availability (13 days later)</td><td>Live - 1M-token output, intro $2/$10, cached input 95% off</td></tr>
+                    <tr><td>Late October 2026</td><td>Gemini 4 Carbon enters the record at 60 (independent measurement)</td><td>Reading published; no Google product surface attached</td></tr>
+                    <tr><td>October 2026</td><td>GPT-6.1 Astra cancelled (OpenAI)</td><td>The named-calendar risk precedent - the comparison class for Carbon</td></tr>
+                    <tr><td>October 30 - November 11, 2026</td><td>Google's vendor-dated shipping in the dispatch window</td><td>Nothing else shipped; live items are the Argon AI-Mode expansion and the December 1 change</td></tr>
+                    <tr><td>November 30, 2026</td><td>Argon introductory pricing ends</td><td>Deadline - $2/$10 window closes</td></tr>
+                    <tr><td>December 1, 2026</td><td>Argon standard pricing begins</td><td>Deadline - $4/$20; the family's calendar-discipline test</td></tr>
+                    <tr><td>Undated</td><td>Gemini 4 Carbon full release</td><td>Open gate - the leaderboard's second slot still has no purchase path</td></tr>
+                </tbody>
+            </table>
+
+            <p>The roadmap rule follows directly, and it is the November dispatch's, repeated because it is correct: treat Carbon the way the October dispatch taught teams to treat GPT-6.1 Astra - a named model on a named calendar is carrying execution risk the vendor has not underwritten. Astra is the cautionary extreme (cancelled outright, never measured at the frontier); Carbon is a different and milder failure mode (measured at the frontier, gated on schedule) - but both belong in roadmap documents the same way: as watch items, not dependencies. If Carbon generalizes with a price tag, the leaderboard's second slot gets a purchase path overnight; until then, the only model at 60-plus that can be bought is Fable 5.2, and every router built this quarter should be built against that fact.</p>
+
+            <h2>The Governance Question: Carbon's Silence Is the Story</h2>
+
+            <p>The November 9 release made Anthropic the first frontier lab to state publicly that it trained its flagship below its ceiling - deliberately throttling capability in accelerator kernel optimization and improving language-model architectures, the two domains that most directly accelerate AI development itself - and independent evaluation organizations have concluded the caps are real. What nobody outside Anthropic can verify is whether Anthropic's competitors apply comparable caps. The November dispatch names the live case, and it is Carbon: a model sitting second on the new index, without a full public release and without comparable public statements, from the vendor whose measured-best model has now missed GA twice in a row. Google DeepMind shipped its frontier-class model into the same quarter without a governance statement of any kind.</p>
+
+            <p>Why the silence matters is a matter of incentives. Anthropic's caps are credible partly because they are costly - the company publicly forwent capability in the two domains that would most accelerate AI development, and invited verification. Silence is free. A governance regime where the disciplined lab discloses and the gated lab does not selects for silence, which is why the dispatch calls this "the most interesting open question in AI governance." Carbon is the test case with the most leverage: if its eventual release ships with a system-card-equivalent that names what Google did and did not throttle, the caps regime generalizes and every frontier release gains a disclosure norm. If it ships with benchmark tables and no statement, the norm dies where it started.</p>
+
+            <p>What to watch, concretely: whether a Carbon GA includes any capability-governance disclosure; whether Artificial Analysis or another independent organization probes for cap-like behavior (the way the 5.2 caps were independently verified); and whether Google's own framing of Carbon borrows Anthropic's vocabulary or pointedly avoids it. None of these is on any calendar. All of them are more predictive of the governance regime's future than anything in the benchmark tables.</p>
+
+            <h2>Economics: What a Purchase Path Would Mean</h2>
+
+            <p>Start with the only honest sentence available: <strong>Google has published no price for Gemini 4 Carbon, so every cost figure in this section is a scenario built on the family ladder, not a fact.</strong> The ladder itself is fully specified. Argon launched at an introductory $2/$10 per million tokens - doubling to $4/$20 on December 1, 2026, with cached input 95% off - and the family's mid-tier economics are therefore known to the penny. What is unknown is where a frontier successor prices relative to its own mid-tier and relative to the competition it out-measures.</p>
+
+            <p>The buyable frontier's cost reality gives the scenarios their stakes. Claude Fable 5.2, the only 60-plus model with a purchase path, costs $8/$40 per million tokens, and Artificial Analysis measured its average task cost at roughly $26.54 at max reasoning settings - the most expensive model in its set, about 2.6 times Opus 5.5's roughly $10 per task, with Opus at $4/$20 and GPT-6.1 at roughly $10/$50. Fable's own numbers say its knowledge-work Elo (1,785) sits behind Claude Sonnet 5.5's 1,813 and Opus 5.5's 1,800 - at multiples of their per-token price. The market's most expensive model is, on the current record, not the best buy for the work most teams do; the best measured model for that work (Carbon, on the business-workflow boards) has no price at all.</p>
+
+            <p><strong>Scenario A - family-standard pricing.</strong> If Carbon prices at or near the family's standard tier, it would be the cheapest 60-plus model ever measured - an overnight Pareto upset that undercuts Fable 5.2 on price while losing only the composite gap and winning the business-workflow boards. Every cost-per-task table the fall dispatches built would need re-baselining. Plausibility: consistent with the family ladder; no evidence.</p>
+
+            <p><strong>Scenario B - frontier premium pricing.</strong> If Carbon prices at or above Fable's $8/$40, the business-workflow lead becomes a premium product's justification - the second expensive 60-plus member of the club, and the router stays shaped as it is today, with Carbon as a specialist rather than a default. Plausibility: consistent with the measured-quality ceiling; no evidence.</p>
+
+            <p><strong>Scenario C - no API price at first.</strong> If the gate lifts as a product-surface rollout (AI Mode, Workspace) before an API purchase path, Carbon's economics stay unmeasurable in token terms - value delivered inside Google's own properties, invisible to the cost-per-task methodology this site runs on. Plausibility: consistent with the Argon AI-Mode expansion being the family's live item; no evidence.</p>
+
+            <p>What teams should actually budget today is simple: nothing. There is no purchase path, so there is no spend; the only cost Carbon carries right now is planning cost, and the playbook below caps that. The discipline the fall dispatches teach applies unchanged - read prices off published ladders, not off scenarios, and re-baseline the day the ladder exists.</p>
+
+            <h2>Developer Playbook: What to Do While the Gate Is Closed</h2>
+
+            <p>The router posture stands: cheap and fast by default, frontier models for the turns that earn it. Carbon does not change the posture; it changes the watch list. Five concrete positions, in the order most teams should check them.</p>
+
+            <p><strong>1. Business-workflow-heavy workloads - buy the best thing you can buy, not the best thing measured.</strong> The boards Carbon leads are boards you cannot purchase. Today's practical ceiling there is the Claude family's: Opus 5.5 at $4/$20 as the daily driver, Sonnet 5.5 carrying the best published knowledge-work Elo (1,813), Fable 5.2 reserved for the turns that justify $26-plus per task. If your procurement decision is due this quarter, the record supports an answer that exists; it does not support waiting for one that does not.</p>
+
+            <p><strong>2. Long-horizon, high-stakes agentic work - Fable 5.2 is the only 60-plus purchase, full stop.</strong> The composite ladder has two members above 60 and one purchase path. If the work is worth frontier quality, the record supports Fable 5.2 at $8/$40 with its effort dial - and the November dispatch's fine print (extra-high effort delivering near-max quality for meaningfully less) is the cost control to copy.</p>
+
+            <p><strong>3. Cost-dominated workloads - the fall's real price window is Argon's, and it closes.</strong> The family you can actually buy is running an introductory $2/$10 through November 30, with cached input 95% off, before the December 1 doubling. Whatever Carbon's gate means commercially, the actionable Gemini 4 decision in November is Argon before the deadline, not Carbon before the rumor.</p>
+
+            <p><strong>4. Everyone - keep the harness warm.</strong> The single highest-leverage preparation for a Carbon GA is an evaluation harness that can test it the week it lands: your business-workflow boards, your agentic loops, your cost-per-task accounting, wired to swap in a new model ID. Teams that measured fast when Fable 5.2 landed re-baselined in days; the same will be true when the second slot gets a purchase path.</p>
+
+            <p><strong>5. Roadmap documents - list Carbon as named-calendar execution risk, never as a dependency.</strong> The Astra precedent is the template: named model, named calendar, vendor underwriting nothing. If a Q1 plan reads better with "Carbon GA" in it, the plan is a forecast wearing a feature's clothes; mark it, gate it, and keep the fallback you already bought.</p>
+
+            <p>The monitoring list, in order of signal value: Artificial Analysis index updates (the 60 will move or it will age); Google communications (a program name, a date, or a price - any one of which changes the record); the December 1 Argon reprice (if the family's calendar fires on schedule, its discipline is real - the same discipline a Carbon GA would need); and the Argon AI-Mode expansion (the packaging signal that discriminates Scenario C).</p>
+
+            <h2>Scenarios: How a Full Release Could Land</h2>
+
+            <p>None of the following is confirmed or reported; they are the three release shapes consistent with the record, written down so that the discriminating signals are visible before the event rather than after.</p>
+
+            <p><strong>S1 - The Argon template.</strong> A staged gate (a named program, the Fairwind pattern), then GA within weeks, with an introductory price ladder and a date attached to its doubling. The family has run this play once, thirteen days start to finish; it is the scenario the clock history favors. Signals to watch: a program announcement, a defenders-class early-access phase, a published price with an end date.</p>
+
+            <p><strong>S2 - The premium debut.</strong> GA at frontier pricing, at or above Fable's $8/$40, sold on the business-workflow lead and the composite gap. The club's second expensive member; the router's shape survives. Signals: a pricing page before a program, launch tables that lead with the business-workflow boards, silence about the composite.</p>
+
+            <p><strong>S3 - The surface-first rollout.</strong> Capability appears inside Google's properties before any API purchase path - AI Mode and Workspace gain the model, tokens stay gateware. The scenario most hostile to independent measurement and to this site's cost-per-task methodology. Signals: AI-Mode feature announcements naming a new model tier, no API documentation, no price.</p>
+
+            <p>Which scenario you are in will be legible within days of any announcement, because each one publishes a different first artifact - a program page, a pricing page, or a product blog post. The record's only job until then is to stay honest about the difference between what has been measured and what has been shipped. As of November 11, 2026: one 60, second place, no purchase path.</p>
+
+            <h2>Frequently Asked Questions</h2>
+
+            <p><strong>What is Gemini 4 Carbon?</strong> Google's frontier model - the successor class to Gemini 4 Argon - that posted a 60 on Artificial Analysis' Intelligence Index v5 in late October 2026: second place on the new index, five points behind Claude Fable 5.2's 65 and five clear of Kimi K3.1 Pro's 55, the open-weight record. It is known to the public almost entirely through independent measurement, not through any Google launch.</p>
+
+            <p><strong>Can you use Gemini 4 Carbon today?</strong> No. As of November 11, 2026, it has no full public release, no published price, and no purchase path - our November dispatch's state-of-play table lists it as rank 2, GATED, Google, 60. The only model at 60-plus on the index that can be bought is Fable 5.2. If Carbon generalizes with a price tag, the leaderboard's second slot gets a purchase path overnight; until then, it is the 60 nobody can buy.</p>
+
+            <p><strong>How does Carbon compare to Fable 5.2?</strong> On the composite, Fable 5.2 leads 65 to 60. On the business-workflow boards, Carbon leads - independent coverage around the Fable launch reports it edging out Fable by a couple of points, and the MindStudio round-up states it directly. Fable 5.2 also has everything Carbon lacks: a release date (November 9, 2026), a price ($8/$40), a published API contract, official benchmark tables, and a purchase path across API, claude.ai, Bedrock, Google Cloud and Foundry. The honest summary: Fable is the more complete measurement; Carbon is the stronger claim on everyday enterprise work - and the one you cannot buy.</p>
+
+            <p><strong>How does Carbon compare to Gemini 4 Argon?</strong> Argon is the family's completed act: defenders-only September 30, general availability October 13 (thirteen days), the industry-first 1M-token output window, introductory $2/$10 pricing that doubles to $4/$20 on December 1, and the software-engineering and automation boards of its day. Carbon is the successor class: a higher measured ceiling (60 on v5, versus Argon's position in the October tables), a longer and still-running gate, and no specifications at all. Our Gemini 4 Argon deep dive covers the predecessor in full.</p>
+
+            <p><strong>Why is it gated?</strong> Google has published no reason, and no source inside Google confirms one. The six hypotheses this post walks through - pricing finalization against the December 1 reprice, inference capacity, evaluation and safety review in Astra's shadow, product packaging via AI Mode and Workspace, competitive timing against Fable's news cycle, and an internal governance review - are analysis, not reporting. What the record supports saying is only this: the family has run a thirteen-day gate before, and this gate has run longer.</p>
+
+            <p><strong>When will it be released?</strong> Undated. It sits on the November dispatch's deadline calendar as the leaderboard's second slot with no purchase path - an undated item, unlike the November 12, November 21, November 30 and December 1 deadlines around it. The nearest family event that could force coherence is December 1, when Argon's introductory pricing doubles.</p>
+
+            <p><strong>How much will it cost?</strong> Nothing has been published. The family anchor is Argon's ladder - introductory $2/$10 through November 30, standard $4/$20 from December 1, cached input 95% off - and the two buyable reference points around the 60-plus club are Fable 5.2 at $8/$40 (about $26.54 per average task at max effort) and Opus 5.5 at $4/$20 (about $10 per task). Whether Carbon prices like a family member (Scenario A) or a premium frontier product (Scenario B) is unknowable until Google publishes it.</p>
+
+            <p><strong>Is the 60 official?</strong> No. It is an independent measurement - the same organization and harness that crowned Fable 5.2 at 65 - entered from a late October reading. Google has published no Carbon benchmark tables, no per-benchmark breakdown, and no compute-tier statement. That is why this post keeps saying the 60 is a strong signal and a weak contract.</p>
+
+            <p><strong>Does Gemini 4 Carbon have capability caps like Fable 5.2's?</strong> Unknown - and the unknown is the point. Anthropic named two training-time caps (accelerator kernel optimization and LLM-architecture improvement) and independent evaluators concluded they are real; Google DeepMind has made no comparable statement in the same quarter. The November dispatch calls Carbon's silence "the live case" in frontier AI governance: whether a gated, measured-at-60 model ships with a capability-governance disclosure or without one is the test of whether the disclosure norm generalizes.</p>
+
+            <p><strong>What are its specs - context window, output, architecture?</strong> Not disclosed. No parameter count, no context window, no output ceiling, no modality list, no latency profile. The family reference point is Argon's industry-first 1M-token output window, and nothing about Carbon's record confirms or denies that it shares the envelope. Every architectural decision that depends on Carbon's specs is currently unfalsifiable.</p>
+
+            <p><strong>Is the business-workflow lead confirmed by Google?</strong> No. It rests on independent coverage around the Fable launch and the MindStudio round-up of independent testers - two consistent echoes, with no per-board numbers published and no official confirmation. The direction is solid; the magnitude ("a couple of points") is the precision limit of the record.</p>
+
+            <p><strong>Should my team wait for it?</strong> No - and also keep the harness warm. If your workload is business-workflow-heavy, buy the best thing you can buy (Opus 5.5 daily driver, Sonnet 5.5 for knowledge-work Elo, Fable 5.2 for the turns that earn it). If your workload is long-horizon agentic work, Fable 5.2 is the only 60-plus purchase there is. If cost dominates, Argon's introductory window closes November 30. And wire an evaluation harness so that the week a Carbon GA lands - with a price and a date - you can re-baseline in days instead of quarters. Waiting for an undated model is not a strategy; measuring fast when it arrives is.</p>
+
+            <h2>Final Verdict</h2>
+
+            <p>Gemini 4 Carbon is the most important number on the board and the least actionable. The 60 is real - measured by the same independent harness that crowned Fable 5.2, five points behind the frontier, five clear of the open-weight record - and the business-workflow lead makes it the strongest measured claim on the workload most enterprises actually run. But a leaderboard entry is not a product, and Carbon's record contains no release date, no price, no specifications, no official benchmark tables, and no governance statement: a black box with one number on it, held behind a gate that has already outlasted the family's own thirteen-day template while a cancelled model named Astra stands as the monument to named calendars that fail. The correct posture is neither hype nor dismissal. Buy what exists - Opus 5.5 and Sonnet 5.5 for the everyday, Argon before its November 30 window closes, Fable 5.2 for the 60-plus work you can justify today - wire the harness so a Carbon GA can be measured the week it lands, and treat the leaderboard's second slot as what the record says it is: the fall's most valuable unowned territory, waiting on a price tag. The day Google publishes one, every router built this quarter gets re-decided - and this post will be updated the same day.</p>
+
+            <!-- Sources Section -->
+            <div class="article-section">
+                <h2 class="section-title" id="sources">Sources</h2>
+                <ul>
+                    <li><strong>[Independent]</strong> Artificial Analysis — Intelligence Index v5 publication, November 9–10, 2026 (Fable 5.2 at 65, first, leading “at every compute tier”; Gemini 4 Carbon at 60, late October reading, second place, no full public release; Kimi K3.1 Pro at 55, the open-weight record; Fable 5.1 at 50; Fable 5.2 average task cost ~$26.54 at max reasoning with ~98,000 output tokens per task; Opus 5.5 roughly $10 per task)</li>
+                    <li><strong>[Official]</strong> Google — communications on Gemini 4 Carbon: no full public release, no published price, no published benchmark tables, specifications or release date as of November 11, 2026; Gemini 4 Argon documentation (defenders-only September 30, 2026; general availability October 13, 2026; industry-first 1M-token output; Fairwind Program; introductory $2/$10 per million tokens through November 30, 2026; standard $4/$20 from December 1, 2026; cached input 95% off); Argon AI-Mode expansion as the family's live November item</li>
+                    <li><strong>[Independent]</strong> MindStudio — independent tester round-up, November 2026 (Gemini 4 Carbon leads the business-workflow boards; extra-high effort outscored max on Frontier Code 2.0; Opus 5.5 still preferred for visual game design); independent coverage around the Fable 5.2 launch reporting Carbon edging out Fable by a couple of points on business-workflow benchmarks; AA-Briefcase knowledge-work Elo readings (Claude Sonnet 5.5 1,813; Opus 5.5 1,800; Fable 5.2 1,785)</li>
+                    <li><strong>[Official]</strong> Anthropic — Claude Fable 5.2 and Claude Mythos 5.2 announcement, model documentation and system card, November 9, 2026 (65 debut on Intelligence Index v5; $8/$40 per million tokens with batch at 50%; 1M context / 128K output; adaptive thinking always-on; the two named training-time capability caps and their independent verification) — Carbon's comparison frame throughout this post</li>
+                    <li><strong>[Official]</strong> Moonshot AI — Kimi K3.1 Pro weight release announcement and Apache 2.0 licence, November 4, 2026 (2.8T total / 104B active parameters; API pricing unchanged at $2/$10) — the open-weight record Carbon's reading sits five points above</li>
+                    <li><strong>[Official]</strong> OpenAI — GPT-6.1 Astra cancellation, October 2026, under a safety-driven calendar (the named-calendar execution-risk precedent this post applies to Carbon); September announcement that third-party IDE integrations including Cursor lose access to OpenAI models effective November 12, 2026 (context for the window's deadline ledger)</li>
+                    <li><strong>[Editorial]</strong> Local AI Zone's own coverage — the October 2026 dispatch (Argon's gate and the shift from price per token to cost per completed task), the November 2026 dispatch (state-of-play table listing Carbon as rank 2, GATED, Google, 60; the deadline ledger; the governance framing), and the Gemini 4 Argon deep dive (the Fairwind gate, the 1M output tokens, the pricing ladder that doubles December 1)</li>
+                </ul>
+                <p style="margin-top: 30px;"><em>Independently researched from primary and independent sources. All benchmark figures and prices belong to their respective vendors and measurement organizations; where the record is thin — the per-board business-workflow numbers are the known case — the thinness is reported rather than filled. Coverage window: late October – November 11, 2026; last verified November 11, 2026. This post will be updated when Google announces a full release, pricing, or specifications for Gemini 4 Carbon.</em></p>
+            </div>
+
+            <!-- Related Posts Section -->
+            <div class="article-section">
+                <h2 class="section-title">Related Posts</h2>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
+                    <a href="gemini-4-argon-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Gemini 4 Argon: The Complete Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Google's first Gemini 4 frontier model: the Fairwind gate, the 1M output tokens, the introductory pricing that doubles December 1 - the access story November's Carbon reading extends.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="claude-fable-5-2-mythos-5-2-deep-dive.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">Claude Fable 5.2 &amp; Mythos 5.2: The Complete Deep Dive</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The model that debuts above Carbon: one model, two safeguard regimes, benchmarks vs Opus 5.5 and GPT-6 Cyber, the deliberate capability caps, and the $8/$40 economics.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="November_2026_AI_Model_Updates.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">November 2026 AI Model Updates</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">The full dispatch: Fable 5.2 debuts at 65, Kimi K3.1 Pro's weights arrive as promised, Carbon stays gated at 60, and every price clock in the fall ledger starts ticking.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                    <a href="October_2026_AI_Model_Updates.html" style="display: block; padding: 24px; background: var(--card-background, #f8fafc); border: 1px solid var(--border-color, #e2e8f0); border-radius: 12px; text-decoration: none; color: inherit; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)'" onmouseout="this.style.transform=''; this.style.boxShadow=''">
+                        <h3 style="margin: 0 0 8px 0; color: var(--primary-600, #2563eb); font-size: 1.1em;">October 2026 AI Model Updates</h3>
+                        <p style="margin: 0 0 8px 0; color: var(--text-secondary, #6b7280); font-size: 0.9em;">Eight specialist releases, Kimi K3.1 Pro at the open-weight record, and the shift from price per token to cost per completed task.</p>
+                        <span style="color: var(--primary-500, #3b82f6); font-weight: 600; font-size: 0.85em;">Read more &rarr;</span>
+                    </a>
+                </div>
+            </div>
+
+            <h2 class="section-title">About the Author</h2>
+            <p><strong>Hussain Nazary</strong> is a software developer specializing in local AI deployment and the creator of <a href="https://github.com/GGUFloader/gguf-loader" target="_blank">GGUF Loader</a>, an open-source tool for running GGUF models locally. This analysis is part of Local AI Zone's ongoing coverage of frontier and open-weight language models and practical deployment strategies.</p>
+            <p><strong>Contact:</strong> <a href="https://github.com/hussainnazary2" target="_blank">GitHub</a> | <a href="../services.html">Consulting Services</a></p>
+            <p style="margin-top: 30px;"><em>Last Updated: November 11, 2026 | Version 1.0</em></p>
+        </div>
+<!-- Need help with this post? -->
+    <section class="post-help" aria-labelledby="post-help-title">
+        <div class="post-help-inner">
+            <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+            <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+            through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+            pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+            you&rsquo;re reading.</p>
+            <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Claude Fable 5.2 and Mythos 5.2">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                <span>Ask me about this post</span>
+            </button>
+        </div>
+    </section>
+
+</article>
+
+    <script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+    <!-- Floating Instagram Button - Always Visible -->
+    <a href="https://www.instagram.com/nazary.ai" class="floating-instagram-btn" rel="noopener" target="_blank" aria-label="Connect with me on Instagram" title="Connect with me on Instagram" style="position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 8px 24px rgba(225, 48, 108, 0.4); z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255, 255, 255, 0.2);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span style="color: white; font-weight: 600; white-space: nowrap;">Connect with me on Instagram</span>
+    </a>
+</body>
+</html>
