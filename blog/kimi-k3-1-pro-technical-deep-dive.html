@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kimi K3.1 Pro: China's 2.8T MoE Model Challenging GPT-6 and Claude Opus — Technical Deep Dive</title>
-<meta name="description" content="Kimi K3.1 Pro is Moonshot AI's most capable 3T-class open-weight model with 2.8T parameters, 1M-token context, and frontier-level coding performance. This technical deep dive covers the architecture, MoE design, reinforcement learning at scale, benchmark dominance on Terminal-Bench and GDPval-AA, cybersecurity controls, pricing, and how it stacks up against Claude Opus 5.5, GPT-6 Astra, and other frontier models.">
+<meta name="description" content="Kimi K3.1 Pro is Moonshot AI's most capable 3T-class open-weight model with 2.8T parameters, 1M-token context, and frontier-adjacent coding performance. This technical deep dive covers the architecture, MoE design, reinforcement learning at scale, Terminal-Bench and GDPval-AA results, cybersecurity controls, pricing, the November 4 weight release under the Kimi K3.1 Pro License, and how it stacks up against Claude Opus 5.5, GPT-6 Astra, and other frontier models.">
 <meta name="keywords" content="Kimi K3.1 Pro, Moonshot AI, 2.8 trillion parameters, MoE architecture, Kimi Delta Attention, open-weight model, Terminal-Bench, coding agents, Claude Opus 5.5, GPT-6 Astra, 1M context window, Chinese AI, agentic AI, reinforcement learning">
 <script type="application/ld+json">
 {
@@ -12,15 +12,15 @@
   "@type": "TechArticle",
   "headline": "Kimi K3.1 Pro: China's 2.8T MoE Model Challenging GPT-6 and Claude Opus — Technical Deep Dive",
   "alternativeHeadline": "How Moonshot AI's K3.1 Pro achieves frontier performance with massive-scale reinforcement learning and MoE architecture",
-  "description": "A comprehensive technical analysis of Kimi K3.1 Pro: 2.8T MoE architecture with 104B active parameters, Kimi Delta Attention, Stable LatentMoE framework, large-scale joint RL training, Terminal-Bench 4.0 leadership, cybersecurity controls, open-weight release strategy, and competitive positioning against Claude Opus 5.5 and GPT-6 Astra.",
+  "description": "A comprehensive technical analysis of Kimi K3.1 Pro: 2.8T MoE architecture with 104B active parameters, Kimi Delta Attention, Stable LatentMoE framework, large-scale joint RL training, near-frontier Terminal-Bench 4.0 performance, cybersecurity controls, the November 4 open-weight release under the Kimi K3.1 Pro License, and competitive positioning against Claude Opus 5.5 and GPT-6 Astra.",
   "author": {"@type": "Person", "name": "Hussain Nazary"},
   "datePublished": "2026-10-24",
-  "dateModified": "2026-10-24",
+  "dateModified": "2026-11-19",
   "keywords": "Kimi K3.1 Pro, Moonshot AI, MoE architecture, Kimi Delta Attention, Terminal-Bench, coding agents, open-weight AI, Chinese frontier models",
   "articleSection": "Technical Deep Dive",
   "inLanguage": "en-US",
   "isAccessibleForFree": true,
-  "wordCount": 14500,
+  "wordCount": 5447,
   "proficiencyLevel": "Expert",
   "mainEntityOfPage": "https://local-ai-zone.github.io/blog/kimi-k3-1-pro-technical-deep-dive.html",
   "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
@@ -81,7 +81,7 @@
       "name": "How does Kimi K3.1 Pro perform on benchmarks?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Kimi K3.1 Pro scores 65.7% on Terminal-Bench 4.0 (ahead of GPT-6 Astra's 58.2%), 61.2% on Kimi Code Bench 3.0 Long-horizon, 92.7% on BenchCAD with tools, and ranks 4th on Artificial Analysis Intelligence Index with a score of 55. It places 3rd on GDPval-AA with 1,846 Elo."
+        "text": "Kimi K3.1 Pro scores 65.7% on Terminal-Bench 4.0 in Moonshot's evaluation, 61.2% on Kimi Code Bench 3.0 Long-horizon, and 92.7% on BenchCAD with tools. On Artificial Analysis' Intelligence Index v5 it read 55 at launch; as of November 19, 2026 it reads 46 and ranks 12th, still the highest open-weight score. It placed 3rd on GDPval-AA with 1,846 Elo."
       }
     },
     {
@@ -89,7 +89,7 @@
       "name": "Is Kimi K3.1 Pro open-weight?",
       "acceptedAnswer": {
         "@type": "Answer",
-        "text": "Yes. Moonshot AI will release full model weights for Kimi K3.1 Pro by November 4, 2026. This makes it the highest-scoring open-weight model on the Artificial Analysis Intelligence Index, narrowing the gap between open and proprietary models from 14 points (K3) to just 3 points."
+        "text": "Yes. Moonshot published the full 2.8T-parameter weights on November 4, 2026, under the custom Kimi K3.1 Pro License — not Apache 2.0. The licence permits commercial use and fine-tuning but requires a separate agreement for model-as-a-service businesses above $20M in revenue, plus attribution above 100M monthly users or $20M in monthly revenue. Hugging Face reports 60,920 downloads last month and 23 quantizations and derivatives, with llama.cpp conversions available. On the November 19 v5 table it reads 46, 19 points behind Claude Fable 5.2."
       }
     },
     {
@@ -115,14 +115,14 @@
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="Local AI Zone">
 <meta property="og:title" content="Kimi K3.1 Pro: China's 2.8T MoE Model Challenging GPT-6 and Claude Opus — Technical Deep Dive">
-<meta property="og:description" content="Technical deep dive into Moonshot AI's 2.8T-parameter open-weight model: Stable LatentMoE architecture, 1M-token context, Terminal-Bench 4.0 leadership, cybersecurity controls, and pricing at half of Claude Opus 5.5.">
+<meta property="og:description" content="Technical deep dive into Moonshot AI's 2.8T-parameter open-weight model: Stable LatentMoE architecture, 1M-token context, Terminal-Bench 4.0 performance, cybersecurity controls, and pricing at half of Claude Opus 5.5. Updated November 19: the weights shipped November 4 under a custom licence, and the current v5 reading is 46.">
 <meta property="og:url" content="https://local-ai-zone.github.io/blog/kimi-k3-1-pro-technical-deep-dive.html">
 <meta property="og:image" content="https://local-ai-zone.github.io/blog/kimi-k3-1-pro-technical-deep-dive-hero.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Kimi K3.1 Pro: China's 2.8T MoE Model Challenging GPT-6 and Claude Opus">
-<meta name="twitter:description" content="2.8T parameters, 104B active, 1M-token context, 65.7% on Terminal-Bench 4.0, and open weights by November 4 — at half the price of Claude Opus 5.5.">
+<meta name="twitter:description" content="2.8T parameters, 104B active, 1M-token context, 65.7% on Terminal-Bench 4.0, and weights shipped November 4 under the custom Kimi K3.1 Pro License — at half the price of Claude Opus 5.5. Updated November 19 with the current v5 reading of 46.">
 <meta name="twitter:image" content="https://local-ai-zone.github.io/blog/kimi-k3-1-pro-technical-deep-dive-hero.png">
 <link rel="icon" href="../logo.svg" type="image/svg+xml">
 <link rel="stylesheet" href="../css/styles.css">
@@ -288,23 +288,27 @@ a:hover {
 <div class="cover">
 <h1>Kimi K3.1 Pro: China's 2.8T MoE Model Challenging GPT-6 and Claude Opus</h1>
 <div class="sub">
-A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 trillion parameters, Stable LatentMoE architecture, massive-scale reinforcement learning, Terminal-Bench 4.0 leadership, deliberate cybersecurity controls, and how it compares to Claude Opus 5.5, GPT-6 Astra, and other frontier models
+A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 trillion parameters, Stable LatentMoE architecture, massive-scale reinforcement learning, near-frontier Terminal-Bench 4.0 performance, deliberate cybersecurity controls, the November 4 weight release, and how it compares to Claude Opus 5.5, GPT-6 Astra, and other frontier models
 </div>
 <div class="meta">
-<strong>Published:</strong> October 24, 2026 | <strong>Author:</strong> Hussain Nazary | <strong>Reading Time:</strong> 45 min
+<strong>Published:</strong> October 24, 2026 | <strong>Last updated:</strong> November 19, 2026 | <strong>Author:</strong> Hussain Nazary | <strong>Reading Time:</strong> 27 min
 </div>
+</div>
+
+<div class="highlight-box" style="border-left-color:#f59e0b;">
+<strong>Update — November 19, 2026:</strong> This deep dive was published on October 24, when Kimi K3.1 Pro read <strong>55</strong> on Artificial Analysis' Intelligence Index v5 and its weights were still pending. Both of those facts have moved. Moonshot published the full 2.8T-parameter weights on <strong>November 4</strong>, exactly on schedule, under the custom <strong>Kimi K3.1 Pro License</strong> — not Apache 2.0. And the index has moved against the model: the November 19 reading is <strong>46</strong>, 12th overall and still the highest open-weight score, but 19 points behind Claude Fable 5.2 at 65. The launch-day benchmark analysis below is preserved as the October record; the current v5 reading is stated here and in the sections that discuss the index.
 </div>
 
 <h2>Introduction: The Open-Weight Frontier Narrows</h2>
 
-<p>On October 23, 2026, Moonshot AI released <strong>Kimi K3.1 Pro</strong>, the first model in their new K3.1 series and their most capable 3T-class open-weight model to date. This isn't just another incremental update—K3.1 Pro represents a substantial leap in what open-weight models can achieve, narrowing the gap between open and proprietary frontier models from 14 points (K3's 44 to Claude Opus 5.5's 58) to just 3 points (K3.1 Pro's 55 to 58) on the <a href="https://artificialanalysis.ai/" target="_blank">Artificial Analysis Intelligence Index</a>.</p>
+<p>On October 23, 2026, Moonshot AI released <strong>Kimi K3.1 Pro</strong>, the first model in their new K3.1 series and their most capable 3T-class open-weight model to date. At launch it read <strong>55</strong> on the <a href="https://artificialanalysis.ai/" target="_blank">Artificial Analysis Intelligence Index</a>, fourth overall and 14 points above K3's 44 — the closest an open-weight model had come to the proprietary frontier. That reading did not hold. By November 19 the index read <strong>46</strong>, twelfth overall and 19 points behind Claude Fable 5.2's 65, as four proprietary labs shipped six 50-plus models in ten days.</p>
 
-<p>The numbers tell a compelling story: K3.1 Pro scores <strong>65.7% on Terminal-Bench 4.0</strong> in Moonshot's evaluation (though independent testing by Artificial Analysis measured 67%, potentially the highest score of any model on this benchmark), surpassing GPT-6 Astra (58.2%) and narrowly trailing Claude Opus 5.5 (66.4%). It ranks <strong>4th overall on the Intelligence Index with a score of 55</strong>, ahead of GPT-6 Astra (53), Gemini 4 Argon (53), and every other publicly available model except three Claude variants. On <strong>GDPval-AA</strong>, which measures performance on real-world work tasks, K3.1 Pro achieves <strong>1,846 Elo—3rd place globally</strong>, behind only Claude Opus 5.5 (1,866 Elo) and Muse Wonder Full (1,857 Elo).</p>
+<p>At launch, the numbers told a compelling story: K3.1 Pro scored <strong>65.7% on Terminal-Bench 4.0</strong> in Moonshot's evaluation (independent testing by Artificial Analysis measured 67%, potentially the highest score of any model on this benchmark), surpassing GPT-6 Astra (58.2%) and narrowly trailing Claude Opus 5.5 (66.4%). It ranked <strong>4th overall on the Intelligence Index with a score of 55</strong>, ahead of GPT-6 Astra (53), Gemini 4 Argon (53), and every other publicly available model except three Claude variants. On <strong>GDPval-AA</strong>, which measures performance on real-world work tasks, K3.1 Pro achieved <strong>1,846 Elo—3rd place globally</strong>, behind only Claude Opus 5.5 (1,866 Elo) and Muse Wonder Full (1,857 Elo). Those are October 24 readings; the sections below keep them as the launch record, with current figures noted where they differ.</p>
 
-<p>What makes K3.1 Pro particularly significant is its <strong>open-weight release strategy</strong>. While proprietary models like Claude and GPT remain black boxes, Moonshot will release the full model weights by November 4, 2026. This makes K3.1 Pro the highest-scoring open-weight model currently available, giving researchers, enterprises, and developers unprecedented access to frontier-level AI capabilities.</p>
+<p>What makes K3.1 Pro particularly significant is its <strong>open-weight release strategy</strong>. While proprietary models like Claude and GPT remain black boxes, Moonshot published the full model weights on <strong>November 4, 2026</strong>, on the date it set at launch. That made K3.1 Pro the highest-scoring open-weight model then available, giving researchers, enterprises, and developers access to frontier-adjacent capabilities they could download, inspect and fine-tune. The licence, discussed below, is more restrictive than the word "open" usually implies.</p>
 
 <div class="highlight-box">
-<strong>Key Takeaway:</strong> Kimi K3.1 Pro demonstrates that open-weight models can now compete directly with the best proprietary systems. At half the price of Claude Opus 5.5 ($2/$10 per million tokens vs. $4/$20), with comparable performance on many benchmarks, and full weight availability, K3.1 Pro represents a paradigm shift in AI accessibility.
+<strong>Key Takeaway:</strong> Kimi K3.1 Pro demonstrates how far open-weight models have come: it holds the highest open-weight score on Intelligence Index v5 at 46, 19 points behind the frontier, and its 2.8T weights are downloadable under a custom licence. At half the price of Claude Opus 5.5 ($2/$10 per million tokens vs. $4/$20), it remains a serious option for coding and long-context work - even though the proprietary frontier has since moved seven points higher.
 </div>
 
 <p>This deep dive examines the technical architecture, training methodology, benchmark performance, cybersecurity controls, and competitive positioning of Kimi K3.1 Pro. We'll explore how Moonshot achieved these results through massive-scale reinforcement learning, what the Stable LatentMoE framework actually does, where K3.1 Pro excels and where it falls short, and what this release means for the future of open AI development.</p>
@@ -795,7 +799,7 @@ A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 tri
 <li><strong>Kimi Business</strong> — Enterprise-grade data privacy and member management with complete separation between personal and organization accounts</li>
 </ul>
 
-<p><strong>Open-Weight Release:</strong> Full model weights will be released by <strong>November 4, 2026</strong>. This makes K3.1 Pro the highest-scoring open-weight model on the Artificial Analysis Intelligence Index.</p>
+<p><strong>Open-Weight Release:</strong> Full model weights shipped on <strong>November 4, 2026</strong> under the <strong>Kimi K3.1 Pro License</strong>. Hugging Face reports 60,920 downloads last month and 23 quantizations and derivatives. The model remains the highest-scoring open-weight entry on the v5 table, though its own reading has fallen to 46 as proprietary models advanced.</p>
 
 <h2>How K3.1 Pro Compares to Claude Opus 5.5 and GPT-6 Astra</h2>
 
@@ -887,7 +891,7 @@ A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 tri
 
 <h3>4. Limited Documentation on Architecture Details</h3>
 
-<p>While Moonshot will release the full model weights, they have not published:</p>
+<p>While Moonshot released the full model weights, they have not published:</p>
 
 <ul>
 <li><strong>Exact parameter breakdown</strong> — How the 2.8T parameters are distributed across layers and experts</li>
@@ -901,7 +905,7 @@ A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 tri
 
 <h2>What "Open-Weight" Actually Means</h2>
 
-<p>Moonshot describes K3.1 Pro as an <strong>"open-weight model"</strong> and will release the full weights by November 4, 2026. But what does "open-weight" actually mean, and how does it differ from "open-source"?</p>
+<p>Moonshot describes K3.1 Pro as an <strong>"open-weight model"</strong> and published the full weights on November 4, 2026. But what does "open-weight" actually mean, and how does it differ from "open-source"?</p>
 
 <h3>Open-Weight vs. Open-Source</h3>
 
@@ -910,7 +914,7 @@ A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 tri
 <li><strong>Open-source:</strong> Everything needed to reproduce the model is released: weights, training code, data pipelines, architectural details, and evaluation scripts. Anyone can replicate the training process.</li>
 </ul>
 
-<p>K3.1 Pro falls into the <strong>open-weight</strong> category. Moonshot will release the weights, but has not committed to releasing:</p>
+<p>K3.1 Pro falls into the <strong>open-weight</strong> category. Moonshot released the weights, but has not published:</p>
 
 <ul>
 <li>Pre-training data</li>
@@ -935,15 +939,14 @@ A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 tri
 
 <h3>License Terms</h3>
 
-<p>Moonshot has not yet disclosed the license terms for K3.1 Pro's weights. The K3 release used a custom license that allowed:</p>
+<p>The weights are released under the <strong>Kimi K3.1 Pro License</strong>, a custom licence rather than Apache 2.0 or another standard open-source licence. It permits commercial use, fine-tuning, modification and redistribution, with two conditions attached:</p>
 
 <ul>
-<li><strong>Commercial use</strong> — Including in products and services</li>
-<li><strong>Fine-tuning and modification</strong> — Creating derivative models</li>
-<li><strong>Redistribution</strong> — Subject to certain restrictions</li>
+<li><strong>Model-as-a-service:</strong> businesses above $20M in annual revenue that host the model for third parties need a separate agreement with Moonshot.</li>
+<li><strong>Attribution:</strong> products above 100M monthly users or $20M in monthly revenue must carry specified naming.</li>
 </ul>
 
-<p>We expect K3.1 Pro to use a similar license, but confirmation will come with the November 4 weight release.</p>
+<p>For most teams the practical effect is small: download, fine-tune, deploy internally. For a hosted inference business the licence is a real permission boundary — the kind Apache 2.0 would not impose. That distinction matters more than a few benchmark points to anyone whose product is the model endpoint itself.</p>
 
 <h2>Cybersecurity: Balancing Capability and Responsibility</h2>
 
@@ -1055,21 +1058,21 @@ A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 tri
 
 <h3>4. What Are the Hardware Requirements for Self-Hosting?</h3>
 
-<p>With 2.8T total parameters and 104B active parameters, K3.1 Pro requires substantial hardware:</p>
+<p>With 2.8T total parameters and 104B active parameters, K3.1 Pro remains data-centre hardware, and the November 4 release did not change that:</p>
 
 <ul>
-<li><strong>At 4-bit quantization:</strong> ~1.4 TB storage, likely requiring 8× A100 80GB GPUs or equivalent</li>
-<li><strong>At 8-bit quantization:</strong> ~2.8 TB storage, requiring even more GPU memory or CPU offloading</li>
-<li><strong>Inference latency:</strong> Depends on batch size, context length, and hardware configuration</li>
+<li><strong>Released MXFP4 weights:</strong> ~1.42 TB, spread across a multi-GPU node</li>
+<li><strong>4-bit community quantizations:</strong> still in the 1.4 TB class; 8× A100/H100 80GB or equivalent is the realistic floor</li>
+<li><strong>8-bit or higher:</strong> ~2.8 TB and beyond, requiring CPU offload or a larger cluster</li>
 </ul>
 
-<p>Moonshot has not yet released official deployment guides or hardware recommendations. Users should expect significant infrastructure requirements for self-hosting.</p>
+<p>Moonshot published model cards and inference code with the weights, and llama.cpp conversions now exist, so tooling is no longer the obstacle — memory capacity and bandwidth are. For local use, wait for a credible distillation rather than planning around the 2.8T base.</p>
 
 <h2>Implications for the AI Landscape</h2>
 
 <h3>1. The Open-Weight Frontier is Real</h3>
 
-<p>K3.1 Pro demonstrates that open-weight models can now compete directly with the best proprietary systems. The gap on the Artificial Analysis Intelligence Index has narrowed from 14 points (K3's 44 vs. Claude Opus 5.5's 58) to just 3 points (K3.1 Pro's 55 vs. 58). On specific benchmarks like Terminal-Bench 4.0 and GDPval-AA, the gap is even smaller.</p>
+<p>K3.1 Pro demonstrated that open-weight models could compete directly with the best proprietary systems at launch. The gap on the Artificial Analysis Intelligence Index narrowed from 14 points (K3's 44 vs. Claude Opus 5.5's 58) to 3 points on October 24 (K3.1 Pro's 55 vs. 58). It has since widened again: on November 19 the frontier sits at 65 and Kimi at 46, a 19-point gap. The open-weight frontier is real, but it is not stationary.</p>
 
 <p>This has profound implications:</p>
 
@@ -1181,16 +1184,16 @@ A technical deep dive into Moonshot AI's most capable open-weight model: 2.8 tri
 <li><strong>Deliberate cybersecurity controls</strong> — Balancing defensive value and offensive risk</li>
 </ul>
 
-<p>But K3.1 Pro's significance extends beyond raw performance. By releasing frontier capabilities as open weights, Moonshot is accelerating a shift toward a more open, accessible, and distributed AI ecosystem. Enterprises gain more control, researchers gain more transparency, and developers gain more freedom to innovate.</p>
+<p>But K3.1 Pro's significance extends beyond raw performance. By releasing frontier-adjacent capabilities as open weights, Moonshot accelerated a shift toward a more open, accessible, and distributed AI ecosystem. Enterprises gain more control, researchers gain more transparency, and developers gain more freedom to innovate.</p>
 
-<p>The gap between open and proprietary models has narrowed dramatically—from 14 points to 3 on the Intelligence Index. If this trend continues, the distinction between "open" and "proprietary" may soon lose its meaning. The frontier will simply be the frontier, regardless of whether the weights are released.</p>
+<p>The gap between open and proprietary models narrowed dramatically at launch—from 14 points to 3 on the Intelligence Index—then widened to 19 by November 19 as the proprietary labs shipped new frontier models in ten days. The durable lesson is not that open weights caught up permanently, but that the lag is now measured in weeks rather than generations. The frontier moves; the question for open-weight teams is how fast they can follow.</p>
 
 <p>For practitioners, the message is clear: <strong>open-weight models are now viable alternatives to proprietary systems for production workloads</strong>. K3.1 Pro won't be the right choice for every use case, but it's competitive enough that you should evaluate it seriously.</p>
 
-<p>The AI landscape has entered a new equilibrium. The best models are still proprietary, but the gap is closing fast—and the open-weight frontier is real.</p>
+<p>The AI landscape has entered a new equilibrium. The best models are still proprietary, the gap now widens and narrows with each release cycle, and the open-weight frontier is real - but it is no longer three points from the lead.</p>
 
 <div class="highlight-box">
-<strong>Next Steps:</strong> Moonshot will release the full K3.1 Pro weights by November 4, 2026. Watch for deployment guides, hardware requirements, and license terms. If you're evaluating K3.1 Pro for production use, start testing now through the API at <a href="https://platform.moonshot.cn/" target="_blank">platform.moonshot.cn</a>.
+<strong>Next Steps:</strong> Moonshot published the full K3.1 Pro weights on November 4, 2026, under the Kimi K3.1 Pro License; Hugging Face reports 60,920 downloads last month, 2.27k likes and 23 quantizations and derivatives, with llama.cpp builds available. If you're evaluating K3.1 Pro for production, the API at $2/$10 remains the practical route — read the model-as-a-service clause before building a hosted product on the weights. Start at <a href="https://platform.moonshot.cn/" target="_blank">platform.moonshot.cn</a>.
 </div>
 
 <a href="../blog.html" class="back-link">← Back to Blog</a>
