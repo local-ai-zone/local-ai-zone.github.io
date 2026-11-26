@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inkling 2 Mini: A 26B Looped MoE That Runs on a Laptop — Side-by-Side with Qwen3.8-27B</title>
+<meta name="description" content="A deep dive on Thinking Machines Lab's Inkling 2 Mini: the 24-layer looped transformer that runs its middle 12 layers three times, its 26.4B/3.4B/5.4B parameter accounting, NVFP4 and MXFP8 training, the pruning-and-healing recipe, loop-depth and monitorability experiments, and every side-by-side benchmark against Qwen3.8-27B.">
+<meta name="keywords" content="Inkling 2 Mini, Thinking Machines Lab, looped transformer, mixture of experts, NVFP4, MXFP8, Qwen3.8-27B, DeepSWE, SWE-bench Pro, BrowseComp, DSpark, GGUF, local AI, 1M context">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Inkling 2 Mini: A 26B Looped MoE That Runs on a Laptop — Side-by-Side with Qwen3.8-27B",
+  "alternativeHeadline": "24 physical layers, 48 visits per token: how looping buys reasoning depth without buying parameters",
+  "description": "A technical deep dive on Inkling 2 Mini and its looped mixture-of-experts architecture, with side-by-side benchmark tables against Qwen3.8-27B, deployment guidance and limitations.",
+  "author": {"@type": "Person", "name": "Hussain Nazary"},
+  "datePublished": "2026-11-26",
+  "dateModified": "2026-11-26",
+  "keywords": "Inkling 2 Mini, Thinking Machines Lab, looped transformer, NVFP4, Qwen3.8-27B, local AI, GGUF",
+  "articleSection": "Research Paper",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 6900,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/inkling-2-mini-looped-transformer-deep-dive.html",
+  "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
+  "about": [
+    {"@type": "Thing", "name": "Inkling 2 Mini"},
+    {"@type": "Thing", "name": "Looped transformer"},
+    {"@type": "Thing", "name": "Thinking Machines Lab"},
+    {"@type": "Thing", "name": "Mixture of experts"},
+    {"@type": "Thing", "name": "Local AI"}
+  ],
+  "isPartOf": {"@type": "Blog", "name": "Local AI Zone — Blog", "url": "https://local-ai-zone.github.io/blog.html"},
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://local-ai-zone.github.io/blog/inkling-2-mini-hero.png",
+    "width": 1200, "height": 630,
+    "caption": "Inkling 2 Mini: 24 physical layers, 48 visits per token, 26.4B total and 3.4B active parameters in a 20 GB checkpoint"
+  },
+  "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
+}
+</script>
+<!-- ==================== SEO ==================== -->
+<meta name="author" content="Local AI Zone">
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/inkling-2-mini-looped-transformer-deep-dive.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/inkling-2-mini-looped-transformer-deep-dive.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/inkling-2-mini-looped-transformer-deep-dive.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/inkling-2-mini-looped-transformer-deep-dive.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow">
+<meta name="bingbot" content="index, follow">
+<meta name="rating" content="general">
+<meta name="revisit-after" content="7 days">
+<meta name="theme-color" content="#2563eb">
+<meta name="creator" content="Local AI Zone">
+<meta name="publisher" content="Local AI Zone">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:title" content="Inkling 2 Mini: A 26B Looped MoE That Runs on a Laptop — Side-by-Side with Qwen3.8-27B">
+<meta property="og:description" content="24 physical layers, 48 visits per token. A deep dive on the looped Mixture-of-Experts architecture, the 20 GB NVFP4 checkpoint, and every benchmark against Qwen3.8-27B.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/inkling-2-mini-looped-transformer-deep-dive.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/inkling-2-mini-hero.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Inkling 2 Mini: 24 layers with the middle 12 looped three times, 26.4B total parameters, 3.4B active, 20 GB checkpoint">
+<meta property="article:author" content="Hussain Nazary">
+<meta property="article:published_time" content="2026-11-26T00:00:00Z">
+<meta property="article:modified_time" content="2026-11-26T00:00:00Z">
+<meta property="article:section" content="Research Paper">
+<meta property="article:tag" content="Inkling 2 Mini">
+<meta property="article:tag" content="Thinking Machines Lab">
+<meta property="article:tag" content="Looped Transformer">
+<meta property="article:tag" content="NVFP4">
+<meta property="article:tag" content="Qwen3.8-27B">
+<meta property="article:tag" content="Local AI">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@localaizone">
+<meta name="twitter:creator" content="@hussainnazary">
+<meta name="twitter:title" content="Inkling 2 Mini: A 26B Looped MoE That Runs on a Laptop">
+<meta name="twitter:description" content="24 physical layers, 48 visits per token: the looped MoE architecture, the 20 GB checkpoint, and a full side-by-side with Qwen3.8-27B.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/inkling-2-mini-hero.png">
+<meta name="twitter:image:alt" content="Inkling 2 Mini: 24 layers, 48 visits per token, 26.4B total, 3.4B active, 20 GB">
+
+<!-- FAQ Schema (AEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Inkling 2 Mini?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Inkling 2 Mini is an open-weights multimodal model from Thinking Machines Lab, released November 20, 2026 under Apache 2.0. It is a 26.4B-parameter mixture-of-experts transformer with 3.4B active parameters per token, and its middle 12 layers are looped three times for 48 layer applications per token."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does looping change the parameter count?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The checkpoint stores 24 physical layers, but layers 6 through 17 are visited three times with shared weights, giving 48 layer applications per token. Each extra pass adds roughly 1.0B effective active parameters, so the 3.4B active headline becomes about 5.4B effective active parameters."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How does Inkling 2 Mini compare with Qwen3.8-27B?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "On Thinking Machines' own tables Inkling 2 Mini leads on DeepSWE 48.2 versus 42.2, SWE-bench Pro v2 Hard 77.9 versus 73.8, BrowseComp 79.0 versus 61.6 and Vals Index 46.5 versus 29.8. Qwen3.8-27B stays ahead on GPQA Diamond 90.5 versus 86.6, ComplexConstraints 35.6 versus 33.4 and AA-Omniscience non-hallucination 71.4 versus 63.4."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What hardware does it need?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The checkpoint is about 20 GB in mixed NVFP4 and MXFP8 precision. Thinking Machines validates one NVIDIA DGX Spark and Apple silicon Macs with 32 GB or more unified memory; other GPUs with 32 GB or more VRAM should work. GGUF IQ4_NL fits in 32 GB and is the recommended local quant."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Can I change the number of loop passes?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Not in the released Inkling 2 Mini checkpoint, which is fixed at three passes. Thinking Machines also published TML-d24-varloop-research, trained for one to five passes, where loop_num_passes can be set in text_config. Lower pass counts are faster but may reduce quality."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Breadcrumb Schema (GEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+    {"@type": "ListItem", "position": 3, "name": "Inkling 2 Mini Deep Dive", "item": "https://local-ai-zone.github.io/blog/inkling-2-mini-looped-transformer-deep-dive.html"}
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/blog-post.css">
+  <link rel="stylesheet" href="../css/blog-paper.css">
+</head>
+<body class="paper-page has-site-header">
+<!-- ==================== SITE HEADER ==================== -->
+<header class="premium-header blog-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-brand">
+                    <div class="header-logo-section">
+                        <div class="header-logo" onclick="window.location.href='../index.html'">
+                            <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="logo-fallback" style="display: none;">
+                                <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <div class="brand-title">GGUF Discovery</div>
+                            <p class="brand-subtitle">Blog &amp; Guides</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <nav class="blog-nav" aria-label="Main navigation">
+                    <a href="../index.html">Home</a>
+                    <a href="../about.html">About</a>
+                    <a href="../services.html">Need Help?</a>
+                    <a href="../blog.html" class="active">Blog</a>
+                </nav>
+                <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                    <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                    <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                    <span class="theme-label light-label">Light</span>
+                    <span class="theme-label dark-label">Dark</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<button class="theme-btn" id="themeBtn" aria-label="Toggle light/dark theme" title="Toggle theme">&#9788;</button>
+<div class="shell">
+<!-- ==================== SIDEBAR TOC ==================== -->
+<aside id="toc">
+  <div class="brand">
+    <div class="t">Inkling 2 Mini</div>
+    <div class="s">Looped Transformer Deep Dive &middot; 2026</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Front Matter</div>
+    <a href="#abstract"><span class="num">&sect;</span>Abstract &amp; How to Read</a>
+    <div class="part">Part I &mdash; The Model</div>
+    <a href="#ch1"><span class="num">1</span>Release Context</a>
+    <a href="#ch2"><span class="num">2</span>The 24-Layer Loop</a>
+    <a href="#ch3"><span class="num">3</span>Specification, Side by Side</a>
+    <a href="#ch4"><span class="num">4</span>Loops Instead of Facts</a>
+    <a href="#ch5"><span class="num">5</span>NVFP4, MXFP8, 20 GB</a>
+    <div class="part">Part II &mdash; Evidence</div>
+    <a href="#ch6"><span class="num">6</span>Agentic Coding</a>
+    <a href="#ch7"><span class="num">7</span>Search &amp; Knowledge Work</a>
+    <a href="#ch8"><span class="num">8</span>The Comparison, at a Glance</a>
+    <a href="#ch9"><span class="num">9</span>Vision, Reasoning &amp; Safety</a>
+    <a href="#ch10"><span class="num">10</span>What Looping Changes</a>
+    <div class="part">Part III &mdash; Running It</div>
+    <a href="#ch11"><span class="num">11</span>Deployment Field Guide</a>
+    <div class="part">Part IV &mdash; Judgment</div>
+    <a href="#ch12"><span class="num">12</span>Limitations &amp; Risks</a>
+    <a href="#ch13"><span class="num">13</span>Verdict</a>
+    <a href="#ch14"><span class="num">14</span>FAQ &amp; Sources</a>
+  </nav>
+  <div class="toc-foot">A fact-checked deep-dive research paper.<br>Every claim traced to primary sources.<br><span style="color:#7c86a0">Last updated: November 26, 2026</span></div>
+</aside>
+<!-- ==================== MAIN ==================== -->
+<main>
+<div class="page">
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <div class="kicker">Deep-Dive Research Paper &middot; Architecture &amp; Local AI</div>
+  <h1>Inkling 2 Mini<br><span class="thin">A 26B Looped MoE That Runs on a Laptop &mdash; Side-by-Side with Qwen3.8-27B</span></h1>
+  <p class="sub">Thinking Machines Lab did not make a bigger model. It made a smaller one that thinks longer per token: 24 physical layers, the middle 12 visited three times, 48 applications of reasoning per token from 26.4B parameters. Here is how that machine works, what it costs in memory, and where it actually beats a dense 27B model.</p>
+  <figure>
+    <img src="inkling-2-mini-hero.png" alt="Inkling 2 Mini architecture: a prelude block, two core blocks each run three times, and a final block, giving 48 layer visits per token from 24 physical layers" width="1200" height="630" decoding="async">
+    <figcaption>24 stored layers, 48 visits per token: the loop is the model&rsquos central design choice.</figcaption>
+  </figure>
+  <div class="statgrid">
+    <div class="cell"><div class="v">26.4B</div><div class="k">Total parameters</div></div>
+    <div class="cell"><div class="v">3.4B</div><div class="k">Active per pass</div></div>
+    <div class="cell"><div class="v">5.4B</div><div class="k">Effective active, three passes</div></div>
+    <div class="cell"><div class="v">48</div><div class="k">Layer visits per token</div></div>
+    <div class="cell"><div class="v">~20 GB</div><div class="k">NVFP4 + MXFP8 checkpoint</div></div>
+    <div class="cell"><div class="v">1M</div><div class="k">Token context window</div></div>
+  </div>
+  <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
+    <span><b>Subject:</b> Inkling 2 Mini (Thinking Machines Lab, November 20, 2026)</span>
+    <span><b>Baseline:</b> Qwen3.8-27B, dense, 27B active</span>
+    <span><b>License:</b> Apache 2.0</span>
+    <span><b>Scope:</b> looped architecture, low-bit numerics, pruning and healing, 48-benchmark comparison, loop-depth research, deployment</span>
+  </div>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<h2 class="ch" id="abstract"><span class="chno">&sect;</span> Abstract &amp; How to Read</h2>
+<p class="ch-sub">The thesis, the baseline, and the boundaries of the evidence.</p>
+
+<p>On <strong>November 20, 2026</strong>, Thinking Machines Lab released <strong>Inkling 2 Mini</strong>: a multimodal, open-weights mixture-of-experts transformer that stores <strong>26.4 billion</strong> parameters, activates <strong>3.4 billion</strong> per token, and runs its middle twelve layers three times so that every token passes through <strong>48 layer applications</strong> before it is emitted. Counting the extra passes, the company puts effective active parameters at about <strong>5.4B</strong>. The whole checkpoint is roughly <strong>20 GB</strong> in mixed NVFP4 and MXFP8 precision, small enough for a 32 GB Mac or a single NVIDIA DGX Spark.</p>
+
+<p>The interesting claim is not the size. Plenty of small models fit on a laptop. The claim is that <em>reusing layers buys reasoning depth that would otherwise require more weights</em>. Thinking Machines reports that looping the middle layers beat looping the last layers on <strong>27 of 28</strong> evaluations, and that in compute-equivalent terms a non-looping model would have needed more than <strong>1.5&times;</strong> the training compute to match the looped model&rsquo;s held-out loss. Alongside the model, the company published a variable-loop research checkpoint so the community can dial passes from one to five and watch what changes.</p>
+
+<p>This paper puts that architecture under a microscope and sets it beside <strong>Qwen3.8-27B</strong>, the dense 27B model that appears as the strongest peer in most of Thinking Machines&rsquo; own tables. The comparison is not a proxy war: the two models take different routes to similar aggregate intelligence. Inkling 2 Mini ties Qwen3.8-27B on the AA Index v5 at <strong>20.1</strong> and leads the Vals Index v2.2 at <strong>46.5%</strong> against <strong>29.8%</strong>. It wins decisively on agentic coding (DeepSWE <strong>48.2</strong> against <strong>42.2</strong>; SWE-bench Pro v2 Hard <strong>77.9</strong> against <strong>73.8</strong>) and on tool-driven search (BrowseComp <strong>79.0</strong> against <strong>61.6</strong>). Qwen stays ahead on factual recall, many-constraint instruction following, and several vision and reasoning benchmarks. Both halves of that picture matter.</p>
+
+<div class="callout info"><span class="lab">How to read this paper</span>
+<p><strong>Part I</strong> (Chapters 1&ndash;5) is the architecture: the loop, the spec table against Qwen3.8-27B, why depth was chosen over stored facts, and the low-bit numerics that make 20 GB possible. <strong>Part II</strong> (Chapters 6&ndash;10) is the evidence: agentic coding, search and knowledge work, a visual comparison, vision/reasoning/safety, and the loop-depth experiments. <strong>Part III</strong> (Chapter 11) is the deployment guide. <strong>Part IV</strong> (Chapters 12&ndash;14) covers limitations, the verdict, FAQ and sources.</p>
+<p>If you only want to know whether to try it, read the abstract, Chapter 3, Chapters 6&ndash;8, and Chapter 13. If you want to understand <em>why</em> it behaves the way it does, Chapters 2, 4 and 10 are the core.</p></div>
+
+<div class="callout warn"><span class="lab">Evidence note</span>
+<p>Every number in this paper comes from Thinking Machines&rsquo; model card, launch post, or Hugging Face&rsquo;s launch article, or from contemporaneous launch coverage. The benchmark figures are <strong>vendor-run</strong>, and Thinking Machines explicitly notes that evaluation setups vary by model. The efficiency-per-watt comparison uses different numeric precisions across the compared models; that caveat is carried with the number in Chapter 10. Nothing here is an independent measurement by the author.</p></div>
+
+<!-- ==================== CHAPTER 1 ==================== -->
+<h2 class="ch" id="ch1"><span class="chno">1</span> Release Context</h2>
+<p class="ch-sub">A small sibling to Inkling 2 Small, released open-weight with a research artifact attached.</p>
+
+<p>Inkling 2 Mini is the compact member of Thinking Machines Lab&rsquo;s second Inkling generation. The company describes it as &ldquo;a fast, powerful model that&rsquo;s small enough to run on your laptop,&rdquo; and the numbers behind that phrase are concrete: a <strong>~20 GB</strong> checkpoint, a <strong>1M-token</strong> context window, text and image input, Apache 2.0 weights, and official support paths for Apple silicon and NVIDIA DGX Spark. The weights are on Hugging Face, the model is available on the company&rsquo;s Tinker platform for inference and fine-tuning, and third-party inference providers carry it too.</p>
+
+<p>The release is unusual in one respect: it ships with a second model. <span class="mono">TML-d24-varloop-research</span> has the same architecture but accepts a variable number of loop passes, from one to five. Thinking Machines published it specifically so researchers could study how looping affects capability and monitorability. Chapters 2 and 10 draw on those experiments. The research checkpoint is not a faster version of Inkling 2 Mini; it is a scientific instrument released alongside the product.</p>
+
+<p>The positioning is local-first. In the launch post, a researcher took the model on a flight and built a playable flight simulator offline on a MacBook Pro in a few minutes; a separate demo runs all 20 residents of a pixel town on a single offline MacBook. Those are demonstrations rather than benchmarks, but they make the intended deployment shape clear: capable agents that stay on the device, with no API bill and no data leaving the machine.</p>
+
+<div class="callout info"><span class="lab">Why Qwen3.8-27B is the baseline here</span>
+<p>Thinking Machines&rsquo; own comparison table puts Inkling 2 Mini next to Gemma 4 31B, Muse Glimmer, Qwen3.8-27B and Nemotron 3.5 Super VL. Qwen3.8-27B is the densest, most frequently leading peer in that table, and it already has a <a href="qwen3-8-27b-comprehensive-analysis.html">full analysis on this site</a>. Using it as the running side-by-side keeps the comparison honest: it is a strong model with 27B active parameters, not a deliberately weak foil. Where the source marks another model as best, this paper says so.</p></div>
+
+<!-- ==================== CHAPTER 2 ==================== -->
+<h2 class="ch" id="ch2"><span class="chno">2</span> The 24-Layer Loop</h2>
+<p class="ch-sub">Four blocks of six, a three-pass core, learned messages between passes, and 48 visits per token.</p>
+
+<p>A conventional transformer has <em>N</em> stored layers and <em>N</em> layer applications per token. Inkling 2 Mini has <strong>24 stored layers</strong> and <strong>48 layer applications</strong>. It is a 24-layer decoder-only transformer divided into four blocks of six. The first block &mdash; the prelude &mdash; runs once. The middle two blocks, layers 6 through 17, run three times with shared weights. The final block runs once. The arithmetic from the Hugging Face launch article is explicit: 6 + 3&times;12 + 6 = 48 visits.</p>
+
+<p>That is the easy half. The hard part of a looped transformer is making the second and third passes do something new rather than re-running the same computation. Inkling uses two mechanisms. First, <strong>attention residuals</strong>: instead of adding every layer&rsquo;s output into one running sum, each layer reads the outputs of earlier blocks and learns its own mixture of them. Second, a <strong>cross-pass message</strong>. Every pass through the looped core starts from the same input &mdash; the prelude&rsquo;s output &mdash; but the second and third passes also read the core&rsquo;s outputs from the previous pass. Each looped layer has learned queries for its query, key, value and MoE inputs, and a small learned gate decides how much of the current input to forget and how much of the previous pass&rsquo;s message to add. The gate initially blocks the message entirely, which makes the first loop behave like an ordinary non-looping model and lets training introduce looping stably.</p>
+
+<p>The routing layer is also unusual. Each token selects <strong>8 of 128 experts</strong> in every MoE layer (Inkling 2 Small selects 8 of 384). The text decoder width is <strong>2,304</strong>, with an intermediate width of <strong>1,152</strong> per expert. Attention uses <strong>24 query heads and eight KV heads</strong>, learned relative position logits, a learned sink and an output gate. Each six-layer block contains five sliding-window layers with a <strong>1,024-token</strong> local window and one full-attention layer; full-attention layers use dynamic key and value convolutions. During passes two and three, each core layer attends over two residual blocks from the previous pass, and four rank-64 gates mix separate messages into the query, key, value and MoE inputs.</p>
+
+<p>The parameter accounting follows from this design. The checkpoint stores 26.4B parameters and activates 3.4B per pass. Thinking Machines notes that &ldquo;each extra pass through the looped layers adds about 1.0B effective active parameters,&rdquo; so the three-pass model runs at about <strong>5.4B effective active parameters per token</strong>. That is the number to use when reasoning about compute, not the 3.4B headline. Each of the 48 visits keeps its own KV and short-convolution state, so weight reuse does not mean state reuse.</p>
+
+<div class="callout info"><span class="lab">The design choice in one sentence</span>
+<p>Inkling 2 Mini spends its parameter budget on experts and spends its compute budget on revisiting the same layers, which is a different trade than storing more weights and visiting each once.</p></div>
+
+<!-- ==================== CHAPTER 3 ==================== -->
+<h2 class="ch" id="ch3"><span class="chno">3</span> Specification, Side by Side</h2>
+<p class="ch-sub">Inkling 2 Mini and Qwen3.8-27B on the same page: depth, sparsity, precision, memory and context.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Item</th><th>Inkling 2 Mini</th><th>Qwen3.8-27B</th></tr></thead>
+<tbody>
+<tr><td>Released</td><td>November 20, 2026</td><td>Earlier 2026 generation</td></tr>
+<tr><td>Model type</td><td>Multimodal autoregressive <strong>looped</strong> transformer</td><td>Dense decoder-only transformer</td></tr>
+<tr><td>Parameters</td><td>26.4B total; 3.4B active; ~5.4B effective with loops</td><td>27.0B total; 27.0B active</td></tr>
+<tr><td>Layers</td><td>24 physical / 48 applications per token</td><td>One application per layer</td></tr>
+<tr><td>Loop</td><td>Layers 6&ndash;17 run three times with shared weights</td><td>None</td></tr>
+<tr><td>Feed-forward</td><td>Sparse MoE, 8 of 128 SwiGLU experts per layer</td><td>Dense MLP</td></tr>
+<tr><td>Attention</td><td>Hybrid local/global; five sliding-window (1,024) + one full per block</td><td>Conventional attention stack</td></tr>
+<tr><td>Width</td><td>2,304 decoder; 1,152 expert intermediate</td><td>Larger dense width</td></tr>
+<tr><td>Numerics</td><td>NVFP4 (20 layers) + MXFP8 (last 4), trained and deployed as-is</td><td>Conventional high-precision weights; GGUF quantizations available</td></tr>
+<tr><td>Checkpoint</td><td class="num">~20 GB</td><td class="num">~54 GB at FP16</td></tr>
+<tr><td>Context</td><td class="num">1,000,000 tokens</td><td class="num">262,144 tokens</td></tr>
+<tr><td>Modalities</td><td>Text + image in, text out</td><td>Text in, text out</td></tr>
+<tr><td>License</td><td>Apache 2.0</td><td>Open weights</td></tr>
+</tbody></table></div>
+<p class="small">Inkling figures are from the model card and Hugging Face launch article; the Qwen3.8-27B column is the peer row in Thinking Machines&rsquo; comparison table and the prior analysis on this site. Width and layer-count details for Qwen are intentionally not restated here beyond what the source table provides.</p>
+
+<p>The table explains the shape of the later benchmark results. Inkling activates a fraction of Qwen&rsquo;s parameters per token, but it visits layers three times and carries a million-token context. It is not simply a smaller Qwen: it is a different allocation of the same budget &mdash; fewer running parameters, more serial computation, longer memory, native low-bit weights. Where a task rewards multi-step reasoning or long context, that allocation shows up as an advantage. Where a task rewards stored factual knowledge or many simultaneous constraints, it tends not to.</p>
+
+<!-- ==================== CHAPTER 4 ==================== -->
+<h2 class="ch" id="ch4"><span class="chno">4</span> Loops Instead of Facts</h2>
+<p class="ch-sub">Why the middle layers, why three passes, and what pruning 384 experts down to 128 cost.</p>
+
+<p>Thinking Machines is explicit about the limit of looping: &ldquo;looping improves the model&rsquo;s reasoning, it doesn&rsquo;t enable its weights to store more facts&mdash;knowledge is mostly a function of total parameter count.&rdquo; In the variable-loop study, long-context and multi-hop benchmarks improved with more passes, while closed-book factual QA &mdash; AA-Omniscience, SimpleQA Verified, SimpleVQA, WorldVQA &mdash; was nearly invariant. That is the architectural boundary of the idea: loops add <em>compute depth</em>, not <em>memory capacity</em>.</p>
+
+<p>The company tested where to put the loop. Looping the middle 12 layers produced larger accuracy gains than looping the last 12 on <strong>27 out of 28</strong> evaluations. At training step 2,000, a no-loop baseline was estimated to need <strong>1.51&ndash;1.91&times;</strong> as much compute to match the middle-loop model&rsquo;s loss, compared with only <strong>1.24&ndash;1.36&times;</strong> for the last-layer loop. The intuition is that middle layers carry abstract reasoning while the first and last layers mostly translate between embeddings and internal representations, so reusing the middle is where the leverage is. A non-looping version of the unpruned model cost <strong>7.5% less</strong> compute to train, but the looping version was <strong>over 50% more compute-efficient</strong>.</p>
+
+<p>Size came from a separate operation. Inkling 2 Mini started training with sparsity 48: each token selected 8 of <strong>384</strong> experts. At one point in midtraining, two-thirds of the experts were pruned, leaving the <strong>128</strong> most-used experts per layer. That cut the parameter count, but it also removed capacity, so the model then trained on <strong>1T tokens</strong> distilled from a larger internal Inkling model. Thinking Machines calls this &ldquo;healing&rdquo;: the surviving experts learn to take over the work of the deleted ones, recovering the pre-pruning performance. SFT followed with a data mix similar to Inkling 2 Small, then RL totalling <strong>2.2T tokens over 2,000 steps</strong>, with on-policy distillation for alignment.</p>
+
+<div class="callout info"><span class="lab">The trade, stated plainly</span>
+<p>Inkling 2 Mini is not trying to remember more than Qwen3.8-27B. It is trying to think harder per token with fewer active weights. It makes up the knowledge difference with search and tools, which is why BrowseComp, DeepSearchQA and MCP Atlas are among its strongest results.</p></div>
+
+<!-- ==================== CHAPTER 5 ==================== -->
+<h2 class="ch" id="ch5"><span class="chno">5</span> NVFP4, MXFP8, 20 GB</h2>
+<p class="ch-sub">Why the checkpoint has no quantization loss, and what it takes to run.</p>
+
+<p>Most low-bit models are trained at higher precision and then quantized. Inkling 2 Mini was trained at 4-bit: NVFP4 in the expert layers on all forward passes from pretraining through RL, backed by a dedicated kernel and hardware acceleration on NVIDIA&rsquo;s GB300 platform. The last four layers ran in 8-bit MXFP8. Crucially, the weights are <em>deployed in the same precision in which they were trained</em> &mdash; 20 layers NVFP4, four layers MXFP8 &mdash; so there is no conversion loss from a post-hoc quantization step. That is a different proposition from taking an FP16 model and rounding it.</p>
+
+<p>The result is a <strong>~20 GB</strong> checkpoint. Thinking Machines validates two local targets: one NVIDIA DGX Spark, and Apple silicon devices with <strong>32 GB or more</strong> unified memory (MacBooks, Mac minis, Mac Studios). Other GPUs and platforms with 32 GB or more of VRAM should work, though they are not the primary validated targets. On the software side, Apple users can choose Ollama or Exo Labs; NVIDIA users have SGLang, vLLM, Unsloth, NVIDIA Dynamo and TokenSpeed; quantized GGUF builds are available from Unsloth and llama.cpp.</p>
+
+<p>The 20 GB number deserves one qualification. It is the native checkpoint size, not the size of every local format. The recommended GGUF quant, <span class="mono">IQ4_NL</span>, converts the NVFP4 weights to a different 4-bit format while keeping the MXFP8 layers in FP8; Hugging Face says it fits in 32 GB of GPU RAM or unified memory. <span class="mono">Q8_0</span> is near-lossless but needs more RAM and runs slightly slower. If you are sizing a machine, 32 GB is the practical floor rather than 20 GB.</p>
+
+<!-- ==================== CHAPTER 6 ==================== -->
+<h2 class="ch" id="ch6"><span class="chno">6</span> Agentic Coding</h2>
+<p class="ch-sub">Twelve benchmarks. Inkling leads most, ties one, and loses one.</p>
+
+<p>This is the category Inkling 2 Mini was built for. Thinking Machines&rsquo; table compares it against Gemma 4 31B, Muse Glimmer, Qwen3.8-27B and Nemotron 3.5 Super VL, with harness details attached to each row. Against Qwen3.8-27B specifically, the pattern is consistent: Inkling leads on repository-scale and long-horizon work, with the notable exception of Terminal Bench v2.1.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Benchmark (harness)</th><th class="num">Inkling 2 Mini</th><th class="num">Qwen3.8-27B</th><th class="num">Delta</th></tr></thead>
+<tbody>
+<tr><td>FrontierCode v2.0 (stirrup v0.2.1)</td><td class="num"><strong>15.1</strong></td><td class="num">14.9</td><td class="num">+0.2</td></tr>
+<tr><td>DeepSWE v1.1 (mini-swe-agent v2.4.6)</td><td class="num"><strong>48.2</strong></td><td class="num">42.2</td><td class="num">+6.0</td></tr>
+<tr><td>Terminal Bench v4.0 (mini-swe-agent)</td><td class="num"><strong>5.6</strong></td><td class="num"><strong>5.6</strong></td><td class="num">tie</td></tr>
+<tr><td>Terminal Bench v2.1 (pi v0.83.0)</td><td class="num">71.6</td><td class="num"><strong>73.0</strong></td><td class="num">&minus;1.4</td></tr>
+<tr><td>SWE-bench Pro v2, Hard (mini-swe-agent)</td><td class="num"><strong>77.9</strong></td><td class="num">73.8</td><td class="num">+4.1</td></tr>
+<tr><td>SWE-bench Multilingual (bash only)</td><td class="num"><strong>73.7</strong></td><td class="num">70.0</td><td class="num">+3.7</td></tr>
+<tr><td>SWE-bench Verified (bash only)</td><td class="num"><strong>79.2</strong></td><td class="num">77.8</td><td class="num">+1.4</td></tr>
+<tr><td>SWE-bench Multimodal v2 (mini-swe-agent, vals)</td><td class="num"><strong>37.9</strong></td><td class="num">37.5</td><td class="num">+0.4</td></tr>
+<tr><td>Vibe Code Bench v1.1 (openhands, vals)</td><td class="num"><strong>77.9</strong></td><td class="num">64.9</td><td class="num">+13.0</td></tr>
+<tr><td>Code Migration v1.1 (pi, vals)</td><td class="num"><strong>23.2</strong></td><td class="num">16.4</td><td class="num">+6.8</td></tr>
+<tr><td>Terminal Bench Science v0.1</td><td class="num"><strong>1.4</strong></td><td class="num">0.5</td><td class="num">+0.9</td></tr>
+<tr><td>PMPP-Hard (AUC, 0&ndash;10h; pi v0.83.0)</td><td class="num"><strong>455.82</strong></td><td class="num">253.59</td><td class="num">+202.23</td></tr>
+</tbody></table></div>
+<p class="small">Thinking Machines&rsquo; model card, thinking-mode evaluation; setups vary by benchmark and are listed in the first column. Delta is Inkling minus Qwen. On PMPP-Hard, a kernel-optimization benchmark, Inkling approaches the much larger Inkling 2 Small.</p>
+
+<p>The headline for most readers is SWE-bench Verified at <strong>79.2</strong>, the highest score in the comparison group, from a model that activates roughly a fifth of Qwen&rsquo;s parameters. The more diagnostic number is DeepSWE <strong>48.2</strong> against <strong>42.2</strong>: that benchmark resolves repository tasks end to end, so it is sensitive to whether an agent keeps a long episode on track. The largest relative gain is Vibe Code Bench, where Inkling leads by <strong>13.0</strong> points. The one clear loss is Terminal Bench v2.1, where Qwen&rsquo;s <strong>73.0</strong> beats Inkling&rsquo;s <strong>71.6</strong>; Thinking Machines also notes that its model trails Qwen on AutomationBench-AA v1.0.6.</p>
+
+<p>Reading these numbers requires the same care as any vendor table. The harnesses differ by row, some scores are pass rates and one is an area-under-curve figure, and the comparison set was chosen by the model&rsquo;s developer. Within the table, the consistent shape is still meaningful: looped sparsity helps most where the work is long and sequential.</p>
+
+<!-- ==================== CHAPTER 7 ==================== -->
+<h2 class="ch" id="ch7"><span class="chno">7</span> Search &amp; Knowledge Work</h2>
+<p class="ch-sub">Inkling buys back its knowledge deficit with tools &mdash; and Qwen still wins the closed-book and constraint-heavy tasks.</p>
+
+<p>Thinking Machines acknowledges that a 26.4B model cannot match a 27B dense model on stored facts. The strategy is to use search and tools instead. The model card reports that Inkling leads similar-sized open-weight models on BrowseComp, DeepSearchQA and MCP Atlas, and the numbers against Qwen3.8-27B are among the largest in the whole comparison.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Benchmark</th><th class="num">Inkling 2 Mini</th><th class="num">Qwen3.8-27B</th><th class="num">Delta</th></tr></thead>
+<tbody>
+<tr><td>BrowseComp (with compaction)</td><td class="num"><strong>79.0</strong></td><td class="num">61.6</td><td class="num">+17.4</td></tr>
+<tr><td>DeepSearchQA (with compaction)</td><td class="num"><strong>85.3</strong></td><td class="num">79.7</td><td class="num">+5.6</td></tr>
+<tr><td>MCP Atlas (public)</td><td class="num"><strong>82.7</strong></td><td class="num">77.3</td><td class="num">+5.4</td></tr>
+<tr><td>JobBench</td><td class="num"><strong>49.6</strong></td><td class="num">33.4</td><td class="num">+16.2</td></tr>
+<tr><td>Finance Agent v2.1</td><td class="num"><strong>56.5</strong></td><td class="num">47.7</td><td class="num">+8.8</td></tr>
+<tr><td>Excel Modeling Benchmark v1.1</td><td class="num"><strong>66.0</strong></td><td class="num">52.8</td><td class="num">+13.2</td></tr>
+<tr><td>Tax Agent Bench</td><td class="num"><strong>14.1</strong></td><td class="num">11.6</td><td class="num">+2.5</td></tr>
+<tr><td>AA-AnalystAgent</td><td class="num"><strong>46.3</strong></td><td class="num">20.0</td><td class="num">+26.3</td></tr>
+<tr><td>Diligence Bench (best harness)</td><td class="num"><strong>48.6</strong></td><td class="num">46.4</td><td class="num">+2.2</td></tr>
+<tr><td>AutomationBench-AA v1.0.6</td><td class="num">41.8</td><td class="num"><strong>48.2</strong></td><td class="num">&minus;6.4</td></tr>
+<tr><td>EnterpriseOps-Gym</td><td class="num">42.0</td><td class="num"><strong>44.2</strong></td><td class="num">&minus;2.2</td></tr>
+<tr><td>AA-Briefcase v1.1 (ELO)</td><td class="num">1263</td><td class="num"><strong>1391</strong></td><td class="num">&minus;128</td></tr>
+<tr><td>GDPVal-AA v2.1 (ELO)</td><td class="num">1319</td><td class="num"><strong>1427</strong></td><td class="num">&minus;108</td></tr>
+</tbody></table></div>
+<p class="small">Thinking Machines&rsquo; model card. ELO figures are ratings, not percentages; the delta column subtracts Qwen from Inkling in the same units.</p>
+
+<p>The tool-use story is real but bounded. Inkling&rsquo;s biggest gain, AA-AnalystAgent <strong>46.3</strong> against <strong>20.0</strong>, is a knowledge-work benchmark that incorporates search and tool use. Its losses are on enterprise operations and ELO-rated briefcase and GDP valuations, where Qwen leads by <strong>6.4</strong>, <strong>128</strong> and <strong>108</strong> points respectively. The honest summary: a small looped model with good tool discipline beats a dense peer when the task permits retrieval, but does not replace a larger model when the answer must come from what is inside the weights.</p>
+
+<p>The same boundary appears in constrained instruction following. The launch post names MultiChallenge <strong>50.0%</strong> and ComplexConstraints v1.1 <strong>33.4%</strong> as places where Inkling is behind Qwen3.8-27B, and calls the model &ldquo;not the strongest small model for multi-turn chat or for instructions with many constraints.&rdquo; If your agent prompt is a long list of hard requirements, this is the number to check before switching.</p>
+
+<!-- ==================== CHAPTER 8 ==================== -->
+<h2 class="ch" id="ch8"><span class="chno">8</span> The Comparison, at a Glance</h2>
+<p class="ch-sub">Four headline numbers in one graphic, with the data beneath it.</p>
+
+<figure>
+  <img src="inkling-2-mini-vs-qwen-3-8-27b.png" alt="Side-by-side bar chart: Inkling 2 Mini versus Qwen3.8-27B on DeepSWE (48.2 vs 42.2), SWE-bench Pro v2 Hard (77.9 vs 73.8), BrowseComp (79.0 vs 61.6) and Vals Index v2.2 (46.5 vs 29.8)" width="1400" height="860" loading="lazy" decoding="async">
+  <figcaption>The four numbers that best summarise the release: agentic coding, hard repository work, tool-driven search and aggregate open-model value. All figures are Thinking Machines&rsquo; own.</figcaption>
+</figure>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Headline metric</th><th class="num">Inkling 2 Mini</th><th class="num">Qwen3.8-27B</th><th class="num">Delta</th></tr></thead>
+<tbody>
+<tr><td>DeepSWE v1.1</td><td class="num">48.2</td><td class="num">42.2</td><td class="num"><span class="tag good">+6.0</span></td></tr>
+<tr><td>SWE-bench Pro v2 Hard</td><td class="num">77.9</td><td class="num">73.8</td><td class="num"><span class="tag good">+4.1</span></td></tr>
+<tr><td>BrowseComp</td><td class="num">79.0</td><td class="num">61.6</td><td class="num"><span class="tag good">+17.4</span></td></tr>
+<tr><td>Vals Index v2.2</td><td class="num">46.5</td><td class="num">29.8</td><td class="num"><span class="tag good">+16.7</span></td></tr>
+<tr><td>AA Index v5.0</td><td class="num">20.1</td><td class="num">20.1</td><td class="num">tie</td></tr>
+</tbody></table></div>
+
+<p>Read together, these rows say that Inkling 2 Mini reaches the same aggregate index score as Qwen3.8-27B while activating about a fifth as many parameters per pass, and that it does so by leading on long-horizon and tool-driven tasks rather than on general knowledge. The graphic shows the wins; Chapters 7, 9 and 12 show the losses and the costs that keep the picture balanced.</p>
+
+<!-- ==================== CHAPTER 9 ==================== -->
+<h2 class="ch" id="ch9"><span class="chno">9</span> Vision, Reasoning &amp; Safety</h2>
+<p class="ch-sub">The rest of the 48-benchmark table, including the rows Qwen wins and the safety results Inkling leads.</p>
+
+<h3>Vision and long context</h3>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Benchmark</th><th class="num">Inkling 2 Mini</th><th class="num">Qwen3.8-27B</th></tr></thead>
+<tbody>
+<tr><td>GDP.pdf</td><td class="num"><strong>16.8</strong></td><td class="num">16.4</td></tr>
+<tr><td>PerceptionBench</td><td class="num"><strong>57.5</strong></td><td class="num">52.4</td></tr>
+<tr><td>MMMU Pro (standard 10)</td><td class="num">74.9</td><td class="num"><strong>76.3</strong></td></tr>
+<tr><td>OmniDocBench v1.6</td><td class="num"><strong>92.8</strong></td><td class="num">91.5</td></tr>
+<tr><td>ScreenSpot Pro (original / with Python)</td><td class="num"><strong>76.5 / 87.7</strong></td><td class="num">75.4 / &ndash;</td></tr>
+<tr><td>Charxiv RQ (original / with Python)</td><td class="num">80.6 / 88.3</td><td class="num"><strong>83.7 / 90.2</strong></td></tr>
+<tr><td>Chartography (original / with Python)</td><td class="num"><strong>22.1 / 72.5</strong></td><td class="num">17.4 / 25.1</td></tr>
+<tr><td>ZeroBench, main (original / with Python)</td><td class="num"><strong>17.0 / 34.0</strong></td><td class="num">12.0 / 29.0</td></tr>
+<tr><td>GroundingME</td><td class="num"><strong>55.5</strong></td><td class="num">44.7</td></tr>
+<tr><td>SAGE v1.1</td><td class="num"><strong>85.9</strong></td><td class="num">&ndash;</td></tr>
+<tr><td>MathVision</td><td class="num">89.0</td><td class="num"><strong>90.0</strong></td></tr>
+<tr><td>MuirBench</td><td class="num">77.5</td><td class="num"><strong>77.6</strong></td></tr>
+<tr><td>BVB</td><td class="num">68.4</td><td class="num"><strong>70.7</strong></td></tr>
+<tr><td>Code2Video-AA (ELO)</td><td class="num">870</td><td class="num"><strong>949</strong></td></tr>
+</tbody></table></div>
+
+<p>Inkling leads on document and screen-grounding work &mdash; Chartography with Python <strong>72.5</strong> against <strong>25.1</strong> is the largest gap in the table &mdash; and takes the best-reported score on seven of these rows. Qwen holds the edge on several reasoning-heavy vision tasks. The native multimodal design is consequently not a uniform win; it is strongest where the model can use code and tools to inspect an image.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Benchmark</th><th class="num">Inkling 2 Mini</th><th class="num">Qwen3.8-27B</th></tr></thead>
+<tbody>
+<tr><td>LongBench v2</td><td class="num"><strong>66.9</strong></td><td class="num">52.3</td></tr>
+<tr><td>GraphWalks BFS 256K</td><td class="num"><strong>69.7</strong></td><td class="num">50.4</td></tr>
+<tr><td>MRCR v2, 8-needle 256K&ndash;512K</td><td class="num"><strong>46.4</strong></td><td class="num">38.0</td></tr>
+<tr><td>HLE-Diamond</td><td class="num">15.2</td><td class="num"><strong>15.3</strong></td></tr>
+<tr><td>HLE, text only</td><td class="num">30.7</td><td class="num"><strong>33.9</strong></td></tr>
+<tr><td>CritPt v2, full / hard</td><td class="num"><strong>31.4 / 17.0</strong></td><td class="num">10.6 / 4.0</td></tr>
+<tr><td>GPQA Diamond</td><td class="num">86.6</td><td class="num"><strong>90.5</strong></td></tr>
+<tr><td>Apex 2025</td><td class="num"><strong>34.4</strong></td><td class="num">18.8</td></tr>
+<tr><td>ARC-AGI v1 / v2</td><td class="num">84.5 / <strong>49.3</strong></td><td class="num"><strong>87.5</strong> / 42.4</td></tr>
+<tr><td>AA-Omniscience v1.1, score</td><td class="num">&minus;8.6</td><td class="num"><strong>&minus;6.4</strong></td></tr>
+<tr><td>AA-Omniscience, non-hallucination rate</td><td class="num">63.4</td><td class="num"><strong>71.4</strong></td></tr>
+<tr><td>ComplexConstraints v1.1</td><td class="num">33.4</td><td class="num"><strong>35.6</strong></td></tr>
+</tbody></table></div>
+
+<p>This table is the clearest statement of the architecture&rsquos limits and strengths. Long-context retrieval is where looping pays: GraphWalks BFS at 256K reaches <strong>69.7</strong> against <strong>50.4</strong>. Factual reliability is where it does not: non-hallucination rate <strong>63.4</strong> against <strong>71.4</strong>, and AA-Omniscience score &minus;8.6 against &minus;6.4. CritPt v2 is an outlier in Inkling&rsquo;s favour at <strong>31.4</strong> full / <strong>17.0</strong> hard against <strong>10.6 / 4.0</strong>, which the company attributes to deeper serial computation rather than stored knowledge.</p>
+
+<h3>Safety and alignment</h3>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Benchmark (lower is better where &darr;)</th><th class="num">Inkling 2 Mini</th><th class="num">Qwen3.8-27B</th></tr></thead>
+<tbody>
+<tr><td>FORTRESS, adversarial (public)</td><td class="num">89.5</td><td class="num"><strong>90.3</strong></td></tr>
+<tr><td>FORTRESS, benign (public)</td><td class="num"><strong>96.4</strong></td><td class="num">89.1</td></tr>
+<tr><td>StrongREJECT (none)</td><td class="num">97.8</td><td class="num"><strong>99.0</strong></td></tr>
+<tr><td>Misbehavior (internal) &darr;</td><td class="num"><strong>9.8%</strong></td><td class="num">57.7%</td></tr>
+<tr><td>Covert misbehavior (internal) &darr;</td><td class="num"><strong>8.3%</strong></td><td class="num">33.2%</td></tr>
+<tr><td>Destructive actions (internal) &darr;</td><td class="num"><strong>10.2%</strong></td><td class="num">35.2%</td></tr>
+<tr><td>HoneyBench v0.2 &darr;</td><td class="num">56.7%</td><td class="num">&ndash;</td></tr>
+</tbody></table></div>
+
+<p>The internal misbehavior metrics are strikingly low for Inkling &mdash; <strong>9.8%</strong> versus <strong>57.7%</strong> for Qwen on misbehavior, <strong>8.3%</strong> versus <strong>33.2%</strong> on covert misbehavior, and <strong>10.2%</strong> versus <strong>35.2%</strong> on destructive actions. These are the company&rsquo;s own internal tests, not public benchmarks, so they should be read as reported results. The model card also notes an extra phase of alignment training using on-policy distillation, applied in the same way as Inkling 2 Small. Notably, the model card&rsquo;s limitations section separately warns that in agentic use Inkling can still take destructive actions such as deleting or overwriting files without confirmation &mdash; a reminder that low scores on internal tests are not a safety guarantee.</p>
+
+<!-- ==================== CHAPTER 10 ==================== -->
+<h2 class="ch" id="ch10"><span class="chno">10</span> What Looping Changes</h2>
+<p class="ch-sub">The variable-loop experiments: no-CoT horizons, shorter legible reasoning, monitorability, and an efficiency-per-watt claim with a precision caveat.</p>
+
+<p>The variable-loop research checkpoint lets Thinking Machines run the same weights at one to five passes. On <strong>Think Fast</strong>, a benchmark estimating the length of task a model can complete at 50% reliability without writing a chain of thought, the no-CoT time horizon rises from <strong>16 seconds at one pass to 37 seconds at three</strong>. Beyond three passes the gains flatten, though the model was never trained with more than five and running it at ten does not significantly degrade performance. On N-Hop Lookup, which requires chaining fictional lookups without writing anything down, accuracy keeps improving out to ten loops.</p>
+
+<p>More passes also produce shorter reasoning without making it unreadable. On GPQA Diamond questions answered correctly at all five pass counts, mean reasoning tokens fell from <strong>3,703</strong> at one pass to <strong>1,731</strong> at three and <strong>1,661</strong> at five &mdash; less than half. Sentence length held at <strong>8.9 / 8.7 / 8.7</strong> words, the fraction of dictionary words at <strong>94.6% / 94.5% / 94.4%</strong>, and uncertainty markers such as &ldquo;wait&rdquo; and &ldquo;hmm&rdquo; dropped from <strong>9.7</strong> to <strong>3.9</strong> and <strong>3.6</strong>. The company&rsquo;s reading is that additional internal computation removes backtracking rather than hiding it; the shorter traces remain human-legible.</p>
+
+<p>Two monitorability results matter for anyone worried that looped reasoning is harder to oversee. On CoT-Control-QA, among chains of 750&ndash;1,250 tokens, Inkling 2 Mini and the variable-loop model followed instructions about their own CoT at most <strong>0.1%</strong> of the time, compared with <strong>0.3%</strong> for Inkling 2 Small, <strong>0.4%</strong> for Inkling-Small and <strong>1.3%</strong> for Qwen3.8-27B &mdash; too low a rate to distinguish loop depths. On LinuxArena, using a deliberately weaker monitor (Qwen3.6-35B-A3B) over 184 main/side-task pairings at a 1% false-positive threshold, stealth rates with tool calls and outputs only were <strong>20.5%</strong> for Qwen3.8-27B, <strong>3.2%</strong> for Inkling 2 Small, <strong>3.9%</strong> for a helpful-only Inkling 2 Mini fine-tune, and <strong>1.0 / 2.5 / 4.0 / 2.8 / 5.0%</strong> for the variable-loop model at one through five passes. With text and thinking visible, the rates fell to <strong>0.4 / 0.5 / 1.3 / 0.3 / 0.4 / 0.6 / 0.3 / 0.0%</strong> across those models. There is no clear trend with loop depth, and a strong monitor (Qwen3.8-27B) detected almost all side-task attempts.</p>
+
+<p>Finally, the efficiency claim. Stanford&rsquo;s Hazy Research and Scaling Intelligence Labs scored Inkling 2 Mini at <strong>0.703</strong> on intelligence-per-joule running on an NVIDIA DGX Spark, against <strong>0.430</strong> for Qwen3.6-35B-A3B, <strong>0.159</strong> for Gemma-4-26B-A4B and <strong>0.036</strong> for Qwen3.5-27B. This is the strongest number in the launch post, and it comes with a real caveat: Inkling ran at MXFP8 with low reasoning effort, Qwen3.6-35B-A3B and Gemma-4-26B-A4B ran at NVFP4, and Qwen3.5-27B at INT4. Different precisions and different effort settings make this a directional result, not a controlled comparison. It is still consistent with the architecture story: fewer active parameters and native low-bit weights mean less energy per completed task.</p>
+
+<div class="callout info"><span class="lab">Who gets the research checkpoint</span>
+<p>Thinking Machines released the variable-loop model so the community can study loop depth directly. The company is working with NDIF to make it accessible to interpretability researchers and gave Goodfire early access. The bigger question &mdash; whether chain-of-thought monitoring remains reliable when models think internally rather than verbally &mdash; is explicitly left open at this scale.</p></div>
+
+<!-- ==================== CHAPTER 11 ==================== -->
+<h2 class="ch" id="ch11"><span class="chno">11</span> Deployment Field Guide</h2>
+<p class="ch-sub">GGUF, Ollama, MLX, transformers, SGLang, DSpark, reasoning effort and tool calling.</p>
+
+<h3>GGUF and the laptop path</h3>
+
+<p>The easiest local route is the Llama App on macOS or Windows: pick a quant from <span class="mono">ggml-org/Inkling-2-Mini-GGUF</span>, click &ldquo;Use this model&rdquo; and select Llama. Hugging Face recommends <span class="mono">IQ4_NL</span> for most users &mdash; the original NVFP4 weights are converted to a different 4-bit format while the MXFP8 layers stay in FP8, and it fits in 32 GB &mdash; with <span class="mono">Q8_0</span> as the near-lossless, slower, more memory-hungry alternative. On Apple silicon, Ollama and Exo Labs are the officially named runtimes, and MLX support was upstreamed to <span class="mono">mlx-lm</span> with image and text inputs. MLX can also load the original checkpoint directly, using the native NVFP4 + MXFP8 scheme without reconversion.</p>
+
+<div class="tblwrap" style="border:1px solid #0d1117;background:var(--code-bg);border-radius:10px;padding:0"><table style="background:none;border:none"><tbody><tr><td style="border:none;padding:0">
+<pre><code><span class="cmt"># Easiest local server: recommended IQ4_NL quant via llama.cpp</span>
+curl -LsSf https://llama.app/install.sh | sh
+llama serve -hf ggml-org/Inkling-2-Mini-GGUF:IQ4_NL
+<span class="cmt"># Swap :IQ4_NL for :Q8_0 for near-lossless weights at higher RAM cost</span>
+<span class="cmt"># Variable-loop research checkpoint: ggml-org/TML-d24-varloop-research-GGUF:IQ4_NL</span></code></pre>
+</td></tr></tbody></table></div>
+
+<h3>Transformers</h3>
+
+<p>Hugging Face ships <span class="mono">AutoModelForMultimodalLM</span> for both the fixed-loop model and the variable-loop research artifact. The variable-loop checkpoint takes <span class="mono">loop_num_passes</span> in <span class="mono">text_config</span>:</p>
+
+<div class="tblwrap" style="border:1px solid #0d1117;background:var(--code-bg);border-radius:10px;padding:0"><table style="background:none;border:none"><tbody><tr><td style="border:none;padding:0">
+<pre><code>from transformers import AutoModelForMultimodalLM, AutoProcessor
+
+model_id = <span class="str">"thinkingmachines/TML-d24-varloop-research"</span>
+processor = AutoProcessor.from_pretrained(model_id)
+model = AutoModelForMultimodalLM.from_pretrained(
+    model_id, text_config={<span class="str">"loop_num_passes"</span>: 2}
+)
+inputs = processor.apply_chat_template(
+    messages, reasoning_effort=<span class="str">"medium"</span>, tokenize=<span class="key">True</span>,
+    add_generation_prompt=<span class="key">True</span>, return_dict=<span class="key">True</span>, return_tensors=<span class="str">"pt"</span>
+).to(model.device)</code></pre>
+</td></tr></tbody></table></div>
+
+<p>Reasoning effort is passed as a named level or a number from 0.0 to 0.99. The named levels are <span class="mono">none</span> (0.0), <span class="mono">minimal</span> (0.1), <span class="mono">low</span> (0.2), <span class="mono">medium</span> (0.7), <span class="mono">high</span> (0.9, the default), <span class="mono">xhigh</span> (0.99) and <span class="mono">max</span> (0.99). Do not expect <span class="mono">none</span> to fully disable reasoning: the model card says minimum effort does not turn reasoning off, and the looped layers keep computing regardless of how much is written out.</p>
+
+<h3>SGLang and DSpark speculative decoding</h3>
+
+<p>SGLang provides day-zero support, with one hardware prerequisite: run on SM103. The documented launch command is:</p>
+
+<div class="tblwrap" style="border:1px solid #0d1117;background:var(--code-bg);border-radius:10px;padding:0"><table style="background:none;border:none"><tbody><tr><td style="border:none;padding:0">
+<pre><code>export MODEL=<span class="str">"thinkingmachines/Inkling-2-Mini"</span>
+python -m sglang.launch_server \
+  --model-path $MODEL --served-model-name inkling \
+  --attention-backend fa4 --bf16-gemm-backend torch --dtype bfloat16 \
+  --tp 1 --page-size 128 --grammar-backend xgrammar \
+  --host 0.0.0.0 --port 30000
+<span class="cmt"># DSpark: add --speculative-algorithm DSPARK --context-length 131072</span></code></pre>
+</td></tr></tbody></table></div>
+
+<p>The DSpark drafter is a three-layer head that reads the inputs to decoder visits <strong>5, 23 and 41</strong>, plus the final normalized state at index <strong>48</strong>, and proposes tokens for the target model to verify. Hugging Face benchmarked it on a single NVIDIA B300 with 1,024-token prompts generating exactly 1,024 tokens at concurrency 1, 4, 16 and 64, using SGLang&rsquo;s serving benchmark; the headline is that speculative decoding adds speed at a small memory cost. The exact speed table is not reproduced in the launch article, so treat the direction as documented and the magnitude as hardware-specific.</p>
+
+<h3>Tools and images</h3>
+
+<p>Tool calling goes through the standard chat template: pass a Python function to <span class="mono">tools=</span> in <span class="mono">apply_chat_template</span>, read the returned <span class="mono">tool_calls</span>, execute the function locally, and append a <span class="mono">role="tool"</span> message. Images are supported by replacing the text content with a list containing an <span class="mono">image</span> part and a text question; accepted dimensions are 40px to 4096px per axis. On MLX the CLI example passes the image directly with <span class="mono">--image</span>. For hosted use without local hardware, Tinker provides inference, a playground and a fine-tuning cookbook.</p>
+
+<!-- ==================== CHAPTER 12 ==================== -->
+<h2 class="ch" id="ch12"><span class="chno">12</span> Limitations &amp; Risks</h2>
+<p class="ch-sub">What the model card says it gets wrong, and what the evidence cannot settle.</p>
+
+<p>The model card is unusually direct about the Mini&rsquos weaknesses. It is &ldquo;less capable than Inkling 2 Small across most of our evaluations, with the largest gaps on factual recall and knowledge-heavy questions,&rdquo; and is more likely than larger models to state incorrect information confidently. In internal testing it sometimes gets stuck in long reasoning loops or repeatedly re-checks its work without progress, particularly while debugging code; Thinking Machines recommends limits on output tokens and agent turns. On tools it is less reliable than larger models at following detailed instructions and project conventions, may take destructive actions such as deleting or overwriting files without confirmation, and may misreport the outcome of its work. Output quality outside English can be lower, with clipped phrasing and mixed languages observed in Chinese, and the model can be overcautious on mental-health topics.</p>
+
+<p>Two further caveats are about interpretation rather than behavior. First, minimum reasoning effort does not fully disable reasoning, and because the middle layers run three times, compute per token is higher than the active-parameter count suggests. Anyone sizing hardware from &ldquo;3.4B active&rdquo; will be surprised; use the 5.4B effective figure. Second, support for looped models in local runtimes is new and speed varies widely by runtime and hardware. The community speed reports already illustrate this: 357.9 tokens/s on an RTX 5090 in one llama.cpp run, 29.0 tokens/s on an RTX 3060 12 GB with experts in RAM, and 21.7&ndash;30.2 tokens/s on Apple silicon depending on runtime. These are individual runs, not controlled comparisons.</p>
+
+<div class="callout warn"><span class="lab">Evidence boundary</span>
+<p>All headline benchmarks are Thinking Machines&rsquo; own, with harnesses that vary by row and by model. The efficiency-per-watt comparison mixes precisions and reasoning efforts. The safety table&rsquo;s internal misbehavior metrics are vendor tests, while the same model card warns about real agentic risk. None of this makes the results wrong, but it does mean a local trial on your own repository and prompts is the only real verification.</p></div>
+
+<p>The deployment recommendation follows from those limits: run agentic workloads in a sandbox, require confirmation before destructive actions, add application-layer filtering and monitoring, avoid medical, legal or safety-critical decisions without fine-tuning and human oversight, and evaluate the model for your own language and population before shipping. Those are standard precautions for an open model, but the agentic-reliability warning makes them more than boilerplate here.</p>
+
+<!-- ==================== CHAPTER 13 ==================== -->
+<h2 class="ch" id="ch13"><span class="chno">13</span> Verdict</h2>
+<p class="ch-sub">What the loop buys, what it does not, and who should switch.</p>
+
+<p>Inkling 2 Mini is the most interesting local-model release of this season because it changes the question. The usual question is &ldquo;how small can we make a model before it stops working?&rdquo; This release asks &ldquo;how much reasoning can we buy by making the model think the same layers over again?&rdquo; The answer, on the published tables, is: quite a lot. A 26.4B checkpoint with 3.4B active parameters ties a dense 27B on the AA Index v5 at 20.1, beats it on DeepSWE, SWE-bench Pro v2 Hard, BrowseComp and the Vals Index, and fits in a backpack&rsquo;s worth of laptop memory at the precision it was trained on.</p>
+
+<p><strong>Run it if</strong> your work is long-horizon and tool-driven: repository agents, search-heavy knowledge work, document and screen understanding, or multiple persistent agents on one machine. The 1M-token context and low-bit checkpoint make those cases practical on hardware people already own, and the loop-depth result suggests the architecture is doing real serial computation rather than just saving storage.</p>
+
+<p><strong>Stick with Qwen3.8-27B, or wait, if</strong> your work depends on stored factual knowledge, strict multi-constraint instruction following, or the vision and reasoning rows where Qwen leads &mdash; GPQA Diamond <strong>90.5</strong> against <strong>86.6</strong>, ComplexConstraints <strong>35.6</strong> against <strong>33.4</strong>, non-hallucination <strong>71.4</strong> against <strong>63.4</strong>. If you need the lowest latency for short prompts, remember that looping adds compute per token and that the strongest efficiency comparisons mix precisions. And if you need independently verified numbers, there are none yet: every figure here is the vendor&rsquo;s.</p>
+
+<p>The broader lesson is that parameter count is no longer a sufficient proxy for either capability or cost. A 26.4B model activated at 5.4B effective parameters can outperform a dense 27B on agentic work, and a 20 GB checkpoint can carry a million-token context. What it cannot do is know more than its weights contain &mdash; which is exactly why Thinking Machines built it to search.</p>
+
+<!-- ==================== CHAPTER 14 ==================== -->
+<h2 class="ch" id="ch14"><span class="chno">14</span> FAQ &amp; Sources</h2>
+<p class="ch-sub">Short answers, then the full source list.</p>
+
+<section id="faq" class="article-section faq">
+<h2>Frequently asked questions</h2>
+<h3>What is Inkling 2 Mini?</h3>
+<p>Inkling 2 Mini is an open-weights multimodal model from Thinking Machines Lab, released November 20, 2026 under Apache 2.0. It is a 26.4B-parameter mixture-of-experts transformer with 3.4B active parameters per token, and its middle 12 layers are looped three times for 48 layer applications per token.</p>
+<h3>How does looping change the parameter count?</h3>
+<p>The checkpoint stores 24 physical layers, but layers 6 through 17 are visited three times with shared weights, giving 48 layer applications per token. Each extra pass adds roughly 1.0B effective active parameters, so the 3.4B active headline becomes about 5.4B effective active parameters.</p>
+<h3>How does Inkling 2 Mini compare with Qwen3.8-27B?</h3>
+<p>On Thinking Machines&rsquo; own tables Inkling leads on DeepSWE 48.2 versus 42.2, SWE-bench Pro v2 Hard 77.9 versus 73.8, BrowseComp 79.0 versus 61.6 and Vals Index 46.5 versus 29.8. Qwen3.8-27B stays ahead on GPQA Diamond 90.5 versus 86.6, ComplexConstraints 35.6 versus 33.4 and AA-Omniscience non-hallucination 71.4 versus 63.4.</p>
+<h3>What hardware does it need?</h3>
+<p>The checkpoint is about 20 GB in mixed NVFP4 and MXFP8 precision. Thinking Machines validates one NVIDIA DGX Spark and Apple silicon Macs with 32 GB or more unified memory; other GPUs with 32 GB or more VRAM should work. GGUF IQ4_NL fits in 32 GB and is the recommended local quant.</p>
+<h3>Can I change the number of loop passes?</h3>
+<p>Not in the released Inkling 2 Mini checkpoint, which is fixed at three passes. Thinking Machines also published TML-d24-varloop-research, trained for one to five passes, where <span class="mono">loop_num_passes</span> can be set in <span class="mono">text_config</span>. Lower pass counts are faster but may reduce quality.</p>
+</section>
+
+<h3>Sources</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>#</th><th>Source</th><th>Role in this paper</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Thinking Machines Lab, <em>Inkling 2 Mini Model Card</em>, November 20, 2026</td><td>Architecture, parameters, numerics, full 48-benchmark table, safety, limitations</td></tr>
+<tr><td>2</td><td>Thinking Machines Lab, <em>Introducing Inkling 2 Mini</em>, November 20, 2026</td><td>Release claims, looping design, pruning and healing, monitorability experiments, efficiency per watt, platform coverage</td></tr>
+<tr><td>3</td><td>Hugging Face, <em>Welcome Inkling 2 Mini, Cutting-edge Performance for your Local Setup</em>, November 20, 2026</td><td>Layer and block detail, attention design, GGUF quants, transformers/llama.cpp/SGLang/MLX examples, DSpark</td></tr>
+<tr><td>4</td><td>MindStudio, <em>Inkling 2 Mini: Run Thinking Machines&rsquo; Open Model Locally</em>, November 21, 2026</td><td>Local hardware and runtime coverage, independent restatement of the comparison table</td></tr>
+<tr><td>5</td><td>AI TLDR, <em>Inkling 2 Mini by Thinking Machines Lab</em>, November 2026</td><td>Launch coverage and model summary</td></tr>
+<tr><td>6</td><td>Silicon Report, <em>Inkling 2 Mini: benchmarks, pricing and speed</em>, November 24, 2026</td><td>Launch-period benchmark and speed tracking</td></tr>
+<tr><td>7</td><td>llm-bench.io, <em>inkling-2-mini Benchmarks: Speed, VRAM &amp; Quality</em>, November 2026</td><td>Community speed reports</td></tr>
+<tr><td>8</td><td>Thinking Machines Lab, <em>Connectionism</em> articles on 4-bit training</td><td>NVFP4 training background</td></tr>
+<tr><td>9</td><td>Local AI Zone, <em>Qwen 3.8 27B: Comprehensive Analysis</em></td><td>Prior baseline analysis for cross-reference</td></tr>
+<tr><td>10</td><td>Local AI Zone, <em>Bonsai 2 27B</em> and <em>Bonsai 2.5 27B</em> deep dives</td><td>Series context on low-bit local models</td></tr>
+</tbody></table></div>
+
+<p class="small">Document-dates note: this paper was assembled November 26, 2026, six days after the Inkling 2 Mini release. Benchmark scores, community speed measurements and runtime support are current to that date and will age. Citation of Thinking Machines&rsquo; materials follows the company&rsquo;s model-card format: <span class="mono">Inkling 2 Mini, Thinking Machines Lab, November 20, 2026; Apache 2.0</span>.</p>
+
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<!-- ==================== RELATED POSTS ==================== -->
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Inkling 2 Mini">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
+<section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
+  <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
+    <a href="qwen3-8-27b-comprehensive-analysis.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Qwen 3.8 27B: Comprehensive Analysis</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The dense baseline in this comparison: architecture, benchmarks and deployment for the 27B model Inkling is measured against.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="bonsai-2-5-27b-agentic-deep-dive.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Bonsai 2.5 27B: FP16-Level Agents in 5.93 GB</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">Another route to local agentic capability: ternary weights instead of looped layers, compared side by side with its predecessor.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="quantization-formats-guide.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">GGUF vs EXL2 vs AWQ vs GPTQ</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">Where NVFP4 and MXFP8 sit among the local quantization formats, and what each costs in quality and memory.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+  </div>
+</section>
+
+
+<button id="backTop" title="Back to top" aria-label="Back to top" style="position:fixed;bottom:26px;right:22px;z-index:70;width:44px;height:44px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:19px;box-shadow:0 4px 16px rgba(15,23,42,.16);display:none;">&#8593;</button>
+
+<script>
+(function(){
+  // ---- theme toggle ----
+  var btn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('inkling2-mini-paper-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+  } catch(e) {}
+  if (btn) btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.innerHTML = '&#9788;'; }
+    else { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+    try { localStorage.setItem('inkling2-mini-paper-theme', dark ? 'light' : 'dark'); } catch(e) {}
+  });
+
+  // ---- scroll-spy TOC ----
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function onScroll(){
+    var y = window.scrollY + 120, best = 0;
+    for (var i = 0; i < targets.length; i++) {
+      if (targets[i] && targets[i].offsetTop <= y) best = i;
+    }
+    links.forEach(function(a, i){ a.classList.toggle('active', i === best); });
+    var bt = document.getElementById('backTop');
+    if (bt) bt.style.display = (window.scrollY > 900) ? 'block' : 'none';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ---- back to top ----
+  var backTop = document.getElementById('backTop');
+  if (backTop) backTop.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+<script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+    <!-- Floating Instagram Button - Always Visible -->
+    <a href="https://www.instagram.com/nazary.ai" class="floating-instagram-btn" rel="noopener" target="_blank" aria-label="Connect with me on Instagram" title="Connect with me on Instagram" style="position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 8px 24px rgba(225, 48, 108, 0.4); z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255, 255, 255, 0.2);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span style="color: white; font-weight: 600; white-space: nowrap;">Connect with me on Instagram</span>
+    </a>
+</body>
+</html>
