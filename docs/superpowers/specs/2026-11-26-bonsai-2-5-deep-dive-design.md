@@ -106,7 +106,7 @@ Framing: Bonsai 2 kept 63% of FP16 on this suite and solved zero DeepSWE tasks; 
 | Vision | 7 benchmarks incl. MMMU-Pro, CharXiv | 86.07 | 81.89 | 83.66 |
 | Average (5 categories) | | 84.32 | 81.55 | 82.12 |
 
-Note explicitly: docs/whitepaper quote the suite average as 84.4 / 82.3 and press as 84.4 / 82.1 — rounding and a 14-vs-16 benchmark count differ between sources; use the model-card table above as canonical and disclose the discrepancy. Per-benchmark regressions to call out: LiveCodeBench v6 83.8 → 83.0; BigCodeBench 57.2 → 60.3.
+Note explicitly: docs/whitepaper quote the suite average as 84.4 / 82.3 while the model card's highlights quote 84.3 / 82.1 — rounding and a 14-vs-16 benchmark count differ between sources; use the model-card category table above as canonical and disclose the discrepancy. Per-benchmark regressions to call out: LiveCodeBench v6 83.8 → 83.0; BigCodeBench 57.2 → 60.3.
 
 ### Throughput
 

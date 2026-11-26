@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ternary Bonsai 2.5 27B: FP16-Level Agents in 5.93 GB — A Side-by-Side Deep Dive</title>
+<meta name="description" content="A side-by-side deep dive on Ternary Bonsai 2.5 27B, Prism ML's November 24, 2026 agentic release: the same Qwen3.8-27B hybrid-attention base, ternary g128 weights and 5.93 GB footprint as Bonsai 2, but FP16-level tool calling, 90% of FP16 agentic coding, an MTP draft head, and every benchmark delta from the previous version.">
+<meta name="keywords" content="Bonsai 2.5 27B, Ternary Bonsai 2.5, Prism ML, agentic coding, tool calling, AppWorld, SWE-bench Verified, DeepSWE, Terminal-Bench 2.1, ternary quantization, 1.76 bits per weight, MTP, speculative decoding, GGUF, MLX, llama.cpp, local AI agents">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Ternary Bonsai 2.5 27B: FP16-Level Agents in 5.93 GB — A Side-by-Side Deep Dive",
+  "alternativeHeadline": "Same 5.93 GB ternary weights, a different agent — Bonsai 2 vs Bonsai 2.5, benchmark by benchmark",
+  "description": "A side-by-side deep dive on Ternary Bonsai 2.5 27B against Bonsai 2 27B and the FP16 Qwen3.8-27B base: what stayed identical, what changed, the full agentic and general-capability benchmark tables, MTP throughput, packaging, deployment, and limitations.",
+  "author": {"@type": "Person", "name": "Hussain Nazary"},
+  "datePublished": "2026-11-26",
+  "dateModified": "2026-11-26",
+  "keywords": "Bonsai 2.5 27B, Bonsai 2 27B, Prism ML, ternary quantization, agentic coding, tool calling, MTP, GGUF, MLX, local AI",
+  "articleSection": "Research Paper",
+  "inLanguage": "en-US",
+  "isAccessibleForFree": true,
+  "wordCount": 8600,
+  "proficiencyLevel": "Expert",
+  "mainEntityOfPage": "https://local-ai-zone.github.io/blog/bonsai-2-5-27b-agentic-deep-dive.html",
+  "publisher": {"@type": "Organization", "name": "Local AI Zone", "logo": {"@type": "ImageObject", "url": "https://local-ai-zone.github.io/logo.svg"}},
+  "about": [
+    {"@type": "Thing", "name": "Ternary Bonsai 2.5 27B"},
+    {"@type": "Thing", "name": "Agentic AI"},
+    {"@type": "Thing", "name": "Prism ML"},
+    {"@type": "Thing", "name": "Quantization"},
+    {"@type": "Thing", "name": "Edge AI"}
+  ],
+  "isPartOf": {"@type": "Blog", "name": "Local AI Zone — Blog", "url": "https://local-ai-zone.github.io/blog.html"},
+  "image": {
+    "@type": "ImageObject",
+    "url": "https://local-ai-zone.github.io/blog/bonsai-2-5-27b-hero.png",
+    "width": 1200, "height": 630,
+    "caption": "Ternary Bonsai 2.5 27B: an agentic 27B model in 5.93 GB at 1.76 bits per weight"
+  },
+  "speakable": {"@type": "SpeakableSpecification", "cssSelector": ["h1", ".cover .sub"]}
+}
+</script>
+<!-- ==================== SEO ==================== -->
+<meta name="author" content="Local AI Zone">
+<link rel="canonical" href="https://local-ai-zone.github.io/blog/bonsai-2-5-27b-agentic-deep-dive.html">
+<link rel="alternate" hreflang="en" href="https://local-ai-zone.github.io/blog/bonsai-2-5-27b-agentic-deep-dive.html">
+<link rel="alternate" hreflang="en-US" href="https://local-ai-zone.github.io/blog/bonsai-2-5-27b-agentic-deep-dive.html">
+<link rel="alternate" hreflang="x-default" href="https://local-ai-zone.github.io/blog/bonsai-2-5-27b-agentic-deep-dive.html">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow">
+<meta name="bingbot" content="index, follow">
+<meta name="rating" content="general">
+<meta name="revisit-after" content="7 days">
+<meta name="theme-color" content="#2563eb">
+<meta name="creator" content="Local AI Zone">
+<meta name="publisher" content="Local AI Zone">
+
+<!-- Open Graph / Facebook -->
+<meta property="og:title" content="Ternary Bonsai 2.5 27B: FP16-Level Agents in 5.93 GB — A Side-by-Side Deep Dive">
+<meta property="og:description" content="Same weights, different agent: Bonsai 2 vs Bonsai 2.5 on tool calling, agentic coding, throughput and runtimes — every number side by side.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://local-ai-zone.github.io/blog/bonsai-2-5-27b-agentic-deep-dive.html">
+<meta property="og:site_name" content="Local AI Zone">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://local-ai-zone.github.io/blog/bonsai-2-5-27b-hero.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ternary Bonsai 2.5 27B illustrated: an agentic 27B model in 5.93 GB at 1.76 bits per weight, beside a ghosted Bonsai 2 chip">
+<meta property="article:author" content="Hussain Nazary">
+<meta property="article:published_time" content="2026-11-26T00:00:00Z">
+<meta property="article:modified_time" content="2026-11-26T00:00:00Z">
+<meta property="article:section" content="Research Paper">
+<meta property="article:tag" content="Bonsai 2.5 27B">
+<meta property="article:tag" content="Ternary Quantization">
+<meta property="article:tag" content="Prism ML">
+<meta property="article:tag" content="Agentic Coding">
+<meta property="article:tag" content="Tool Calling">
+<meta property="article:tag" content="GGUF">
+<meta property="article:tag" content="Local AI">
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@localaizone">
+<meta name="twitter:creator" content="@hussainnazary">
+<meta name="twitter:title" content="Ternary Bonsai 2.5 27B: FP16-Level Agents in 5.93 GB">
+<meta name="twitter:description" content="Bonsai 2 vs Bonsai 2.5, side by side: AppWorld 51.2 to 90.5, DeepSWE 0 to 27.0, coding retention 63% to 90% — same 5.93 GB ternary footprint.">
+<meta name="twitter:image" content="https://local-ai-zone.github.io/blog/bonsai-2-5-27b-hero.png">
+<meta name="twitter:image:alt" content="Ternary Bonsai 2.5 27B: an agentic 27B model in 5.93 GB at 1.76 bits per weight">
+
+<!-- FAQ Schema (AEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "What is Ternary Bonsai 2.5 27B?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Ternary Bonsai 2.5 27B is Prism ML's agentic release of the Ternary Bonsai 27B line, published November 24, 2026. It keeps the Qwen3.8-27B hybrid-attention architecture and the ternary g128 weight format of Bonsai 2, so it remains 1.76 bits per weight and 5.93 GB, but is tuned for long-horizon tool use and agentic coding."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "What changed from Bonsai 2 27B?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "The base model, weight format, file size and runtimes are unchanged. What changed is agentic behavior: AppWorld rises from 51.2 to 90.5, DeepSWE from 0.0 to 27.0, agentic coding retention from 63% to 90% of FP16, and MTP variants of every packing add a draft head for 1.5–1.8x faster decode on NVIDIA GPUs. Thinking-mode min_p is now 0.0 instead of 0.05."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Does Bonsai 2.5 still fit in 5.93 GB?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Yes. The PTQ1_0 packing is 5.93 GB at 1.76 bits per weight, against 53.8 GB for the FP16 Qwen3.8-27B base. PQ2_0 is about 7.2 GB and Q2_0 about 7.6 GB; the Apple MLX package is about 8.9 GB."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "How much of FP16 agentic coding does Bonsai 2.5 keep?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "About 90% across Terminal-Bench 2.1, SWE-bench Verified and DeepSWE (54.2 against 60.5 for FP16), up from 63% for Bonsai 2 (37.9). SWE-bench Verified reaches 94% of FP16 and DeepSWE 90%."
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "Which runtimes and files should I use?",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Use PTQ1_0 with the PrismML llama.cpp binaries on NVIDIA GPUs, PQ2_0 on Apple Silicon, and Q2_0 with stock llama.cpp b11556 or newer. Pass --min-p 0 explicitly. MTP variants live in a separate GGUF repository and need the PrismML binaries."
+      }
+    }
+  ]
+}
+</script>
+
+<!-- Breadcrumb Schema (GEO) -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {"@type": "ListItem", "position": 1, "name": "Home", "item": "https://local-ai-zone.github.io/"},
+    {"@type": "ListItem", "position": 2, "name": "Blog", "item": "https://local-ai-zone.github.io/blog.html"},
+    {"@type": "ListItem", "position": 3, "name": "Bonsai 2.5 27B Side-by-Side Deep Dive", "item": "https://local-ai-zone.github.io/blog/bonsai-2-5-27b-agentic-deep-dive.html"}
+  ]
+}
+</script>
+
+<link rel="stylesheet" href="../css/premium-styles.css">
+<link rel="stylesheet" href="../css/custom.css">
+<link rel="stylesheet" href="../css/blog-article.css">
+<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../css/theme-overrides.css">
+<link rel="stylesheet" href="../css/contact-form.css">
+<link rel="icon" href="../logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/blog-post.css">
+  <link rel="stylesheet" href="../css/blog-paper.css">
+</head>
+<body class="paper-page has-site-header">
+<!-- ==================== SITE HEADER ==================== -->
+<header class="premium-header blog-header">
+    <div class="container">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-brand">
+                    <div class="header-logo-section">
+                        <div class="header-logo" onclick="window.location.href='../index.html'">
+                            <img src="../logo.svg" alt="Local AI Zone Logo" class="logo-image" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+                            <div class="logo-fallback" style="display: none;">
+                                <svg class="logo-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="brand-text">
+                            <div class="brand-title">GGUF Discovery</div>
+                            <p class="brand-subtitle">Blog &amp; Guides</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="header-right">
+                <nav class="blog-nav" aria-label="Main navigation">
+                    <a href="../index.html">Home</a>
+                    <a href="../about.html">About</a>
+                    <a href="../services.html">Need Help?</a>
+                    <a href="../blog.html" class="active">Blog</a>
+                </nav>
+                <button id="theme-toggle-button" class="theme-switcher-btn" aria-label="Toggle dark mode">
+                    <span class="theme-icon sun-icon" aria-hidden="true">☀️</span>
+                    <span class="theme-icon moon-icon" aria-hidden="true">🌙</span>
+                    <span class="theme-label light-label">Light</span>
+                    <span class="theme-label dark-label">Dark</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</header>
+
+<button class="theme-btn" id="themeBtn" aria-label="Toggle light/dark theme" title="Toggle theme">&#9788;</button>
+<div class="shell">
+<!-- ==================== SIDEBAR TOC ==================== -->
+<aside id="toc">
+  <div class="brand">
+    <div class="t">Bonsai 2.5 27B</div>
+    <div class="s">Side-by-Side Deep Dive &middot; 2026</div>
+  </div>
+  <nav id="tocnav">
+    <div class="part">Front Matter</div>
+    <a href="#abstract"><span class="num">&sect;</span>Abstract &amp; How to Read</a>
+    <div class="part">Part I &mdash; The Release</div>
+    <a href="#ch1"><span class="num">1</span>Release Context</a>
+    <a href="#ch2"><span class="num">2</span>What Stayed the Same</a>
+    <a href="#ch3"><span class="num">3</span>What Changed</a>
+    <div class="part">Part II &mdash; Why Agentic Is Hard</div>
+    <a href="#ch4"><span class="num">4</span>The Long-Horizon Problem</a>
+    <a href="#ch5"><span class="num">5</span>How to Read the Tables</a>
+    <div class="part">Part III &mdash; Side by Side</div>
+    <a href="#ch6"><span class="num">6</span>Agentic Tool Calling</a>
+    <a href="#ch7"><span class="num">7</span>Agentic Coding</a>
+    <a href="#ch8"><span class="num">8</span>General Capability</a>
+    <a href="#ch9"><span class="num">9</span>The Comparison, at a Glance</a>
+    <div class="part">Part IV &mdash; Running It</div>
+    <a href="#ch10"><span class="num">10</span>Throughput &amp; MTP</a>
+    <a href="#ch11"><span class="num">11</span>Packings &amp; Runtime Changes</a>
+    <a href="#ch12"><span class="num">12</span>Deployment Field Guide</a>
+    <div class="part">Part V &mdash; Judgment</div>
+    <a href="#ch13"><span class="num">13</span>Limitations &amp; Reception</a>
+    <a href="#ch14"><span class="num">14</span>Verdict, FAQ &amp; Sources</a>
+  </nav>
+  <div class="toc-foot">A fact-checked deep-dive research paper.<br>Every claim traced to primary sources.<br><span style="color:#7c86a0">Last updated: November 26, 2026</span></div>
+</aside>
+<!-- ==================== MAIN ==================== -->
+<main>
+<div class="page">
+
+<!-- ==================== COVER ==================== -->
+<div class="cover">
+  <div class="kicker">Deep-Dive Research Paper &middot; Agentic Efficiency</div>
+  <h1>Ternary Bonsai 2.5 27B<br><span class="thin">FP16-Level Agents in 5.93 GB &mdash; A Side-by-Side Deep Dive</span></h1>
+  <p class="sub">On November 24, 2026, Prism ML shipped a replacement for Bonsai 2 27B that changes none of the weights and nearly all of the behavior. Same Qwen3.8-27B architecture, same 1.76 bits per weight, same 5.93 GB. This paper puts the two releases side by side, benchmark by benchmark, and asks what a 63% &rarr; 90% jump in retained agentic coding actually means.</p>
+  <figure>
+    <img src="bonsai-2-5-27b-hero.png" alt="Ternary Bonsai 2.5 27B illustrated beside a ghosted Bonsai 2 chip: an agentic 27B model in 5.93 GB at 1.76 bits per weight" width="1200" height="630" decoding="async">
+    <figcaption>Same footprint, different agent: the November 2026 release keeps Bonsai 2&rsquo;s weights and changes the behavior.</figcaption>
+  </figure>
+  <div class="statgrid">
+    <div class="cell"><div class="v">5.93 GB</div><div class="k">Unchanged ternary footprint</div></div>
+    <div class="cell"><div class="v">77.2</div><div class="k">Tool calling vs FP16&rsquo;s 77.7</div></div>
+    <div class="cell"><div class="v">90%</div><div class="k">FP16 coding kept (was 63%)</div></div>
+    <div class="cell"><div class="v">51.2 &rarr; 90.5</div><div class="k">AppWorld, Bonsai 2 to 2.5</div></div>
+    <div class="cell"><div class="v">0 &rarr; 27.0</div><div class="k">DeepSWE, Bonsai 2 to 2.5</div></div>
+    <div class="cell"><div class="v">1.5&ndash;1.8&times;</div><div class="k">MTP decode speedup, NVIDIA</div></div>
+  </div>
+  <div class="meta">
+    <span><b>By</b> Hussain Nazary</span>
+    <span><b>Subject:</b> Ternary Bonsai 2.5 27B (Prism ML, November 24, 2026)</span>
+    <span><b>Baseline:</b> Bonsai 2 27B (September 17, 2026) and Qwen3.8-27B FP16</span>
+    <span><b>Base:</b> Qwen3.8-27B, architecture unchanged</span>
+    <span><b>License:</b> Apache 2.0</span>
+    <span><b>Scope:</b> specification deltas, three benchmark suites, MTP throughput, GGUF/MLX packaging, deployment, caveats</span>
+  </div>
+</div>
+
+<!-- ==================== ABSTRACT ==================== -->
+<h2 class="ch" id="abstract"><span class="chno">&sect;</span> Abstract &amp; How to Read</h2>
+<p class="ch-sub">What this paper claims, what it does not, and how the side-by-side evidence is organized.</p>
+
+<p>There is a particular kind of release that is easy to misread. <strong>Ternary Bonsai 2.5 27B</strong>, published by Prism ML on <strong>November 24, 2026</strong>, is not a smaller model, not a new base model, and not a new quantization format. It is the same 27.36-billion-parameter Qwen3.8-27B derivative, the same ternary <span class="mono">g128</span> representation with one FP16 scale per 128 weights in a blockwise Hadamard basis, the same <strong>1.76 bits per weight</strong> and the same <strong>5.93 GB</strong> <span class="mono">PTQ1_0</span> file that shipped as Bonsai 2 27B on September 17. Anyone comparing file names or parameter counts would conclude nothing happened.</p>
+
+<p>Anyone comparing <em>behavior</em> would conclude the opposite. Across the three agentic coding benchmarks Prism uses &mdash; Terminal-Bench 2.1, SWE-bench Verified and DeepSWE 1.1 &mdash; Bonsai 2 retained 63% of the FP16 base model&rsquo;s score and solved <strong>zero</strong> DeepSWE tasks. Bonsai 2.5 retains <strong>90%</strong> and scores <strong>27.0</strong> on DeepSWE, against 30.1 for FP16. On AppWorld, a tool-use benchmark where the agent writes code against the APIs of nine everyday apps, the score moves from <strong>51.2 to 90.5</strong> &mdash; past every conventional low-bit build of the same base model, including one that is 1.7&times; larger. The five-benchmark tool-calling average goes from 67.0 to <strong>77.2</strong>, essentially level with FP16&rsquo;s 77.7.</p>
+
+<p>That is the whole story of this release: <strong>intelligence density held constant, agentic reliability recovered</strong>. The weights did not get smaller; the model got better at staying on task. Prism&rsquo;s own framing is that Bonsai 2.5 &ldquo;reads tool results, recovers when a step fails, and keeps the objective in view, and it finishes in fewer turns and fewer tokens, with less of the over-thinking and repetition the earlier model could fall into.&rdquo; The engineering changes that accompany that behavior are modest on paper &mdash; MTP draft-head variants of every packing, a changed <em>recommended</em> <span class="mono">min_p</span>, and <span class="mono">Q2_0</span> moved into the main repository &mdash; but the measured effect is large.</p>
+
+<p>This paper is built as a <em>side-by-side</em> deep dive. Every results chapter uses the same three-column frame: <strong>Qwen3.8-27B FP16</strong> (53.8 GB), <strong>Bonsai 2 27B</strong> (5.93 GB), and <strong>Bonsai 2.5 27B</strong> (5.93 GB). Where a number changed, the delta is stated in prose and shown in the comparison graphic in Chapter 9. Readers who want the format maths &mdash; how ternary storage, the rotated basis and the low-bit kernels work &mdash; should read the companion <a href="bonsai-2-27b-ternary-quantization-deep-dive.html">Bonsai 2 27B deep dive</a> first; Chapter 2 here summarises only what carried over.</p>
+
+<div class="callout info"><span class="lab">How to read this paper</span>
+<p><strong>Part I</strong> (Chapters 1&ndash;3) fixes the release in time and lists exactly what did and did not change. <strong>Part II</strong> (Chapters 4&ndash;5) explains why agentic work is the hardest possible test for a compressed model and how the numbers were produced. <strong>Part III</strong> (Chapters 6&ndash;9) is the side-by-side evidence: tool calling, coding, general capability, and a visual comparison. <strong>Part IV</strong> (Chapters 10&ndash;12) covers MTP throughput, file packings and a deployment guide. <strong>Part V</strong> (Chapters 13&ndash;14) handles limitations, reception, the verdict and sources.</p>
+<p>Readers evaluating only <em>whether to upgrade</em> can read the abstract, Chapter 3&rsquo;s change table, Chapters 6&ndash;9, and Chapter 14. Readers deploying the model should add Chapters 10&ndash;12 in full.</p></div>
+
+<div class="callout warn"><span class="lab">Evidence and honesty note</span>
+<p>Every figure in this paper comes from Prism ML&rsquo;s own whitepaper, documentation or model cards, or from contemporaneous press coverage; none is estimated by the author. The benchmarks are <strong>vendor-run</strong>. On launch day there was no independent leaderboard entry for Bonsai 2.5, and at least one reviewer explicitly advised readers to treat the scores as claims to verify on their own hardware. One methodological break is important enough to repeat wherever the tool-calling table appears: the τ²-Bench, τ³-Bench and BFCL v3 figures were produced with a thinking-mode user simulator and native tool calls, so they are <strong>not comparable with the original Bonsai 2 report</strong>. The Bonsai 2 numbers in this paper are re-runs under the newer harness. Both caveats are carried in the relevant chapters, not buried in the sources.</p></div>
+
+<!-- ==================== CHAPTER 1 ==================== -->
+<h2 class="ch" id="ch1"><span class="chno">1</span> Release Context</h2>
+<p class="ch-sub">A November release that replaces a September release without changing the bytes that made the September release remarkable.</p>
+
+<p>Prism ML announced Ternary Bonsai 2.5 27B on <strong>November 24, 2026</strong>, a little over two months after Bonsai 2 27B shipped on September 17. The company calls it &ldquo;the agentic release of the Ternary Bonsai 27B line&rdquo; and describes it directly as an upgrade: it &ldquo;replaces Ternary Bonsai 2 27B. The base model, the ternary format, the file size, and the runtimes are all the same; what changed is how the model behaves over a long task.&rdquo; The weights remain available under Apache 2.0, and the previous generation stays published at <span class="mono">prism-ml/Ternary-Bonsai-2-27B-gguf</span> and <span class="mono">-mlx-2bit</span> for anyone who wants to keep it.</p>
+
+<p>The stated motivation is specific rather than generic. With Bonsai 2, Prism says, the company brought &ldquo;stronger reasoning, visual understanding, and tool use to local devices.&rdquo; What it heard back from developers was that agents built on the model lost the thread over long sequences of tool calls: they misread results, repeated failed approaches, over-thought, and burned turns. Bonsai 2.5 is the answer to that feedback. In the announcement&rsquo;s words, it &ldquo;completes tasks in fewer turns, uses fewer tokens, and delivers results faster and more accurately.&rdquo; The release is therefore best understood as a <em>post-training and serving change</em> layered on an unchanged compressed checkpoint, plus a runtime feature (the draft head) that makes the same weights faster to decode.</p>
+
+<p>The timing matters for how the numbers should be read. Bonsai 2 27B&rsquo;s benchmark record accumulated over September and October as kernels matured; the 2.5 release arrives with both a new evaluation harness for agentic benchmarks and a newer runtime. That means two different kinds of improvement are tangled together in the headline deltas &mdash; model behavior and tooling &mdash; and Prism is careful to separate them in the model card&rsquo;s speed tables. Chapters 6&ndash;9 deal with behavior; Chapter 10 deals with the runtime.</p>
+
+<div class="callout info"><span class="lab">The one-sentence version</span>
+<p>Bonsai 2 proved a 27B reasoning model could live in 5.93 GB; Bonsai 2.5 argues that the same 5.93 GB can now do the work an agent actually needs it to do. This paper tests that argument against every published table.</p></div>
+
+<!-- ==================== CHAPTER 2 ==================== -->
+<h2 class="ch" id="ch2"><span class="chno">2</span> What Stayed the Same</h2>
+<p class="ch-sub">The base model, the parameter split, the ternary grid, the rotated basis, the context window, and the price of entry.</p>
+
+<p>It is worth being precise about the things Bonsai 2.5 did <em>not</em> change, because they are the things that made Bonsai 2 interesting in the first place. The new release keeps the Qwen3.8-27B hybrid-attention architecture untouched. It keeps the same 27.36B total parameter count, split the same way. It keeps the same ternary representation &mdash; weights restricted to <span class="mono">{&minus;1, 0, +1}</span>, with a single FP16 scale factor shared by each group of 128 weights &mdash; and the same blockwise Hadamard rotation folded offline into the stored weights, so the runtime applies a matching transform to activations and the rotation costs no extra bits and no extra weight traffic. A ternary value carries log<sub>2</sub>3 &asymp; 1.585 bits of information, and the group scales bring the shipped figure to 1.76 bits per weight.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Item</th><th>Bonsai 2 27B</th><th>Bonsai 2.5 27B</th><th>Changed?</th></tr></thead>
+<tbody>
+<tr><td>Base model</td><td>Qwen3.8-27B</td><td>Qwen3.8-27B</td><td>No</td></tr>
+<tr><td>Architecture</td><td>Hybrid attention (~75% linear / ~25% full), SwiGLU MLP, RoPE, RMSNorm</td><td>Identical</td><td>No</td></tr>
+<tr><td>Parameters</td><td>27.36B total = 24.35B language + 2.54B embedding/LM head + 0.47B vision tower</td><td>Identical</td><td>No</td></tr>
+<tr><td>Weight format</td><td>Ternary g128, FP16 group scale, Hadamard-rotated basis</td><td>Identical</td><td>No</td></tr>
+<tr><td>Bits per weight</td><td class="num">1.76</td><td class="num">1.76</td><td>No</td></tr>
+<tr><td>Size (<span class="mono">PTQ1_0</span>)</td><td class="num">5.93 GB</td><td class="num">5.93 GB</td><td>No</td></tr>
+<tr><td>Context length</td><td class="num">262,144 tokens</td><td class="num">262,144 tokens</td><td>No</td></tr>
+<tr><td>Modalities</td><td>Text + image in, text out</td><td>Identical</td><td>No</td></tr>
+<tr><td>Reasoning efforts</td><td><span class="mono">xhigh</span> / <span class="mono">medium</span></td><td>Identical; <span class="mono">low</span> explicitly unsupported</td><td>Clarified</td></tr>
+<tr><td>License</td><td>Apache 2.0</td><td>Apache 2.0</td><td>No</td></tr>
+</tbody></table></div>
+<p class="small">Prism marks changed items with a dagger in its own tables. Almost nothing in the system specification carries one &mdash; the daggers cluster around focus, decoding and speculative decoding.</p>
+
+<p>The practical consequence is that upgrading costs no memory. A machine that could hold Bonsai 2 in VRAM or unified memory can hold Bonsai 2.5. The vision tower still ships as a separate optional <span class="mono">mmproj</span> file, loaded only when image input arrives, so text-only serving never pays for it. The 262K-token context is unchanged, which matters for agentic work: a coding agent can keep a whole repository in view, and a tool-calling agent can keep a long transcript. If you already have a working Bonsai 2 setup, the upgrade is a weight download and a few flag changes, not a hardware purchase.</p>
+
+<p>For the derivation of the format &mdash; why 1.58 bits is the natural floor, how the rotated grid preserves reasoning, what the hybrid-attention kernels do differently from a conventional 2-bit GGUF &mdash; this paper defers to the earlier report. The relevant point here is that none of that machinery was touched. Whatever Bonsai 2.5 gained, it gained without asking the representation to do more than it already did.</p>
+
+<!-- ==================== CHAPTER 3 ==================== -->
+<h2 class="ch" id="ch3"><span class="chno">3</span> What Changed</h2>
+<p class="ch-sub">Five concrete deltas: focus, a draft head, a sampling default, a file location, and a clearer reasoning-effort story.</p>
+
+<p>If the specification table is almost identical, the change list is short enough to hold in your head. Prism marks four items in its model overview with a dagger, and the documentation adds a fifth practical note. Each is listed below with its consequence.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Change</th><th>Bonsai 2</th><th>Bonsai 2.5</th><th>Consequence</th></tr></thead>
+<tbody>
+<tr><td><strong>Focus</strong></td><td>Reasoning, vision, tool use</td><td>Agentic and tool-use tasks</td><td>Post-training optimized for long sequences of tool calls and repository work</td></tr>
+<tr><td><strong>Speculative decoding</strong></td><td>Community MTP head published three days after release</td><td>MTP variants of every packing carry a draft head in a separate <span class="mono">-mtp</span> repo; the base files do not</td><td>1.5&ndash;1.8&times; decode speedup on NVIDIA GPUs without changing the output distribution</td></tr>
+<tr><td><strong>Thinking-mode <span class="mono">min_p</span></strong></td><td>Recommended 0.05</td><td>0.0</td><td>llama.cpp still defaults to 0.05; pass <span class="mono">--min-p 0</span> explicitly or benchmarks do not reproduce</td></tr>
+<tr><td><strong><span class="mono">Q2_0</span> packing</strong></td><td>Not in the main GGUF repo</td><td>Sits alongside <span class="mono">PTQ1_0</span> and <span class="mono">PQ2_0</span></td><td>Stock llama.cpp <span class="mono">b11556</span>+ can run the model directly</td></tr>
+<tr><td><strong>Reasoning effort</strong></td><td><span class="mono">xhigh</span> / <span class="mono">medium</span></td><td>Same, with an explicit warning that <span class="mono">low</span> is unsupported</td><td>Selecting <span class="mono">low</span> behaves close to <span class="mono">xhigh</span>; use a token budget to bound thinking</td></tr>
+</tbody></table></div>
+
+<p>The first change is the one that matters most and the one hardest to see in a table. Prism does not publish a new architecture diagram for 2.5, because there is no new architecture. What it publishes is a different behavior profile: the model reads tool results, recovers when a step fails, keeps the objective in view, and finishes in fewer turns with fewer tokens. The company attributes this to work on &ldquo;excessive thinking and repetitive loops&rdquo; in the previous model. Chapters 6 and 7 quantify how much that was worth.</p>
+
+<p>The second change is mechanical. A multi-token prediction head is one extra layer that guesses the next few tokens; the full model checks all the guesses in one pass and keeps only the tokens it would have produced itself. The output distribution is unchanged &mdash; Prism measures mean KL divergence of 5.2 &times; 10<sup>&minus;5</sup> between drafting on and off on an H200 with the <span class="mono">PTQ1_0</span> file, no higher than a control that accepts every guess &mdash; so only speed differs. On an H200 the released setting drafts three tokens per pass with a 0.1 minimum draft probability; on an RTX 4090 the optimum is three drafts with no cutoff; on an Apple M4 Pro it is one draft with a 0.6 cutoff. The head makes its own pass over the prompt, which costs 9&ndash;23% of prefill speed on NVIDIA GPUs with released builds, so for long prompts with short answers it is better switched off. Chapter 10 has the full table.</p>
+
+<p>The third change is a trap for anyone reproducing the numbers. llama.cpp applies <span class="mono">min_p = 0.05</span> when you do not set it. Bonsai 2&rsquo;s documentation recommended 0.05 in thinking mode; Bonsai 2.5 recommends 0.0, and every official command now passes <span class="mono">--min-p 0</span>. Get this wrong and you are not evaluating the same sampling distribution as the published benchmarks. Thinking mode uses temperature 1.0, top-p 0.95, top-k 20, min-p 0.0, presence penalty 0.0 and repetition penalty 1.0; instruct mode uses temperature 0.7, top-p 0.80, top-k 20, min-p 0.0, presence penalty 1.5 and repetition penalty 1.0. Mixing the two sets &ldquo;degrades output quality,&rdquo; in Prism&rsquo;s words.</p>
+
+<p>The fourth and fifth changes are about access rather than capability. Stock llama.cpp from release <span class="mono">b11556</span> runs the <span class="mono">Q2_0</span> file, which removes the need for the PrismML fork for users who do not need the fastest decode; older builds load it without any warning and produce garbage, so checking <span class="mono">llama-cli --version</span> is mandatory. And <span class="mono">low</span> reasoning effort is not supported: selecting it makes the model behave close to <span class="mono">xhigh</span>. To bound reasoning, use a token budget rather than the effort flag.</p>
+
+<!-- ==================== CHAPTER 4 ==================== -->
+<h2 class="ch" id="ch4"><span class="chno">4</span> The Long-Horizon Problem</h2>
+<p class="ch-sub">Why a benchmark that looks fine in aggregate can collapse when one bad action compounds across twenty tool calls.</p>
+
+<p>To understand why Bonsai 2.5 exists, it helps to understand what agentic evaluation measures. A conventional benchmark asks a question and grades an answer. An agentic benchmark asks the model to operate: read a repository, form a plan, call a tool, read the result, adjust, call again, and eventually commit or answer. Every step is an opportunity to fail, and the failures are not independent. A misread file leads to a wrong edit; a wrong edit leads to a failing test; a failing test that the model does not understand leads to a second wrong edit, or to the model declaring victory early. Small errors compound.</p>
+
+<p>This is why Prism describes agentic workflows as &ldquo;particularly sensitive to model degradation&rdquo; and why compression has historically hurt them most. A compressed model can score well on knowledge and math while losing the thin margin of reliability that keeps a long episode on track. The Bonsai 2 report recorded exactly that pattern: the language model&rsquo;s reasoning core held close to FP16, but on agentic coding it kept 63% of the base score and solved none of the DeepSWE tasks. DeepSWE is a particularly unforgiving benchmark &mdash; 113 repository tasks graded by hidden tests on the agent&rsquo;s final commit &mdash; and a zero there is not a small loss. It means the model never completed the loop successfully.</p>
+
+<p>The second failure mode is as important as the first. Prism says the previous model could fall into &ldquo;over-thinking and repetition&rdquo;: long reasoning traces that consume the output budget before an answer, and unproductive retries after a tool result that should have ended the attempt. On a reasoning model with a default <span class="mono">xhigh</span> effort and a 262K context, unbounded thinking is not a cosmetic problem &mdash; it is the difference between finishing a task and timing out. Prism&rsquo;s claim for 2.5 is that it finishes in fewer turns and with fewer tokens, which means less time spent thinking and less time re-doing work.</p>
+
+<div class="callout info"><span class="lab">Why the DeepSWE number is the headline</span>
+<p>AppWorld 51.2 &rarr; 90.5 is the largest absolute move in the release. But DeepSWE 0.0 &rarr; 27.0 is the more diagnostic one: it is the difference between never completing a repository task and completing about a quarter of them. A model that scores zero on an agentic coding benchmark has failed at the <em>loop</em>, not at the code. Recovering 90% of FP16 on that benchmark is evidence that the loop now closes.</p></div>
+
+<p>There is a useful caution here. Prism&rsquo;s own limitations section notes that even its longest evaluations are &ldquo;bounded, single-task episodes&rdquo; and that it has not measured workloads that run for hours across many context windows. So the claim is narrower than &ldquo;this is a reliable autonomous agent&rdquo;: it is &ldquo;this compressed model now keeps up with a single task over a realistic number of tool calls.&rdquo; Chapter 13 returns to that boundary.</p>
+
+<!-- ==================== CHAPTER 5 ==================== -->
+<h2 class="ch" id="ch5"><span class="chno">5</span> How to Read the Tables</h2>
+<p class="ch-sub">Evaluation setup, three columns, and one comparability break that changes how the tool-calling numbers should be interpreted.</p>
+
+<p>All figures in this paper come from thinking-mode evaluations at reasoning effort <span class="mono">xhigh</span>. Prism uses one harness and serving path for every model, strips the reasoning block before grading, and evaluates pass@1; where a benchmark was run more than once, it reports the mean. Non-agentic benchmarks use EvalScope with the vLLM backend on NVIDIA H100 GPUs, with per-benchmark output budgets from 16,384 to 81,920 tokens. The conventional low-bit comparison builds &mdash; GSQ-RCO <span class="mono">IQ3_XXS</span>, <span class="mono">IQ2_S</span>, <span class="mono">IQ2_XS</span> and Unsloth Dynamic <span class="mono">UD-IQ2_XS</span> &mdash; are unpacked to BF16 and served through the same path. Their advertised &ldquo;2-bit&rdquo; labels hide true bit-widths of 2.27 to 2.75; Bonsai&rsquo;s 1.76 is real end to end.</p>
+
+<p>The agentic setups are more involved. Terminal-Bench 2.1 uses the Terminus-2 agent on all 89 tasks with a 262,144-token context, an 80,000-token output budget per turn and network access in the task container. SWE-bench Verified uses all 500 tasks with the mini-SWE-agent scaffold and a 262,144-token context, graded by the official test harness. DeepSWE 1.1 uses 113 repository tasks with the same scaffold, graded by hidden tests on the final commit. τ³-Bench and τ²-Bench use 375 and 278 tasks respectively, with a thinking-mode user simulator (deepseek-v4-flash at high reasoning effort, a 32,768-token budget and temperature 0). AppWorld uses its 168 test-normal tasks with a ReAct-style code-action agent, a 40,000-token output budget and a 131,072-token context, reporting the mean of task-goal and scenario-goal completion. BFCL v3 covers all 17 subsets including multi-turn, 4,441 items, with native tool calls; BFCL v4 adds 4,906 items and agentic memory categories, excluding web search.</p>
+
+<div class="callout warn"><span class="lab">The comparability break</span>
+<p>Because τ²-Bench and τ³-Bench now use a thinking-mode user simulator and BFCL v3 uses native tool calls, Prism states that those figures are <strong>not comparable with the Bonsai 2 report</strong>. The Bonsai 2 column in Chapter 6 is therefore a re-run under the 2.5 harness, not the numbers published in September. The within-table comparison &mdash; Bonsai 2 versus Bonsai 2.5 on the same setup &mdash; is valid. A comparison against Bonsai 2&rsquo;s original report is not. The coding and general-capability tables do not carry this caveat.</p></div>
+
+<p>Finally, every number here is Prism&rsquo;s own. The eesel AI review published on November 25 noted that it found no independent leaderboard entry on launch day and advised readers to treat every figure as a claim to check on their own hardware; Tested Intelligence made the same point from the opposite direction, framing the absence of independent benchmarks as a reason to skip the model if that is what you need. Neither review disputes a number. Both dispute the idea that vendor-run agentic scores are settled fact. This paper reports the numbers as claims, with attribution, throughout.</p>
+
+<!-- ==================== CHAPTER 6 ==================== -->
+<h2 class="ch" id="ch6"><span class="chno">6</span> Agentic Tool Calling</h2>
+<p class="ch-sub">Five benchmarks, one near-perfect recovery, and one exception that keeps the result honest.</p>
+
+<p>The tool-calling suite is where the release makes its cleanest claim. Across τ²-Bench, τ³-Bench, BFCL v3, BFCL v4 and AppWorld, Bonsai 2.5 averages <strong>77.2</strong> against <strong>77.7</strong> for the FP16 Qwen3.8-27B base. At one ninth the footprint, that is indistinguishable from full precision and ahead of every conventional low-bit build Prism compared against. It is also a large move from Bonsai 2&rsquo;s 67.0 average on the same harness.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.8 FP16</th><th class="num">Bonsai 2 27B</th><th class="num">Bonsai 2.5 27B</th><th class="num">2.5 vs 2</th></tr></thead>
+<tbody>
+<tr><td>τ²-Bench</td><td class="num">80.6</td><td class="num">80.2</td><td class="num"><strong>82.0</strong></td><td class="num">+1.8</td></tr>
+<tr><td>τ³-Bench</td><td class="num">72.8</td><td class="num">69.1</td><td class="num"><strong>73.9</strong></td><td class="num">+4.8</td></tr>
+<tr><td>BFCL v3 (native)</td><td class="num">71.2</td><td class="num">70.3</td><td class="num"><strong>72.6</strong></td><td class="num">+2.3</td></tr>
+<tr><td>BFCL v4</td><td class="num">70.8</td><td class="num">64.4</td><td class="num"><strong>67.2</strong></td><td class="num">+2.8</td></tr>
+<tr><td>AppWorld</td><td class="num">93.2</td><td class="num">51.2</td><td class="num"><strong>90.5</strong></td><td class="num">+39.3</td></tr>
+<tr><td><strong>Average (5)</strong></td><td class="num"><strong>77.7</strong></td><td class="num"><strong>67.0</strong></td><td class="num"><strong>77.2</strong></td><td class="num"><strong>+10.2</strong></td></tr>
+<tr><td>Size (GB)</td><td class="num">53.8</td><td class="num">5.93</td><td class="num">5.93</td><td class="num">&mdash;</td></tr>
+<tr><td>Bits per weight</td><td class="num">16.0</td><td class="num">1.76</td><td class="num">1.76</td><td class="num">&mdash;</td></tr>
+</tbody></table></div>
+<p class="small">Thinking mode, <span class="mono">xhigh</span>. Re-run harness as described in Chapter 5; the Bonsai 2 column is not the original September report. AppWorld is the mean of task-goal and scenario-goal completion.</p>
+
+<p>Three of the five results are above FP16: τ²-Bench (82.0 against 80.6), τ³-Bench (73.9 against 72.8) and BFCL v3 with native tool calls (72.6 against 71.2). The two &tau;-Bench results come from agents serving a simulated customer over many turns of conversation and tool calls, while BFCL v3 uses native function calls; the gains are consistent with the release&rsquo;s stated focus on multi-turn behavior. BFCL v4 is the exception: Bonsai 2.5 reaches 67.2, up from 64.4 but still 3.6 behind FP16 and 0.5 behind GSQ-RCO <span class="mono">IQ2_S</span>. It is the one place in the tool-calling table where the compression gap is still visible, and it is worth remembering when choosing a model for strict tool schemas.</p>
+
+<p>AppWorld is the dramatic number. The benchmark asks the agent to write code against the APIs of nine everyday apps, and Bonsai 2.5 reaches 90.5 against Bonsai 2&rsquo;s 51.2 &mdash; and ahead of every conventional build, including <span class="mono">IQ3_XXS</span> at 86.1, despite that build being 1.7&times; larger. Prism attributes most of the gap to finishing whole scenarios: Bonsai 2.5 completes every task in a scenario 89.3% of the time, against 80.4% for <span class="mono">IQ3_XXS</span> and 75.0% for <span class="mono">IQ2_S</span>. This is the clearest evidence for the &ldquo;keeps the objective in view&rdquo; claim in the whole release.</p>
+
+<p>The model card also documents a failure mode that aggregate scores hide. GSQ-RCO <span class="mono">IQ2_XS</span>, a build 1.4&times; the size of Bonsai 2.5, scores 79.5 on τ²-Bench but only 46.5 on AppWorld. In about one task in five it writes a long script that guesses every API call and marks the task complete before seeing any output. That is the classic compressed-agent failure: the surface behavior looks confident and finished, and the underlying task was never done. A tool-calling average alone would not tell you this; a scenario-completion rate would.</p>
+
+<!-- ==================== CHAPTER 7 ==================== -->
+<h2 class="ch" id="ch7"><span class="chno">7</span> Agentic Coding</h2>
+<p class="ch-sub">From 63% to 90% of FP16, and from zero DeepSWE tasks solved to twenty-seven points on the benchmark.</p>
+
+<p>If tool calling is the cleanest claim, agentic coding is the most consequential one. Compression has usually hurt coding agents most, because one wrong action can derail a long episode. Bonsai 2 kept 63% of the FP16 score across Terminal-Bench 2.1, SWE-bench Verified and DeepSWE and did not solve a single DeepSWE task. Bonsai 2.5 keeps <strong>90%</strong>: the three-benchmark average moves from <strong>37.9 to 54.2</strong>, against 60.5 for FP16.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Benchmark</th><th class="num">Qwen3.8 FP16</th><th class="num">Bonsai 2 27B</th><th class="num">Bonsai 2.5 27B</th><th class="num">2.5 vs 2</th><th class="num">Retention</th></tr></thead>
+<tbody>
+<tr><td>Terminal-Bench 2.1</td><td class="num">70.8</td><td class="num">52.8</td><td class="num"><strong>60.1</strong></td><td class="num">+7.3</td><td class="num">85%</td></tr>
+<tr><td>SWE-bench Verified</td><td class="num">80.6</td><td class="num">60.8</td><td class="num"><strong>75.6</strong></td><td class="num">+14.8</td><td class="num">94%</td></tr>
+<tr><td>DeepSWE 1.1</td><td class="num">30.1</td><td class="num">0.0</td><td class="num"><strong>27.0</strong></td><td class="num">+27.0</td><td class="num">90%</td></tr>
+<tr><td><strong>Average (3)</strong></td><td class="num"><strong>60.5</strong></td><td class="num"><strong>37.9</strong></td><td class="num"><strong>54.2</strong></td><td class="num"><strong>+16.3</strong></td><td class="num"><strong>90%</strong></td></tr>
+</tbody></table></div>
+<p class="small">Thinking mode, <span class="mono">xhigh</span>. Terminal-Bench 2.1 uses the Terminus-2 agent; SWE-bench Verified and DeepSWE use the mini-SWE-agent scaffold. Unlike the tool-calling table, these figures are comparable with the Bonsai 2 report.</p>
+
+<p>The per-benchmark shape matters. SWE-bench Verified improves by 14.8 points and reaches 94% of FP16 &mdash; within five points of the full-precision base on 500 real repository issues. DeepSWE improves by 27.0 points from a standing zero and reaches 90% of FP16. Terminal-Bench 2.1 improves by 7.3 points to 60.1, or 85% of FP16, and remains the agentic benchmark furthest from full precision. Prism names it explicitly as the weakest point in the release, which is a useful signal about where the remaining work sits: long terminal sessions with network access are harder than graded repository patches.</p>
+
+<p>Against the conventional low-bit builds, Bonsai 2.5 beats all three IQ2 builds on Terminal-Bench 2.1 and DeepSWE, and scores highest on SWE-bench Verified, with <span class="mono">IQ2_S</span> just 0.2 points behind. Only <span class="mono">IQ3_XXS</span> &mdash; 1.7&times; larger at 10.1 GB &mdash; has a higher coding average, on the strength of its Terminal-Bench 2.1 score. The comparison is worth stating plainly: at 5.93 GB, Bonsai 2.5 is the smallest build in the table and the strongest under 10 GB on both agentic suites. The &ldquo;2-bit&rdquo; IQ2 files actually use 29&ndash;56% more bits per weight and still score lower.</p>
+
+<p>The practical reading is not &ldquo;this is now as good as FP16 at coding.&rdquo; It is &ldquo;the 5.93 GB file is now in the same conversation as a 10 GB 3-bit file for repository work, and it finishes tasks the previous version could not finish at all.&rdquo; For an on-device coding agent, that is the threshold that changes what you can build.</p>
+
+<!-- ==================== CHAPTER 8 ==================== -->
+<h2 class="ch" id="ch8"><span class="chno">8</span> General Capability</h2>
+<p class="ch-sub">The gains should not come at the cost of everything else. Mostly they do not &mdash; with two small regressions.</p>
+
+<p>An agentic release can win its headline benchmarks by sacrificing general capability, so Prism also reports category averages over 14&ndash;16 non-agentic benchmarks in thinking mode. Bonsai 2.5 scores <strong>82.12</strong> across five categories against <strong>84.32</strong> for FP16 and <strong>81.55</strong> for Bonsai 2. It is the highest of the compressed builds, ahead of <span class="mono">IQ3_XXS</span> at 81.72, and the only compressed build within four points of FP16 in every category. Its largest gap is 3.1 points on math.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Category (benchmarks)</th><th class="num">Qwen3.8 FP16</th><th class="num">Bonsai 2 27B</th><th class="num">Bonsai 2.5 27B</th><th class="num">2.5 vs 2</th></tr></thead>
+<tbody>
+<tr><td>Knowledge &amp; reasoning (MMLU-Redux, GPQA Diamond, AA-LCR)</td><td class="num">86.67</td><td class="num">83.80</td><td class="num">84.27</td><td class="num">+0.47</td></tr>
+<tr><td>Math (AIME26, HMMT26)</td><td class="num">93.15</td><td class="num">89.00</td><td class="num">90.10</td><td class="num">+1.10</td></tr>
+<tr><td>Coding (LiveCodeBench v6, BigCodeBench)</td><td class="num">74.55</td><td class="num">70.50</td><td class="num">71.65</td><td class="num">+1.15</td></tr>
+<tr><td>Instruction following (IFBench, IFEval)</td><td class="num">81.15</td><td class="num">82.55</td><td class="num">80.90</td><td class="num">&minus;1.65</td></tr>
+<tr><td>Vision (7 benchmarks incl. MMMU-Pro, CharXiv)</td><td class="num">86.07</td><td class="num">81.89</td><td class="num">83.66</td><td class="num">+1.77</td></tr>
+<tr><td><strong>Average (5 categories)</strong></td><td class="num"><strong>84.32</strong></td><td class="num"><strong>81.55</strong></td><td class="num"><strong>82.12</strong></td><td class="num"><strong>+0.57</strong></td></tr>
+</tbody></table></div>
+<p class="small">Category averages, thinking mode. Model-card figures. A discrepancy to be aware of: the docs page and whitepaper round the five-category average to 84.4 / 82.3, while the model card&rsquo;s own highlights round it to 84.3 / 82.1; the sources also differ on whether the suite has 14 or 16 benchmarks. This paper uses the model-card category table above as canonical and reports the alternatives rather than silently reconciling them.</p>
+
+<p>Four of the five categories improve. Vision gains 1.77 points and recovers most of Bonsai 2&rsquo;s gap to FP16; math gains 1.10; coding gains 1.15; knowledge and reasoning gains 0.47. Instruction following is the one category that moves backwards, from 82.55 to 80.90 &mdash; still within 0.25 of FP16&rsquo;s 81.15, but notably below Bonsai 2, which had been *above* the full-precision base by 1.4 points. If your workload is strict instruction adherence rather than tool use, this is the number to check before upgrading.</p>
+
+<p>Two per-benchmark results deserve the same treatment. LiveCodeBench v6 falls from 83.8 in Bonsai 2 to 83.0 in Bonsai 2.5, a small regression that 9to5Mac flagged in its launch coverage because it was the only highlight benchmark to move the wrong way. BigCodeBench goes the other way, from 57.2 to 60.3, and remains below FP16&rsquo;s 61.5. Neither changes the agentic picture, but both are evidence that this release is a trade, not a uniform improvement.</p>
+
+<div class="callout info"><span class="lab">The rounding discrepancy, explained</span>
+<p>The model card&rsquo;s category table sums to 82.12 for Bonsai 2.5 and 84.32 for FP16. The documentation rounds these to 82.3 and 84.4; the model card&rsquo;s highlights round them to 82.1 and 84.3; the documents disagree on whether the underlying suite has 14 or 16 benchmarks. None of these differences changes a conclusion &mdash; Bonsai 2.5 stays within about two points of FP16 either way &mdash; but a side-by-side paper should show the seam rather than glue it over.</p></div>
+
+<!-- ==================== CHAPTER 9 ==================== -->
+<h2 class="ch" id="ch9"><span class="chno">9</span> The Comparison, at a Glance</h2>
+<p class="ch-sub">Four headline deltas in one graphic, with a data table beneath it so the numbers survive if the image does not.</p>
+
+<figure>
+  <img src="bonsai-2-5-vs-2-comparison.png" alt="Side-by-side bar chart comparing Qwen3.8 FP16, Bonsai 2 and Bonsai 2.5 on AppWorld (93.2 / 51.2 / 90.5), DeepSWE (30.1 / 0.0 / 27.0), SWE-bench Verified (80.6 / 60.8 / 75.6) and agentic coding average (60.5 / 37.9 / 54.2)" width="1400" height="860" loading="lazy" decoding="async">
+  <figcaption>The headline deltas: the same 5.93 GB file closes most of the gap to full precision on agentic tasks. All figures are Prism ML&rsquo;s own, thinking mode, <span class="mono">xhigh</span>.</figcaption>
+</figure>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Headline metric</th><th class="num">Bonsai 2</th><th class="num">Bonsai 2.5</th><th class="num">Delta</th><th class="num">FP16</th></tr></thead>
+<tbody>
+<tr><td>AppWorld</td><td class="num">51.2</td><td class="num">90.5</td><td class="num"><span class="tag good">+39.3</span></td><td class="num">93.2</td></tr>
+<tr><td>DeepSWE 1.1</td><td class="num">0.0</td><td class="num">27.0</td><td class="num"><span class="tag good">+27.0</span></td><td class="num">30.1</td></tr>
+<tr><td>SWE-bench Verified</td><td class="num">60.8</td><td class="num">75.6</td><td class="num"><span class="tag good">+14.8</span></td><td class="num">80.6</td></tr>
+<tr><td>Agentic coding average</td><td class="num">37.9</td><td class="num">54.2</td><td class="num"><span class="tag good">+16.3</span></td><td class="num">60.5</td></tr>
+<tr><td>Tool-calling average</td><td class="num">67.0</td><td class="num">77.2</td><td class="num"><span class="tag good">+10.2</span></td><td class="num">77.7</td></tr>
+</tbody></table></div>
+
+<p>Read together, these five rows describe a consistent shape. The biggest gains are on the benchmarks that require the model to <em>finish</em> something: AppWorld scenarios, DeepSWE commits, SWE-bench patches. The tool-calling average closes almost completely because it was never as far behind as coding was. The coding average closes by 16.3 points but still leaves 6.3 points to FP16. That is the honest headline: Bonsai 2.5 does not erase the compression gap, but it moves it from &ldquo;unusable for long agentic work&rdquo; to &ldquo;a small, measurable tax.&rdquo;</p>
+
+<!-- ==================== CHAPTER 10 ==================== -->
+<h2 class="ch" id="ch10"><span class="chno">10</span> Throughput &amp; Multi-Token Prediction</h2>
+<p class="ch-sub">A draft head in every file, a 1.5&ndash;1.8&times; gain, and a 2.3&ndash;3.0&times; gain against release day that is partly about the tooling, not the model.</p>
+
+<p>Bonsai 2.5 ships MTP variants in a separate GGUF repository, <span class="mono">prism-ml/Ternary-Bonsai-2.5-27B-gguf-mtp</span>, carrying a draft head built by Prism. The head guesses the next few tokens; the full model verifies all guesses in one pass and keeps only tokens it would have produced itself, so the output is unchanged up to rounding noise. Loading an MTP file is a substitution, not an addition &mdash; load it instead of the plain file, not alongside it. MTP drafting needs the PrismML binaries.</p>
+
+<p>On NVIDIA GPUs the released setting gives a 1.5&ndash;1.8&times; decode speedup. The model card&rsquo;s device table is worth reproducing because it shows how much the setting depends on hardware:</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Device</th><th>File</th><th class="num">Drafts / cutoff</th><th class="num">Decode off</th><th class="num">Decode on</th><th class="num">Decode + kernels</th></tr></thead>
+<tbody>
+<tr><td>NVIDIA H200</td><td><span class="mono">PTQ1_0</span></td><td class="num">3 / 0.1</td><td class="num">194</td><td class="num">296 (1.53&times;)</td><td class="num">306 (1.58&times;)</td></tr>
+<tr><td>NVIDIA H100</td><td><span class="mono">PTQ1_0</span></td><td class="num">3 / 0.1</td><td class="num">184</td><td class="num">282 (1.53&times;)</td><td class="num">291 (1.58&times;)</td></tr>
+<tr><td>NVIDIA B200</td><td><span class="mono">PTQ1_0</span></td><td class="num">3 / 0.1</td><td class="num">191</td><td class="num">296 (1.55&times;)</td><td class="num">309 (1.61&times;)</td></tr>
+<tr><td>RTX PRO 6000</td><td><span class="mono">PTQ1_0</span></td><td class="num">3 / 0.1</td><td class="num">158</td><td class="num">277 (1.76&times;)</td><td class="num">283 (1.80&times;)</td></tr>
+<tr><td>RTX 5090</td><td><span class="mono">PTQ1_0</span></td><td class="num">3 / 0.1</td><td class="num">174</td><td class="num">305 (1.75&times;)</td><td class="num">312 (1.79&times;)</td></tr>
+<tr><td>RTX 4090</td><td><span class="mono">PTQ1_0</span></td><td class="num">3 / 0</td><td class="num">111</td><td class="num">204 (1.83&times;)</td><td class="num">204 (1.83&times;)</td></tr>
+<tr><td>Apple M4 Pro</td><td><span class="mono">PQ2_0</span></td><td class="num">1 / 0.6</td><td class="num">22.9</td><td class="num">25.3 (1.10&times;)</td><td class="num">29.2 (1.27&times;)</td></tr>
+<tr><td>Core Ultra laptop</td><td><span class="mono">PTQ1_0</span></td><td class="num">8 / 0.6</td><td class="num">11.1</td><td class="num">23.1 (2.08&times;)</td><td class="num">24.5 (2.21&times;)</td></tr>
+</tbody></table></div>
+<p class="small">Tokens per second, llama-server on 36 real prompts. &ldquo;+kernels&rdquo; means MTP plus the kernels in testing that apply to that device&rsquo;s file. The M4 Pro row is Metal with <span class="mono">PQ2_0</span>; the Core Ultra row is SYCL.</p>
+
+<p>Prism also publishes a comparison against <em>release day</em>, which is the number most relevant to someone who ran Bonsai 2 in September. Using the fastest setup available in Bonsai 2&rsquo;s release week as the baseline, decode with MTP is <strong>2.3&ndash;3.0&times; faster on six of the seven NVIDIA GPUs measured</strong>: H200 114 &rarr; 306 (2.69&times;), H100 112 &rarr; 291 (2.60&times;), B200 104 &rarr; 309 (2.98&times;), A100 73 &rarr; 175 (2.39&times;), RTX PRO 6000 120 &rarr; 283 (2.36&times;), RTX 5090 135 &rarr; 312 (2.31&times;). The RTX 4090 is the exception at 106 &rarr; 204 (1.92&times;), measured conservatively across different hosts. Roughly 300 tokens/s on H200 and B200 is the headline. Note that the earlier Bonsai 2 report described about 143 tokens/s on an RTX 5090; the release-day table uses 135 tokens/s for that card under its own &ldquo;fastest available setup&rdquo; definition, so treat the two as differently measured references rather than interchangeable figures.</p>
+
+<p>Two qualifications keep this honest. First, the &ldquo;+kernels&rdquo; column is explicitly a testing build, not a released one &mdash; the model card says so &mdash; so the 2.3&ndash;3.0&times; figure describes what a user can get with MTP and kernels now in testing, not what a stock download gives today. Second, drafting is not free: with released builds, prefill is 9&ndash;23% slower on NVIDIA GPUs when MTP is on, because the head makes its own pass over the prompt. With the testing kernels that penalty disappears and prefill with MTP beats plain prefill on every NVIDIA GPU measured. For long prompts with short answers, run without drafting.</p>
+
+<p>For completeness, the plain-decoding table shows why the format still matters: on the current runtime, <span class="mono">PTQ1_0</span> decodes at 189 tokens/s on an H200, 186 on an H100, 192 on a B200 and 163 on an RTX 5090, with no speculative decoding at all. Upstream llama.cpp on the <span class="mono">Q2_0</span> file matches the PrismML runtime&rsquo;s output closely (mean KL divergence 3.6 &times; 10<sup>&minus;4</sup>, same top token at 99.3% of positions) but decodes at 109 tokens/s on an H200 against 150 for PrismML. The Apple MLX pack, exported from <span class="mono">PQ2_0</span>, reproduces llama.cpp within 4 &times; 10<sup>&minus;6</sup> to 3 &times; 10<sup>&minus;5</sup> mean KL divergence and the same top token at all 1,020 positions checked, decoding at 21.7 tokens/s on an M5 Pro against llama.cpp&rsquo;s 30.2.</p>
+
+<!-- ==================== CHAPTER 11 ==================== -->
+<h2 class="ch" id="ch11"><span class="chno">11</span> Packings &amp; Runtime Changes</h2>
+<p class="ch-sub">Three layouts of the same ternary model, one new home for <span class="mono">Q2_0</span>, and a hard version floor for stock llama.cpp.</p>
+
+<p>All three GGUF packings represent exactly the same ternary model. They differ only in how the trits are laid out and which runtime can read them.</p>
+
+<div class="tblwrap"><table>
+<thead><tr><th>File</th><th class="num">Size</th><th>Runtime</th><th>Notes</th></tr></thead>
+<tbody>
+<tr><td><span class="mono">Ternary-Bonsai-2.5-27B-PTQ1_0.gguf</span></td><td class="num">5.93 GB</td><td>PrismML llama.cpp binaries; upstream review pending</td><td>Dense trits; fastest decode on every NVIDIA GPU measured; also runs on Metal in the fork</td></tr>
+<tr><td><span class="mono">Ternary-Bonsai-2.5-27B-PQ2_0.gguf</span></td><td class="num">~7.2 GB</td><td>PrismML llama.cpp binaries</td><td>Each trit in a 2-bit slot; benchmarked on Apple Metal and exported to MLX</td></tr>
+<tr><td><span class="mono">Ternary-Bonsai-2.5-27B-Q2_0.gguf</span></td><td class="num">~7.6 GB</td><td>Upstream llama.cpp <span class="mono">b11556</span> or newer</td><td>llama.cpp&rsquo;s standard 2-bit type; now in the main GGUF repo</td></tr>
+<tr><td>MLX 2-bit pack</td><td class="num">~8.9 GB</td><td>MLX on Mac, iPhone and iPad</td><td>Text-only language model exported from <span class="mono">PQ2_0</span>, FP16 vision tower, bundled loader, optional v2 MTP head</td></tr>
+</tbody></table></div>
+
+<p>The version floor is the operational change with the sharpest teeth. <span class="mono">Q2_0</span> needs the blockwise Hadamard activation runtime that landed in llama.cpp release <span class="mono">b11556</span>. Older upstream builds load the file <em>without any warning</em> and produce garbage. Prism&rsquo;s instruction is blunt: check <span class="mono">llama-cli --version</span> first. Apps that bundle their own llama.cpp need an engine built from <span class="mono">b11556</span> or newer. <span class="mono">PTQ1_0</span> and <span class="mono">PQ2_0</span> still require the PrismML fork; upstream refuses them as unknown types, and PTQ1_0&rsquo;s upstream review is tracked in two separate pull requests for the format and CPU, and for CUDA.</p>
+
+<p>The Apple path is simpler than it was for Bonsai 2. The 2-bit MLX pack is exported from <span class="mono">PQ2_0</span> and includes a loader that applies the Hadamard transforms; it reproduces llama.cpp closely and supports text and image input. The Apple silicon package is about 8.9 GB and works on Mac, iPhone and iPad, as 9to5Mac noted at launch. A separate <span class="mono">-mtp</span> GGUF repo carries the draft head for llama.cpp users who want speculative decoding. The vision tower remains optional and is loaded only for image input, so text-only serving never pays for it.</p>
+
+<p>One known issue is worth carrying into deployment. Prism&rsquo;s server can start four request slots sharing a unified KV cache in automatic mode; for one request at a time on a GPU with limited VRAM, add <span class="mono">-np 1</span>. A community report on an RTX 3080 10 GB measured about 9.5 GB of total GPU memory use before the flag and about 7.8 GB afterward. That is not a Bonsai 2.5-specific problem, but it is the kind of detail that decides whether a 5.93 GB model actually fits on a 10 GB card.</p>
+
+<!-- ==================== CHAPTER 12 ==================== -->
+<h2 class="ch" id="ch12"><span class="chno">12</span> Deployment Field Guide</h2>
+<p class="ch-sub">Commands that reproduce the published setup, the sampling tables, and the flags that trip people up.</p>
+
+<h3>NVIDIA, with the PrismML binaries</h3>
+
+<p>The recommended NVIDIA path uses <span class="mono">PTQ1_0</span>, the smallest file and the fastest decode. The command below is the documented one, with <span class="mono">--min-p 0</span> made explicit and a generous output cap so the thinking trace can finish:</p>
+
+<div class="tblwrap" style="border:1px solid #0d1117;background:var(--code-bg);border-radius:10px;padding:0"><table style="background:none;border:none"><tbody><tr><td style="border:none;padding:0">
+<pre><code><span class="cmt"># Download the 5.93 GB PTQ1_0 pack</span>
+hf download prism-ml/Ternary-Bonsai-2.5-27B-gguf Ternary-Bonsai-2.5-27B-PTQ1_0.gguf --local-dir .
+
+<span class="cmt"># Run with the PrismML llama.cpp binaries; --min-p 0 is required</span>
+./bin/llama-cli -m Ternary-Bonsai-2.5-27B-PTQ1_0.gguf \
+  -ngl 99 -fa on -c 32768 \
+  --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0 \
+  -p <span class="str">"Explain KV cache growth in one paragraph."</span> -n 16384
+<span class="cmt"># -ngl 99 offloads every layer (0 = CPU-only); -c up to 262144</span>
+<span class="cmt"># -n 16384 leaves room for the xhigh thinking trace before the answer</span></code></pre>
+</td></tr></tbody></table></div>
+
+<p>With stock llama.cpp <span class="mono">b11556</span> or newer, swap in the <span class="mono">Q2_0</span> file and keep the same flags. On Apple Silicon, swap in <span class="mono">PQ2_0</span>. The demo repository at <span class="mono">PrismML-Eng/Bonsai-demo</span> is the source of truth and ships a <span class="mono">start_llama_server.sh</span> launcher that picks the right flags for the hardware; Prism says to follow it whenever the model card and the demo disagree.</p>
+
+<h3>Sampling: thinking versus instruct</h3>
+
+<div class="tblwrap"><table>
+<thead><tr><th>Parameter</th><th class="num">Thinking (default)</th><th class="num">Instruct / non-thinking</th></tr></thead>
+<tbody>
+<tr><td><span class="mono">temperature</span></td><td class="num">1.0</td><td class="num">0.7</td></tr>
+<tr><td><span class="mono">top_p</span></td><td class="num">0.95</td><td class="num">0.80</td></tr>
+<tr><td><span class="mono">top_k</span></td><td class="num">20</td><td class="num">20</td></tr>
+<tr><td><span class="mono">min_p</span></td><td class="num">0.0</td><td class="num">0.0</td></tr>
+<tr><td><span class="mono">presence_penalty</span></td><td class="num">0.0</td><td class="num">1.5</td></tr>
+<tr><td><span class="mono">repetition_penalty</span></td><td class="num">1.0</td><td class="num">1.0</td></tr>
+</tbody></table></div>
+<p class="small">Mixing the two sets degrades output quality. llama.cpp defaults <span class="mono">min_p</span> to 0.05, so pass <span class="mono">--min-p 0</span> in both modes. The published benchmarks used the thinking-mode values.</p>
+
+<h3>Speculative decoding</h3>
+
+<div class="tblwrap" style="border:1px solid #0d1117;background:var(--code-bg);border-radius:10px;padding:0"><table style="background:none;border:none"><tbody><tr><td style="border:none;padding:0">
+<pre><code><span class="cmt"># Load the MTP file INSTEAD of the plain one; needs PrismML binaries</span>
+./llama-server -m Ternary-Bonsai-2.5-27B-PTQ1_0-mtp.gguf \
+  -ngl 99 -fa on -c 32768 -np 1 \
+  --temp 1.0 --top-p 0.95 --top-k 20 --min-p 0 \
+  --spec-type draft-mtp --spec-draft-n-min 0 --spec-draft-n-max 3 --spec-draft-p-min 0.1
+<span class="cmt"># --spec-draft-n-max = tokens drafted per pass; --spec-draft-p-min = cutoff</span>
+<span class="cmt"># -np 1 keeps VRAM bounded for one-at-a-time requests</span></code></pre>
+</td></tr></tbody></table></div>
+
+<h3>Tools, images and reasoning budgets</h3>
+
+<p>Tool calling and image input go through the standard OpenAI-compatible surface: send an <span class="mono">image_url</span> content part and a <span class="mono">tools</span> array, and read the call from <span class="mono">choices[0].message.tool_calls</span>. Image input needs the <span class="mono">mmproj</span> file loaded with <span class="mono">--mmproj</span>. The model thinks by default; send <span class="mono">reasoning_effort</span> per request, cap it with <span class="mono">--reasoning-budget N</span>, or use <span class="mono">thinking_budget_tokens</span> (<span class="mono">0</span> disables thinking, <span class="mono">-1</span> is unlimited). Remember that <span class="mono">low</span> effort is unsupported and that the chat UI&rsquo;s levels are fixed token budgets &mdash; a different thing from the model&rsquo;s own <span class="mono">medium</span> effort setting.</p>
+
+<p>Every GGUF packing is also exposed through the Hugging Face &ldquo;use this model&rdquo; surface for llama.cpp, vLLM, Docker Model Runner, Lemonade, Pi, Hermes Agent, OpenClaw and others. Those integrations pick the <span class="mono">Q2_0</span> file by default; if a bundled engine predates <span class="mono">b11556</span>, do not trust it. Check for 2.5-specific WebGPU and API availability before carrying over any Bonsai 2 workflow that depended on them &mdash; the prior post&rsquo;s WebGPU Space and OpenRouter listing were documented for the September release and should be re-verified for this one.</p>
+
+<!-- ==================== CHAPTER 13 ==================== -->
+<h2 class="ch" id="ch13"><span class="chno">13</span> Limitations, Reception &amp; Roadmap</h2>
+<p class="ch-sub">Vendor-run evidence, two regressions, unmeasured horizons, and what the launch coverage actually said.</p>
+
+<p>The first limitation is about evidence, not the model. All published Bonsai 2.5 benchmarks come from Prism ML&rsquo;s own whitepaper and model cards. The eesel AI review released the day after launch observed that it found no independent leaderboard entry and that &ldquo;the evidence is all new and mostly vendor-run.&rdquo; Tested Intelligence made the mirror-image point: its review is explicitly research-based, and it advises skipping the model if you need independent benchmarks or a hosted service. Neither review presents a contradicting measurement. But a 90% retention claim is a claim until someone else runs Terminal-Bench 2.1 on their own hardware, and the harness changes described in Chapter 5 mean that comparing against the original Bonsai 2 report is not a substitute.</p>
+
+<p>The second limitation is the regressions. BFCL v4 remains 3.6 points behind FP16 and slightly behind <span class="mono">IQ2_S</span>. LiveCodeBench v6 falls from 83.8 to 83.0, the only highlighted benchmark to move backwards, as 9to5Mac noted. Instruction following falls from 82.55 to 80.90 at the category level. None of these overturns the agentic result, but they mean the release is not a strict upgrade for every workload. If strict JSON-mode tool schemas or instruction adherence are your primary use case, verify on your own tasks before switching.</p>
+
+<p>The third limitation is horizon. Prism&rsquo;s roadmap names Terminal-Bench 2.1 as the agentic benchmark furthest from FP16, and says its longest evaluations are still &ldquo;bounded, single-task episodes.&rdquo; It has not measured workloads that run for hours across many context windows: machine-learning engineering (MLE-bench), long-running autonomous operation (VendingBench) or harder multi-language repository work (SWE-bench Pro). The kernel and KV-cache roadmap from Bonsai 2 still applies &mdash; making <span class="mono">PTQ1_0</span> as fast as <span class="mono">PQ2_0</span> on every target, sub-4-bit KV caches, and removing activation-side rotation overhead at batch size 1. MTP gains on Apple Silicon are small on released builds, and the &ldquo;+kernels&rdquo; numbers require unreleased software.</p>
+
+<p>Reception was positive but careful. 9to5Mac covered the Mac/iPhone/iPad path and the ~8.9 GB Apple package. The Decoder framed the release as squeezing a 54 GB language model into 5.9 GB by reducing every weight to three values. Prism&rsquo;s own announcement gave a single-H100 figure of 291 tokens/s with MTP and 3,200 tokens/s prompt processing, and 204 tokens/s on an RTX 4090. The model card reported 59,366 downloads in the preceding month at the time of research. None of this is independent validation, but it does show the release reached an audience quickly.</p>
+
+<div class="callout warn"><span class="lab">What the release does not prove</span>
+<p>That a 5.93 GB model is a reliable autonomous agent. It proves that on a set of bounded, single-task agentic benchmarks, a 5.93 GB ternary model now reaches close to its FP16 base where its predecessor did not. Hours-long operation, cross-context-window persistence and strict-schema reliability remain unmeasured or imperfect. The honest boundary is &ldquo;capable local agent for a task,&rdquo; not &ldquo;autonomous employee.&rdquo;</p></div>
+
+<!-- ==================== CHAPTER 14 ==================== -->
+<h2 class="ch" id="ch14"><span class="chno">14</span> Verdict, FAQ &amp; Sources</h2>
+<p class="ch-sub">Who should upgrade, who should stay, and where every number in this paper came from.</p>
+
+<p><strong>Upgrade if</strong> you are building a local coding or terminal agent, a tool-calling assistant over private files, or anything that must keep a multi-step task on track within a single context window. That is exactly what the release was built for, and the side-by-side tables show large, consistent gains: AppWorld +39.3, DeepSWE +27.0, SWE-bench Verified +14.8, tool-calling average +10.2. The MTP head adds speed without changing the output distribution, and the memory footprint is unchanged, so the upgrade costs a download and a few flags rather than new hardware.</p>
+
+<p><strong>Stay on Bonsai 2, or wait, if</strong> your workload is dominated by strict instruction following or BFCL v4-style tool schemas, where the numbers move the wrong way or stay behind FP16; if you need independently verified benchmarks before you deploy; or if you depend on a hosted API surface that has not yet been confirmed for 2.5. Bonsai 2 remains published, so staying is a real option rather than a dead end.</p>
+
+<p>The broader verdict is that Bonsai 2.5 is a more interesting release than its changelog suggests. A model that keeps the same weights and the same footprint but closes most of its agentic gap to full precision is evidence that compression quality is not only a function of bits per weight. Behavior over a long task is a separate axis, and it can be improved without spending another byte. That is the lesson worth taking from the side-by-side tables.</p>
+
+<section id="faq" class="article-section faq">
+<h2>Frequently asked questions</h2>
+<h3>What is Ternary Bonsai 2.5 27B?</h3>
+<p>Ternary Bonsai 2.5 27B is Prism ML&rsquo;s agentic release of the Ternary Bonsai 27B line, published November 24, 2026. It keeps the Qwen3.8-27B hybrid-attention architecture and the ternary g128 weight format of Bonsai 2, so it remains 1.76 bits per weight and 5.93 GB, but is tuned for long-horizon tool use and agentic coding.</p>
+<h3>What changed from Bonsai 2 27B?</h3>
+<p>The base model, weight format, file size and runtimes are unchanged. What changed is agentic behavior: AppWorld rises from 51.2 to 90.5, DeepSWE from 0.0 to 27.0, agentic coding retention from 63% to 90% of FP16, and MTP variants of every packing add a draft head for 1.5&ndash;1.8&times; faster decode on NVIDIA GPUs. Thinking-mode <span class="mono">min_p</span> is now 0.0 instead of 0.05.</p>
+<h3>Does Bonsai 2.5 still fit in 5.93 GB?</h3>
+<p>Yes. The <span class="mono">PTQ1_0</span> packing is 5.93 GB at 1.76 bits per weight, against 53.8 GB for the FP16 Qwen3.8-27B base. <span class="mono">PQ2_0</span> is about 7.2 GB and <span class="mono">Q2_0</span> about 7.6 GB; the Apple MLX package is about 8.9 GB.</p>
+<h3>How much of FP16 agentic coding does Bonsai 2.5 keep?</h3>
+<p>About 90% across Terminal-Bench 2.1, SWE-bench Verified and DeepSWE (54.2 against 60.5 for FP16), up from 63% for Bonsai 2 (37.9). SWE-bench Verified reaches 94% of FP16 and DeepSWE 90%.</p>
+<h3>Which runtimes and files should I use?</h3>
+<p>Use <span class="mono">PTQ1_0</span> with the PrismML llama.cpp binaries on NVIDIA GPUs, <span class="mono">PQ2_0</span> on Apple Silicon, and <span class="mono">Q2_0</span> with stock llama.cpp <span class="mono">b11556</span> or newer. Pass <span class="mono">--min-p 0</span> explicitly. MTP variants live in a separate GGUF repository and need the PrismML binaries.</p>
+</section>
+
+<h3>Sources</h3>
+<div class="tblwrap"><table>
+<thead><tr><th>#</th><th>Source</th><th>Role in this paper</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Prism ML, <em>Ternary Bonsai 2.5 27B: A 27B Ternary Model Built for Agents</em>, whitepaper, November 2026 (PrismML-Eng/Bonsai-demo)</td><td>Executive summary, system specification, agentic tables, evaluation methodology, limitations</td></tr>
+<tr><td>2</td><td>Prism ML documentation: <span class="mono">docs.prismml.com/models/bonsai-2-5-27b</span></td><td>What changed, specifications, artifacts, runtime rules, sampling and reasoning settings, MTP device table</td></tr>
+<tr><td>3</td><td>Hugging Face model card: <span class="mono">prism-ml/Ternary-Bonsai-2.5-27B-gguf</span></td><td>Full benchmark tables, plain decoding and MTP speed tables, packings, known issues, upstream status, MLX fidelity</td></tr>
+<tr><td>4</td><td>Hugging Face model card: <span class="mono">prism-ml/Ternary-Bonsai-2.5-27B-mlx-2bit</span></td><td>Apple silicon package and loader</td></tr>
+<tr><td>5</td><td>Prism ML announcements: <em>Introducing Ternary Bonsai 2.5 27B</em> and <em>PrismML Launches Ternary Bonsai 2.5 27B</em>, November 24, 2026</td><td>Release claims, highlight table, H100/RTX 4090 figures, platform coverage</td></tr>
+<tr><td>6</td><td>9to5Mac, <em>PrismML&rsquo;s Bonsai 2.5 brings better coding and tool use to on-device AI</em>, November 24/25, 2026</td><td>Apple package size, LiveCodeBench regression, launch coverage</td></tr>
+<tr><td>7</td><td>The Decoder, <em>PrismML shrinks a 54 GB language model to 5.9 GB&hellip;</em>, November 25, 2026</td><td>Independent launch coverage of the ternary approach</td></tr>
+<tr><td>8</td><td>eesel AI, <em>Ternary Bonsai 2.5 review: a 5.9 GB agent model, with fine print</em>, November 25, 2026</td><td>Vendor-run evidence caveat; no independent leaderboard on launch day</td></tr>
+<tr><td>9</td><td>Tested Intelligence, <em>Ternary Bonsai 2.5 27B Review 2026</em>, November 25, 2026</td><td>Independent-benchmark and hosted-service caveat</td></tr>
+<tr><td>10</td><td>Atomic Chat, <em>How to Run Bonsai 2.5 27B Locally</em>, November 24, 2026</td><td>Deployment and hardware context</td></tr>
+<tr><td>11</td><td>Local AI Zone, <em>Bonsai 2 27B: A 27B AI Model That Fits in 5.9 GB</em>, September 21, 2026</td><td>Prior release, format deep dive, release-day throughput reference</td></tr>
+</tbody></table></div>
+
+<p class="small">Document-dates note: this paper was assembled November 26, 2026, two days after the Bonsai 2.5 27B release. Benchmark scores, adoption counts, upstreaming status and the &ldquo;kernels in testing&rdquo; figures are current to that date and will age. Citation of Prism ML&rsquo;s own materials follows the company&rsquo;s requested format: <span class="mono">@techreport{bonsai2_5_27b, title={Ternary Bonsai 2.5 27B: A 27B Ternary Model Built for Agents}, author={PrismML}, year={2026}, month={November}}</span>.</p>
+
+</div><!-- /page -->
+</main>
+</div><!-- /shell -->
+
+<!-- ==================== RELATED POSTS ==================== -->
+<!-- Need help with this post? -->
+<section class="post-help" aria-labelledby="post-help-title">
+    <div class="post-help-inner">
+        <h2 class="post-help-title" id="post-help-title">Need help with this?</h2>
+        <p class="post-help-text">Tell me what you&rsquo;re working on and I&rsquo;ll help you work
+        through it &mdash; where you got stuck, what you&rsquo;re trying to build, which model to
+        pick. Your message arrives with this article attached, so I&rsquo;ll know exactly what
+        you&rsquo;re reading.</p>
+        <button type="button" class="post-help-btn" data-contact-open data-contact-subject="Help with: Bonsai 2.5 27B">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+            </svg>
+            <span>Ask me about this post</span>
+        </button>
+    </div>
+</section>
+
+<section class="kv-related" style="max-width:880px;margin:0 auto;padding:46px 48px 96px;border-top:1px solid var(--line);background:var(--paper)">
+  <h2 style="font-size:23px;font-weight:800;color:var(--ink);letter-spacing:-.3px;margin:0 0 20px">Related Posts</h2>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;align-items:stretch">
+    <a href="bonsai-2-27b-ternary-quantization-deep-dive.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">Bonsai 2 27B: A 27B Model in 5.9 GB</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The previous release: the ternary format, rotated basis, kernels and full benchmark record that Bonsai 2.5 builds on.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="quantization-formats-guide.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">GGUF vs EXL2 vs AWQ vs GPTQ</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The quantization landscape this format sits inside: bit-widths, VRAM and accuracy trade-offs.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+    <a href="how-to-build-an-ai-agent-step-by-step-guide.html" style="display:flex;flex-direction:column;height:100%;padding:20px 22px;background:var(--paper);border:1px solid var(--line);border-radius:12px;text-decoration:none;color:var(--ink);transition:transform .18s,box-shadow .18s,border-color .18s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='0 10px 26px rgba(15,23,42,.12)';this.style.borderColor='var(--accent)'" onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='var(--line)'">
+      <div style="font-weight:750;color:var(--accent);font-size:15.5px;line-height:1.35;margin-bottom:7px">How to Build an AI Agent</div>
+      <span style="display:block;color:var(--ink-soft);font-size:13.5px;line-height:1.55;margin-bottom:14px">The method behind the tool loops and failure recovery that these agentic benchmarks measure.</span>
+      <span style="margin-top:auto;color:var(--accent);font-weight:600;font-size:12.5px">Read more &rarr;</span>
+    </a>
+  </div>
+</section>
+
+
+<button id="backTop" title="Back to top" aria-label="Back to top" style="position:fixed;bottom:26px;right:22px;z-index:70;width:44px;height:44px;border-radius:99px;border:1px solid var(--line);background:var(--paper);color:var(--ink-soft);cursor:pointer;font-size:19px;box-shadow:0 4px 16px rgba(15,23,42,.16);display:none;">&#8593;</button>
+
+<script>
+(function(){
+  // ---- theme toggle ----
+  var btn = document.getElementById('themeBtn');
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('bonsai-2-5-paper-theme');
+    if (saved === 'dark') { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+  } catch(e) {}
+  if (btn) btn.addEventListener('click', function(){
+    var dark = root.getAttribute('data-theme') === 'dark';
+    if (dark) { root.removeAttribute('data-theme'); btn.innerHTML = '&#9788;'; }
+    else { root.setAttribute('data-theme','dark'); btn.innerHTML = '&#9789;'; }
+    try { localStorage.setItem('bonsai-2-5-paper-theme', dark ? 'light' : 'dark'); } catch(e) {}
+  });
+
+  // ---- scroll-spy TOC ----
+  var links = Array.prototype.slice.call(document.querySelectorAll('#tocnav a'));
+  var targets = links.map(function(a){ return document.getElementById(a.getAttribute('href').slice(1)); });
+  function onScroll(){
+    var y = window.scrollY + 120, best = 0;
+    for (var i = 0; i < targets.length; i++) {
+      if (targets[i] && targets[i].offsetTop <= y) best = i;
+    }
+    links.forEach(function(a, i){ a.classList.toggle('active', i === best); });
+    var bt = document.getElementById('backTop');
+    if (bt) bt.style.display = (window.scrollY > 900) ? 'block' : 'none';
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+
+  // ---- back to top ----
+  var backTop = document.getElementById('backTop');
+  if (backTop) backTop.addEventListener('click', function(){ window.scrollTo({ top: 0, behavior: 'smooth' }); });
+})();
+</script>
+<script src="../js/theme-switcher.js"></script>
+<script src="/js/goatcounter.js" defer></script>
+    <!-- Contact Form Tab Button -->
+    <button id="contact-tab-button" 
+            class="contact-tab-button" 
+            aria-label="Open contact form"
+            aria-expanded="false"
+            aria-controls="contact-form-panel"
+            type="button">
+        <svg class="contact-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+            <polyline points="22,6 12,13 2,6" />
+        </svg>
+        <span class="contact-text">Contact</span>
+    </button>
+
+    <!-- Contact Form Panel -->
+    <div id="contact-form-panel" 
+         class="contact-form-panel" 
+         role="dialog" 
+         aria-labelledby="contact-form-title"
+         aria-modal="true"
+         aria-hidden="true">
+        <div class="contact-form-header">
+            <h2 id="contact-form-title">Contact Us</h2>
+            <button class="contact-form-close" 
+                    aria-label="Close contact form"
+                    type="button">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18" />
+                    <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
+            </button>
+        </div>
+
+        <form id="contact-form" class="contact-form" novalidate aria-label="Contact form">
+            <div class="form-group">
+                <label for="contact-name" class="form-label">
+                    Name <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-name" 
+                       name="name"
+                       class="form-input"
+                       placeholder="Your name"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-name-error">
+                <div id="contact-name-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-email" class="form-label">
+                    Email <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="email" 
+                       id="contact-email" 
+                       name="email"
+                       class="form-input"
+                       placeholder="your.email@example.com"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-email-error">
+                <div id="contact-email-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-subject" class="form-label">
+                    Subject <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <input type="text" 
+                       id="contact-subject" 
+                       name="subject"
+                       class="form-input"
+                       placeholder="What is this about?"
+                       required
+                       aria-required="true"
+                       aria-describedby="contact-subject-error">
+                <div id="contact-subject-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <div class="form-group">
+                <label for="contact-message" class="form-label">
+                    Message <span class="required-indicator" aria-label="required">*</span>
+                </label>
+                <textarea id="contact-message" 
+                          name="message"
+                          class="form-input form-textarea"
+                          rows="6"
+                          placeholder="Your message..."
+                          required
+                          aria-required="true"
+                          aria-describedby="contact-message-error"></textarea>
+                <div id="contact-message-error" 
+                     class="form-error" 
+                     role="alert"
+                     aria-live="polite"></div>
+            </div>
+
+            <button type="submit" class="form-submit" aria-label="Send message">
+                <span class="btn-text">Send Message</span>
+                <svg class="btn-spinner" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="display: none;">
+                    <circle cx="12" cy="12" r="10" opacity="0.25" />
+                    <path d="M12 2a10 10 0 0 1 10 10" opacity="0.75" />
+                </svg>
+            </button>
+        </form>
+
+        <div class="contact-form-status" role="status" aria-live="polite" aria-atomic="true"></div>
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="../js/components/contact-form.js"></script>
+    <script>
+        // Initialize contact form
+        document.addEventListener('DOMContentLoaded', () => {
+            new ContactForm();
+        });
+    </script>
+
+    <!-- Floating Instagram Button - Always Visible -->
+    <a href="https://www.instagram.com/nazary.ai" class="floating-instagram-btn" rel="noopener" target="_blank" aria-label="Connect with me on Instagram" title="Connect with me on Instagram" style="position: fixed; bottom: 24px; right: 24px; display: flex; align-items: center; gap: 12px; padding: 14px 24px; background: linear-gradient(135deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: white; text-decoration: none; border-radius: 50px; font-size: 0.9rem; font-weight: 600; box-shadow: 0 8px 24px rgba(225, 48, 108, 0.4); z-index: 1000; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border: 2px solid rgba(255, 255, 255, 0.2);">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+            <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+            <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+        </svg>
+        <span style="color: white; font-weight: 600; white-space: nowrap;">Connect with me on Instagram</span>
+    </a>
+</body>
+</html>
